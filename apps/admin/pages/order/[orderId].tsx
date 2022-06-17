@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Center,
-  Divider,
   Heading,
   Link,
   Spinner,
@@ -14,7 +13,6 @@ import {
 } from '@chakra-ui/react';
 import { SellerOrderCancelRequestStatus } from '@prisma/client';
 import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
-import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import {
   useAdminOneOrderCancelRequest,
@@ -39,43 +37,37 @@ export function OrderCancelRequestDetail(): JSX.Element {
       changeDoneFlag.mutateAsync({
         requestId: orderCancelRequest.data.id,
       });
-      toast({
-        title: '처리 완료',
-        status: 'success',
-      });
+      toast({ title: '처리 완료', status: 'success' });
       router.back();
     } catch (error) {
       console.error(error);
-      toast({
-        title: '처리 실패',
-        status: 'error',
-      });
+      toast({ title: '처리 실패', status: 'error' });
     }
   };
 
-  // if (orderCancelRequest.isLoading || fmOrder.isLoading) {
-  //   return (
-  //     <AdminPageLayout>
-  //       <Center>
-  //         <Spinner />
-  //       </Center>
-  //     </AdminPageLayout>
-  //   );
-  // }
-  // if (!orderCancelRequest.data || !fmOrder.data) {
-  //   return (
-  //     <AdminPageLayout>
-  //       <Button
-  //         size="sm"
-  //         leftIcon={<ChevronLeftIcon />}
-  //         onClick={() => router.push('/order-cancel')}
-  //       >
-  //         목록으로
-  //       </Button>
-  //       <Text>...no data</Text>
-  //     </AdminPageLayout>
-  //   );
-  // }
+  if (orderCancelRequest.isLoading) {
+    return (
+      <AdminPageLayout>
+        <Center>
+          <Spinner />
+        </Center>
+      </AdminPageLayout>
+    );
+  }
+  if (!orderCancelRequest.data) {
+    return (
+      <AdminPageLayout>
+        <Button
+          size="sm"
+          leftIcon={<ChevronLeftIcon />}
+          onClick={() => router.push('/order-cancel')}
+        >
+          목록으로
+        </Button>
+        <Text>...no data</Text>
+      </AdminPageLayout>
+    );
+  }
 
   return (
     <AdminPageLayout>

@@ -1,38 +1,25 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Skeleton,
-  SkeletonCircle,
-  SkeletonText,
-  Stack,
-  Text,
-  useColorModeValue,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Button, Center, Flex, Stack, Text } from '@chakra-ui/react';
+import { OrderItemOption, OrderShipping } from '@prisma/client';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
+import { OrderDetailActions } from '@project-lc/components-seller/kkshow-order/OrderDetailActions';
+import { OrderDetailCancelInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailCancelInfo';
+import { OrderDetailExchangeInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExchangeInfo';
+import { OrderDetailExportInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExportInfo';
+import { OrderDetailReturnInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailReturnInfo';
+import { OrderDetailSummary } from '@project-lc/components-seller/kkshow-order/OrderDetailSummary';
+import { OrderDetailTitle } from '@project-lc/components-seller/kkshow-order/OrderDetailTitle';
+import { OrderExchangeReturnCancelExistsAlert } from '@project-lc/components-seller/kkshow-order/OrderExchangeReturnCancelExistsAlert';
 import { OrderDetailDeliveryInfo } from '@project-lc/components-seller/OrderDetailDeliveryInfo';
-import { OrderDetailGoods } from '@project-lc/components-seller/OrderDetailGoods';
 import { OrderDetailOptionList } from '@project-lc/components-seller/OrderDetailOptionList';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
+import { OrderItemOptionInfo } from '@project-lc/components-shared/order/OrderItemOptionInfo';
 import { useDisplaySize, useOrderDetail } from '@project-lc/hooks';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
-import React, { useMemo } from 'react';
-import { OrderDetailTitle } from '@project-lc/components-seller/kkshow-order/OrderDetailTitle';
-import { OrderDetailActions } from '@project-lc/components-seller/kkshow-order/OrderDetailActions';
-import { OrderDetailSummary } from '@project-lc/components-seller/kkshow-order/OrderDetailSummary';
-import { OrderItemOptionInfo } from '@project-lc/components-shared/order/OrderItemOptionInfo';
-import { OrderDetailReturnInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailReturnInfo';
-import { OrderDetailExchangeInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExchangeInfo';
-import { OrderDetailCancelInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailCancelInfo';
-import { OrderDetailExportInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExportInfo';
-import { OrderExchangeReturnCancelExistsAlert } from '@project-lc/components-seller/kkshow-order/OrderExchangeReturnCancelExistsAlert';
-import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
-import { OrderItemOption, OrderShipping } from '@prisma/client';
+import { useMemo } from 'react';
 
 const exchangeSectionTitle = '교환(재배송) 정보';
 const returnSectionTitle = '반품(환불) 정보';

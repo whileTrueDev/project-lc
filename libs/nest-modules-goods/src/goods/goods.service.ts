@@ -375,6 +375,7 @@ export class GoodsService {
             name: true,
             avatar: true,
             email: true,
+            agreementFlag: true,
             sellerShop: {
               select: {
                 shopName: true,
