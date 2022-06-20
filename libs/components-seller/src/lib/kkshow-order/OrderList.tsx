@@ -315,13 +315,12 @@ export function OrderToolbar({ options }: OrderToolbarProps): JSX.Element {
               내보내기
             </Button>
 
-            {/* // TODO: 내보내기 기능(스프레드시트) 사용할 수 있게 만들기(fmOrderRes와 OrderDetailRes 타입이 달라서 수정이 필요) */}
-            {/* {orderDownloadDialog.isOpen && (
+            {orderDownloadDialog.isOpen && (
               <OrderListDownloadDialog
                 isOpen={orderDownloadDialog.isOpen}
                 onClose={orderDownloadDialog.onClose}
               />
-            )} */}
+            )}
           </>
         )}
       </Stack>
