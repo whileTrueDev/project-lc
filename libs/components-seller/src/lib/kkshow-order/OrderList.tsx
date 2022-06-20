@@ -27,7 +27,7 @@ import NextLink from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaTruck } from 'react-icons/fa';
 import ExportManyDialog from '../ExportManyDialog';
-import OrderListDownloadDialog from '../OrderListDownloadDialog';
+import OrderListDownloadDialog from './OrderListDownloadDialog';
 
 const columns: GridColumns = [
   {
