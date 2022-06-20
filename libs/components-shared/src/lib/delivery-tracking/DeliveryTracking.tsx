@@ -109,7 +109,7 @@ export function DeliveryTrackingButton({
       <Alert status="warning" mb={4} maxW={400} fontSize="sm">
         <AlertIcon />
         <AlertDescription>
-          <Text>죄송합니다 배송 조회 기능이 아직 개발중입니다.</Text>
+          <Text>죄송합니다. 배송 조회 기능이 아직 개발중입니다.</Text>
           <Text>
             택배사와 송장번호를 검색하거나 해당 택배사 홈페이지에서 확인하시기 바랍니다.
           </Text>
