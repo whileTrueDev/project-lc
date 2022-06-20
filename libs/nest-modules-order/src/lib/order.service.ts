@@ -16,7 +16,6 @@ import {
   CreateOrderShippingData,
   FindAllOrderByBroadcasterRes,
   FindManyDto,
-  FmOrderStatusNumString,
   GetNonMemberOrderDetailDto,
   GetOneOrderDetailDto,
   GetOrderListDto,
@@ -28,6 +27,7 @@ import {
   OrderPurchaseConfirmationDto,
   OrderShippingCheckDto,
   OrderStatsRes,
+  OrderStatusNumString,
   sellerOrderSteps,
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
@@ -375,13 +375,12 @@ export class OrderService {
 
   /** '15' 와 같은 stringNumber로 orderReceived와 같은  OrderProcessStep 값 리턴 */
   private getStepNameByStringNumber(
-    stringNumber: FmOrderStatusNumString,
+    stringNumber: OrderStatusNumString,
   ): OrderProcessStep {
     return getOrderProcessStepNameByStringNumber(stringNumber);
   }
 
   /** 판매자의 주문조회시 주문에 포함된 판매자의 상품옵션의 상태에 따라 표시될 주문의 상태 구하는 함수
-   * (FmOrderService 의 getOrderRealStep와 같은 로직 )
    */
   private getOrderRealStep(
     originOrderStep: OrderProcessStep,
@@ -400,7 +399,7 @@ export class OrderService {
     // 원 주문 상태가 부분000 일때
     if (isPartialStep) {
       // 5를 더해 "부분" 상태를 제거한 상태
-      const nonPartialStep = String(originOrderStepNum + 5) as FmOrderStatusNumString;
+      const nonPartialStep = String(originOrderStepNum + 5) as OrderStatusNumString;
       // 옵션들 모두가 "부분" 상태를 제거한 상태만 있는 지 확인, 그렇다면 "부분" 상태를 제거한 상태를 반환
       if (
         sellerGoodsOrderItemOptions.every(
@@ -419,7 +418,7 @@ export class OrderService {
     ) {
       const maxOptionStepStrNum = Math.max(
         ...sellerGoodsOrderItemOptions.map((io) => Number(orderProcessStepDict[io.step])),
-      ).toString() as FmOrderStatusNumString;
+      ).toString() as OrderStatusNumString;
 
       return this.getStepNameByStringNumber(maxOptionStepStrNum);
     }
@@ -528,6 +527,7 @@ export class OrderService {
         exchanges: { include: { exchangeItems: true } },
         returns: { include: { items: true } },
         orderCancellations: { include: { items: true } },
+        shippings: { include: { items: { include: { options: true } } } },
         sellerSettlementItems: {
           select: {
             liveShopping: {
@@ -541,7 +541,6 @@ export class OrderService {
             },
           },
         },
-        shippings: { include: { items: true } },
       },
     });
 
@@ -740,9 +739,7 @@ export class OrderService {
           orderItemOptions.map((opt) => {
             return this.prisma.orderItemOption.update({
               where: { id: opt.id },
-              data: {
-                step: rest.step,
-              },
+              data: { step: rest.step },
             });
           }),
         );
@@ -865,6 +862,7 @@ export class OrderService {
       });
       return { ...orderData, orderItems: sellerGoodsOrderItems };
     });
+
     // 판매자 상품인 주문상품옵션의 상태에 기반한 주문상태 표시
     const ordersWithRealStep = ordersWithFilteredItems.map((order) => {
       const { orderItems, step, ...orderData } = order;
@@ -872,11 +870,7 @@ export class OrderService {
         step,
         orderItems.flatMap((item) => item.options),
       );
-      return {
-        ...orderData,
-        step: newStep,
-        orderItems,
-      };
+      return { ...orderData, step: newStep, orderItems };
     });
     // 주문상태별 개수 카운트
     const orderStats = {

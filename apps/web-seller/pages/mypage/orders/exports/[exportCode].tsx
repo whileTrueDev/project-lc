@@ -1,4 +1,4 @@
-import { Box, Button, Center, Stack, Text } from '@chakra-ui/react';
+import { Box, Button, Center, Link, Stack, Text } from '@chakra-ui/react';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
 import { ExportDetailSummary } from '@project-lc/components-seller/ExportDetailSummary';
 import { ExportDetailTitle } from '@project-lc/components-seller/ExportDetailTitle';
@@ -6,13 +6,12 @@ import { DeliveryTrackingList } from '@project-lc/components-shared/delivery-tra
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
 import { useExportByCode } from '@project-lc/hooks';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
 
 export default function ExportsDetail(): JSX.Element {
   const router = useRouter();
   const exportCode = router.query.exportCode as string;
-
   const exp = useExportByCode(exportCode, { enabled: !!exportCode });
 
   if (exp.isLoading) {
@@ -52,6 +51,20 @@ export default function ExportsDetail(): JSX.Element {
         <Box as="section">
           <ExportDetailSummary exportData={exp.data} />
         </Box>
+
+        <SectionWithTitle title="합포장 출고 정보">
+          <Stack>
+            {exp.data.bundleExports.map((bundle) => (
+              <Box key={bundle.exportCode}>
+                <NextLink passHref href={`/mypage/orders/exports/${bundle.exportCode}`}>
+                  <Link color="blue.500" fontSize="sm">
+                    {bundle.exportCode}
+                  </Link>
+                </NextLink>
+              </Box>
+            ))}
+          </Stack>
+        </SectionWithTitle>
 
         <SectionWithTitle title="출고 주문 정보">
           <Stack spacing={4}>

@@ -15,7 +15,9 @@ export function ExportDetailTitle({ exportData }: ExportDetailTitleProps): JSX.E
         <OrderStatusBadge step={exportData.status} />
         {/* 구매확정 배지 */}
         {exportData.buyConfirmDate && exportData.buyConfirmSubject ? (
-          <Badge colorScheme="green">구매확정됨</Badge>
+          <Box>
+            <Badge colorScheme="green">구매확정됨</Badge>
+          </Box>
         ) : null}
         <TextDotConnector />
         <Text>{dayjs(exportData.exportDate).fromNow()} 출고</Text>

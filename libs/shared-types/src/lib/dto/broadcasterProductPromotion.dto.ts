@@ -1,10 +1,4 @@
-import { IsInt, IsNumber, IsOptional } from 'class-validator';
-
-/** @deprecated */
-export class broadcasterProductPromotionDto {
-  /** @deprecated */
-  @IsInt() fmGoodsSeq: number;
-}
+import { IsNumber, IsOptional } from 'class-validator';
 
 /**  방송홍보 레코드 생성 dto */
 export class CreateProductPromotionDto {

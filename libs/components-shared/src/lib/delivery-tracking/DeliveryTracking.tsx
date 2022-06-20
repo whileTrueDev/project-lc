@@ -11,14 +11,14 @@ import {
 } from '@chakra-ui/react';
 import { Order } from '@prisma/client';
 import { useExports } from '@project-lc/hooks';
-import { ExportRes } from '@project-lc/shared-types';
+import { ExportListItem } from '@project-lc/shared-types';
 import { deliveryCompanies, getLocaleNumber } from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
 import { FaShippingFast } from 'react-icons/fa';
 import { OrderStatusBadge } from '../order/OrderStatusBadge';
 
 export interface DeliveryTrackingProps {
-  exportData: ExportRes;
+  exportData: ExportListItem;
 }
 export function DeliveryTracking({ exportData }: DeliveryTrackingProps): JSX.Element {
   return (
@@ -142,11 +142,11 @@ export function DeliveryTrackingList({
   orderCode,
 }: DeliveryTrackingListProps): JSX.Element {
   const exportsData = useExports(
-    { orderCode: orderCode || undefined },
+    { orderCode: orderCode || '' },
     { enabled: !!orderCode },
   );
   return (
-    <Box mt={4}>
+    <Box mt={4} mb={40}>
       {exportsData.data?.list.map((exp) => (
         <DeliveryTracking key={exp.exportCode} exportData={exp} />
       ))}

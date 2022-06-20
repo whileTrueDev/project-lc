@@ -1,12 +1,12 @@
-import { Link, Text, Box } from '@chakra-ui/react';
-import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { useAdminOrderList } from '@project-lc/hooks';
-import { GridColumns, GridRowData, GridToolbar, GridRowId } from '@material-ui/data-grid';
+import { Box, Link, Text } from '@chakra-ui/react';
+import { GridColumns, GridRowData, GridRowId, GridToolbar } from '@material-ui/data-grid';
 import { OrderProcessStep } from '@prisma/client';
+import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
+import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
+import { useAdminOrderList } from '@project-lc/hooks';
+import { useSellerOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
-import { KkshowOrderStatusBadge } from '@project-lc/components-shared/KkshowOrderStatusBadge';
-import { useSellerOrderStore } from '@project-lc/stores';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 const columns: GridColumns = [
@@ -49,7 +49,7 @@ const columns: GridColumns = [
     headerName: '주문상태',
     renderCell: ({ row }) => (
       <Box lineHeight={2}>
-        <KkshowOrderStatusBadge orderStatus={row.step as OrderProcessStep} />
+        <OrderStatusBadge step={row.step as OrderProcessStep} />
       </Box>
     ),
   },
@@ -140,11 +140,13 @@ export function AdminOrderList(): JSX.Element {
       onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
       rows={data?.orders || []}
       minH={500}
+      autoHeight
       loading={isLoading}
       disableSelectionOnClick
       pageSize={pageSize}
       pagination
       rowCount={rowCountState}
+      density="compact"
       paginationMode="server"
       onPageChange={handlePageChange}
     />

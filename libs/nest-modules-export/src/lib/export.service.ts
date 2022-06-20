@@ -219,11 +219,20 @@ export class ExportService {
       );
     }
 
+    let bundleExports = [];
+    if (exportData.bundleExportCode) {
+      const bundleData = await this.prisma.export.findMany({
+        where: { bundleExportCode: exportData.bundleExportCode },
+      });
+      bundleExports = bundleData;
+    }
+
     const { items, ...rest } = exportData;
 
     return {
       ...rest,
       items: this.exportItemsToResDataType(items),
+      bundleExports,
     };
   }
 
@@ -250,10 +259,7 @@ export class ExportService {
   public async getExportList(dto: FindExportListDto): Promise<ExportListRes> {
     const { sellerId, orderCode, skip, take } = dto;
 
-    const where: Prisma.ExportWhereInput = sellerId
-      ? { sellerId, order: { orderCode } }
-      : undefined;
-
+    const where: Prisma.ExportWhereInput = { sellerId, order: { orderCode } };
     const totalCount = await this.prisma.export.count({ where });
     const data = await this.prisma.export.findMany({
       where,
@@ -276,15 +282,8 @@ export class ExportService {
     // 리턴타입에 맞게 주문상품 형태 변경
     const list = data.map((d) => {
       const { items, ...rest } = d;
-
-      return {
-        ...rest,
-        items: this.exportItemsToResDataType(items),
-      };
+      return { ...rest, items: this.exportItemsToResDataType(items) };
     });
-    return {
-      list,
-      totalCount,
-    };
+    return { list, totalCount };
   }
 }

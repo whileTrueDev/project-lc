@@ -1,9 +1,8 @@
 import { OrderItemOption } from '@prisma/client';
 import { SummaryList } from '@project-lc/components-core/SummaryList';
 import { OrderDetailRes, OrderItemWithRelations } from '@project-lc/shared-types';
-import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
-import { FaBoxOpen, FaShippingFast, FaShoppingBag, FaUser } from 'react-icons/fa';
+import { FaBoxOpen, FaShoppingBag, FaUser } from 'react-icons/fa';
 import { MdDateRange } from 'react-icons/md';
 
 export interface OrderDetailSummaryProps {
@@ -35,12 +34,6 @@ export function OrderDetailSummary({ order }: OrderDetailSummaryProps): JSX.Elem
           icon: FaBoxOpen,
           value: `수령자 ${order.recipientName}`,
         },
-        // 크크쇼 주문테이블에는 주문환경 저장하지 않음
-        // {
-        //   id: '주문환경',
-        //   icon: AiTwotoneEnvironment,
-        //   value: `${convertOrderSitetypeToString(order.sitetype)}에서 주문`,
-        // },
         {
           disabled: !(totalType || totalEa),
           id: '총 주문 종류 및 수량',

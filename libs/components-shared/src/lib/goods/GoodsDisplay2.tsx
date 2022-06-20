@@ -7,9 +7,8 @@ import {
   Seller,
   SellerShop,
 } from '@prisma/client';
-import { orderProcessStepDict } from '@project-lc/shared-types';
 import NextLink from 'next/link';
-import FmOrderStatusBadge from '../FmOrderStatusBadge';
+import { OrderStatusBadge } from '../order/OrderStatusBadge';
 
 export interface GoodsDisplay2Props {
   goods: {
@@ -87,9 +86,7 @@ export function GoodsDisplay2({
               <Text fontSize="sm">
                 {opt.value}, {opt.quantity} 개
               </Text>
-              {opt.step && (
-                <FmOrderStatusBadge orderStatus={orderProcessStepDict[opt.step]} />
-              )}
+              {opt.step && <OrderStatusBadge step={opt.step} />}
             </Flex>
           ))}
 

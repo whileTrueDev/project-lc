@@ -88,33 +88,9 @@ export class ProductPromotionService {
     return data;
   }
 
-  /** @deprecated */
-  public async checkIsPromotionProductFmGoodsSeq(fmGoodsSeq: number): Promise<boolean> {
-    const productPromotionFmGoodsSeq = await this.prisma.productPromotion.findFirst({
-      where: {
-        fmGoodsSeq: Number(fmGoodsSeq),
-      },
-    });
-    if (productPromotionFmGoodsSeq) return true;
-    return false;
-  }
-
   /**
-   * @deprecated
-   * 전달받은 fmGoodsSeq 배열에 해당하는 '상품홍보' 목록 조회
-   * @param fmGoodsSeqs 퍼스트몰 상품 고유번호 fmGoodsSeq 배열 (productPromotion.fmGoodsSeq)
-   */
-  public async _findProductPromotionsByGoodsIds(
-    fmGoodsSeqs: number[],
-  ): Promise<ProductPromotion[]> {
-    const _fmGoodsSeqs = fmGoodsSeqs.map((s) => Number(s)).filter((x) => !!x);
-    return this.prisma.productPromotion.findMany({
-      where: { fmGoodsSeq: { in: _fmGoodsSeqs } },
-    });
-  }
-
-  /**
-   * goodsId에 해당하는 상품홍보 목록 조회
+   * 전달받은 goodsIds 배열에 해당하는 '상품홍보' 목록 조회
+   * @param goodsIds 상품 고유번호 GoodsId 배열 (productPromotion.goodsId)
    */
   public async findProductPromotionsByGoodsIds(
     goodsIds: Goods['id'][],

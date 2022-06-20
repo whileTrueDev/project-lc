@@ -1,11 +1,7 @@
-import { OrderShipping, OrderItem, OrderItemOption } from '@prisma/client';
-import {
-  convertFmOrderStatusToString,
-  OrderDetailRes,
-  orderProcessStepDict,
-} from '@project-lc/shared-types';
+import { OrderItem, OrderItemOption, OrderShipping } from '@prisma/client';
+import { getOrderStatusKrString, OrderDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { WorkBook, WorkSheet, CellObject, ColInfo, RowInfo, Range } from 'xlsx';
+import { CellObject, ColInfo, Range, RowInfo, WorkBook, WorkSheet } from 'xlsx';
 import { SpreadSheetGenerator } from './spreadSheetGenerator';
 
 export interface OrderSpreadSheetColumnOption {
@@ -138,8 +134,7 @@ export const defaultColumOpts: OrderSpreadSheetColumnOption[] = [
   {
     type: '상품정보',
     headerName: '상태',
-    getValue: (_, __, ___, opt) =>
-      opt ? convertFmOrderStatusToString(orderProcessStepDict[opt.step]) : '-',
+    getValue: (_, __, ___, opt) => (opt ? getOrderStatusKrString(opt.step) : '-'),
   },
   {
     type: '상품정보',
@@ -187,8 +182,8 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailR
   protected getSheetRef(orders: OrderDetailRes[]): string {
     const lengthOfRows = orders.reduce((prev, curr) => {
       let num = 0;
-      curr.shippings.forEach((ship) => {
-        ship.items.forEach((item) => {
+      curr.shippings.forEach((ship: any) => {
+        ship.items.forEach((item: any) => {
           item.options.forEach(() => {
             num += 1;
           });

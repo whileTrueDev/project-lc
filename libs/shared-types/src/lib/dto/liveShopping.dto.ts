@@ -122,8 +122,6 @@ export type LiveShoppingsWithBroadcasterAndGoodsName = Pick<
     goods_name: string;
   };
 };
-/** @deprecated */
-export type LiveShoppingFmGoodsSeq = Pick<LiveShopping, 'fmGoodsSeq'>;
 
 export type LiveShoppingId = Pick<LiveShopping, 'id'>;
 

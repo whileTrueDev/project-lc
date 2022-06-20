@@ -41,6 +41,25 @@ const dummyOrderItemData = [
   },
 ];
 
+const dummyOrderItemOptionData = [
+  {
+    name: '맛',
+    value: '매운맛',
+    quantity: 1,
+    normalPrice: 5000,
+    discountPrice: 4000,
+    goodsOptionId: 1,
+  },
+  {
+    name: '맛',
+    value: '순한맛',
+    quantity: 1,
+    normalPrice: 5000,
+    discountPrice: 4000,
+    goodsOptionId: 2,
+  },
+];
+
 type CreateDummyOrderOpts = DummyOrderFundamentalDataProps & {
   withSupportData?: boolean;
 };
@@ -61,6 +80,17 @@ export const createDummyOrder = async ({
         orderCode,
         step,
       }),
+      shippings: {
+        create: [
+          {
+            shippingCost: '2500',
+            shippingCostPayType: 'prepay',
+            shippingGroupId: 1,
+            shippingMethod: 'delivery',
+            shippingSetId: 1,
+          },
+        ],
+      },
     },
   });
 
@@ -92,6 +122,21 @@ export const createDummyOrder = async ({
     },
   });
 
+  const foundedOrderShipping = await prisma.orderShipping.findFirst({
+    where: { orderId: order.id },
+  });
+  await prisma.order.update({
+    where: { id: order.id },
+    data: {
+      orderItems: {
+        updateMany: {
+          where: { orderId: order.id },
+          data: { orderShippingId: foundedOrderShipping?.id },
+        },
+      },
+    },
+  });
+
   const orderItemOption = await prisma.orderItemOption.create({
     data: {
       orderItem: { connect: { id: orderItem.id } },
@@ -112,29 +157,190 @@ export const createDummyOrder = async ({
   };
 };
 
-export const normalOrder = {
+export const normalOrder: Prisma.OrderCreateInput = {
+  customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
     orderCode: 'dummy-order-1-asdfasd',
   }),
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
+  orderItems: {
+    create: [
+      {
+        ...dummyOrderItemData[0],
+        options: dummyOrderItemOptionData,
+      },
+    ].map((item) => {
+      const { options, ...rest } = item;
+      return {
+        ...rest,
+        options: { create: options },
+      };
+    }),
+  },
 };
 
-export const purchaseConfirmedOrder = {
+export const nonMemberOrder: Prisma.OrderCreateInput = {
+  ...getDummyOrderFundamentalData({
+    orderCode: 'nonmember-order-dummy',
+  }),
+  nonMemberOrderFlag: true,
+  nonMemberOrderPassword: 'test',
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
+  orderItems: {
+    create: [
+      {
+        ...dummyOrderItemData[0],
+        options: dummyOrderItemOptionData,
+      },
+    ].map((item) => {
+      const { options, ...rest } = item;
+      return {
+        ...rest,
+        options: { create: options },
+      };
+    }),
+  },
+};
+
+export const purchaseConfirmedOrder: Prisma.OrderCreateInput = {
   ...normalOrder,
   orderCode: 'dummy-order-2-qwer',
   step: 'purchaseConfirmed' as const,
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
+  orderItems: {
+    create: [
+      {
+        ...normalOrder.orderItems.create[0],
+        goodsId: 2,
+        options: {
+          create: [
+            {
+              ...normalOrder.orderItems.create[0].options.create[0],
+              step: 'purchaseConfirmed' as const,
+            },
+            {
+              ...normalOrder.orderItems.create[0].options.create[1],
+              step: 'purchaseConfirmed' as const,
+            },
+          ],
+        },
+      },
+    ],
+  },
 };
 
-export const shippingDoneOrder = {
+export const shippingDoneOrder: Prisma.OrderCreateInput = {
   ...normalOrder,
   orderCode: 'dummy-order-3-zxcv',
   step: 'shippingDone' as const,
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
+  orderItems: {
+    create: [
+      {
+        ...normalOrder.orderItems.create[0],
+        goodsId: 2,
+        options: {
+          create: [
+            {
+              ...normalOrder.orderItems.create[0].options.create[0],
+              step: 'shippingDone' as const,
+            },
+            {
+              ...normalOrder.orderItems.create[0].options.create[1],
+              step: 'shippingDone' as const,
+            },
+          ],
+        },
+      },
+    ],
+  },
 };
 
-export const orderExportReady = {
+export const orderExportReady: Prisma.OrderCreateInput = {
+  customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
     orderCode: 'orderExportReady-for-exchange-return',
     step: 'exportReady',
   }),
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
+  orderItems: {
+    create: [
+      {
+        ...dummyOrderItemData[0],
+        options: [
+          {
+            ...dummyOrderItemOptionData[0],
+            step: 'exportReady' as const,
+          },
+        ],
+      },
+      {
+        ...dummyOrderItemData[1],
+        options: [
+          {
+            ...dummyOrderItemOptionData[1],
+            step: 'exportReady' as const,
+          },
+        ],
+      },
+    ].map((item) => {
+      const { options, ...rest } = item;
+      return {
+        ...rest,
+        options: { create: options },
+      };
+    }),
+  },
 };
 
 export const createDummyOrderWithCancellation = async (): Promise<void> => {
@@ -284,21 +490,32 @@ export const createDummyOrderWithSupport = async (): Promise<void> => {
   });
 };
 
+async function connectDummyOrderToOrderShipping(orderId: number): Promise<void> {
+  const orderShipping = await prisma.orderShipping.findFirst({
+    where: { orderId },
+  });
+  await prisma.order.update({
+    where: { id: orderId },
+    data: {
+      orderItems: {
+        updateMany: {
+          where: { orderId },
+          data: { orderShippingId: orderShipping?.id },
+        },
+      },
+    },
+  });
+}
+
 export const createDummyOrderData = async (): Promise<void> => {
-  await createDummyOrder({
-    orderCode: normalOrder.orderCode,
-    step: normalOrder.step,
-  });
-  await createDummyOrder({
-    orderCode: purchaseConfirmedOrder.orderCode,
-    step: purchaseConfirmedOrder.step,
-  });
-  await createDummyOrder({
-    orderCode: shippingDoneOrder.orderCode,
-    step: shippingDoneOrder.step,
-  });
-  await createDummyOrder({
-    orderCode: orderExportReady.orderCode,
-    step: orderExportReady.step,
-  });
+  const order1 = await prisma.order.create({ data: normalOrder });
+  await connectDummyOrderToOrderShipping(order1.id);
+  const order2 = await prisma.order.create({ data: nonMemberOrder });
+  await connectDummyOrderToOrderShipping(order2.id);
+  const order3 = await prisma.order.create({ data: purchaseConfirmedOrder });
+  await connectDummyOrderToOrderShipping(order3.id);
+  const order4 = await prisma.order.create({ data: shippingDoneOrder });
+  await connectDummyOrderToOrderShipping(order4.id);
+  const order5 = await prisma.order.create({ data: orderExportReady });
+  await connectDummyOrderToOrderShipping(order5.id);
 };
