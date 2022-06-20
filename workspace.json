@@ -438,29 +438,6 @@
       },
       "tags": []
     },
-    "firstmall-db": {
-      "root": "libs/firstmall-db",
-      "sourceRoot": "libs/firstmall-db/src",
-      "projectType": "library",
-      "targets": {
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/firstmall-db/**/*.ts"]
-          },
-          "outputs": ["{options.outputFile}"]
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/firstmall-db"],
-          "options": {
-            "jestConfig": "libs/firstmall-db/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      },
-      "tags": []
-    },
     "hooks": {
       "root": "libs/hooks",
       "sourceRoot": "libs/hooks/src",

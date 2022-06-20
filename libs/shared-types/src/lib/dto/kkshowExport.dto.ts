@@ -33,9 +33,7 @@ export class CreateKkshowExportDto {
   orderId: Order['id'];
 
   @IsString()
-  /** 택배사 : 택배사 코드(fmDeliveryCompanies)
-   * 택배사명을 저장할지, 택배사 코드를 저장할지..?? 택배사 관련해서 회사명 이외에 저장해야 할 정보가 있을 수도 있어서 택배사 코드를 저장하는게 좋겠다
-   */
+  /** 택배사 : 택배사 코드() */
   deliveryCompany: string;
 
   @IsString()

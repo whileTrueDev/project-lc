@@ -8,6 +8,7 @@ export interface GoodsDetailInfoProps {
   goods: GoodsByIdRes;
 }
 export function GoodsDetailInfo({ goods }: GoodsDetailInfoProps): JSX.Element {
+  console.log('goods.informationNotice.contents: ', goods.informationNotice.contents);
   return (
     <Stack>
       <Box>

@@ -144,7 +144,7 @@ export interface FindAllOrderByBroadcaster {
     id: OrderItem['id'];
     channel: SellType;
     review: GoodsReview | null;
-    support: OrderItemSupport;
+    support?: OrderItemSupport;
     goods: {
       goods_name: Goods['goods_name'];
       image: GoodsImages[];

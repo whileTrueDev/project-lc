@@ -1,11 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { LiveShopping } from '@prisma/client';
 import { UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
-  LiveShoppingFmGoodsSeq,
-  LiveShoppingId,
   FindLiveShoppingDto,
+  LiveShoppingId,
   LiveShoppingRegistDTO,
   LiveShoppingsWithBroadcasterAndGoodsName,
   LiveShoppingWithGoods,
@@ -142,26 +140,6 @@ export class LiveShoppingService {
     });
   }
 
-  /**
-   * @deprecated
-   * @author m'baku
-   * @description 해당 방송인에게 매칭된 모든 라이브 쇼핑에 연결된 상품들의 fmGoodsSeq 반환받는다
-   * @param broadcasterId
-   * @returns fmGoodsSeq
-   */
-  async getFmGoodsSeqsLinkedToLiveShoppings(
-    broadcasterId: number,
-  ): Promise<LiveShoppingFmGoodsSeq[]> {
-    const fmGoodsSeqs = await this.prisma.liveShopping.findMany({
-      where: {
-        broadcasterId: broadcasterId ? Number(broadcasterId) : undefined,
-      },
-      select: { fmGoodsSeq: true },
-    });
-
-    return fmGoodsSeqs;
-  }
-
   async getLiveShoppingsForOverlayController(): Promise<
     LiveShoppingsWithBroadcasterAndGoodsName[]
   > {
@@ -197,32 +175,6 @@ export class LiveShoppingService {
       },
       select: { id: true },
       orderBy: { broadcastEndDate: 'asc' },
-    });
-  }
-
-  /**
-   * @deprecated
-   * 특정 라이브 쇼핑의 현황(응원메시지 데이터) 조회 - 생성일 내림차순 조회(최신순)
-   * @param liveShoppingId 라이브쇼핑 고유id
-   */
-  /** 해당 fmGoodsSeq가 라이브쇼핑에 등록되어 있으면 true를 반환 */
-  async checkIsLiveShoppingFmGoodsSeq(fmGoodsSeq: number): Promise<boolean> {
-    const liveShoppingFmGoodsSeq = await this.prisma.liveShopping.findFirst({
-      where: { fmGoodsSeq: Number(fmGoodsSeq) },
-    });
-    if (liveShoppingFmGoodsSeq) return true;
-    return false;
-  }
-
-  /**
-   * @deprecated
-   * 전달된 fmGoodsSeq 배열에 해당하는 라이브쇼핑 목록 정보 조회
-   * @param fmGoodsSeqs 퍼스트몰 상품 고유번호 fmGoodsSeq 배열 (liveShopping.fmGoodsSeq)
-   */
-  async findLiveShoppingsByGoodsIds(fmGoodsSeqs: number[]): Promise<LiveShopping[]> {
-    const _fmGoodsSeqs = fmGoodsSeqs.map((s) => Number(s)).filter((x) => !!x);
-    return this.prisma.liveShopping.findMany({
-      where: { fmGoodsSeq: { in: _fmGoodsSeqs } },
     });
   }
 }
