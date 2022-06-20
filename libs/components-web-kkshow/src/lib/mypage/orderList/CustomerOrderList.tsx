@@ -132,7 +132,7 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
   const orderDataBgColor = useColorModeValue('white', 'gray.800');
   const router = useRouter();
   const handleDetailClick = (): void => {
-    router.push(`${router.asPath}/${order.orderCode}`);
+    router.push(`/mypage/orders/${order.orderCode}`);
   };
   return (
     <Stack borderWidth="1px" borderRadius="md" p={1} boxShadow="md" bg={orderDataBgColor}>

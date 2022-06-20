@@ -74,6 +74,7 @@ export const useReviewCreateMutation = (): UseMutationResult<
         queryClient.invalidateQueries(ORDERITEM_REVIEW_NEEDED_QUERY_KEY);
         // 내 주문목록 캐시 초기화
         queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
+        queryClient.invalidateQueries('OrderDetail'); // 주문 상세 초기화
       },
     },
   );
