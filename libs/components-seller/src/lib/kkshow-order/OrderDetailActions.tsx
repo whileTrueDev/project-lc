@@ -91,6 +91,7 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps): JSX.Elem
           </Button>
         )}
       </Stack>
+
       <ConfirmDialog
         title="상품준비 처리"
         isOpen={isOpen}
@@ -106,12 +107,11 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps): JSX.Elem
         </Center>
       </ConfirmDialog>
 
-      {/* // TODO: exportDialog 연결 */}
-      {/* <ExportDialog
+      <ExportDialog
         order={order}
         isOpen={exportModal.isOpen}
         onClose={exportModal.onClose}
-      /> */}
+      />
 
       {/* // TODO: 필요없다면 삭제하기 */}
       {/* 결제취소 요청 다이얼로그 -> 판매자가 크크쇼 관리자에게 결제취소 요청하는 다이얼로그. 판매자가 주문자 연락처 알 수 있는 크크쇼에서는 필요없는 기능임 */}

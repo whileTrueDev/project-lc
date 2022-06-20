@@ -5,9 +5,11 @@ import {
   Box,
   Button,
   Checkbox,
+  Flex,
   FormControl,
   FormErrorMessage,
   HStack,
+  Image,
   Input,
   Select,
   Stack,
@@ -21,45 +23,42 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import TextDotConnector from '@project-lc/components-core/TextDotConnector';
+import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
+import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import {
-  useFmOrder,
+  useOrderDetail,
   useOrderExportableCheck,
   useOrderShippingItemsExportableCheck,
 } from '@project-lc/hooks';
 import {
-  ExportOrderDto,
-  FindFmOrderDetailRes,
-  fmDeliveryCompanies,
-  FmOrderShipping,
+  CreateKkshowExportDto,
+  OrderDetailRes,
+  OrderDetailShipping,
 } from '@project-lc/shared-types';
-import { fmExportStore } from '@project-lc/stores';
+import { sellerExportStore } from '@project-lc/stores';
+import { deliveryCompanies } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useEffect, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
-import { OrderDetailGoods } from './OrderDetailGoods';
 
 export interface ExportOrderOptionListProps {
-  orderId: string;
+  orderCode?: string;
   orderIndex?: number;
-  onSubmitClick?: (id: string, idx: number) => void | Promise<void>;
+  onSubmitClick?: (id: number, idx: number) => void | Promise<void>;
   disableSelection?: boolean;
 }
 export function ExportOrderOptionList({
-  orderId,
+  orderCode,
   orderIndex = 0,
   onSubmitClick,
   disableSelection = false,
 }: ExportOrderOptionListProps): JSX.Element | null {
-  const order = useFmOrder(orderId);
-
+  const order = useOrderDetail({ orderCode });
   // 주문 출고가능한 지 체크
   const { isDone, isExportable } = useOrderExportableCheck(order.data);
-
   if (isDone) return null;
   if (!isExportable) return null;
   if (order.isLoading) return null;
-
   if (!order.data) {
     return (
       <Alert status="warning">
@@ -68,15 +67,15 @@ export function ExportOrderOptionList({
       </Alert>
     );
   }
+
   return (
     <Stack pt={2} spacing={4}>
-      {order.data.shippings.map((shipping, shippingIndex) => (
+      {order.data.shippings?.map((shipping, shippingIndex) => (
         <ExportOrderShippingListItem
-          key={shipping.shipping_seq}
+          key={shipping.id}
           shipping={shipping}
           order={order.data}
           disableSelection={disableSelection}
-          orderId={orderId}
           orderIndex={orderIndex}
           shippingIndex={shippingIndex}
           onSubmitClick={onSubmitClick}
@@ -87,26 +86,25 @@ export function ExportOrderOptionList({
 }
 
 type ExportOrderShippingListItem = ExportOrderOptionListProps & {
-  shipping: FmOrderShipping;
-  order: FindFmOrderDetailRes;
+  shipping: OrderDetailShipping;
+  order: OrderDetailRes;
   shippingIndex: number;
 };
 function ExportOrderShippingListItem({
   shipping,
   order,
   disableSelection,
-  orderId,
   orderIndex = 0,
   shippingIndex,
   onSubmitClick,
 }: ExportOrderShippingListItem): JSX.Element {
-  const { setValue } = useFormContext<ExportOrderDto[]>();
-  const selectedOrderShippings = fmExportStore((s) => s.selectedOrderShippings);
-  const handleSelect = fmExportStore((s) => s.handleOrderShippingSelect);
+  const { setValue } = useFormContext<CreateKkshowExportDto[]>();
+  const selectedOrderShippings = sellerExportStore((s) => s.selectedOrderShippings);
+  const handleSelect = sellerExportStore((s) => s.handleOrderShippingSelect);
   const selected = useMemo(() => {
     if (disableSelection) return true;
-    return selectedOrderShippings.includes(shipping.shipping_seq);
-  }, [disableSelection, selectedOrderShippings, shipping.shipping_seq]);
+    return selectedOrderShippings.includes(shipping.id);
+  }, [disableSelection, selectedOrderShippings, shipping.id]);
 
   // 현재 주문 상품배송 출고가능한 지 체크
   const { isDone, isExportable } = useOrderShippingItemsExportableCheck(shipping);
@@ -118,13 +116,9 @@ function ExportOrderShippingListItem({
 
   // 첫 렌더링시, 해당 상품 선택
   useEffect(() => {
-    if (
-      !isDone &&
-      isExportable &&
-      !selectedOrderShippings.includes(shipping.shipping_seq)
-    ) {
-      setValue(`${orderIndex * 2 + shippingIndex * 3}.orderId`, orderId);
-      handleSelect(shipping.shipping_seq);
+    if (!isDone && isExportable && !selectedOrderShippings.includes(shipping.id)) {
+      setValue(`${orderIndex * 2 + shippingIndex * 3}.orderId`, order.id);
+      handleSelect(shipping.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -142,7 +136,7 @@ function ExportOrderShippingListItem({
         order={order}
         disableSelection={disableSelection}
         selected={selected}
-        onSelect={() => handleSelect(shipping.shipping_seq)}
+        onSelect={() => handleSelect(shipping.id)}
       />
 
       {isDone && <FmOrderStatusBadge orderStatus="55" />}
@@ -154,8 +148,9 @@ function ExportOrderShippingListItem({
         <Stack flex={3}>
           {shipping.items.map((item, itemIndex) => (
             <ExportOrderItem
-              key={item.item_seq}
-              orderId={orderId}
+              key={item.id}
+              orderId={order.id}
+              order={order}
               item={item}
               orderShippingIndex={orderIndex * 2 + shippingIndex * 3}
               itemIndex={itemIndex}
@@ -168,7 +163,7 @@ function ExportOrderShippingListItem({
         <Box flex={1}>
           <ExportOrderFormFields
             isDisabled={isDisabled}
-            orderId={orderId}
+            orderId={order.id}
             orderShippingIndex={orderIndex * 2 + shippingIndex * 3}
             disableSelection={disableSelection}
             selected={selected}
@@ -181,7 +176,7 @@ function ExportOrderShippingListItem({
 }
 
 interface ExportOrderSummaryProps {
-  order: FindFmOrderDetailRes;
+  order: OrderDetailRes;
   selected?: boolean;
   disableSelection?: boolean;
   onSelect: () => void;
@@ -207,25 +202,25 @@ function ExportOrderSummary({
         </Box>
       )}
       <HStack alignItems="center" flexWrap="nowrap">
-        <Text fontSize="sm">{order.order_seq}</Text>
+        <Text fontSize="sm">{order.orderCode}</Text>
         <TextDotConnector />
         <Text fontSize="sm" ml={2}>
-          {dayjs(order.regist_date).fromNow()}
+          {dayjs(order.createDate).fromNow()}
         </Text>
       </HStack>
       <HStack>
         <Text fontSize="sm">
-          {order.recipient_address} {order.recipient_address_detail || ''}
+          {order.recipientAddress} {order.recipientDetailAddress || ''}
         </Text>
         <Text fontSize="sm">
-          {order.recipient_user_name} {order.recipient_cellphone}
+          {order.recipientName} {order.recipientPhone}
         </Text>
       </HStack>
-      {order.order_user_name === order.recipient_user_name &&
-      order.order_cellphone === order.recipient_cellphone ? null : (
+      {order.ordererName === order.recipientName &&
+      order.ordererPhone === order.recipientPhone ? null : (
         <HStack>
           <Text fontSize="sm">
-            {order.order_user_name} {order.order_cellphone}
+            {order.ordererName} {order.ordererPhone}
           </Text>
         </HStack>
       )}
@@ -239,7 +234,7 @@ function ExportOrderSummary({
 }
 
 interface ExportOrderFormFieldsProps {
-  orderId: string;
+  orderId: number;
   onSubmitClick: ExportOrderOptionListProps['onSubmitClick'];
   orderShippingIndex: number;
   isDisabled?: boolean;
@@ -259,28 +254,28 @@ function ExportOrderFormFields({
   const {
     register,
     formState: { errors },
-  } = useFormContext<ExportOrderDto[]>();
+  } = useFormContext<CreateKkshowExportDto[]>();
 
   return (
     <Stack>
       {/* 택배사 선택 */}
-      <FormControl isInvalid={!!errors[orderShippingIndex]?.deliveryCompanyCode}>
+      <FormControl isInvalid={!!errors[orderShippingIndex]?.deliveryCompany}>
         <Select
           isDisabled={isDisabled}
-          {...register(`${orderShippingIndex}.deliveryCompanyCode`, {
+          {...register(`${orderShippingIndex}.deliveryCompany`, {
             required: { message: '택배사를 선택하세요.', value: !!selected },
           })}
           placeholder="택배사 선택"
         >
-          {Object.keys(fmDeliveryCompanies).map((company) => (
-            <option key={company} value={company}>
-              {fmDeliveryCompanies[company].name}
+          {deliveryCompanies.map((company) => (
+            <option key={company.company} value={company.company}>
+              {company.company}
             </option>
           ))}
         </Select>
         <FormErrorMessage>
-          {errors[orderShippingIndex]?.deliveryCompanyCode &&
-            errors[orderShippingIndex]?.deliveryCompanyCode?.message}
+          {errors[orderShippingIndex]?.deliveryCompany &&
+            errors[orderShippingIndex]?.deliveryCompany?.message}
         </FormErrorMessage>
       </FormControl>
 
@@ -289,10 +284,7 @@ function ExportOrderFormFields({
         <Input
           isDisabled={isDisabled}
           {...register(`${orderShippingIndex}.deliveryNumber`, {
-            required: {
-              message: '송장번호를 입력하세요.',
-              value: !!selected,
-            },
+            required: { message: '송장번호를 입력하세요.', value: !!selected },
           })}
           placeholder="송장번호"
         />
@@ -320,8 +312,9 @@ function ExportOrderFormFields({
 }
 
 export interface ExportOrderItemProps {
-  orderId: string;
-  item: FindFmOrderDetailRes['items'][0];
+  orderId: number;
+  item: OrderDetailShipping['items'][number];
+  order: OrderDetailRes;
   orderShippingIndex: number;
   itemIndex: number;
   selected?: boolean;
@@ -329,16 +322,20 @@ export interface ExportOrderItemProps {
 export function ExportOrderItem({
   item,
   orderId,
+  order,
   orderShippingIndex,
   itemIndex,
   selected,
 }: ExportOrderItemProps): JSX.Element | null {
-  const { setValue } = useFormContext<ExportOrderDto[]>();
+  const { setValue } = useFormContext<CreateKkshowExportDto[]>();
   useEffect(() => {
-    setValue(`${orderShippingIndex}.shippingSeq`, item.shipping_seq);
     setValue(`${orderShippingIndex}.orderId`, orderId);
-  }, [item.shipping_seq, orderId, orderShippingIndex, setValue]);
+  }, [orderId, orderShippingIndex, setValue]);
 
+  const orderItem = useMemo(
+    () => order.orderItems.find((oi) => oi.id === item.id),
+    [item.id, order.orderItems],
+  );
   return (
     <Stack
       pl={3}
@@ -347,16 +344,25 @@ export function ExportOrderItem({
       borderWidth="0.025rem"
       borderRadius="lg"
     >
-      <Box flex={1}>
-        <OrderDetailGoods orderItem={item} />
-      </Box>
+      <Flex gap={2} align="center">
+        <Image
+          objectFit="cover"
+          w="50px"
+          h="50px"
+          rounded="md"
+          draggable={false}
+          src={orderItem?.goods.image?.[0]?.image}
+        />
+        <Text maxW={75} fontSize="sm" noOfLines={3}>
+          {orderItem?.goods.goods_name}
+        </Text>
+      </Flex>
       <Box flex={2}>
         <Table>
           <Thead>
             <Tr>
               <Th>옵션</Th>
               <Th>총수량</Th>
-              <Th>취소</Th>
               <Th>보냄</Th>
               <Th>남음</Th>
               <Th>보낼수량</Th>
@@ -366,9 +372,10 @@ export function ExportOrderItem({
           <Tbody>
             {item.options.map((opt, optIndex) => (
               <ExportOrderOptionItem
+                key={opt.id}
                 item={item}
-                key={opt.item_option_seq}
                 option={opt}
+                order={order}
                 orderShippingIndex={orderShippingIndex}
                 itemIndex={itemIndex}
                 optionIndex={optIndex}
@@ -383,14 +390,16 @@ export function ExportOrderItem({
 }
 
 export interface ExportOrderOptionItemProps {
-  item: FindFmOrderDetailRes['items'][0];
-  option: FindFmOrderDetailRes['items'][0]['options'][0];
+  order: OrderDetailRes;
+  item: OrderDetailShipping['items'][number];
+  option: OrderDetailShipping['items'][number]['options'][number];
   orderShippingIndex: number;
   optionIndex: number;
   itemIndex: number;
   selected?: boolean;
 }
 export function ExportOrderOptionItem({
+  order,
   item,
   option,
   orderShippingIndex,
@@ -402,21 +411,30 @@ export function ExportOrderOptionItem({
     register,
     formState: { errors },
     setValue,
-  } = useFormContext<ExportOrderDto[]>();
+  } = useFormContext<CreateKkshowExportDto[]>();
 
   // 보낸 수량
   const sendedEa = useMemo(() => {
-    const _calc = option.step55 + option.step65 + option.step75;
-    if (_calc > option.ea) return option.ea;
-    return _calc;
-  }, [option.ea, option.step55, option.step65, option.step75]);
+    if (!order.exports || order.exports.length === 0) return 0; // 출고가 없는 경우
+    const orderExp = order.exports.find((e) => e.orderId === order.id);
+    if (!orderExp) return 0; // 출고를 찾을 수 없는 경우
+    const orderOptExp = orderExp.items.find((i) => i.orderItemOptionId === option.id);
+    if (!orderOptExp) return 0; // 출고가 있으나 해당 옵션에 대한 출고는 없는 경우
+    return orderOptExp.amount;
+  }, [option.id, order.exports, order.id]);
+
   // 남은 수량
   const restEa = useMemo(() => {
-    const _calc =
-      option.ea - option.step55 - option.step65 - option.step75 - option.step85;
-    if (_calc < 0) return 0;
-    return _calc;
-  }, [option.ea, option.step55, option.step65, option.step75, option.step85]);
+    // 출고가 없는 경우
+    if (!order.exports || order.exports.length === 0) return option.quantity;
+    const orderExp = order.exports.find((e) => e.orderId === order.id);
+    if (!orderExp) return option.quantity;
+    const orderOptExp = orderExp.items.find((i) => i.orderItemOptionId === option.id);
+    if (!orderOptExp) return option.quantity;
+    const _restEa = option.quantity - orderOptExp.amount;
+    if (_restEa < 0) return 0;
+    return _restEa;
+  }, [option.id, option.quantity, order.exports, order.id]);
 
   const realIndex = useMemo(() => {
     // 두 배열인덱스를 통해 중복없는 값을 만들어내는 과정.
@@ -426,83 +444,57 @@ export function ExportOrderOptionItem({
   useEffect(() => {
     if (selected) {
       // 입력받지는 않지만, 필수 값 처리
-      setValue(
-        `${orderShippingIndex}.exportOptions.${realIndex}.itemOptionSeq`,
-        option.item_option_seq,
-      );
-      setValue(
-        `${orderShippingIndex}.exportOptions.${realIndex}.itemSeq`,
-        option.item_seq,
-      );
-      setValue(
-        `${orderShippingIndex}.exportOptions.${realIndex}.optionTitle`,
-        option.title1,
-      );
-      setValue(
-        `${orderShippingIndex}.exportOptions.${realIndex}.option1`,
-        option.option1,
-      );
-
+      setValue(`${orderShippingIndex}.items.${realIndex}.orderItemOptionId`, option.id);
+      setValue(`${orderShippingIndex}.items.${realIndex}.orderItemId`, item.id);
       // 보낼 수량 기본값으로 남은 수량 만큼 설정되어 있도록 처리
       if (restEa > 0) {
-        setValue(`${orderShippingIndex}.exportOptions.${realIndex}.exportEa`, restEa);
+        setValue(`${orderShippingIndex}.items.${realIndex}.amount`, restEa);
       }
     }
-  }, [
-    option.item_option_seq,
-    option.item_seq,
-    option.option1,
-    option.title1,
-    orderShippingIndex,
-    realIndex,
-    restEa,
-    selected,
-    setValue,
-    item.shipping_seq,
-  ]);
+  }, [item.id, option.id, orderShippingIndex, realIndex, restEa, selected, setValue]);
 
   return (
-    <Tr key={option.title1 + option.option1}>
+    <Tr key={`${option.name}${option.value}`}>
       <Td>
-        {option.title1 && option.option1 ? (
+        {option.name && option.value ? (
           <Text fontSize="sm">
-            {option.title1} : {option.option1}
+            {option.name} : {option.value}
           </Text>
         ) : (
-          <Text fontSize="sm">{item.goods_name}</Text>
+          <Text fontSize="sm">{option.goodsName}</Text>
         )}
-        <FmOrderStatusBadge orderStatus={option.step} />
+        <OrderStatusBadge step={option.step} />
       </Td>
-      <Td>{option.ea}</Td>
-      <Td>{option.step85}</Td>
+      <Td>{option.quantity}</Td>
       <Td>{sendedEa}</Td>
       <Td>{restEa}</Td>
       <Td w="65px">
         <FormControl
           isInvalid={
             !!(
-              errors[orderShippingIndex]?.exportOptions &&
-              errors[orderShippingIndex]?.exportOptions?.[realIndex]?.exportEa
+              errors[orderShippingIndex]?.items &&
+              errors[orderShippingIndex]?.items?.[realIndex]?.amount
             )
           }
         >
           <Input
             isDisabled={restEa === 0 || !selected}
-            {...register(`${orderShippingIndex}.exportOptions.${realIndex}.exportEa`, {
+            {...register(`${orderShippingIndex}.items.${realIndex}.amount`, {
               required: {
                 message: '보낼 수량을 입력해주세요.',
-                value: !!selected && option.step85 + sendedEa !== option.ea,
+                value: !!selected && sendedEa !== option.quantity,
               },
               min: { value: 0, message: '0보다 작을 수 없습니다.' },
               max: { value: restEa, message: '남은 수량 보다 클 수 없습니다.' },
+              valueAsNumber: true,
             })}
             w="60px"
             placeholder={String(restEa)}
           />
           <FormErrorMessage fontSize="xs">
-            {errors[orderShippingIndex]?.exportOptions &&
-              errors[orderShippingIndex]?.exportOptions?.[realIndex]?.exportEa &&
-              errors[orderShippingIndex]?.exportOptions?.[realIndex]?.exportEa?.message}
+            {errors[orderShippingIndex]?.items &&
+              errors[orderShippingIndex]?.items?.[realIndex]?.amount &&
+              errors[orderShippingIndex]?.items?.[realIndex]?.amount?.message}
           </FormErrorMessage>
         </FormControl>
       </Td>

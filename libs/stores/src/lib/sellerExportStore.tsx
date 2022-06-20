@@ -1,12 +1,12 @@
 import create from 'zustand';
 
-export interface FmExportStoreStates {
+export interface SellerExportStore {
   selectedOrderShippings: number[];
   handleOrderShippingSelect: (shippingSeq: number, forceConcat?: 'forceConcat') => void;
   resetSelectedOrderShippings: () => void;
 }
 
-export const fmExportStore = create<FmExportStoreStates>((set, get) => ({
+export const sellerExportStore = create<SellerExportStore>((set, get) => ({
   selectedOrderShippings: [],
   handleOrderShippingSelect: (shippingSeq, forceConcat) => {
     return set(({ selectedOrderShippings }) => {

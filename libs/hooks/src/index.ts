@@ -139,7 +139,6 @@ export * from './lib/queries/useDefaultContacts';
 export * from './lib/queries/useEmailDupCheck';
 export * from './lib/queries/useExchange';
 export * from './lib/queries/useExports';
-export * from './lib/queries/useFmExport';
 export * from './lib/queries/useFmOrder';
 export * from './lib/queries/useFmOrderDetails';
 export * from './lib/queries/useFmOrders';

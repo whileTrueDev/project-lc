@@ -46,7 +46,7 @@ export function ExportDetailSummary({
         {
           id: '구매확정',
           value: `구매확정 (${exportData.buyConfirmSubject}), 
-            ${dayjs(exportData.buyConfirmDate).format('YYYY년 MM월 DD일')})`,
+            ${dayjs(exportData.buyConfirmDate).format('YYYY년 MM월 DD일')}`,
           icon: FaHamburger,
           iconColor: 'blue.500',
           disabled: !(exportData.buyConfirmDate && exportData.buyConfirmSubject),

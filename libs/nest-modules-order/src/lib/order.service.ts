@@ -528,6 +528,7 @@ export class OrderService {
         exchanges: { include: { exchangeItems: true } },
         returns: { include: { items: true } },
         orderCancellations: { include: { items: true } },
+        shippings: { include: { items: { include: { options: true } } } },
         sellerSettlementItems: {
           select: {
             liveShopping: {
@@ -541,7 +542,6 @@ export class OrderService {
             },
           },
         },
-        shippings: { include: { items: true } },
       },
     });
 
@@ -740,9 +740,7 @@ export class OrderService {
           orderItemOptions.map((opt) => {
             return this.prisma.orderItemOption.update({
               where: { id: opt.id },
-              data: {
-                step: rest.step,
-              },
+              data: { step: rest.step },
             });
           }),
         );
