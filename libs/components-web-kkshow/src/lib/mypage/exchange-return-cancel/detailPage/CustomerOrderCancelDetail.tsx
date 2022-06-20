@@ -53,7 +53,6 @@ export function OrderCancelDetailData({
   const handleDeleteRequest = (): void => {
     mutateAsync(data.id)
       .then((res) => {
-        console.log(res);
         toast({ title: '주문취소 요청을 철회하였습니다', status: 'success' });
         router.push('/mypage/exchange-return-cancel');
       })
@@ -76,10 +75,7 @@ export function OrderCancelDetailData({
 
         <Button
           size="xs"
-          onClick={() => {
-            // TODO: 주문상세보기로 이동
-            console.log(`주문상세보기로 이동, 주문코드: ${data.order.orderCode}`);
-          }}
+          onClick={() => router.push(`/mypage/orders/${data.order.orderCode}`)}
         >
           주문상세보기
         </Button>
