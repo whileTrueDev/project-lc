@@ -330,9 +330,9 @@ export class GetNonMemberOrderDetailDto {
   @IsString()
   orderCode: string;
 
-  /** 비회원주문 비밀번호 */
+  /** 주문자명 */
   @IsString()
-  password: string;
+  ordererName: string;
 }
 
 /** 내보내기 위한 주문상세 여러개 조회 dto */

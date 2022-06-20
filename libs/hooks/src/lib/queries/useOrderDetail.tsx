@@ -1,6 +1,8 @@
 import {
+  GetNonMemberOrderDetailDto,
   GetOneOrderDetailDto,
   GetOrderDetailsForSpreadsheetDto,
+  NonMemberOrderDetailRes,
   OrderDetailRes,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
@@ -44,5 +46,24 @@ export const useOrderDetailsForSpreadsheet = (
     ['OrderDetailList', dto],
     () => getOrderDetailsForSpreadsheet(dto),
     { enabled: !!dto.orderIds.length },
+  );
+};
+
+/** 비회원 주문조회 */
+export const getNonmemberOrderDetail = async (
+  dto: GetNonMemberOrderDetailDto,
+): Promise<NonMemberOrderDetailRes> => {
+  return axios
+    .get<NonMemberOrderDetailRes>(`/order/nonmember`, { params: dto })
+    .then((res) => res.data);
+};
+
+export const useNonmemberOrderDetail = (
+  dto: GetNonMemberOrderDetailDto,
+): UseQueryResult<NonMemberOrderDetailRes, AxiosError> => {
+  return useQuery<NonMemberOrderDetailRes, AxiosError>(
+    ['NonmemberOrderDetail', dto],
+    () => getNonmemberOrderDetail(dto),
+    { enabled: !!dto.orderCode && !!dto.ordererName },
   );
 };

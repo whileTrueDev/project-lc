@@ -207,3 +207,8 @@ export type AdminLiveShoppingGiftOrder = Order & {
     goods: Omit<OriginGoods, 'image' | 'sellerId'>;
   })[];
 };
+
+/** 비회원 주문상세조회 타입 */
+export type NonMemberOrderDetailRes = {
+  order: OrderDetailRes;
+};

@@ -32,6 +32,7 @@ import {
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
   UpdateOrderDto,
+  NonMemberOrderDetailRes,
 } from '@project-lc/shared-types';
 import { calculateShippingCost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
@@ -670,19 +671,16 @@ export class OrderService {
   /** 비회원 주문 상세 조회 */
   async getNonMemberOrderDetail({
     orderCode,
-    password,
-  }: GetNonMemberOrderDetailDto): Promise<OrderDetailRes> {
-    const order = await this.findOneOrderDetail({ orderCode, deleteFlag: false });
+    ordererName,
+  }: GetNonMemberOrderDetailDto): Promise<NonMemberOrderDetailRes> {
+    const order = await this.findOneOrderDetail({
+      orderCode,
+      ordererName,
+      customerId: null,
+      deleteFlag: false,
+    });
 
-    // 비회원주문 비밀번호 확인
-    const isPasswordCorrect = await this.userPwManager.validatePassword(
-      password,
-      order.nonMemberOrderPassword,
-    );
-    if (!isPasswordCorrect) {
-      throw new BadRequestException(`주문 비밀번호가 일치하지 않습니다.`);
-    }
-    return order;
+    return { order };
   }
 
   /** 주문수정 */

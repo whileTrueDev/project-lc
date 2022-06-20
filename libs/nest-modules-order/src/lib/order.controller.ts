@@ -24,6 +24,7 @@ import {
   GetOneOrderDetailDto,
   GetOrderDetailsForSpreadsheetDto,
   GetOrderListDto,
+  NonMemberOrderDetailRes,
   OrderDetailRes,
   OrderListRes,
   OrderPurchaseConfirmationDto,
@@ -69,7 +70,7 @@ export class OrderController {
   @Get('nonmember')
   getNonMemberOrderDetail(
     @Query(ValidationPipe) dto: GetNonMemberOrderDetailDto,
-  ): Promise<OrderDetailRes> {
+  ): Promise<NonMemberOrderDetailRes> {
     return this.orderService.getNonMemberOrderDetail(dto);
   }
 
