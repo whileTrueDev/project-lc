@@ -122,7 +122,10 @@ export function isOrderExportable(step: OrderStatusNumString): boolean {
 export const deliveryTrackingAbleSteps: OrderProcessStep[] = [
   'exportDone',
   'shipping',
+  'partialShipping',
   'shippingDone',
+  'partialShippingDone',
+  'purchaseConfirmed',
 ];
 
 /** 주문취소신청 가능한 주문상태 목록 - 상품준비 이전 */

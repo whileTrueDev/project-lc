@@ -28,12 +28,15 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { useOrderDetailsForSpreadsheet, useProfile } from '@project-lc/hooks';
-import { defaultColumOpts, OrderSpreadSheetGenerator } from '@project-lc/shreadsheet';
+import { useFmOrderDetails } from '@project-lc/hooks';
+import {
+  defaultColumOpts,
+  OrderSpreadSheetGeneratorBackup,
+} from '@project-lc/shreadsheet';
 import {
   getOrderDownloadFileName,
+  useFmOrderStore,
   useOrderListDownloadStore,
-  useSellerOrderStore,
 } from '@project-lc/stores';
 import { useState } from 'react';
 
@@ -45,15 +48,11 @@ export function OrderListDownloadDialog({
   isOpen,
   onClose,
 }: OrderListDownloadDialogProps): JSX.Element {
-  const { data: profileData } = useProfile();
   const toast = useToast();
   // 선택된 주문
-  const selectedOrders = useSellerOrderStore((state) => state.selectedOrders);
+  const selectedOrders = useFmOrderStore((state) => state.selectedOrders);
   // 선택된 주문 상세 정보 조회
-  const orderDetails = useOrderDetailsForSpreadsheet({
-    orderIds: selectedOrders.map((orderId) => Number(orderId)),
-    sellerId: profileData?.id,
-  });
+  const orderDetails = useFmOrderDetails({ orderIds: selectedOrders });
 
   const disableHeaders = useOrderListDownloadStore((st) => st.disableHeaders);
   const fileName = useOrderListDownloadStore((st) => st.fileName);
@@ -61,7 +60,7 @@ export function OrderListDownloadDialog({
   // 엑셀 생성 및 내보내기
   const onConfirm = async (): Promise<void> => {
     if (orderDetails.data) {
-      const ossg = new OrderSpreadSheetGenerator({
+      const ossg = new OrderSpreadSheetGeneratorBackup({
         disabledColumnHeaders: disableHeaders,
       });
       const workbook = ossg.createXLSX(orderDetails.data);
@@ -80,12 +79,6 @@ export function OrderListDownloadDialog({
     }
   };
 
-  const selectedOrdersOrderCodeList = orderDetails.data
-    ? orderDetails.data
-        .filter((o) => selectedOrders.includes(o.id))
-        .map((o) => o.orderCode as string)
-    : [];
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="2xl">
       <ModalOverlay />
@@ -95,7 +88,7 @@ export function OrderListDownloadDialog({
         <ModalBody>
           {orderDetails.isLoading && <OrderListDownloadLoading />}
           {!orderDetails.isLoading && orderDetails.data && (
-            <OrderListDownloadSetting targetOrderIds={selectedOrdersOrderCodeList} />
+            <OrderListDownloadSetting targetOrderIds={selectedOrders} />
           )}
         </ModalBody>
         <ModalFooter>

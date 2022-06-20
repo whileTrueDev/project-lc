@@ -55,17 +55,11 @@ export function OrderDetail(): JSX.Element {
   const handleSubmit = async (): Promise<void> => {
     mutateAsync({ step: orderStep })
       .then(() => {
-        toast({
-          description: '변경완료',
-          status: 'success',
-        });
+        toast({ description: '변경완료', status: 'success' });
         setIsEdit(false);
       })
       .catch(() => {
-        toast({
-          description: '변경실패',
-          status: 'error',
-        });
+        toast({ description: '변경실패', status: 'error' });
       });
   };
 

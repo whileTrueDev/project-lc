@@ -16,7 +16,7 @@ import { OrderDetailOptionList } from '@project-lc/components-seller/OrderDetail
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
 import { OrderItemOptionInfo } from '@project-lc/components-shared/order/OrderItemOptionInfo';
-import { useDisplaySize, useOrderDetail } from '@project-lc/hooks';
+import { useDisplaySize, useOrderDetail, useProfile } from '@project-lc/hooks';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
@@ -28,10 +28,11 @@ const orderCancelSectionTitle = '주문취소 정보';
 /** 주문 상세 보기 페이지 */
 export function OrderDetail(): JSX.Element {
   const router = useRouter();
+  const { data: profileData } = useProfile();
 
   const orderCode = router.query.orderCode as string; // 주문코드
 
-  const order = useOrderDetail({ orderCode });
+  const order = useOrderDetail({ orderCode, sellerId: profileData?.id });
 
   const { isMobileSize } = useDisplaySize();
 

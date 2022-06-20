@@ -14,6 +14,11 @@ import {
 import { cartSample, tempUserCartItemSample } from './seedData/cart';
 import { dummyCustomer } from './seedData/customer';
 import {
+  dummyCoupon,
+  dummyCustomerCoupon,
+  dummyCustomerCouponLog,
+} from './seedData/dummyCoupon';
+import {
   defaultOption,
   defaultSellCommissionData,
   dummyBroadcasterAddress,
@@ -31,27 +36,18 @@ import {
   testsellerExtraData,
 } from './seedData/dummyData';
 import {
+  createDummyOrderData,
   createDummyOrderWithCancellation,
   createDummyOrderWithExchange,
   createDummyOrderWithReturn,
   createDummyOrderWithSupport,
-  nonMemberOrder,
-  normalOrder,
-  orderExportReady,
-  purchaseConfirmedOrder,
-  shippingDoneOrder,
 } from './seedData/dummyOrder';
 import { dummyPayments } from './seedData/dummyPayment';
 import { createGoodsInquiry, createGoodsInquiry2 } from './seedData/goods-inquiry';
-import {
-  dummyCoupon,
-  dummyCustomerCoupon,
-  dummyCustomerCouponLog,
-} from './seedData/dummyCoupon';
-import { dummyMileage, dummyMileageLog } from './seedData/mileage';
 import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
+import { dummyMileage, dummyMileageLog } from './seedData/mileage';
 import { termsData } from './seedData/terms';
 
 const prisma = new PrismaClient();
@@ -355,36 +351,6 @@ async function genereateInitialKkshowShoppingTabData(): Promise<void> {
 async function createCartItems(): Promise<void> {
   await prisma.cartItem.create({ data: cartSample });
   await prisma.cartItem.create({ data: tempUserCartItemSample });
-}
-
-async function connectDummyOrderToOrderShipping(orderId: number): Promise<void> {
-  const orderShipping = await prisma.orderShipping.findFirst({
-    where: { orderId },
-  });
-  await prisma.order.update({
-    where: { id: orderId },
-    data: {
-      orderItems: {
-        updateMany: {
-          where: { orderId },
-          data: { orderShippingId: orderShipping?.id },
-        },
-      },
-    },
-  });
-}
-
-async function createDummyOrderData(): Promise<void> {
-  const order1 = await prisma.order.create({ data: normalOrder });
-  await connectDummyOrderToOrderShipping(order1.id);
-  const order2 = await prisma.order.create({ data: nonMemberOrder });
-  await connectDummyOrderToOrderShipping(order2.id);
-  const order3 = await prisma.order.create({ data: purchaseConfirmedOrder });
-  await connectDummyOrderToOrderShipping(order3.id);
-  const order4 = await prisma.order.create({ data: shippingDoneOrder });
-  await connectDummyOrderToOrderShipping(order4.id);
-  const order5 = await prisma.order.create({ data: orderExportReady });
-  await connectDummyOrderToOrderShipping(order5.id);
 }
 
 async function createDummyOrderCancelReturnExchange(): Promise<void> {

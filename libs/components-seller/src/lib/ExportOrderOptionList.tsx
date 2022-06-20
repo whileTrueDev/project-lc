@@ -485,6 +485,7 @@ export function ExportOrderOptionItem({
               },
               min: { value: 0, message: '0보다 작을 수 없습니다.' },
               max: { value: restEa, message: '남은 수량 보다 클 수 없습니다.' },
+              valueAsNumber: true,
             })}
             w="60px"
             placeholder={String(restEa)}

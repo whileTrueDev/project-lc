@@ -109,12 +109,13 @@ export function Success(): JSX.Element {
           createOrder
             .mutateAsync({ order: createOrderDto, shipping: shippingDto })
             .then((res) => {
-              console.log(res);
               const orderId = res.id;
               router.push(`/payment/receipt?orderId=${orderId}&orderCode=${orderCode}`);
             })
             .catch((e) => {
               console.error(e);
+              console.error(e.response?.data?.message);
+              router.push('/payment/fail?message=주문생성 오류');
             });
         }
       });
