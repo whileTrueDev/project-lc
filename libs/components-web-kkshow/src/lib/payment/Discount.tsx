@@ -89,12 +89,13 @@ export function Discount(): JSX.Element {
         </Stack>
 
         <Stack>
-          {/* // TODO: 결제 금액이 0원 이상일때까지만 적용하도록 구성 */}
           <Text fontWeight="semibold">적립금</Text>
           <FormControl isInvalid={!!errors.usedMileageAmount}>
             <Flex gap={2} alignItems="center">
               <Input
-                isReadOnly={!customerMileage || customerMileage?.mileage <= 0}
+                isReadOnly={
+                  !customerMileage || customerMileage?.mileage <= 0 || orderPrice <= 0
+                }
                 maxW={150}
                 type="number"
                 size="sm"
@@ -109,7 +110,7 @@ export function Discount(): JSX.Element {
                   min: { value: 0, message: '0원이하로 적용할 수 없습니다.' },
                 })}
               />
-              {customerMileage && customerMileage.mileage > 0 && (
+              {customerMileage && customerMileage.mileage > 0 && orderPrice > 0 && (
                 <Button size="xs" colorScheme="blue" onClick={handleUseMaxMileage}>
                   전액사용
                 </Button>
