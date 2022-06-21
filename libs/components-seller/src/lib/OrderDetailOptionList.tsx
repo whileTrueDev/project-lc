@@ -11,11 +11,11 @@ import {
   Tr,
   useDisclosure,
 } from '@chakra-ui/react';
-import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
-import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
+import { OrderItemOption } from '@prisma/client';
+import TextDotConnector from '@project-lc/components-core/TextDotConnector';
+import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import ShowMoreTextButton from '@project-lc/components-shared/ShowMoreTextButton';
 import { useDisplaySize } from '@project-lc/hooks';
-import { FmOrderOption } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
 
@@ -23,13 +23,13 @@ import { useMemo } from 'react';
 export function OrderDetailOptionList({
   options,
 }: {
-  options: FmOrderOption[];
+  options: OrderItemOption[];
 }): JSX.Element {
   const displaySize = useDisplaySize();
   return (
     <Box mt={4}>
       {options.map((goodsOpt) => (
-        <OrderDetailOptionListItem key={goodsOpt.item_option_seq} option={goodsOpt} />
+        <OrderDetailOptionListItem key={goodsOpt.id} option={goodsOpt} />
       ))}
 
       {/* 태블릿 이상의 크기에서만 보여줌 */}
@@ -42,26 +42,26 @@ export function OrderDetailOptionListItem({
   option,
   withBadge = true,
 }: {
-  option: Pick<FmOrderOption, 'ea' | 'price' | 'option1' | 'title1' | 'step'>;
+  option: Pick<OrderItemOption, 'quantity' | 'discountPrice' | 'value' | 'name' | 'step'>;
   withBadge?: boolean;
 }): JSX.Element {
   const orderPrice = useMemo(() => {
-    const price = Number(option.price) * Number(option.ea);
+    const price = Number(option.discountPrice) * Number(option.quantity);
     return `${getLocaleNumber(price)} 원`;
-  }, [option.ea, option.price]);
+  }, [option.discountPrice, option.quantity]);
   return (
     <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
-      {withBadge && <FmOrderStatusBadge orderStatus={option.step} />}
-      {option.title1 && option.option1 && (
+      {withBadge && <OrderStatusBadge step={option.step} />}
+      {option.name && option.value && (
         <>
           <Text isTruncated>
-            {option.title1}: {option.option1}
+            {option.name}: {option.value}
           </Text>
           <TextDotConnector />
         </>
       )}
 
-      <Text isTruncated>{option.ea} 개</Text>
+      <Text isTruncated>{option.quantity} 개</Text>
       <TextDotConnector />
       <Text isTruncated>{orderPrice}</Text>
     </Stack>
@@ -72,7 +72,7 @@ export function OrderDetailOptionListItem({
 export function OrderDetailOptionDescription({
   options,
 }: {
-  options: FmOrderOption[];
+  options: OrderItemOption[];
 }): JSX.Element {
   const { isOpen, onToggle } = useDisclosure({});
   return (
@@ -88,43 +88,19 @@ export function OrderDetailOptionDescription({
                 <Tr>
                   <Th>상품</Th>
                   <Th>총 수량</Th>
-                  <Th>
-                    <FmOrderStatusBadge orderStatus="35" />
-                  </Th>
-                  <Th>
-                    <FmOrderStatusBadge orderStatus="45" />
-                  </Th>
-                  <Th>
-                    <FmOrderStatusBadge orderStatus="55" />
-                  </Th>
-                  <Th>
-                    <FmOrderStatusBadge orderStatus="65" />
-                  </Th>
-                  <Th>
-                    <FmOrderStatusBadge orderStatus="75" />
-                  </Th>
-                  <Th>
-                    <FmOrderStatusBadge orderStatus="85" />
-                  </Th>
                 </Tr>
               </Thead>
               <Tbody>
                 {options.map((opt) => (
-                  <Tr key={opt.item_option_seq}>
-                    {opt.title1 && opt.option1 ? (
+                  <Tr key={opt.id}>
+                    {opt.name && opt.value ? (
                       <Td>
-                        {opt.title1}: {opt.option1}
+                        {opt.name}: {opt.value}
                       </Td>
                     ) : (
                       <Td>기본옵션</Td>
                     )}
-                    <Td>{opt.ea} 개</Td>
-                    <Td>{opt.step35}</Td>
-                    <Td>{opt.step45}</Td>
-                    <Td>{opt.step55}</Td>
-                    <Td>{opt.step65}</Td>
-                    <Td>{opt.step75}</Td>
-                    <Td>{opt.step85}</Td>
+                    <Td>{opt.quantity} 개</Td>
                   </Tr>
                 ))}
               </Tbody>

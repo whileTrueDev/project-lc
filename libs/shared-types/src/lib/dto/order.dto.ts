@@ -325,6 +325,9 @@ export class GetOrderListDto {
   @IsOptional()
   @IsString()
   appType?: string;
+
+  /** 상품ID 목록을 기준으로 조회시 */
+  @IsOptional() @IsString({ each: true }) goodsIds?: number[];
 }
 
 /** 비회원 주문 조회 dto */

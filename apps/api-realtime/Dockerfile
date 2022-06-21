@@ -1,4 +1,4 @@
-FROM node:14-slim
+FROM node:14
 
 RUN apt-get update
 RUN apt-get install -y openssl
@@ -13,6 +13,9 @@ COPY ./libs/prisma-orm/prisma ./prisma
 RUN yarn global add prisma@3.11.0
 RUN yarn install --prod
 RUN prisma generate
+
+RUN yarn add argon2@0.28.2
+RUN npx node-pre-gyp rebuild -C ./node_modules/argon2
 
 EXPOSE 3001
 CMD NODE_ENV=production node ./main.js

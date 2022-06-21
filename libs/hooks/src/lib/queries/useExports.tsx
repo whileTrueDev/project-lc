@@ -11,7 +11,7 @@ export const useExports = (
   dto: FindExportListDto,
   options?: UseQueryOptions<ExportListRes, AxiosError>,
 ): UseQueryResult<ExportListRes, AxiosError> => {
-  return useQuery<ExportListRes, AxiosError>('Exports', () => getExports(dto), {
+  return useQuery<ExportListRes, AxiosError>(['Exports', dto], () => getExports(dto), {
     ...options,
   });
 };
@@ -27,8 +27,6 @@ export const useExportByCode = (
   return useQuery<ExportRes, AxiosError>(
     ['Exports', exportCode],
     () => getExportByCode(exportCode),
-    {
-      ...options,
-    },
+    { ...options },
   );
 };

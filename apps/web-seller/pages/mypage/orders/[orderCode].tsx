@@ -1,42 +1,25 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Skeleton,
-  SkeletonCircle,
-  SkeletonText,
-  Stack,
-  Text,
-  useColorModeValue,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Button, Center, Flex, Stack, Text } from '@chakra-ui/react';
+import { OrderItemOption, OrderShipping } from '@prisma/client';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
+import { OrderDetailActions } from '@project-lc/components-seller/kkshow-order/OrderDetailActions';
+import { OrderDetailCancelInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailCancelInfo';
+import { OrderDetailExchangeInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExchangeInfo';
+import { OrderDetailExportInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExportInfo';
+import { OrderDetailReturnInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailReturnInfo';
+import { OrderDetailSummary } from '@project-lc/components-seller/kkshow-order/OrderDetailSummary';
+import { OrderDetailTitle } from '@project-lc/components-seller/kkshow-order/OrderDetailTitle';
+import { OrderExchangeReturnCancelExistsAlert } from '@project-lc/components-seller/kkshow-order/OrderExchangeReturnCancelExistsAlert';
 import { OrderDetailDeliveryInfo } from '@project-lc/components-seller/OrderDetailDeliveryInfo';
-import { OrderDetailGoods } from '@project-lc/components-seller/OrderDetailGoods';
 import { OrderDetailOptionList } from '@project-lc/components-seller/OrderDetailOptionList';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
+import { OrderItemOptionInfo } from '@project-lc/components-shared/order/OrderItemOptionInfo';
 import { useDisplaySize, useOrderDetail, useProfile } from '@project-lc/hooks';
-import {
-  convertFmOrderShippingTypesToString,
-  FmOrderShipping,
-} from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
-import React, { useMemo } from 'react';
-import { OrderDetailTitle } from '@project-lc/components-seller/kkshow-order/OrderDetailTitle';
-import { OrderDetailActions } from '@project-lc/components-seller/kkshow-order/OrderDetailActions';
-import { OrderDetailSummary } from '@project-lc/components-seller/kkshow-order/OrderDetailSummary';
-import { OrderItemOptionInfo } from '@project-lc/components-shared/order/OrderItemOptionInfo';
-import { OrderDetailReturnInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailReturnInfo';
-import { OrderDetailExchangeInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExchangeInfo';
-import { OrderDetailCancelInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailCancelInfo';
-import { OrderDetailExportInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExportInfo';
-import { OrderExchangeReturnCancelExistsAlert } from '@project-lc/components-seller/kkshow-order/OrderExchangeReturnCancelExistsAlert';
-import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
-import { OrderItemOption, OrderShipping } from '@prisma/client';
+import { useMemo } from 'react';
 
 const exchangeSectionTitle = '교환(재배송) 정보';
 const returnSectionTitle = '반품(환불) 정보';
@@ -152,23 +135,7 @@ export function OrderDetail(): JSX.Element {
         {/* 주문자 / 수령자 정보 */}
         <SectionWithTitle title="주문자 / 수령자 정보">
           {/* OrderDetailDeliveryInfo 기존 컴포넌트 그대로 사용함 */}
-          <OrderDetailDeliveryInfo
-            orderDeliveryData={{
-              order_phone: '', // 주문자전화
-              recipient_phone: '',
-              recipient_address_street: '',
-              recipient_address: order.data.recipientAddress,
-              recipient_address_detail: order.data.recipientDetailAddress,
-              order_user_name: order.data.ordererName,
-              order_email: order.data.ordererEmail,
-              order_cellphone: order.data.ordererPhone, // '주문자휴대폰',
-              recipient_user_name: order.data.recipientName,
-              recipient_zipcode: order.data.recipientPostalCode,
-              recipient_cellphone: order.data.recipientPhone,
-              recipient_email: order.data.recipientEmail,
-              memo: order.data.memo,
-            }}
-          />
+          <OrderDetailDeliveryInfo orderDeliveryData={order.data} />
         </SectionWithTitle>
 
         {/* 출고 정보 */}
@@ -231,7 +198,7 @@ function OrderDetailShippingItem({
     <Box key={shipping.id} mt={6} borderWidth="0.025rem" p={2} pl={4}>
       {/* 배송정보 */}
       <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
-        <Text>{convertFmOrderShippingTypesToString(shipping.shippingCostPayType)}</Text>
+        {/* <Text>{shippingType}</Text> */}
         {shipping.shippingCostPayType === 'free' ? null : (
           <>
             <TextDotConnector />
@@ -242,12 +209,7 @@ function OrderDetailShippingItem({
 
       {/* 상품(옵션) 정보 */}
       <Box mt={4}>
-        {shipping.items.map((item) => (
-          <Box key={item.id} mt={2}>
-            {/* <OrderDetailGoods orderItem={item} />
-            <OrderDetailOptionList options={item.options} /> */}
-          </Box>
-        ))}
+        <OrderDetailOptionList options={shipping.items} />
       </Box>
     </Box>
   );

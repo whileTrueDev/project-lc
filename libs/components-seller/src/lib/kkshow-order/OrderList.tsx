@@ -13,7 +13,7 @@ import { GridColumns, GridRowId, GridToolbarContainer } from '@material-ui/data-
 import { OrderItemOption, OrderProcessStep } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { TooltipedText } from '@project-lc/components-core/TooltipedText';
-import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
+import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { useDisplaySize, useProfile, useSellerOrderList } from '@project-lc/hooks';
 import {
   isOrderExportable,
@@ -26,6 +26,7 @@ import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaTruck } from 'react-icons/fa';
+import ExportManyDialog from '../ExportManyDialog';
 import OrderListDownloadDialog from './OrderListDownloadDialog';
 
 const columns: GridColumns = [
@@ -127,9 +128,7 @@ const columns: GridColumns = [
     width: 120,
     renderCell: ({ row }) => (
       <Box lineHeight={2}>
-        <FmOrderStatusBadge
-          orderStatus={orderProcessStepDict[row.step as OrderProcessStep]}
-        />
+        <OrderStatusBadge step={row.step as OrderProcessStep} />
       </Box>
     ),
   },
@@ -251,17 +250,13 @@ export function OrderList(): JSX.Element {
           ExportIcon: DownloadIcon,
         }}
       />
-      {/* // TODO : [판매자] 마이페이지 출고 처리 및 조회 (project-lc)에서 처리하기 
-      ExportManyDialog > ExportOrderOptionList 컴포넌트 내부에서 fmOrder.shipping 데이터를 사용하는데 
-      project-lc db에는 orderShipping에 해당하는 테이블이 없음.(주문에 부과된 배송비 + 해당 배송비와 연결된 주문상품옵션 저장하는 테이블이 필요할듯하다)
-      */}
-      {/* {exportManyDialog.isOpen && orders.data?.orders && (
+      {exportManyDialog.isOpen && orders.data?.orders && (
         <ExportManyDialog
           isOpen={exportManyDialog.isOpen}
           onClose={exportManyDialog.onClose}
           orders={orders.data?.orders}
         />
-      )} */}
+      )}
     </Box>
   );
 }

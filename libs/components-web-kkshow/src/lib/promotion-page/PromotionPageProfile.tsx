@@ -30,7 +30,13 @@ export function PromotionPageProfile({
         src={bc.data?.avatar || ''}
       />
       <Text fontSize="2xl">{bc.data?.userNickname}</Text>
-      <Flex my={4} gap={4} maxW="xl" w="100%" justify="space-between">
+      <Flex
+        my={4}
+        gap={4}
+        maxW="xl"
+        w="100%"
+        justify={channels.data?.length === 1 ? 'center' : 'space-between'}
+      >
         {channels.data?.map((channel) => (
           <Flex flexDir="column" justify="space-between" key={channel.id}>
             {channel.url.includes('twitch.com') && <FaTwitch color="purple" />}

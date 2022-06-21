@@ -1,9 +1,9 @@
 import { Heading, Stack, Text } from '@chakra-ui/react';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
-import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
-import FmRefundStatusBadge from '@project-lc/components-shared/FmRefundStatusBadge';
 import { ExchangeReturnCancelRequestStatusBadge } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestStatusBadge';
-import { OrderDetailRes, orderProcessStepDict } from '@project-lc/shared-types';
+import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
+import ProcessStatusBadge from '@project-lc/components-shared/ProcessStatusBadge';
+import { OrderDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useMemo } from 'react';
@@ -30,10 +30,10 @@ export function OrderDetailTitle({ order }: OrderDetailTitleProps): JSX.Element 
     <>
       <Heading>주문 {order.orderCode}</Heading>
       <Stack direction="row" alignItems="center">
-        <FmOrderStatusBadge orderStatus={orderProcessStepDict[order.step]} />
+        <OrderStatusBadge step={order.step} />
         {/* 환불이 완료된 후 환불 데이터가 생성되므로 환불상태는 항상 완료로 고정 */}
         {order.refunds && order.refunds.length > 0 && (
-          <FmRefundStatusBadge refundStatus="complete" />
+          <ProcessStatusBadge processStatus="complete" />
         )}
         {order.returns && order.returns.length > 0 && returnStatus && (
           <>

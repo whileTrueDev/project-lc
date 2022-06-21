@@ -1628,7 +1628,7 @@ enum PaymentMethod {
   virtualAccount // 가상계좌
 }
 
-// FmOrderShipping 테이블에 해당 (주문에 부과된 배송비정보 저장하는 테이블인듯 함)
+// 주문에 부과된 배송비정보 저장하는 테이블
 // 하나의 주문에 여러 배송비가 부과될 수 있다
 model OrderShipping {
   id                  Int                 @id @default(autoincrement()) // 고유 식별 번호

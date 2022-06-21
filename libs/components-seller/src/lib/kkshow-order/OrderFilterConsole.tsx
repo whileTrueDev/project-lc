@@ -15,9 +15,9 @@ import {
 import { OrderProcessStep } from '@prisma/client';
 import { useDisplaySize } from '@project-lc/hooks';
 import {
-  fmOrderStatuses,
   getOrderProcessStepNameByStringNumber,
   orderProcessStepDict,
+  orderStatuses,
 } from '@project-lc/shared-types';
 import { SellerOrderFilterFormType, useSellerOrderStore } from '@project-lc/stores';
 import moment from 'moment';
@@ -40,7 +40,6 @@ export function OrderFilterConsole(): JSX.Element {
 
   // * 필터/검색 폼 제출
   const onSubmit: SubmitHandler<SellerOrderFilterFormType> = (data) => {
-    console.log(data);
     handleOrderSearchStates(data);
   };
 
@@ -157,16 +156,16 @@ export function OrderFilterConsole(): JSX.Element {
             </Button>
           </Stack>
           <Box>
-            {(Object.keys(fmOrderStatuses) as Array<keyof typeof fmOrderStatuses>).map(
+            {(Object.keys(orderStatuses) as Array<keyof typeof orderStatuses>).map(
               (orderStatus) => {
                 const orderProcessStep =
                   getOrderProcessStepNameByStringNumber(orderStatus);
                 return (
                   <Checkbox
                     m={1}
-                    aria-label={`order-status-${fmOrderStatuses[orderStatus].name}`}
+                    aria-label={`order-status-${orderStatuses[orderStatus].name}`}
                     key={orderStatus}
-                    colorScheme={fmOrderStatuses[orderStatus].chakraColor}
+                    colorScheme={orderStatuses[orderStatus].chakraColor}
                     isChecked={watch('searchStatuses')?.includes(orderProcessStep)}
                     onChange={(_) => {
                       const prev = getValues('searchStatuses');
@@ -182,8 +181,8 @@ export function OrderFilterConsole(): JSX.Element {
                       return setValue('searchStatuses', prev.concat(orderProcessStep));
                     }}
                   >
-                    <Badge colorScheme={fmOrderStatuses[orderStatus].chakraColor}>
-                      {fmOrderStatuses[orderStatus].name}
+                    <Badge colorScheme={orderStatuses[orderStatus].chakraColor}>
+                      {orderStatuses[orderStatus].name}
                     </Badge>
                   </Checkbox>
                 );
