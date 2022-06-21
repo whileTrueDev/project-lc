@@ -17,6 +17,7 @@ import {
   ModalProps,
   Stack,
   Text,
+  Tooltip,
   useDisclosure,
 } from '@chakra-ui/react';
 import { GridColDef, GridRowData } from '@material-ui/data-grid';
@@ -24,7 +25,7 @@ import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { useCustomerCouponList, useCustomerMileage } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
-import { getLocaleNumber } from '@project-lc/utils-frontend';
+import { checkCouponAvailable, getLocaleNumber } from '@project-lc/utils-frontend';
 import { useFormContext } from 'react-hook-form';
 
 export function Discount(): JSX.Element {
@@ -58,6 +59,9 @@ export function Discount(): JSX.Element {
       setValue('usedMileageAmount', customerMileage.mileage);
     }
   };
+
+  const orderPrice = watch('orderPrice'); // 주문상품금액
+  const orderItemIdList = watch('orderItems').map((i) => i.goodsId); // 주문상품 goodsId 목록
 
   return (
     <SectionWithTitle title="할인 및 적립금">
@@ -154,6 +158,8 @@ export function Discount(): JSX.Element {
       </Stack>
 
       <CouponSelectDialog
+        orderPrice={orderPrice}
+        orderItemIdList={orderItemIdList as number[]}
         isOpen={couponSelectDialog.isOpen}
         onClose={couponSelectDialog.onClose}
         onCouponSelect={(coupon) => {
@@ -172,25 +178,28 @@ export function Discount(): JSX.Element {
 
 type CouponSelectDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
   onCouponSelect: (coupon: any) => void;
+  orderPrice: number; // 주문 총 상품가격(쿠폰 최소주문금액과 비교하여 쿠폰사용여부 판단용)
+  orderItemIdList: number[]; // 주문 상품 goodsId(number)[] (쿠폰 상품적용가능 여부 판단용)
 };
 /** 쿠폰 선택 다이얼로그 */
 function CouponSelectDialog({
   isOpen,
   onClose,
   onCouponSelect,
+  orderPrice,
+  orderItemIdList,
 }: CouponSelectDialogProps): JSX.Element {
   const { data: customerCoupons } = useCustomerCouponList();
 
   const couponList = customerCoupons
     ? customerCoupons.map((c) => {
         return {
-          id: c.id, // CustomerCoupon 의 고유번호(CustomerCoupon.id)임. Coupon.id 가 아님
-          name: c.coupon.name,
-          amount: c.coupon.amount,
+          ...c.coupon, // 쿠폰정보(관리자가 생성한 쿠폰 정보)
+          id: c.id, // CustomerCoupon의 고유번호(CustomerCoupon.id = 소비자에게 발급된 쿠폰 고유번호)임. Coupon.id(관리자가 생성한 쿠폰 고유번호) 가 아님
         };
       })
     : [];
-  // TODO: 쿠폰 사용 가능여부 처리 필요 (최소 주문금액 등 적용 가능 여부 판단 이후 선택못하도록) + 총 주문가격이 쿠폰할인금액보다 적은경우 처리
+
   const columns: GridColDef[] = [
     { field: 'name', headerName: '쿠폰명', flex: 1 },
     { field: 'amount', headerName: '금액' },
@@ -202,18 +211,29 @@ function CouponSelectDialog({
       filterable: false,
       field: '',
       width: 20,
-      renderCell: ({ row }: GridRowData) => (
-        <Button
-          size="xs"
-          colorScheme="blue"
-          onClick={() => {
-            onCouponSelect({ id: row.id, amount: row.amount });
-            onClose();
-          }}
-        >
-          적용
-        </Button>
-      ),
+      renderCell: ({ row }: GridRowData) => {
+        const { available, reason } = checkCouponAvailable({
+          coupon: row,
+          orderPrice,
+          orderItemIdList,
+        });
+        return (
+          // shouldWrapChildren 있어야 Button disable일때 툴팁 표시됨
+          <Tooltip shouldWrapChildren hasArrow label={reason}>
+            <Button
+              size="xs"
+              colorScheme="blue"
+              disabled={!available}
+              onClick={() => {
+                onCouponSelect({ id: row.id, amount: row.amount });
+                onClose();
+              }}
+            >
+              적용
+            </Button>
+          </Tooltip>
+        );
+      },
     },
   ];
 
