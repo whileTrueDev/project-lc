@@ -287,7 +287,6 @@ CREATE TABLE `Order` (
     `ordererEmail` VARCHAR(191) NOT NULL,
     `memo` VARCHAR(191) NOT NULL,
     `nonMemberOrderFlag` BOOLEAN NOT NULL DEFAULT false,
-    `nonMemberOrderPassword` VARCHAR(191) NULL,
     `giftFlag` BOOLEAN NOT NULL DEFAULT false,
     `supportOrderIncludeFlag` BOOLEAN NOT NULL DEFAULT false,
     `bundleFlag` BOOLEAN NOT NULL DEFAULT false,

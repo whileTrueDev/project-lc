@@ -1565,7 +1565,6 @@ model Order {
   ordererEmail               String // 주문자 이메일
   memo                       String // 배송메시지
   nonMemberOrderFlag         Boolean                      @default(false) // 비회원 주문 여부
-  nonMemberOrderPassword     String? // 비회원주문시 입력받는 비밀번호 - 비회원이 주문조회,취소시 사용할예정
   giftFlag                   Boolean                      @default(false) // 선물주문 여부
   supportOrderIncludeFlag    Boolean                      @default(false) // 후원상품 포함여부
   bundleFlag                 Boolean                      @default(false) // 묶음배송여부

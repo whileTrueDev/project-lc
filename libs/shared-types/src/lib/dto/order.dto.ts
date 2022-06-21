@@ -134,11 +134,6 @@ export class CreateOrderDto {
   @IsOptional()
   nonMemberOrderFlag?: Order['nonMemberOrderFlag'];
 
-  /** 비회원 주문인 경우 입력받는 비밀번호 - 비회원이 주문조회, 취소시 사용할예정, 비회원주문인경우에만 validate */
-  @ValidateIf((o) => o.nonMemberOrderFlag)
-  @IsString()
-  nonMemberOrderPassword?: Order['nonMemberOrderPassword'];
-
   /** 주문금액 = 실제 주문 상품/상품옵션 의 금액 합 */
   @IsNumber()
   orderPrice: Order['orderPrice'];
@@ -385,11 +380,6 @@ export class UpdateOrderDto {
   @IsBoolean()
   @IsOptional()
   nonMemberOrderFlag?: Order['nonMemberOrderFlag'];
-
-  /** 비회원 주문인 경우 입력받는 비밀번호 - 비회원이 주문조회, 취소시 사용할예정, 비회원주문인경우에만 validate */
-  @IsString()
-  @IsOptional()
-  nonMemberOrderPassword?: Order['nonMemberOrderPassword'];
 
   /** 주문금액 = 실제 주문 상품/상품옵션 의 금액 합 */
   @IsNumber()
