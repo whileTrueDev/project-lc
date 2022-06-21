@@ -1,14 +1,10 @@
-import { Button, Center, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
+import { Button, Center, Spinner, Stack, Text } from '@chakra-ui/react';
 import { ExchangeReturnCancelRequestGoodsData } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestGoodsData';
 import { ExchangeReturnCancelRequestStatusBadge } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestStatusBadge';
 import { RelatedRefundData } from '@project-lc/components-shared/order/RelatedRefundData';
-import {
-  useCustomerOrderCancellationDetail,
-  useDeleteCustomerOrderCancel,
-} from '@project-lc/hooks';
+import { useCustomerOrderCancellationDetail } from '@project-lc/hooks';
 import { OrderCancellationData } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { useRouter } from 'next/router';
 
 export interface CustomerOrderCancelDetailProps {
   cancelCode: string;
@@ -41,31 +37,11 @@ export function OrderCancelDetailData({
 }: {
   data: OrderCancellationData;
 }): JSX.Element {
-  const router = useRouter();
-  const toast = useToast();
-
   const requestDate = dayjs(data.requestDate).format('YYYY-MM-DD');
   const completeDate = data.completeDate
     ? dayjs(data.completeDate).format('YYYY-MM-DD')
     : '';
 
-  const { mutateAsync } = useDeleteCustomerOrderCancel();
-  const handleDeleteRequest = (): void => {
-    mutateAsync(data.id)
-      .then((res) => {
-        console.log(res);
-        toast({ title: '주문취소 요청을 철회하였습니다', status: 'success' });
-        router.push('/mypage/exchange-return-cancel');
-      })
-      .catch((e) => {
-        toast({
-          title: '주문취소 요청 철회 중 오류가 발생하였습니다',
-          description: e?.response?.data?.message || e,
-          status: 'error',
-        });
-        console.log(e?.response?.data?.message, e);
-      });
-  };
   return (
     <Stack spacing={8} px={2}>
       <Stack direction="row" justifyContent="space-between">
@@ -90,16 +66,7 @@ export function OrderCancelDetailData({
         <Stack pl={4}>
           <Stack direction="row" alignItems="center">
             <ExchangeReturnCancelRequestStatusBadge status={data.status} />
-            {/* 주문취소요청이 신청됨 상태일때만 철회가능하도록 */}
-            {data.status === 'requested' && (
-              <Button size="xs" onClick={handleDeleteRequest}>
-                철회하기
-              </Button>
-            )}
           </Stack>
-          {data.rejectReason && (
-            <Text pl={4}>주문취소 거절 사유 : {data.rejectReason}</Text>
-          )}
 
           <Text>요청일 : {requestDate}</Text>
           {completeDate && <Text>완료일 : {completeDate}</Text>}
