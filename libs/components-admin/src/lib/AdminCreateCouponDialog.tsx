@@ -24,6 +24,7 @@ import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { AmountUnit, DiscountApplyType, DiscountApplyField } from '@prisma/client';
 import { useAdminCouponMutation } from '@project-lc/hooks';
 import { CouponDto } from '@project-lc/shared-types';
+import dayjs from 'dayjs';
 import { AdminCreateCouponConfirmDialog } from './AdminCreateCouponConfirmDialog';
 import { AdminCouponCreationGoodsList } from './AdminCouponCreationGoodsList';
 
@@ -98,7 +99,6 @@ export function AdminCreateCouponDialog(
       })
       .catch(() => toast({ description: '등록에 실패하였습니다', status: 'error' }));
   };
-
   return (
     <>
       <Modal isOpen={isOpen} onClose={handleModalClose} size="5xl">
@@ -113,35 +113,38 @@ export function AdminCreateCouponDialog(
                   <Flex direction="column" h="700px" justifyContent="space-between">
                     <FormControl isInvalid={!!errors.name}>
                       <Flex direction="column">
-                        <Text>쿠폰이름</Text>
+                        <Text>*쿠폰이름</Text>
                         <Input {...register('name', { required: true })} />
                         <FormErrorMessage>쿠폰 이름을 등록하세요</FormErrorMessage>
                       </Flex>
                     </FormControl>
                     <FormControl isInvalid={!!errors.unit}>
                       <Flex direction="column">
-                        <Text>할인방법</Text>
+                        <Text>*할인방법</Text>
                         <Controller
                           name="unit"
                           control={control}
                           render={({ field }) => (
                             <Select placeholder="쿠폰 할인 유형" {...field}>
-                              <option value="P">퍼센트</option>
-                              <option value="W">원</option>
+                              <option value="P">퍼센트(%)</option>
+                              <option value="W">원(\)</option>
                             </Select>
                           )}
-                          rules={{ required: '할인방법을 선택해주세요' }}
+                          rules={{
+                            required: '할인방법을 선택해주세요',
+                          }}
                         />
                       </Flex>
                       <FormErrorMessage>{errors.unit?.message}</FormErrorMessage>
                     </FormControl>
                     <FormControl isInvalid={!!errors.amount}>
                       <Flex direction="column">
-                        <Text>할인액/할인율</Text>
+                        <Text>*할인액/할인율</Text>
                         <InputGroup maxW="200px">
                           <Input
                             {...register('amount', {
                               required: '할인액(할인율)을 입력해주세요',
+                              min: { value: 1, message: '최소값은 1입니다' },
                               valueAsNumber: true,
                             })}
                           />
@@ -154,7 +157,7 @@ export function AdminCreateCouponDialog(
                     </FormControl>
                     <FormControl isInvalid={!!errors.applyField}>
                       <Flex direction="column">
-                        <Text>할인영역</Text>
+                        <Text>*할인영역</Text>
                         <Controller
                           name="applyField"
                           control={control}
@@ -171,7 +174,7 @@ export function AdminCreateCouponDialog(
                     </FormControl>
                     <FormControl isInvalid={!!errors.applyType}>
                       <Flex direction="column">
-                        <Text>할인상품선택</Text>
+                        <Text>*할인상품선택</Text>
                         <Controller
                           name="applyType"
                           control={control}
@@ -189,11 +192,12 @@ export function AdminCreateCouponDialog(
                     </FormControl>
                     <FormControl isInvalid={!!errors.startDate}>
                       <Flex direction="column">
-                        <Text>시작날짜</Text>
+                        <Text>*시작날짜</Text>
                         <Input
                           type="datetime-local"
                           {...register('startDate', {
-                            required: '쿠폰 시작날짜를 입력하세요',
+                            validate: (v) =>
+                              dayjs(v).isValid() || '시작날짜를 입력해주세요',
                             valueAsDate: true,
                           })}
                         />
@@ -227,7 +231,10 @@ export function AdminCreateCouponDialog(
                   </Flex>
                 </GridItem>
                 <GridItem>
-                  {watch('applyType') !== 'allGoods' && <AdminCouponCreationGoodsList />}
+                  {(watch('applyType') === 'selectedGoods' ||
+                    watch('applyType') === 'exceptSelectedGoods') && (
+                    <AdminCouponCreationGoodsList />
+                  )}
                 </GridItem>
               </Grid>
             </ModalBody>
