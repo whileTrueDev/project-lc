@@ -3,6 +3,7 @@ import { OrderPayment, PaymentMethod } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreatePaymentRes,
+  KKsPaymentProviders,
   Payment,
   PaymentRequestDto,
   PaymentTransaction,
@@ -10,22 +11,19 @@ import {
 } from '@project-lc/shared-types';
 import { PaymentsByDateRequestType, TossPaymentsApi } from '@project-lc/utils';
 
-export enum KKsPaymentProviders {
-  TossPayments = 'TossPayments',
-  NaverPay = 'NaverPay', // 코드 이해를 위해 임시로 추가해둠. 현재 사용하지 않음 (220516 by hwasurr)
-}
-
 @Injectable()
 export class PaymentService {
   constructor(private readonly prisma: PrismaService) {}
 
   /** 크크쇼 OrderPayment 테이블에 결제 데이터 저장 */
-  async savePaymentRecord(dto: {
+  public async savePaymentRecord(dto: {
     method: string;
     orderId?: number;
     paymentKey: string;
     depositDate?: Date;
     depositor?: string;
+    depositSecret?: string;
+    depositDueDate?: Date;
     depositDoneFlag: boolean;
     account?: string;
   }): Promise<OrderPayment> {
@@ -46,7 +44,7 @@ export class PaymentService {
   }
 
   /** 토스페이먼츠 결제승인 요청 API */
-  async createPayment(dto: PaymentRequestDto): Promise<CreatePaymentRes> {
+  public async createPayment(dto: PaymentRequestDto): Promise<CreatePaymentRes> {
     try {
       const result = await TossPaymentsApi.createPayment(dto);
 
@@ -54,8 +52,16 @@ export class PaymentService {
       const orderPayment = await this.savePaymentRecord({
         method: result.method as PaymentMethod,
         paymentKey: result.paymentKey,
-        depositDate: new Date(result.approvedAt),
+        depositDate: result.approvedAt ? new Date(result.approvedAt) : null,
         depositDoneFlag: !!result.approvedAt,
+        depositSecret: result.secret,
+        depositor: result.virtualAccount?.customerName,
+        account: result.virtualAccount
+          ? `${result.virtualAccount.bank}_${result.virtualAccount.accountNumber}`
+          : null,
+        depositDueDate: result.virtualAccount?.dueDate
+          ? new Date(result.virtualAccount?.dueDate)
+          : null,
       });
 
       return { status: 'success', orderId: dto.orderId, orderPaymentId: orderPayment.id };
@@ -70,7 +76,7 @@ export class PaymentService {
   }
 
   /** 주문번호별 결제내역 */
-  async getPaymentByOrderCode(orderId: string): Promise<Payment> {
+  public async getPaymentByOrderCode(orderId: string): Promise<Payment> {
     try {
       return TossPaymentsApi.getPaymentByOrderId(orderId);
     } catch (error) {
@@ -83,7 +89,9 @@ export class PaymentService {
   }
 
   /** 날짜 기간 거래내역 */
-  async getPaymentsByDate(dto: PaymentsByDateRequestType): Promise<PaymentTransaction> {
+  public async getPaymentsByDate(
+    dto: PaymentsByDateRequestType,
+  ): Promise<PaymentTransaction> {
     try {
       return TossPaymentsApi.getPaymentsByDate(dto);
     } catch (error) {
@@ -96,10 +104,10 @@ export class PaymentService {
   }
 
   /** 토스페이먼츠 결제취소 요청 래핑 & 에러핸들링 */
-  async requestCancel<P extends KKsPaymentProviders, DTO extends PaymentCancelDto<P>>(
-    provider: P,
-    _dto: DTO,
-  ): Promise<{ transactionKey: string } & Record<string, any>> {
+  public async requestCancel<
+    P extends KKsPaymentProviders,
+    DTO extends PaymentCancelDto<P>,
+  >(provider: P, _dto: DTO): Promise<{ transactionKey: string } & Record<string, any>> {
     try {
       if (provider === KKsPaymentProviders.TossPayments) {
         const dto = _dto as TossPaymentCancelDto;
