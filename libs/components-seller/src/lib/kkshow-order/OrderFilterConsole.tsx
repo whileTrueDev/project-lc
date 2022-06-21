@@ -11,6 +11,7 @@ import {
   Select,
   Stack,
   Text,
+  Divider,
 } from '@chakra-ui/react';
 import { OrderProcessStep } from '@prisma/client';
 import { useDisplaySize } from '@project-lc/hooks';
@@ -18,6 +19,9 @@ import {
   fmOrderStatuses,
   getOrderProcessStepNameByStringNumber,
   orderProcessStepDict,
+  kkshowOrderStatuses,
+  KkshowOrderCancelEnum,
+  KkshowOrderStatusExtendedType,
 } from '@project-lc/shared-types';
 import { SellerOrderFilterFormType, useSellerOrderStore } from '@project-lc/stores';
 import moment from 'moment';
@@ -42,6 +46,13 @@ export function OrderFilterConsole(): JSX.Element {
   const onSubmit: SubmitHandler<SellerOrderFilterFormType> = (data) => {
     console.log(data);
     handleOrderSearchStates(data);
+  };
+
+  const resetCheckBox = (): void => {
+    if (getValues('searchStatuses') || getValues('searchExtendedStatus')) {
+      setValue('searchStatuses', []);
+      setValue('searchExtendedStatus', []);
+    }
   };
 
   return (
@@ -139,6 +150,10 @@ export function OrderFilterConsole(): JSX.Element {
                   'searchStatuses',
                   Object.keys(orderProcessStepDict) as OrderProcessStep[],
                 );
+                setValue(
+                  'searchExtendedStatus',
+                  Object.keys(KkshowOrderCancelEnum) as KkshowOrderStatusExtendedType[],
+                );
               }}
             >
               전체 선택
@@ -147,11 +162,7 @@ export function OrderFilterConsole(): JSX.Element {
               size="xs"
               variant="outline"
               borderColor="red.200"
-              onClick={
-                getValues('searchStatuses')
-                  ? () => setValue('searchStatuses', [])
-                  : undefined
-              }
+              onClick={resetCheckBox}
             >
               전체 취소
             </Button>
@@ -189,6 +200,41 @@ export function OrderFilterConsole(): JSX.Element {
                 );
               },
             )}
+            <Divider />
+            {(
+              Object.keys(kkshowOrderStatuses) as Array<keyof typeof kkshowOrderStatuses>
+            ).map((orderStatus) => {
+              return (
+                <>
+                  {Object.keys(KkshowOrderCancelEnum).includes(orderStatus) && (
+                    <Checkbox
+                      m={1}
+                      aria-label={`order-status-${kkshowOrderStatuses[orderStatus].name}`}
+                      key={orderStatus}
+                      colorScheme={kkshowOrderStatuses[orderStatus].chakraColor}
+                      isChecked={watch('searchExtendedStatus')?.includes(orderStatus)}
+                      onChange={(_) => {
+                        const prev = getValues('searchExtendedStatus');
+                        if (!prev) {
+                          return setValue('searchExtendedStatus', [orderStatus]);
+                        }
+                        if (prev.includes(orderStatus)) {
+                          return setValue(
+                            'searchExtendedStatus',
+                            prev.filter((x) => x !== orderStatus),
+                          );
+                        }
+                        return setValue('searchExtendedStatus', prev.concat(orderStatus));
+                      }}
+                    >
+                      <Badge colorScheme={kkshowOrderStatuses[orderStatus].chakraColor}>
+                        {kkshowOrderStatuses[orderStatus].name}
+                      </Badge>
+                    </Checkbox>
+                  )}
+                </>
+              );
+            })}
           </Box>
         </Box>
       </Stack>

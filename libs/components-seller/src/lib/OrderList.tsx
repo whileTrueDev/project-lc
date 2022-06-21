@@ -13,14 +13,14 @@ import { GridColumns, GridRowId, GridToolbarContainer } from '@material-ui/data-
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { TooltipedText } from '@project-lc/components-core/TooltipedText';
 import { FmOrderStatusBadge } from '@project-lc/components-shared/FmOrderStatusBadge';
-import { useDisplaySize, useFmOrders } from '@project-lc/hooks';
+import { useDisplaySize, useFmOrders, useKkshowOrders } from '@project-lc/hooks';
 import {
   convertFmOrderStatusToString,
   convertOrderSitetypeToString,
   FmOrderStatusNumString,
   isOrderExportable,
 } from '@project-lc/shared-types';
-import { useFmOrderStore } from '@project-lc/stores';
+import { useFmOrderStore, useKkshowOrderSearchStore } from '@project-lc/stores';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
@@ -157,15 +157,17 @@ const columns: GridColumns = [
 
 export function OrderList(): JSX.Element {
   const exportManyDialog = useDisclosure();
-  const fmOrderStates = useFmOrderStore();
-  const orders = useFmOrders(fmOrderStates);
+  const kkshowOrderStates = useKkshowOrderSearchStore();
+  const orders = useKkshowOrders(kkshowOrderStates);
   const { isDesktopSize } = useDisplaySize();
-
+  console.log(orders);
   const isExportable = useMemo(() => {
     if (!orders.data) return false;
-    const _so = orders.data.filter((o) => fmOrderStates.selectedOrders.includes(o.id));
+    const _so = orders.data.filter((o) =>
+      kkshowOrderStates.selectedOrders.includes(o.id),
+    );
     return _so.filter((so) => isOrderExportable(so.step)).length > 0;
-  }, [fmOrderStates.selectedOrders, orders.data]);
+  }, [kkshowOrderStates.selectedOrders, orders.data]);
 
   const filteredOrders = useMemo(() => {
     if (!orders.data) return [];
@@ -191,8 +193,8 @@ export function OrderList(): JSX.Element {
         })}
         rows={filteredOrders}
         checkboxSelection
-        selectionModel={fmOrderStates.selectedOrders}
-        onSelectionModelChange={fmOrderStates.handleOrderSelected}
+        selectionModel={kkshowOrderStates.selectedOrders}
+        onSelectionModelChange={kkshowOrderStates.handleOrderSelected}
         components={{
           Toolbar: () => (
             <OrderToolbar
@@ -238,7 +240,7 @@ export function OrderToolbar({ options }: OrderToolbarProps): JSX.Element {
   const xSize = useBreakpoint();
   const isMobile = useMemo(() => xSize && ['base', 'sm'].includes(xSize), [xSize]);
 
-  const selectedOrders = useFmOrderStore((state) => state.selectedOrders);
+  const selectedOrders = useKkshowOrderSearchStore((state) => state.selectedOrders);
 
   return (
     <GridToolbarContainer>

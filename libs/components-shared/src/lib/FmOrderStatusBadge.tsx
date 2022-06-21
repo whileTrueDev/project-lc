@@ -3,17 +3,21 @@ import {
   convertFmOrderStatusToString,
   fmOrderStatuses,
   getFmOrderStatusColor,
+  orderProcessStepKoreanDict,
+  kkshowOrderStatuses,
+  KkshowOrderStatusExtended,
 } from '@project-lc/shared-types';
+import { OrderItemOption, OrderProcessStep } from '@prisma/client';
 
-export interface FmOrderStatusBadgeProps {
-  orderStatus: keyof typeof fmOrderStatuses;
+export interface KkshowOrderStatusBadgeProps {
+  orderStatus: keyof typeof kkshowOrderStatuses;
 }
 export function FmOrderStatusBadge({
   orderStatus,
-}: FmOrderStatusBadgeProps): JSX.Element {
+}: KkshowOrderStatusBadgeProps): JSX.Element {
   return (
-    <Badge colorScheme={getFmOrderStatusColor(orderStatus)} variant="solid">
-      {convertFmOrderStatusToString(orderStatus)}
+    <Badge colorScheme={kkshowOrderStatuses[orderStatus].chakraColor} variant="solid">
+      {orderProcessStepKoreanDict[orderStatus]}
     </Badge>
   );
 }

@@ -1,4 +1,10 @@
-import { CreateOrderForm, ShippingCostByShippingGroupId } from '@project-lc/shared-types';
+import {
+  CreateOrderForm,
+  ShippingCostByShippingGroupId,
+  FindFmOrdersDto,
+  OrderFilterFormType,
+} from '@project-lc/shared-types';
+import { GridRowId, GridSelectionModel } from '@material-ui/data-grid';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -92,4 +98,35 @@ export const useKkshowOrderStore = create<KkshowOrderStore>(
     }),
     { name: 'kkshow-order-storage' }, // 로컬스토리지 키값(고유식별값)
   ),
+);
+
+export interface KkshowOrderSearchStoreState extends FindFmOrdersDto {
+  handleOrderSearchStates(dto: OrderFilterFormType): void;
+  selectedOrders: GridRowId[];
+  handleOrderSelected: (s: GridSelectionModel) => void;
+}
+export const useKkshowOrderSearchStore = create<KkshowOrderSearchStoreState>(
+  (set, get) => ({
+    search: '',
+    searchDateType: '주문일',
+    searchStartDate: null,
+    searchEndDate: null,
+    searchStatuses: [],
+    searchExtendedStatuses: [],
+    handleOrderSearchStates(dto: OrderFilterFormType) {
+      set({
+        search: dto.search,
+        searchDateType: dto.searchDateType,
+        searchStartDate: dto.searchStartDate || undefined,
+        searchEndDate: dto.searchEndDate || undefined,
+        searchStatuses: dto.searchStatuses,
+        searchExtendedStatuses: dto.searchExtendedStatuses,
+      });
+    },
+
+    selectedOrders: [],
+    handleOrderSelected(s: GridSelectionModel) {
+      set({ selectedOrders: s });
+    },
+  }),
 );

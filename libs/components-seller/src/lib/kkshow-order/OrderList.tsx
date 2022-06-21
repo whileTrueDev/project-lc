@@ -9,7 +9,12 @@ import {
   useBreakpoint,
   useDisclosure,
 } from '@chakra-ui/react';
-import { GridColumns, GridRowId, GridToolbarContainer } from '@material-ui/data-grid';
+import {
+  GridColumns,
+  GridRowId,
+  GridToolbarContainer,
+  GridRowData,
+} from '@material-ui/data-grid';
 import { OrderItemOption, OrderProcessStep } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { TooltipedText } from '@project-lc/components-core/TooltipedText';
@@ -19,6 +24,7 @@ import {
   isOrderExportable,
   OrderItemWithRelations,
   orderProcessStepDict,
+  orderProcessStepKoreanDict,
 } from '@project-lc/shared-types';
 import { useSellerOrderStore } from '@project-lc/stores';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
@@ -125,15 +131,25 @@ const columns: GridColumns = [
     disableColumnMenu: true,
     disableReorder: true,
     width: 120,
-    renderCell: ({ row }) => (
-      <Box lineHeight={2}>
-        <FmOrderStatusBadge
-          orderStatus={orderProcessStepDict[row.step as OrderProcessStep]}
-        />
-      </Box>
-    ),
+    renderCell: ({ row }) => <Box lineHeight={2}>{KkshowOrderStatusBadge(row)}</Box>,
   },
 ];
+
+function KkshowOrderStatusBadge(row: GridRowData): JSX.Element {
+  if (row.returns.length) {
+    return <FmOrderStatusBadge orderStatus="returns" />;
+  }
+  if (row.refunds.length) {
+    return <FmOrderStatusBadge orderStatus="refunds" />;
+  }
+  if (row.exchanges.length) {
+    return <FmOrderStatusBadge orderStatus="exchanges" />;
+  }
+  if (row.orderCancellations.length) {
+    return <FmOrderStatusBadge orderStatus="orderCancellations" />;
+  }
+  return <FmOrderStatusBadge orderStatus={row.step} />;
+}
 
 export function OrderList(): JSX.Element {
   // 페이지당 행 select
@@ -151,8 +167,14 @@ export function OrderList(): JSX.Element {
   const { data: profileData } = useProfile();
 
   const sellerOrderListDto = useMemo(() => {
-    const { search, searchDateType, periodStart, periodEnd, searchStatuses } =
-      sellerOrderStates;
+    const {
+      search,
+      searchDateType,
+      periodStart,
+      periodEnd,
+      searchStatuses,
+      searchExtendedStatus,
+    } = sellerOrderStates;
 
     return {
       search,
@@ -160,11 +182,13 @@ export function OrderList(): JSX.Element {
       periodStart,
       periodEnd,
       searchStatuses,
+      searchExtendedStatus,
       sellerId: profileData?.id,
       take: pageSize,
       skip: pageSize * page,
     };
   }, [page, pageSize, profileData?.id, sellerOrderStates]);
+  console.log(sellerOrderListDto);
   const orders = useSellerOrderList(sellerOrderListDto);
   const { isDesktopSize } = useDisplaySize();
 
@@ -206,7 +230,7 @@ export function OrderList(): JSX.Element {
       orders.data?.count ? orders.data.count : prevRowCountState,
     );
   }, [orders.data, setRowCountState]);
-
+  console.log(orders.data);
   return (
     <Box minHeight={{ base: 300, md: 600 }} mb={24}>
       <ChakraDataGrid

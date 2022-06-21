@@ -26,6 +26,10 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import {
+  KkshowOrderStatusExtended,
+  KkshowOrderCancelEnum,
+} from '../constants/kkshowOrderStatuses';
 
 // ------------------생성 dto--------------------
 
@@ -255,6 +259,8 @@ export type CreateOrderForm = CreateOrderDto & {
   recipientPhone3?: string;
 };
 
+// export type OrderProcessStepExtended = OrderProcessStep & KkshowOrderCancelEnum;
+
 // ------------------조회 dto--------------------
 /** 주문 목록 조회 dto */
 export class GetOrderListDto {
@@ -319,6 +325,10 @@ export class GetOrderListDto {
   @IsOptional()
   @IsEnum(OrderProcessStep, { each: true })
   searchStatuses?: OrderProcessStep[];
+
+  @IsOptional()
+  @IsEnum(KkshowOrderStatusExtended, { each: true })
+  searchExtendedStatus?: KkshowOrderStatusExtended[];
 }
 
 /** 비회원 주문 조회 dto */
