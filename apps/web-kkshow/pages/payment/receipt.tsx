@@ -10,6 +10,7 @@ import {
   useColorModeValue,
   Spinner,
   Center,
+  useToast,
 } from '@chakra-ui/react';
 import { useDisplaySize, usePaymentByOrderCode, useOrderDetail } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
@@ -23,6 +24,7 @@ import dayjs from 'dayjs';
 
 export function Receipt(): JSX.Element {
   const router = useRouter();
+  const toast = useToast();
   const { isDesktopSize } = useDisplaySize();
   const orderCode = router.query.orderCode as string;
   const orderId = Number(router.query.orderId);
@@ -52,6 +54,12 @@ export function Receipt(): JSX.Element {
         .toLocaleString()
     : '';
 
+  const copyOrderCode = (): void => {
+    navigator.clipboard.writeText(orderCode);
+
+    toast({ title: '복사되었습니다.', status: 'success' });
+  };
+
   if (orderDetailLoading) {
     return (
       <KkshowLayout>
@@ -78,6 +86,25 @@ export function Receipt(): JSX.Element {
                 ) : (
                   <Heading>주문 완료</Heading>
                 )}
+              </Flex>
+            </GridItem>
+            <GridItem colSpan={7}>
+              <Heading>주문코드</Heading>
+              {orderDetailData?.nonMemberOrderFlag && (
+                <Text fontSize="sm">
+                  * 비회원 주문조회시 주문코드와 주문자명이 필요합니다.
+                </Text>
+              )}
+              <Flex
+                bg={virtualAccountBoxBgColor}
+                p={5}
+                borderRadius="10px"
+                alignItems="center"
+              >
+                <Text fontSize={{ base: 'md', sm: 'xl' }}>{orderCode}</Text>
+                <Button size="sm" ml={4} onClick={copyOrderCode}>
+                  복사
+                </Button>
               </Flex>
             </GridItem>
             <GridItem colSpan={7}>
