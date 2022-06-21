@@ -1,7 +1,7 @@
 import {
   CreateOrderForm,
   ShippingCostByShippingGroupId,
-  FindFmOrdersDto,
+  FindKkshowOrderDto,
   OrderFilterFormType,
 } from '@project-lc/shared-types';
 import { GridRowId, GridSelectionModel } from '@material-ui/data-grid';
@@ -100,7 +100,7 @@ export const useKkshowOrderStore = create<KkshowOrderStore>(
   ),
 );
 
-export interface KkshowOrderSearchStoreState extends FindFmOrdersDto {
+export interface KkshowOrderSearchStoreState extends FindKkshowOrderDto {
   handleOrderSearchStates(dto: OrderFilterFormType): void;
   selectedOrders: GridRowId[];
   handleOrderSelected: (s: GridSelectionModel) => void;

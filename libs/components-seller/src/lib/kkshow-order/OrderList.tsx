@@ -15,7 +15,7 @@ import {
   GridToolbarContainer,
   GridRowData,
 } from '@material-ui/data-grid';
-import { OrderItemOption, OrderProcessStep } from '@prisma/client';
+import { OrderItemOption } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { TooltipedText } from '@project-lc/components-core/TooltipedText';
 import { useDisplaySize, useProfile, useSellerOrderList } from '@project-lc/hooks';
@@ -23,7 +23,6 @@ import {
   isOrderExportable,
   OrderItemWithRelations,
   orderProcessStepDict,
-  orderProcessStepKoreanDict,
 } from '@project-lc/shared-types';
 import { useSellerOrderStore } from '@project-lc/stores';
 import { getLocaleNumber } from '@project-lc/utils-frontend';

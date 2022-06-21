@@ -209,7 +209,7 @@ export function OrderFilterConsole(): JSX.Element {
                     <Checkbox
                       m={1}
                       aria-label={`order-status-${kkshowOrderStatuses[orderStatus].name}`}
-                      key={orderStatus}
+                      key={`extended-${orderStatus}`}
                       colorScheme={kkshowOrderStatuses[orderStatus].chakraColor}
                       isChecked={watch('searchExtendedStatus')?.includes(orderStatus)}
                       onChange={(_) => {
