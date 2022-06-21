@@ -63,6 +63,18 @@ export function Discount(): JSX.Element {
   const orderPrice = watch('orderPrice'); // 주문상품금액
   const orderItemIdList = watch('orderItems').map((i) => i.goodsId); // 주문상품 goodsId 목록
 
+  const customerId = watch('customerId');
+  const isNonMemberOrder = !customerId;
+
+  // 비회원주문인경우 쿠폰 및 적립금 사용 불가
+  if (isNonMemberOrder) {
+    return (
+      <SectionWithTitle title="할인 및 적립금">
+        <Text>로그인 시 할인쿠폰 및 적립금 혜택을 받을 수 있습니다</Text>
+      </SectionWithTitle>
+    );
+  }
+
   return (
     <SectionWithTitle title="할인 및 적립금">
       <Stack spacing={4}>
@@ -101,6 +113,7 @@ export function Discount(): JSX.Element {
                 size="sm"
                 onFocus={(e) => e.target.select()}
                 {...register('usedMileageAmount', {
+                  valueAsNumber: true,
                   max: customerMileage
                     ? {
                         value: customerMileage.mileage,

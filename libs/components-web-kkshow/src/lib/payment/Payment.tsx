@@ -78,14 +78,31 @@ export function MileageBenefit({
 
 export function PaymentBox(): JSX.Element {
   const { order, shipping } = useKkshowOrderStore();
-  const PRODUCT_PRICE = order.orderPrice;
+
+  const PRODUCT_PRICE =
+    order.orderItems
+      .flatMap((item) => item.options)
+      .map((opt) => Number(opt.normalPrice) * opt.quantity)
+      .reduce((s, a) => s + Number(a), 0) || 0;
+
+  const productDiscountedPrice =
+    order.orderItems
+      .flatMap((item) => item.options)
+      .map((opt) => Number(opt.discountPrice) * opt.quantity)
+      .reduce((s, a) => s + Number(a), 0) || 0;
+
+  const DISCOUNT = PRODUCT_PRICE - productDiscountedPrice;
+
   // orderItem.shippingCost 가 아닌 kkshowOrderStore에 저장된 배송비 정보 참조하여 배송비 계산
   const SHIPPING_COST = Object.values(shipping).reduce((prev, curr) => {
     if (!curr.cost) return prev;
     return prev + curr.cost.std + curr.cost.add;
   }, 0);
-  const DISCOUNT = order.totalDiscount || 0;
+
   const { watch } = useFormContext<CreateOrderForm>();
+
+  const noMileageBenefit =
+    mileageSetting.mileageStrategy === 'noMileage' || !watch('customerId'); // 로그인 안한경우도 적립안됨
 
   return (
     <Box
@@ -97,7 +114,7 @@ export function PaymentBox(): JSX.Element {
     >
       <SectionWithTitle title="적립혜택" disableDivider>
         <Flex justifyContent="space-between" h="60px" alignItems="center">
-          {mileageSetting.mileageStrategy === 'noMileage' ? (
+          {noMileageBenefit ? (
             <Text>적립 혜택이 없습니다</Text>
           ) : (
             <>
@@ -184,8 +201,7 @@ export function PaymentBox(): JSX.Element {
       </Center>
 
       <Box mt={6}>
-        <TermBox shopName="테스트" />
-        {/* // TODO: shopName 변경 */}
+        <TermBox shopName="테스트" /> {/* // TODO: shopName 변경 */}
       </Box>
     </Box>
   );

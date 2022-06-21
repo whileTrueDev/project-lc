@@ -24,15 +24,6 @@ export const orderNeedToFillInDefault = {
 };
 
 /** 주문 준비 데이터 타입  */
-// export type OrderPrepareData = Pick<
-//   CreateOrderForm,
-//   | 'orderItems'
-//   | 'cartItemIdList'
-//   | 'giftFlag'
-//   | 'nonMemberOrderFlag'
-//   | 'orderPrice'
-//   | 'supportOrderIncludeFlag'
-// >;
 export type OrderPrepareData = Partial<CreateOrderForm>;
 
 /** 배송비정보 타입 */
@@ -51,8 +42,11 @@ export interface KkshowOrderStore {
 
   // ******* 배송비 저장
   shipping: OrderShippingData;
+  resetShippingData: () => void;
   setShippingData: (data: OrderShippingData) => void;
 }
+
+export const KKSHOW_ORDER_STORAGE_KEY = 'K_OR_STRG';
 export const useKkshowOrderStore = create<KkshowOrderStore>(
   // 로컬스토리지 사용 => 결제완료 후(토스페이먼츠 결제요청 이후) Order 데이터 생성하려고 하는데 리다이렉트 이후 store에 있는 데이터가 사라져서
   persist(
@@ -86,10 +80,11 @@ export const useKkshowOrderStore = create<KkshowOrderStore>(
 
       // ******* 배송비 저장
       shipping: {},
+      resetShippingData: () => set({ shipping: {} }),
       setShippingData: (data: OrderShippingData) => {
         set({ shipping: data });
       },
     }),
-    { name: 'kkshow-order-storage' }, // 로컬스토리지 키값(고유식별값)
+    { name: KKSHOW_ORDER_STORAGE_KEY }, // 로컬스토리지 키값(고유식별값)
   ),
 );

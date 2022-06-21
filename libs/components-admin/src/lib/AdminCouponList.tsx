@@ -141,7 +141,7 @@ export function AdminCouponList(): JSX.Element {
         data={couponDetail}
       />
       <ConfirmDialog
-        title="일괄발급확인"
+        title="삭제"
         isOpen={deleteIsOpen}
         onClose={deleteOnClose}
         onConfirm={handleCouponDelete}

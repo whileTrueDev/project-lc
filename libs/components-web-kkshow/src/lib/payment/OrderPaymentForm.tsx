@@ -4,6 +4,7 @@ import { CreateOrderForm } from '@project-lc/shared-types';
 import { useCartStore, useKkshowOrderStore } from '@project-lc/stores';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { setCookie } from '@project-lc/utils-frontend';
+import { useEffect } from 'react';
 import { BuyerInfo } from './BuyerInfo';
 import { DeliveryAddress } from './DeliveryAddress';
 import { Discount } from './Discount';
@@ -46,7 +47,16 @@ export function OrderPaymentForm(): JSX.Element | null {
     productName = productNameArray[0] || '';
   }
 
-  const { getValues } = methods;
+  const { getValues, setValue } = methods;
+
+  // 로그인하여 소비자 정보가 있는경우 id등 기타 정보 저장
+  useEffect(() => {
+    if (profile) {
+      setValue('customerId', profile?.id);
+      setValue('ordererName', profile?.name || '');
+      setValue('ordererEmail', profile?.email || '');
+    }
+  }, [profile, setValue]);
 
   // * submit => doPayment 실행(success 혹은 fail로 리다이렉트 됨)
   const onSubmit: SubmitHandler<CreateOrderForm> = async (submitData) => {
