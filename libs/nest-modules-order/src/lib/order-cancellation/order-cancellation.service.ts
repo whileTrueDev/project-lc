@@ -119,7 +119,7 @@ export class OrderCancellationService {
       skip,
       orderBy: { requestDate: 'desc' },
       include: {
-        order: { select: { orderCode: true, id: true } },
+        order: { select: { orderCode: true, id: true, paymentPrice: true } },
         refund: true,
         items: {
           include: {
@@ -230,7 +230,7 @@ export class OrderCancellationService {
     const orderCancel = await this.prisma.orderCancellation.findUnique({
       where: { cancelCode },
       include: {
-        order: { select: { orderCode: true, id: true } },
+        order: { select: { orderCode: true, id: true, paymentPrice: true } },
         refund: true,
         items: {
           include: {

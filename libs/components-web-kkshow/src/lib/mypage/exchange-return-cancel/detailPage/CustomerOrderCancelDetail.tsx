@@ -82,12 +82,10 @@ export function OrderCancelDetailData({
         </Stack>
       </Stack>
 
-      {/* 환불정보 */}
+      {/* 환불정보 - 주문취소는 상품 배송전에만 신청 가능 && 전체 주문상품을 취소하므로 배송비 포함한 실 결제금액 환불해야함 -> order.paymentPrice */}
       <RelatedRefundData
         refund={data.refund}
-        estimatedRefundAmount={data.items
-          .map((item) => item.price)
-          .reduce((sum, price) => sum + price, 0)}
+        estimatedRefundAmount={data.order.paymentPrice}
       />
     </Stack>
   );
