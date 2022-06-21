@@ -20,12 +20,12 @@ import {
 } from '@chakra-ui/react';
 import { useExportBundledOrdersMutation } from '@project-lc/hooks';
 import {
-  ExportBundledOrdersDto,
-  ExportOrderDto,
-  FindFmOrderRes,
-  fmDeliveryCompanies,
+  CreateKkshowExportDto,
+  ExportManyDto,
+  OrderDetailRes,
 } from '@project-lc/shared-types';
-import { fmExportStore } from '@project-lc/stores';
+import { sellerExportStore } from '@project-lc/stores';
+import { deliveryCompanies } from '@project-lc/utils-frontend';
 import { useCallback, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -34,13 +34,13 @@ export interface ExportBundleDialogProps {
   onClose: () => void;
   onSuccess?: () => Promise<void> | void;
   orders: Pick<
-    FindFmOrderRes,
-    | 'shipping_seq'
-    | 'order_user_name'
-    | 'recipient_address'
-    | 'recipient_address_detail'
-    | 'recipient_user_name'
-    | 'recipient_cellphone'
+    OrderDetailRes,
+    | 'shippings'
+    | 'ordererName'
+    | 'recipientAddress'
+    | 'recipientDetailAddress'
+    | 'recipientName'
+    | 'recipientPhone'
   >[];
 }
 export function ExportBundleDialog({
@@ -50,8 +50,8 @@ export function ExportBundleDialog({
   orders,
 }: ExportBundleDialogProps): JSX.Element {
   const toast = useToast();
-  const { getValues } = useFormContext<ExportOrderDto[]>();
-  const selectedOrderShippings = fmExportStore((s) => s.selectedOrderShippings);
+  const { getValues } = useFormContext<CreateKkshowExportDto[]>();
+  const selectedOrderShippings = sellerExportStore((s) => s.selectedOrderShippings);
   const [deliveryCompany, setDeliveryCompany] = useState('');
   const [deliveryNumber, setDeliveryNumber] = useState('');
 
@@ -60,10 +60,8 @@ export function ExportBundleDialog({
   /** 합포장 출고처리 가능한 지 체크 */
   const isAbleToBundle = useMemo(() => {
     const targetOrders = orders.filter((order) => {
-      const shippingIds = order.shipping_seq.split(',');
-      if (!shippingIds || shippingIds.length === 0) return false;
-      return shippingIds.some((shippingSeq) => {
-        return selectedOrderShippings.includes(Number(shippingSeq));
+      return order.shippings?.some((shipp) => {
+        return selectedOrderShippings.includes(shipp.id);
       });
     });
 
@@ -73,26 +71,24 @@ export function ExportBundleDialog({
       if (!prev) return true;
       // * 선택한 주문의 주문자, 받는곳, 받는분, 받는분 연락처(휴대폰)의 정보가 동일해야 합니다.
       // 주문자
-      if (order.order_user_name !== prev.order_user_name) return false;
+      if (order.ordererName !== prev.ordererName) return false;
       // 받는 곳
-      if (order.recipient_address !== prev.recipient_address) return false;
-      if (order.recipient_address_detail !== prev.recipient_address_detail) return false;
+      if (order.recipientAddress !== prev.recipientAddress) return false;
+      if (order.recipientDetailAddress !== prev.recipientDetailAddress) return false;
       // 받는 분
-      if (order.recipient_user_name !== prev.recipient_user_name) return false;
+      if (order.recipientName !== prev.recipientName) return false;
       // 받는 분 연락처
-      if (order.recipient_cellphone !== prev.recipient_cellphone) return false;
-
+      if (order.recipientPhone !== prev.recipientPhone) return false;
       // * 선택한 주문의 동일 판매자의 실물 배송상품을 합포장 할 수 있습니다.
-
       return true;
     }, true);
   }, [orders, selectedOrderShippings]);
 
   /** 합포장 출고 처리 요청 */
   const exportBundle = useCallback(
-    async (dto: ExportBundledOrdersDto) => {
+    async (dto: ExportManyDto) => {
       const isExportable = dto.exportOrders.every((o) =>
-        o.exportOptions.every((_o) => !(Number(_o.exportEa) === 0)),
+        o.items.every((i) => !(Number(i.amount) === 0)),
       );
       if (!isExportable)
         return toast({
@@ -106,7 +102,7 @@ export function ExportBundleDialog({
         ...dto,
         exportOrders: dto.exportOrders.map((order) => ({
           ...order,
-          exportOptions: order.exportOptions.filter((x) => !!x.exportEa),
+          items: order.items.filter((x) => !!x.amount),
         })),
       };
 
@@ -135,14 +131,10 @@ export function ExportBundleDialog({
   async function onBundledExportSubmit(): Promise<string | number | void> {
     const formData = getValues();
     const selectedKeys = Object.keys(formData);
-    const _orders: ExportOrderDto[] = [];
+    const _orders: CreateKkshowExportDto[] = [];
     selectedKeys.forEach((k) => {
       const data = formData[Number(k)];
-      _orders.push({
-        ...data,
-        deliveryCompanyCode: deliveryCompany,
-        deliveryNumber,
-      });
+      _orders.push({ ...data, deliveryCompany, deliveryNumber });
     });
 
     // 합포장 출고처리 요청
@@ -168,9 +160,9 @@ export function ExportBundleDialog({
                     value={deliveryCompany}
                     onChange={(e) => setDeliveryCompany(e.target.value)}
                   >
-                    {Object.keys(fmDeliveryCompanies).map((company) => (
-                      <option key={company} value={company}>
-                        {fmDeliveryCompanies[company].name}
+                    {deliveryCompanies.map((company) => (
+                      <option key={company.company} value={company.company}>
+                        {company.company}
                       </option>
                     ))}
                   </Select>
@@ -179,9 +171,7 @@ export function ExportBundleDialog({
                   <Input
                     placeholder="송장번호"
                     value={deliveryNumber}
-                    onChange={(e) => {
-                      setDeliveryNumber(e.target.value);
-                    }}
+                    onChange={(e) => setDeliveryNumber(e.target.value)}
                   />
                 </FormControl>
               </Stack>

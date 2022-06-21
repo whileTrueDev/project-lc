@@ -39,11 +39,16 @@ export type ExportItemOption = ExportItem & {
 };
 
 /** 출고 상세 조회 리턴값 */
-export type ExportRes = Export & { items: ExportItemOption[]; order: Order }; // order의 주문자정보, 받는사람정보, 배송메모 필요
+export type ExportRes = Export & {
+  items: ExportItemOption[];
+  order: Order;
+  bundleExports: Export[];
+}; // order의 주문자정보, 받는사람정보, 배송메모 필요
 
+export type ExportListItem = Omit<ExportRes, 'bundleExports'>;
 /** 출고 목록 조회 리턴값 */
 export type ExportListRes = {
-  list: ExportRes[];
+  list: ExportListItem[];
   totalCount: number;
 };
 

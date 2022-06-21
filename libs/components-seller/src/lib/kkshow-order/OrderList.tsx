@@ -18,7 +18,6 @@ import {
 import { OrderItemOption, OrderProcessStep } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { TooltipedText } from '@project-lc/components-core/TooltipedText';
-import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
 import { useDisplaySize, useProfile, useSellerOrderList } from '@project-lc/hooks';
 import {
   isOrderExportable,
@@ -32,6 +31,8 @@ import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaTruck } from 'react-icons/fa';
+import { KkshowOrderStatusBadge } from '../KkshowOrderStatusBadge';
+import ExportManyDialog from '../ExportManyDialog';
 import OrderListDownloadDialog from './OrderListDownloadDialog';
 
 const columns: GridColumns = [
@@ -131,24 +132,24 @@ const columns: GridColumns = [
     disableColumnMenu: true,
     disableReorder: true,
     width: 120,
-    renderCell: ({ row }) => <Box lineHeight={2}>{KkshowOrderStatusBadge(row)}</Box>,
+    renderCell: ({ row }) => <Box lineHeight={2}>{OrderStatusBadge(row)}</Box>,
   },
 ];
 
-function KkshowOrderStatusBadge(row: GridRowData): JSX.Element {
+function OrderStatusBadge(row: GridRowData): JSX.Element {
   if (row.returns.length) {
-    return <FmOrderStatusBadge orderStatus="returns" />;
+    return <KkshowOrderStatusBadge orderStatus="returns" />;
   }
   if (row.refunds.length) {
-    return <FmOrderStatusBadge orderStatus="refunds" />;
+    return <KkshowOrderStatusBadge orderStatus="refunds" />;
   }
   if (row.exchanges.length) {
-    return <FmOrderStatusBadge orderStatus="exchanges" />;
+    return <KkshowOrderStatusBadge orderStatus="exchanges" />;
   }
   if (row.orderCancellations.length) {
-    return <FmOrderStatusBadge orderStatus="orderCancellations" />;
+    return <KkshowOrderStatusBadge orderStatus="orderCancellations" />;
   }
-  return <FmOrderStatusBadge orderStatus={row.step} />;
+  return <KkshowOrderStatusBadge orderStatus={row.step} />;
 }
 
 export function OrderList(): JSX.Element {
@@ -188,7 +189,6 @@ export function OrderList(): JSX.Element {
       skip: pageSize * page,
     };
   }, [page, pageSize, profileData?.id, sellerOrderStates]);
-  console.log(sellerOrderListDto);
   const orders = useSellerOrderList(sellerOrderListDto);
   const { isDesktopSize } = useDisplaySize();
 
@@ -230,7 +230,6 @@ export function OrderList(): JSX.Element {
       orders.data?.count ? orders.data.count : prevRowCountState,
     );
   }, [orders.data, setRowCountState]);
-  console.log(orders.data);
   return (
     <Box minHeight={{ base: 300, md: 600 }} mb={24}>
       <ChakraDataGrid
@@ -275,17 +274,13 @@ export function OrderList(): JSX.Element {
           ExportIcon: DownloadIcon,
         }}
       />
-      {/* // TODO : [판매자] 마이페이지 출고 처리 및 조회 (project-lc)에서 처리하기 
-      ExportManyDialog > ExportOrderOptionList 컴포넌트 내부에서 fmOrder.shipping 데이터를 사용하는데 
-      project-lc db에는 orderShipping에 해당하는 테이블이 없음.(주문에 부과된 배송비 + 해당 배송비와 연결된 주문상품옵션 저장하는 테이블이 필요할듯하다)
-      */}
-      {/* {exportManyDialog.isOpen && orders.data?.orders && (
+      {exportManyDialog.isOpen && orders.data?.orders && (
         <ExportManyDialog
           isOpen={exportManyDialog.isOpen}
           onClose={exportManyDialog.onClose}
           orders={orders.data?.orders}
         />
-      )} */}
+      )}
     </Box>
   );
 }
@@ -342,13 +337,12 @@ export function OrderToolbar({ options }: OrderToolbarProps): JSX.Element {
               내보내기
             </Button>
 
-            {/* // TODO: 내보내기 기능(스프레드시트) 사용할 수 있게 만들기(fmOrderRes와 OrderDetailRes 타입이 달라서 수정이 필요) */}
-            {/* {orderDownloadDialog.isOpen && (
+            {orderDownloadDialog.isOpen && (
               <OrderListDownloadDialog
                 isOpen={orderDownloadDialog.isOpen}
                 onClose={orderDownloadDialog.onClose}
               />
-            )} */}
+            )}
           </>
         )}
       </Stack>

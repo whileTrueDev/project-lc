@@ -14,20 +14,20 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import {
-  useExportOrderMutation,
-  useOrderExportableCheck,
   checkShippingCanExport,
   checkShippingExportIsDone,
+  useExportOrderMutation,
+  useOrderExportableCheck,
 } from '@project-lc/hooks';
-import { ExportOrderDto, FindFmOrderDetailRes } from '@project-lc/shared-types';
-import { fmExportStore } from '@project-lc/stores';
+import { CreateKkshowExportDto, OrderDetailRes } from '@project-lc/shared-types';
+import { sellerExportStore } from '@project-lc/stores';
 import { useCallback, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ExportBundleDialog } from './ExportBundleDialog';
 import { ExportOrderOptionList } from './ExportOrderOptionList';
 
 export type OrderExportDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
-  order: FindFmOrderDetailRes;
+  order: OrderDetailRes;
 };
 
 /** 단일 주문 출고 처리 모달창 */
@@ -36,13 +36,15 @@ export function ExportDialog({
   isOpen,
   onClose,
 }: OrderExportDialogProps): JSX.Element {
-  const resetSelectedOrderShippings = fmExportStore((s) => s.resetSelectedOrderShippings);
+  const resetSelectedOrderShippings = sellerExportStore(
+    (s) => s.resetSelectedOrderShippings,
+  );
   // 이미 출고가 끝난 주문인 지 체크
   const { isDone } = useOrderExportableCheck(order);
 
   const bundleDialog = useDisclosure();
   const toast = useToast();
-  const formMethods = useForm<ExportOrderDto[]>();
+  const formMethods = useForm<CreateKkshowExportDto[]>();
   const exportOrder = useExportOrderMutation();
 
   // 모달창 닫기 && orderShipping 배열 초기화
@@ -52,10 +54,7 @@ export function ExportDialog({
   }, [onClose, resetSelectedOrderShippings]);
 
   const onExportSuccess = useCallback(() => {
-    toast({
-      status: 'success',
-      description: '출고 처리가 성공적으로 완료되었습니다.',
-    });
+    toast({ status: 'success', description: '출고 처리가 성공적으로 완료되었습니다.' });
     closeAndResetShippings();
   }, [closeAndResetShippings, toast]);
 
@@ -72,15 +71,15 @@ export function ExportDialog({
 
   /** 개별 출고 처리 */
   const onExportOneOrder = useCallback(
-    async (orderId: string, orderShippingIdx: number) => {
+    async (orderId: number, orderShippingIdx: number) => {
       const fieldID = `${orderShippingIdx}` as const;
       const isValid = await formMethods.trigger(fieldID);
       if (isValid) {
         formMethods.setValue(`${orderShippingIdx}.orderId`, orderId);
         const dto = formMethods.getValues(fieldID);
-        const realDto = { ...dto, exportOptions: dto.exportOptions.filter((x) => !!x) };
+        const realDto = { ...dto, items: dto.items.filter((x) => !!x.amount) };
         // 보낼 수량이 0개 인지 체크
-        if (realDto.exportOptions.every((o) => Number(o.exportEa) === 0)) {
+        if (realDto.items.every((o) => Number(o.amount) === 0)) {
           toast({
             status: 'warning',
             description:
@@ -97,13 +96,13 @@ export function ExportDialog({
 
   /** 합포장 출고처리가 가능한지 여부 */
   const isBundleExportable = useMemo(() => {
-    const exportable = order.shippings.every((shipping) => {
+    const exportable = order.shippings?.every((shipping) => {
       const a = checkShippingCanExport(shipping);
       const isShippingDone = checkShippingExportIsDone(shipping);
       return a && !isShippingDone;
     });
     // shipping 목록이 2개 이상이어야 합포장 출고처리 버튼 활성화
-    const shippingMoreThanTwo = order.shippings.length >= 2;
+    const shippingMoreThanTwo = order.shippings && order.shippings.length >= 2;
     return exportable && shippingMoreThanTwo;
   }, [order.shippings]);
 
@@ -118,7 +117,7 @@ export function ExportDialog({
       <ModalOverlay />
       <FormProvider {...formMethods}>
         <ModalContent as="form">
-          <ModalHeader>{order.order_seq} 출고처리</ModalHeader>
+          <ModalHeader>{order.orderCode} 출고처리</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {isDone && (
@@ -127,7 +126,7 @@ export function ExportDialog({
               </Alert>
             )}
             <ExportOrderOptionList
-              orderId={String(order.order_seq)}
+              orderCode={order.orderCode || undefined}
               disableSelection
               onSubmitClick={onExportOneOrder}
             />

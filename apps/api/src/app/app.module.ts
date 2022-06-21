@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
-import { FirstmallDbModule } from '@project-lc/firstmall-db';
 import { CacheConfig, CsrfTokenMiddleware, mailerConfig } from '@project-lc/nest-core';
 import { AdminModule } from '@project-lc/nest-modules-admin';
 import { AuthModule, SocialModule } from '@project-lc/nest-modules-auth';
@@ -56,7 +55,6 @@ import { AppController } from './app.controller';
     CacheModule.registerAsync({ isGlobal: true, useClass: CacheConfig }),
     MailerModule.forRoot(mailerConfig),
     AuthModule,
-    FirstmallDbModule,
     PrismaModule,
     SocialModule,
     ShippingGroupModule,

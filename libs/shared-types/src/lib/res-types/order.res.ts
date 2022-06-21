@@ -106,6 +106,7 @@ export type SellerSettlementItemsRes = {
 export type OrderDataWithRelations = OrderBaseData & {
   exchanges: Nullable<ExchangeBaseData[]>;
   returns: Nullable<ReturnBaseData[]>;
+  shippings: Nullable<OrderDetailShipping[]>;
   sellerSettlementItems?: SellerSettlementItemsRes[] | null;
 };
 
@@ -116,15 +117,17 @@ export type OrderListRes = {
   nextCursor?: number; // infinite Query 에서 사용하기 위한 다음 skip 값
 };
 
+export type OrderDetailShipping = OrderShipping & {
+  items: (OrderItem & { options: OrderItemOption[] })[];
+};
+
 /** 주문 상세 리턴데이터 타입 -> 주문 완료 페이지 혹은 주문 상세 페이지 작업하면서 수정 필요
  */
 export type OrderDetailRes = OrderBaseData & {
   exchanges: Nullable<ExchangeDataWithImages[]>;
   returns: Nullable<ReturnDataWithImages[]>;
+  shippings: Nullable<OrderDetailShipping[]>;
   sellerSettlementItems?: SellerSettlementItemsRes[] | null;
-  shippings: Nullable<
-    (OrderShipping & { items: (OrderItem & { options: OrderItemOption[] })[] })[]
-  >;
 };
 /**
  * 방송인 후원 주문 목록 타입
@@ -141,7 +144,7 @@ export interface FindAllOrderByBroadcaster {
     id: OrderItem['id'];
     channel: SellType;
     review: GoodsReview | null;
-    support: OrderItemSupport;
+    support?: OrderItemSupport;
     goods: {
       goods_name: Goods['goods_name'];
       image: GoodsImages[];

@@ -2,10 +2,9 @@ import {
   PrepayInfo,
   ShippingCalculType,
   ShippingCost,
+  ShippingOptType,
   ShippingSet,
   ShippingSetCode,
-  ShippingOptType,
-  ShippingSetType,
 } from '@prisma/client';
 
 import { ShippingOptionDto } from '../dto/shippingOption.dto';
@@ -69,7 +68,7 @@ export const ShippingSetCodes: Array<ShippingSetCode> = [
   'custom',
 ];
 
-// 선불/착불정보 fm_shipping_set.prepay_info -----------------------------------------------
+// 선불/착불정보 prepay_info -----------------------------------------------
 export const PrepayInfoOptions = {
   all: { label: '착불/선불' },
   delivery: { label: '선불' },

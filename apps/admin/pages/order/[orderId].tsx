@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Center,
-  Divider,
   Heading,
   Link,
   Spinner,
@@ -14,10 +13,8 @@ import {
 } from '@chakra-ui/react';
 import { SellerOrderCancelRequestStatus } from '@prisma/client';
 import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
-import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import {
-  useAdminFmOrderByGoods,
   useAdminOneOrderCancelRequest,
   useSellerOrderCancelDoneFlagMutation,
 } from '@project-lc/hooks';
@@ -31,10 +28,6 @@ export function OrderCancelRequestDetail(): JSX.Element {
   const toast = useToast();
   const orderId = router.query.orderId as string;
   const orderCancelRequest = useAdminOneOrderCancelRequest(orderId);
-  const fmOrder = useAdminFmOrderByGoods({
-    orderId,
-    sellerId: orderCancelRequest.data?.seller.id,
-  });
 
   const changeDoneFlag = useSellerOrderCancelDoneFlagMutation();
 
@@ -44,21 +37,15 @@ export function OrderCancelRequestDetail(): JSX.Element {
       changeDoneFlag.mutateAsync({
         requestId: orderCancelRequest.data.id,
       });
-      toast({
-        title: '처리 완료',
-        status: 'success',
-      });
+      toast({ title: '처리 완료', status: 'success' });
       router.back();
     } catch (error) {
       console.error(error);
-      toast({
-        title: '처리 실패',
-        status: 'error',
-      });
+      toast({ title: '처리 실패', status: 'error' });
     }
   };
 
-  if (orderCancelRequest.isLoading || fmOrder.isLoading) {
+  if (orderCancelRequest.isLoading) {
     return (
       <AdminPageLayout>
         <Center>
@@ -67,7 +54,7 @@ export function OrderCancelRequestDetail(): JSX.Element {
       </AdminPageLayout>
     );
   }
-  if (!orderCancelRequest.data || !fmOrder.data) {
+  if (!orderCancelRequest.data) {
     return (
       <AdminPageLayout>
         <Button
@@ -145,7 +132,7 @@ export function OrderCancelRequestDetail(): JSX.Element {
             결제취소 요청 상품 및 개수
           </Text>
           {/* 취소요청 상품 목록 */}
-          <Stack spacing={2}>
+          {/* <Stack spacing={2}>
             {orderCancelRequest.data.orderCancelItems.map((item: any) => {
               const { id, amount, orderItemSeq, orderItemOptionSeq } = item;
               const orderedItem = fmOrder.data.items.find(
@@ -179,7 +166,7 @@ export function OrderCancelRequestDetail(): JSX.Element {
                 </React.Fragment>
               );
             })}
-          </Stack>
+          </Stack> */}
         </Box>
 
         <ConfirmDialog

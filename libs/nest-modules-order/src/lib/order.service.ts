@@ -13,30 +13,30 @@ import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
-  FmOrderStatusNumString,
+  CreateOrderShippingData,
   FindAllOrderByBroadcasterRes,
   FindManyDto,
   GetNonMemberOrderDetailDto,
   GetOneOrderDetailDto,
   GetOrderListDto,
   getOrderProcessStepNameByStringNumber,
+  OrderDataWithRelations,
   OrderDetailRes,
   OrderListRes,
   orderProcessStepDict,
   OrderPurchaseConfirmationDto,
-  OrderStatsRes,
-  sellerOrderSteps,
-  UpdateOrderDto,
   OrderShippingCheckDto,
+  OrderStatsRes,
+  OrderStatusNumString,
+  sellerOrderSteps,
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
-  CreateOrderShippingDto,
-  CreateOrderShippingData,
+  UpdateOrderDto,
 } from '@project-lc/shared-types';
+import { calculateShippingCost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
-import { calculateShippingCost } from '@project-lc/utils';
 
 dayjs.extend(isToday);
 @Injectable()
@@ -230,7 +230,11 @@ export class OrderService {
               // 주문상품에 후원정보가 있는경우 주문상품후원생성
               support: support
                 ? {
-                    create: support,
+                    create: {
+                      broadcasterId: support.broadcasterId,
+                      message: support.message,
+                      nickname: support.nickname,
+                    },
                   }
                 : undefined,
             };
@@ -385,13 +389,12 @@ export class OrderService {
 
   /** '15' 와 같은 stringNumber로 orderReceived와 같은  OrderProcessStep 값 리턴 */
   private getStepNameByStringNumber(
-    stringNumber: FmOrderStatusNumString,
+    stringNumber: OrderStatusNumString,
   ): OrderProcessStep {
     return getOrderProcessStepNameByStringNumber(stringNumber);
   }
 
   /** 판매자의 주문조회시 주문에 포함된 판매자의 상품옵션의 상태에 따라 표시될 주문의 상태 구하는 함수
-   * (FmOrderService 의 getOrderRealStep와 같은 로직 )
    */
   private getOrderRealStep(
     originOrderStep: OrderProcessStep,
@@ -410,7 +413,7 @@ export class OrderService {
     // 원 주문 상태가 부분000 일때
     if (isPartialStep) {
       // 5를 더해 "부분" 상태를 제거한 상태
-      const nonPartialStep = String(originOrderStepNum + 5) as FmOrderStatusNumString;
+      const nonPartialStep = String(originOrderStepNum + 5) as OrderStatusNumString;
       // 옵션들 모두가 "부분" 상태를 제거한 상태만 있는 지 확인, 그렇다면 "부분" 상태를 제거한 상태를 반환
       if (
         sellerGoodsOrderItemOptions.every(
@@ -429,7 +432,7 @@ export class OrderService {
     ) {
       const maxOptionStepStrNum = Math.max(
         ...sellerGoodsOrderItemOptions.map((io) => Number(orderProcessStepDict[io.step])),
-      ).toString() as FmOrderStatusNumString;
+      ).toString() as OrderStatusNumString;
 
       return this.getStepNameByStringNumber(maxOptionStepStrNum);
     }
@@ -438,21 +441,20 @@ export class OrderService {
     return originOrderStep;
   }
 
-  /** 특정 판매자 주문목록 조회 - 주문상품 중 판매자의 상품만 추려냄 & 주문상태 표시는 판매자의 상품 상태에 따라 표시되는 후처리 추가  */
-  async getSellerOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
-    if (!dto.sellerId)
-      throw new BadRequestException('판매자 주문 목록 조회시 sellerId를 입력해야합니다');
-    const { orders, ...rest } = await this.getOrderList(dto);
-
-    // 판매자 주문목록 후처리
+  /** 판매자 주문목록 후처리
     // 주문상품옵션 중 자기 상품옵션만 남기기
     // 자기상품옵션 상태에 기반한 주문상태 표시
-    const ordersWithOnlySellerGoodsOrderItems = orders.map((o) => {
+  */
+  private postProcessSellerOrders(
+    orders: OrderDataWithRelations[],
+    sellerId: number, // 판매자 고유번호
+  ): OrderDataWithRelations[] {
+    return orders.map((o) => {
       const { orderItems, ...orderRestData } = o;
 
       // 주문상품옵션 중 판매자 본인의 상품옵션만 남기기
       const sellerGoodsOrderItems = orderItems.filter(
-        (oi) => oi.goods.sellerId === dto.sellerId,
+        (oi) => oi.goods.sellerId === sellerId,
       );
       // 판매자 본인의 상품옵션 상태에 기반한 주문상태 표시
       let displaySellerOrderStep: OrderProcessStep = o.step;
@@ -474,6 +476,20 @@ export class OrderService {
         orderItems: sellerGoodsOrderItems,
       };
     });
+  }
+
+  /** 특정 판매자 주문목록 조회 - 주문상품 중 판매자의 상품만 추려냄 & 주문상태 표시는 판매자의 상품 상태에 따라 표시되는 후처리 추가  */
+  async getSellerOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
+    if (!dto.sellerId)
+      throw new BadRequestException('판매자 주문 목록 조회시 sellerId를 입력해야합니다');
+    const { orders, ...rest } = await this.getOrderList(dto);
+
+    // 주문상품옵션 중 자기 상품옵션만 남기기
+    // 자기상품옵션 상태에 기반한 주문상태 표시
+    const ordersWithOnlySellerGoodsOrderItems = this.postProcessSellerOrders(
+      orders,
+      dto.sellerId,
+    );
 
     return {
       orders: ordersWithOnlySellerGoodsOrderItems,
@@ -530,6 +546,7 @@ export class OrderService {
         exchanges: { include: { exchangeItems: true } },
         returns: { include: { items: true } },
         orderCancellations: { include: { items: true } },
+        shippings: { include: { items: { include: { options: true } } } },
         sellerSettlementItems: {
           select: {
             liveShopping: {
@@ -543,7 +560,6 @@ export class OrderService {
             },
           },
         },
-        shippings: { include: { items: true } },
       },
     });
 
@@ -623,10 +639,51 @@ export class OrderService {
 
   /** 개별 주문 상세 조회 */
   async getOrderDetail(dto: GetOneOrderDetailDto): Promise<OrderDetailRes> {
-    if (dto.orderId) {
-      return this.findOneOrderDetail({ id: dto.orderId, deleteFlag: false });
+    const whereInput: Prisma.OrderWhereInput = dto.orderId
+      ? { id: dto.orderId } // orderId 값이 있으면 orderId로 조회
+      : { orderCode: dto.orderCode }; // 아니면 orderCode로 조회
+
+    let result = await this.findOneOrderDetail({ ...whereInput, deleteFlag: false });
+
+    // 특정 판매자가 개별주문 상세조회시
+    // 주문상품 중 판매자의 상품만 보내기 & 판매자의 주문상품 상태에 따라 주문상태 표시 & 판매자의 베송비그룹으로 계산된 배송비만 보내기
+    if (dto.sellerId) {
+      const { orderItems, shippings, ...orderRestData } = result;
+
+      // * 주문상품옵션 중 판매자 본인의 상품옵션만 남기기
+      const sellerGoodsOrderItems = orderItems.filter(
+        (oi) => oi.goods.sellerId === dto.sellerId,
+      );
+      // * 판매자 본인의 상품옵션 상태에 기반한 주문상태 표시
+      let displaySellerOrderStep: OrderProcessStep = result.step;
+      if (sellerGoodsOrderItems.length > 0) {
+        displaySellerOrderStep = this.getOrderRealStep(
+          result.step,
+          sellerGoodsOrderItems.flatMap((oi) => oi.options),
+        );
+      }
+
+      // * 판매자 본인의 배송비정책과 연결된 주문배송비정보만 보내기
+      let sellerShippings = shippings;
+      const sellerShippingGroupList = await this.prisma.shippingGroup.findMany({
+        where: { sellerId: dto.sellerId },
+      });
+      if (sellerShippingGroupList.length > 0) {
+        const shippingGroupIdList = sellerShippingGroupList.map((g) => g.id);
+        sellerShippings = shippings.filter((s) =>
+          shippingGroupIdList.includes(s.shippingGroupId),
+        );
+      }
+
+      result = {
+        ...orderRestData,
+        shippings: sellerShippings,
+        step: displaySellerOrderStep,
+        orderItems: sellerGoodsOrderItems,
+      };
     }
-    return this.findOneOrderDetail({ orderCode: dto.orderCode, deleteFlag: false });
+
+    return result;
   }
 
   /** 비회원 주문 상세 조회 */
@@ -701,9 +758,7 @@ export class OrderService {
           orderItemOptions.map((opt) => {
             return this.prisma.orderItemOption.update({
               where: { id: opt.id },
-              data: {
-                step: rest.step,
-              },
+              data: { step: rest.step },
             });
           }),
         );
@@ -826,6 +881,7 @@ export class OrderService {
       });
       return { ...orderData, orderItems: sellerGoodsOrderItems };
     });
+
     // 판매자 상품인 주문상품옵션의 상태에 기반한 주문상태 표시
     const ordersWithRealStep = ordersWithFilteredItems.map((order) => {
       const { orderItems, step, ...orderData } = order;
@@ -833,11 +889,7 @@ export class OrderService {
         step,
         orderItems.flatMap((item) => item.options),
       );
-      return {
-        ...orderData,
-        step: newStep,
-        orderItems,
-      };
+      return { ...orderData, step: newStep, orderItems };
     });
     // 주문상태별 개수 카운트
     const orderStats = {

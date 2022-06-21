@@ -80,6 +80,27 @@ export const createDummyOrder = async ({
         orderCode,
         step,
       }),
+      shippings: {
+        create: [
+          {
+            shippingCost: '2500',
+            shippingCostPayType: 'prepay',
+            shippingGroupId: 1,
+            shippingMethod: 'delivery',
+            shippingSetId: 1,
+          },
+        ],
+      },
+    },
+  });
+
+  const orderShipping = await prisma.orderShipping.create({
+    data: {
+      orderId: order.id,
+      shippingCost: 2500,
+      shippingMethod: 'delivery',
+      shippingGroupId: 1,
+      shippingSetId: 1,
     },
   });
 
@@ -87,6 +108,7 @@ export const createDummyOrder = async ({
     data: {
       ...dummyOrderItemData[0],
       orderId: order.id,
+      orderShippingId: orderShipping.id,
       support: {
         create: !withSupportData
           ? undefined
@@ -100,6 +122,21 @@ export const createDummyOrder = async ({
     },
   });
 
+  const foundedOrderShipping = await prisma.orderShipping.findFirst({
+    where: { orderId: order.id },
+  });
+  await prisma.order.update({
+    where: { id: order.id },
+    data: {
+      orderItems: {
+        updateMany: {
+          where: { orderId: order.id },
+          data: { orderShippingId: foundedOrderShipping?.id },
+        },
+      },
+    },
+  });
+
   const orderItemOption = await prisma.orderItemOption.create({
     data: {
       orderItem: { connect: { id: orderItem.id } },
@@ -109,6 +146,7 @@ export const createDummyOrder = async ({
       normalPrice: 5000,
       discountPrice: 4000,
       goodsOption: { connect: { id: 1 } },
+      goodsName: '예스닭강정',
       step,
     },
   });
@@ -119,11 +157,22 @@ export const createDummyOrder = async ({
   };
 };
 
-export const normalOrder = {
+export const normalOrder: Prisma.OrderCreateInput = {
   customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
     orderCode: 'dummy-order-1-asdfasd',
   }),
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
   orderItems: {
     create: [
       {
@@ -140,12 +189,23 @@ export const normalOrder = {
   },
 };
 
-export const nonMemberOrder = {
+export const nonMemberOrder: Prisma.OrderCreateInput = {
   ...getDummyOrderFundamentalData({
     orderCode: 'nonmember-order-dummy',
   }),
   nonMemberOrderFlag: true,
   nonMemberOrderPassword: 'test',
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
   orderItems: {
     create: [
       {
@@ -162,11 +222,21 @@ export const nonMemberOrder = {
   },
 };
 
-export const purchaseConfirmedOrder = {
+export const purchaseConfirmedOrder: Prisma.OrderCreateInput = {
   ...normalOrder,
   orderCode: 'dummy-order-2-qwer',
   step: 'purchaseConfirmed' as const,
-
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
   orderItems: {
     create: [
       {
@@ -189,10 +259,21 @@ export const purchaseConfirmedOrder = {
   },
 };
 
-export const shippingDoneOrder = {
+export const shippingDoneOrder: Prisma.OrderCreateInput = {
   ...normalOrder,
   orderCode: 'dummy-order-3-zxcv',
   step: 'shippingDone' as const,
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
   orderItems: {
     create: [
       {
@@ -215,12 +296,23 @@ export const shippingDoneOrder = {
   },
 };
 
-export const orderExportReady = {
+export const orderExportReady: Prisma.OrderCreateInput = {
   customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
     orderCode: 'orderExportReady-for-exchange-return',
     step: 'exportReady',
   }),
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
   orderItems: {
     create: [
       {
@@ -396,4 +488,34 @@ export const createDummyOrderWithSupport = async (): Promise<void> => {
       },
     },
   });
+};
+
+async function connectDummyOrderToOrderShipping(orderId: number): Promise<void> {
+  const orderShipping = await prisma.orderShipping.findFirst({
+    where: { orderId },
+  });
+  await prisma.order.update({
+    where: { id: orderId },
+    data: {
+      orderItems: {
+        updateMany: {
+          where: { orderId },
+          data: { orderShippingId: orderShipping?.id },
+        },
+      },
+    },
+  });
+}
+
+export const createDummyOrderData = async (): Promise<void> => {
+  const order1 = await prisma.order.create({ data: normalOrder });
+  await connectDummyOrderToOrderShipping(order1.id);
+  const order2 = await prisma.order.create({ data: nonMemberOrder });
+  await connectDummyOrderToOrderShipping(order2.id);
+  const order3 = await prisma.order.create({ data: purchaseConfirmedOrder });
+  await connectDummyOrderToOrderShipping(order3.id);
+  const order4 = await prisma.order.create({ data: shippingDoneOrder });
+  await connectDummyOrderToOrderShipping(order4.id);
+  const order5 = await prisma.order.create({ data: orderExportReady });
+  await connectDummyOrderToOrderShipping(order5.id);
 };

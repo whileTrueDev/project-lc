@@ -28,7 +28,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { useFmOrderDetails, useOrderDetailsForSpreadsheet } from '@project-lc/hooks';
+import { useOrderDetailsForSpreadsheet, useProfile } from '@project-lc/hooks';
 import { defaultColumOpts, OrderSpreadSheetGenerator } from '@project-lc/shreadsheet';
 import {
   getOrderDownloadFileName,
@@ -45,12 +45,14 @@ export function OrderListDownloadDialog({
   isOpen,
   onClose,
 }: OrderListDownloadDialogProps): JSX.Element {
+  const { data: profileData } = useProfile();
   const toast = useToast();
   // 선택된 주문
   const selectedOrders = useSellerOrderStore((state) => state.selectedOrders);
   // 선택된 주문 상세 정보 조회
   const orderDetails = useOrderDetailsForSpreadsheet({
     orderIds: selectedOrders.map((orderId) => Number(orderId)),
+    sellerId: profileData?.id,
   });
 
   const disableHeaders = useOrderListDownloadStore((st) => st.disableHeaders);
@@ -59,26 +61,30 @@ export function OrderListDownloadDialog({
   // 엑셀 생성 및 내보내기
   const onConfirm = async (): Promise<void> => {
     if (orderDetails.data) {
-      // FindFmOrderDetailRes 와 OrderDetailRes 타입이 달라서 해당 OrderSpreadSheetGenerator 사용할 수 없음
-      // TODO: OrderSpreadSheetGenerator가 OrderDetailRes 사용할 수 있게 수정하기
-      // const ossg = new OrderSpreadSheetGenerator({
-      //   disabledColumnHeaders: disableHeaders,
-      // });
-      // const workbook = ossg.createXLSX(orderDetails.data);
-      // ossg
-      //   .download(`${fileName || getOrderDownloadFileName()}.xlsx`, workbook)
-      //   .then(() => {
-      //     toast({ status: 'success', title: '주문목록 다운로드 완료' });
-      //     onClose();
-      //   })
-      //   .catch(() => {
-      //     toast({
-      //       status: 'error',
-      //       title: '주문목록 다운로드중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-      //     });
-      //   });
+      const ossg = new OrderSpreadSheetGenerator({
+        disabledColumnHeaders: disableHeaders,
+      });
+      const workbook = ossg.createXLSX(orderDetails.data);
+      ossg
+        .download(`${fileName || getOrderDownloadFileName()}.xlsx`, workbook)
+        .then(() => {
+          toast({ status: 'success', title: '주문목록 다운로드 완료' });
+          onClose();
+        })
+        .catch(() => {
+          toast({
+            status: 'error',
+            title: '주문목록 다운로드중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+          });
+        });
     }
   };
+
+  const selectedOrdersOrderCodeList = orderDetails.data
+    ? orderDetails.data
+        .filter((o) => selectedOrders.includes(o.id))
+        .map((o) => o.orderCode as string)
+    : [];
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="2xl">
@@ -87,10 +93,9 @@ export function OrderListDownloadDialog({
         <ModalHeader>주문 내보내기</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          {JSON.stringify(selectedOrders)}
           {orderDetails.isLoading && <OrderListDownloadLoading />}
           {!orderDetails.isLoading && orderDetails.data && (
-            <OrderListDownloadSetting targetOrderIds={selectedOrders} />
+            <OrderListDownloadSetting targetOrderIds={selectedOrdersOrderCodeList} />
           )}
         </ModalBody>
         <ModalFooter>

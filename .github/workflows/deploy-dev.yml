@@ -19,6 +19,7 @@ on:
 
 name: Deploy to AWS ECS "Dev"
 env:
+  BEFORE_SHA: ${{ github.event.before }}
   DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
 jobs:
   Build:
@@ -38,7 +39,7 @@ jobs:
 
       #  Build API server
       - name: Build
-        run: yarn affected:build --prod --base=origin/dev
+        run: yarn affected:build --prod --base=$BEFORE_SHA
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -60,7 +61,7 @@ jobs:
         run: |
           yarn affected \
             --target=dockerize-dev \
-            --base=origin/dev \
+            --base=$BEFORE_SHA \
             --args="--registry=$ECR_REGISTRY"
 
   DeployAPI:

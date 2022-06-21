@@ -19,9 +19,6 @@ export const useDeleteLiveShopping = (): UseMutationResult<
   return useMutation(deleteLiveShopping, {
     onSuccess: () => {
       queryClient.invalidateQueries('LiveShoppingList', { refetchInactive: true });
-      queryClient.invalidateQueries('FmOrdersDuringLiveShoppingSales', {
-        refetchInactive: true,
-      });
     },
   });
 };

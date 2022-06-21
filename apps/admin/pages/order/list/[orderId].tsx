@@ -1,33 +1,34 @@
 import {
+  Avatar,
   Box,
-  Text,
+  Button,
+  Center,
   Flex,
   Grid,
   GridItem,
-  Center,
   Heading,
-  useColorModeValue,
-  Button,
   Select,
+  Text,
+  useColorModeValue,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
 import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import {
   useAdminOrder,
-  usePaymentByOrderCode,
   useAdminOrderPatchMutation,
+  usePaymentByOrderCode,
 } from '@project-lc/hooks';
-import { useRouter } from 'next/router';
-import dayjs from 'dayjs';
 import {
-  Payment,
   orderProcessStepKoreanDict,
+  Payment,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
+import dayjs from 'dayjs';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
-import { KkshowOrderStatusBadge } from '@project-lc/components-shared/KkshowOrderStatusBadge';
 
 export function OrderDetail(): JSX.Element {
   const router = useRouter();
@@ -54,17 +55,11 @@ export function OrderDetail(): JSX.Element {
   const handleSubmit = async (): Promise<void> => {
     mutateAsync({ step: orderStep })
       .then(() => {
-        toast({
-          description: '변경완료',
-          status: 'success',
-        });
+        toast({ description: '변경완료', status: 'success' });
         setIsEdit(false);
       })
       .catch(() => {
-        toast({
-          description: '변경실패',
-          status: 'error',
-        });
+        toast({ description: '변경실패', status: 'error' });
       });
   };
 
@@ -98,7 +93,7 @@ export function OrderDetail(): JSX.Element {
               <Text>단계</Text>
               <Flex>
                 {!isEdit ? (
-                  <KkshowOrderStatusBadge orderStatus={data.step} />
+                  <OrderStatusBadge step={data.step} />
                 ) : (
                   <Select
                     placeholder="Select option"
@@ -121,16 +116,10 @@ export function OrderDetail(): JSX.Element {
                 </Button>
               </Flex>
             </Flex>
-            <Flex justifyContent="space-between">
-              <Text>연결 방송인</Text>
-              <Text>
-                {data.sellerSettlementItems[0]?.liveShopping.broadcaster.userNickname}
-              </Text>
-            </Flex>
             <Box>
               <Text>주문상품</Text>
               {data.orderItems.map((item) => (
-                <Grid templateColumns="repeat(6,2fr)" key={item.id} mt={3} mb={3}>
+                <Grid templateColumns="repeat(6,2fr)" key={item.id} mt={3} mb={3} gap={1}>
                   <GridItem bgColor={backgroundColor}>
                     <Center>
                       <Text>상품명</Text>
@@ -180,6 +169,22 @@ export function OrderDetail(): JSX.Element {
                   <GridItem>
                     <Text>{item.options[0]?.quantity}</Text>
                   </GridItem>
+                  {item.support && (
+                    <>
+                      <GridItem bgColor={backgroundColor}>
+                        <Center>
+                          <Text>후원정보</Text>
+                        </Center>
+                      </GridItem>
+                      <GridItem colSpan={2}>
+                        <Avatar size="xs" src={item.support.broadcaster.avatar} />
+                        <Text fontSize="sm">
+                          방송인: {item.support.broadcaster.userNickname}
+                        </Text>
+                        <Text fontSize="sm">메시지: {item.support.message}</Text>
+                      </GridItem>
+                    </>
+                  )}
                 </Grid>
               ))}
             </Box>
@@ -206,7 +211,7 @@ export function OrderDetail(): JSX.Element {
                   <Text>결제키</Text>
                 </GridItem>
                 <GridItem>
-                  <Text>{data.payment.paymentKey}</Text>
+                  <Text>{data.payment?.paymentKey}</Text>
                 </GridItem>
                 <GridItem>
                   <Text>결제수단</Text>
@@ -243,10 +248,10 @@ export function OrderDetail(): JSX.Element {
         onConfirm={handleSubmit}
       >
         <Text>
-          현재 상태: <KkshowOrderStatusBadge orderStatus={data?.step} />
+          현재 상태: <OrderStatusBadge step={data?.step} />
         </Text>
         <Text>
-          변경될 상태 : <KkshowOrderStatusBadge orderStatus={orderStep} />
+          변경될 상태 : <OrderStatusBadge step={orderStep} />
         </Text>
       </ConfirmDialog>
     </AdminPageLayout>
