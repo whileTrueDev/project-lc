@@ -26,7 +26,6 @@ import { CreateOrderForm } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useFormContext } from 'react-hook-form';
 
-// todo : 쿠폰 crud 이후 디비에서 가져오도록 변경
 const dummyCoupon = [
   { id: 1, name: '3000원 할인 쿠폰', amount: 3000 },
   { id: 2, name: '5000원 할인 쿠폰', amount: 5000 },
@@ -167,7 +166,6 @@ export function Discount(): JSX.Element {
 }
 
 type CouponSelectDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
-  // TODO: 쿠폰 정보 연결 필요
   onCouponSelect: (coupon: any) => void;
 };
 /** 쿠폰 선택 다이얼로그 */
@@ -176,7 +174,7 @@ function CouponSelectDialog({
   onClose,
   onCouponSelect,
 }: CouponSelectDialogProps): JSX.Element {
-  // TODO: 쿠폰 사용 가능여부 처리 필요 (최소 주문금액 등 적용 가능 여부 판단 이후 선택못하도록)
+  // TODO: 쿠폰 사용 가능여부 처리 필요 (최소 주문금액 등 적용 가능 여부 판단 이후 선택못하도록) + 총 주문가격이 쿠폰할인금액보다 적은경우 처리
   const columns: GridColDef[] = [
     { field: 'name', headerName: '쿠폰명', flex: 1 },
     { field: 'amount', headerName: '금액' },

@@ -35,6 +35,7 @@ export function GiftOrderPolicy(): JSX.Element {
         </Text>
       </ListItem>
       <ListItem>
+        {/* // TODO: 문구 수정 */}
         <Text>선물 주문을 취소할 수 있습니다.?</Text>
       </ListItem>
       <ListItem>

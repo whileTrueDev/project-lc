@@ -141,7 +141,6 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
         <Button
           size="sm"
           onClick={() => {
-            // TODO: 주문 상세페이지와 연결
             console.log('주문 상세보기 페이지로 이동');
           }}
         >

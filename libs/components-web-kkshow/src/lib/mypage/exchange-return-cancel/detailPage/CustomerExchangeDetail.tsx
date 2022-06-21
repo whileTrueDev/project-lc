@@ -73,7 +73,6 @@ export function ExchangeDetialData({ data }: { data: ExchangeDetailRes }): JSX.E
         <Button
           size="xs"
           onClick={() => {
-            // TODO: 주문상세보기로 이동
             console.log(`주문상세보기로 이동, 주문코드: ${data.order.orderCode}`);
           }}
         >
