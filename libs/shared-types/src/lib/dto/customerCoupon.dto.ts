@@ -7,6 +7,11 @@ export class CouponStatusDto {
 
   @IsEnum(CouponStatus)
   status: CouponStatus;
+
+  /** 쿠폰 사용시 사용된 주문 고유번호 */
+  @IsOptional()
+  @IsNumber()
+  orderId?: number;
 }
 
 export class CustomerCouponDto {
