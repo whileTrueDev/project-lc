@@ -1,8 +1,19 @@
-import { Button, Center, Image, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  Image,
+  Spinner,
+  Stack,
+  Text,
+  useToast,
+} from '@chakra-ui/react';
 import { Export } from '@prisma/client';
 import { ExchangeReturnCancelRequestGoodsData } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestGoodsData';
 import { ExchangeReturnCancelRequestStatusBadge } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestStatusBadge';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
+import { DeliveryTrackingButton } from '@project-lc/components-shared/delivery-tracking/DeliveryTracking';
 import { useDeleteCustomerExchange, useExchangeDetail } from '@project-lc/hooks';
 import { ExchangeDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -133,7 +144,6 @@ export interface ReExportDataProps {
   exportData: Export | null; // export가 예약어라 변수명으로 쓸 수 없음
 }
 /** 교환 요청에 연결된 재배송 정보 표시
- // TODO: 임의로 출고상태, 출고일, 운송장번호, 택배사만 표시함. 기획 요청에 따라 필요한 데이터 추가 & 디자인 적용필요
  */
 export function ReExportData(props: ReExportDataProps): JSX.Element {
   const { exportData } = props;
@@ -143,16 +153,29 @@ export function ReExportData(props: ReExportDataProps): JSX.Element {
       <Stack pl={4}>
         {exportData ? (
           <Stack>
-            <Text>
-              상태 : <OrderStatusBadge step={exportData.status} />
-            </Text>
-            <Text>
-              출고일 :{' '}
-              {exportData.exportDate &&
-                dayjs(exportData.exportDate).format('YYYY-MM-DD HH:mm')}
-            </Text>
-            <Text>운송장번호 : {exportData.deliveryNumber}</Text>
-            <Text>택배사 : {exportData.deliveryCompany}</Text>
+            <Flex gap={3} flexWrap="wrap" alignItems="center">
+              <OrderStatusBadge step={exportData.status} />
+              {exportData.exportDate && (
+                <Box>
+                  <Text fontWeight="bold">출고일</Text>
+                  <Text>{dayjs(exportData.exportDate).format('YYYY-MM-DD HH:mm')}</Text>
+                </Box>
+              )}
+
+              <Box>
+                <Text fontWeight="bold">택배사</Text>
+                <Text>{exportData.deliveryCompany}</Text>
+              </Box>
+              <Box>
+                <Text fontWeight="bold">송장 번호</Text>
+                <Text>{exportData.deliveryNumber}</Text>
+              </Box>
+            </Flex>
+            <DeliveryTrackingButton
+              enableWarning
+              deliveryCompany={exportData.deliveryCompany}
+              deliveryNumber={exportData.deliveryNumber}
+            />
           </Stack>
         ) : (
           <Stack>
