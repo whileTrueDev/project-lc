@@ -75,9 +75,9 @@ export const useKkshowOrderStore = create<KkshowOrderStore>(
       resetOrder: () => set({ order: orderNeedToFillInDefault }),
       /** 상품상세페이지or장바구니 -> 바로구매 주문페이지 이동 처리 */
       handleOrderPrepare: (orderPrepareData: OrderPrepareData) => {
-        set(({ order: prevOrderData }) => ({
+        set(() => ({
           order: {
-            ...prevOrderData,
+            ...orderNeedToFillInDefault, // 초기화 후 주문정보 저장
             ...orderPrepareData,
           },
         }));
