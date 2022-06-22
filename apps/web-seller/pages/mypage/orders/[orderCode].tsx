@@ -1,7 +1,6 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
 import { Box, Button, Center, Flex, Stack, Text } from '@chakra-ui/react';
 import { OrderItemOption, OrderShipping } from '@prisma/client';
-import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
 import { OrderDetailActions } from '@project-lc/components-seller/kkshow-order/OrderDetailActions';
 import { OrderDetailCancelInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailCancelInfo';
@@ -15,8 +14,8 @@ import { OrderDetailDeliveryInfo } from '@project-lc/components-seller/OrderDeta
 import { OrderDetailOptionList } from '@project-lc/components-seller/OrderDetailOptionList';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
-import { OrderItemOptionInfo } from '@project-lc/components-shared/order/OrderItemOptionInfo';
 import { useDisplaySize, useOrderDetail, useProfile } from '@project-lc/hooks';
+import { ExportBaseData } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
@@ -113,28 +112,23 @@ export function OrderDetail(): JSX.Element {
         </Box>
 
         {/* 주문 상품 정보 */}
-        {/*  // TODO: 주문-배송비 테이블 생성 후 주석 처리된 코드처럼 OrderDetailShippingItem 활용하여 주문상품 & 주문상품 상태별 개수 표시하도록 수정하기(임의로 주문상품정보 표시하도록 해둠) */}
-        {/* <SectionWithTitle title="주문 상품 정보">
-          {order.data.shippings.map((shipping) => (
-            <OrderDetailShippingItem key={shipping.id} shipping={shipping} />
-          ))}
-        </SectionWithTitle> */}
         <SectionWithTitle title="주문 상품 정보">
-          {order.data.orderItems.flatMap((item) =>
-            item.options.map((opt) => (
-              <OrderItemOptionInfo
-                key={opt.id}
-                order={order.data}
-                option={opt}
-                orderItem={item}
+          {order.data.shippings.map((_shipping) => {
+            const { items, ...orderShipping } = _shipping;
+            const options = items.flatMap((i) => i.options);
+            const shipping = { ...orderShipping, options };
+            return (
+              <OrderDetailShippingItem
+                key={shipping.id}
+                shipping={shipping}
+                exports={order.data.exports}
               />
-            )),
-          )}
+            );
+          })}
         </SectionWithTitle>
 
         {/* 주문자 / 수령자 정보 */}
         <SectionWithTitle title="주문자 / 수령자 정보">
-          {/* OrderDetailDeliveryInfo 기존 컴포넌트 그대로 사용함 */}
           <OrderDetailDeliveryInfo orderDeliveryData={order.data} />
         </SectionWithTitle>
 
@@ -189,27 +183,25 @@ export function OrderDetail(): JSX.Element {
 export default OrderDetail;
 
 interface OrderDetailShippingItemProps {
-  shipping: OrderShipping & { items: OrderItemOption[] };
+  shipping: OrderShipping & { options: OrderItemOption[] };
+  exports: ExportBaseData[];
 }
 function OrderDetailShippingItem({
   shipping,
+  exports,
 }: OrderDetailShippingItemProps): JSX.Element {
   return (
     <Box key={shipping.id} mt={6} borderWidth="0.025rem" p={2} pl={4}>
       {/* 배송정보 */}
       <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
-        {/* <Text>{shippingType}</Text> */}
-        {shipping.shippingCostPayType === 'free' ? null : (
-          <>
-            <TextDotConnector />
-            <Text>배송비: {getLocaleNumber(shipping.shippingCost)} 원</Text>
-          </>
+        {shipping.shippingCostPayType !== 'free' && (
+          <Text>배송비: {getLocaleNumber(shipping.shippingCost)} 원</Text>
         )}
       </Stack>
 
       {/* 상품(옵션) 정보 */}
       <Box mt={4}>
-        <OrderDetailOptionList options={shipping.items} />
+        <OrderDetailOptionList options={shipping.options} exports={exports} />
       </Box>
     </Box>
   );
