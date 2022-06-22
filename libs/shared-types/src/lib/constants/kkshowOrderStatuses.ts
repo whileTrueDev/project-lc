@@ -44,10 +44,10 @@ export const kkshowOrderStatusNames = [
 ];
 
 export const KkshowOrderCancelEnum = {
-  orderCancellations: 'orderCancellations',
-  returns: 'returns',
-  refunds: 'refunds',
-  exchanges: 'exchanges',
+  orderCancellations: 'orderCancellations' as const,
+  returns: 'returns' as const,
+  refunds: 'refunds' as const,
+  exchanges: 'exchanges' as const,
 };
 
 export const KkshowOrderStatusExtended = Object.assign(
