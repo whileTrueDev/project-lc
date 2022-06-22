@@ -18,8 +18,6 @@ import {
 type SellerSettlementTargetsExportItem = Pick<ExportItem, 'id' | 'amount' | 'status'> & {
   orderItem: {
     channel: OrderItem['channel'];
-    shippingCost: OrderItem['shippingCost'];
-    shippingCostIncluded: OrderItem['shippingCostIncluded'];
     goods: {
       goods_name: Goods['goods_name'];
       image: Pick<GoodsImages, 'id' | 'image'>[];
