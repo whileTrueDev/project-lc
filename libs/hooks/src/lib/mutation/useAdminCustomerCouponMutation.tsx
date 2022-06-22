@@ -1,7 +1,11 @@
+import { CustomerCoupon } from '@prisma/client';
+import {
+  CreateCustomerCouponDto,
+  CreateCustomerCouponManyDto,
+  CustomerCouponDto,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
-import { CustomerCoupon } from '@prisma/client';
-import { CustomerCouponDto } from '@project-lc/shared-types';
 import axios from '../../axios';
 
 type CustomerCouponWithoutCustomerIdAndCustomerId = Omit<
@@ -12,11 +16,11 @@ type CustomerCouponWithoutCustomerIdAndCustomerId = Omit<
 export const useAdminCustomerCouponPostMutation = (): UseMutationResult<
   CustomerCoupon,
   AxiosError,
-  CustomerCouponDto
+  CreateCustomerCouponDto
 > => {
   const queryClient = useQueryClient();
-  return useMutation<CustomerCoupon, AxiosError, CustomerCouponDto>(
-    (dto: CustomerCouponDto) => {
+  return useMutation<CustomerCoupon, AxiosError, CreateCustomerCouponDto>(
+    (dto: CreateCustomerCouponDto) => {
       return axios
         .post<CustomerCoupon>('/admin/customer-coupon', dto)
         .then((res) => res.data);
@@ -32,11 +36,11 @@ export const useAdminCustomerCouponPostMutation = (): UseMutationResult<
 export const useAdminAllCustomerCouponPostMutation = (): UseMutationResult<
   number,
   AxiosError,
-  CustomerCouponDto
+  CreateCustomerCouponManyDto
 > => {
   const queryClient = useQueryClient();
-  return useMutation<number, AxiosError, CustomerCouponDto>(
-    (dto: CustomerCouponDto) => {
+  return useMutation<number, AxiosError, CreateCustomerCouponManyDto>(
+    (dto: CreateCustomerCouponManyDto) => {
       return axios
         .post<number>('/admin/customer-coupon/all', dto)
         .then((res) => res.data);

@@ -160,7 +160,7 @@ export function CartActions(): JSX.Element {
           channel: defineCorrectChannel(i), // 판매유형 결정
           support: i.support
             ? {
-                broadcasterId: i.support.id,
+                broadcasterId: i.support.broadcasterId,
                 message: i.support.message || '',
                 nickname: i.support.broadcaster.userNickname,
                 avatar: i.support.broadcaster.avatar,

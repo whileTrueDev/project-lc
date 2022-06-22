@@ -225,7 +225,7 @@ jobs:
         run: yarn install
 
       - name: Check RealtimeAPI affected
-        run: tools/check-need-deploy.sh realtimeapi
+        run: tools/check-need-deploy.sh api-realtime
 
       - name: Configure AWS credentials
         if: ${{ success() }}

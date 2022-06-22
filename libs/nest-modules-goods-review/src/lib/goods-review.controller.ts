@@ -59,7 +59,7 @@ export class GoodsReviewController {
   /** 리뷰 생성 */
   @UseGuards(JwtAuthGuard)
   @Post()
-  @CacheClearKeys('order-item/review-needed', 'order/list')
+  @CacheClearKeys('order-item/review-needed', 'order/list', 'order')
   create(
     @Body(new ValidationPipe({ transform: true })) dto: GoodsReviewCreateDto,
   ): Promise<GoodsReview> {

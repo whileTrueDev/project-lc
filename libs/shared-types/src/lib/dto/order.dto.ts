@@ -140,6 +140,7 @@ export class CreateOrderDto {
 
   /** 비회원 주문인 경우 입력받는 비밀번호 - 비회원이 주문조회, 취소시 사용할예정, 비회원주문인경우에만 validate */
   @ValidateIf((o) => o.nonMemberOrderFlag)
+  @IsOptional()
   @IsString()
   nonMemberOrderPassword?: Order['nonMemberOrderPassword'];
 
@@ -147,7 +148,7 @@ export class CreateOrderDto {
   @IsNumber()
   orderPrice: Order['orderPrice'];
 
-  /** 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한 금액 */
+  /** 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한/입금해야 할 금액 + 총 배송비 */
   @IsNumber()
   paymentPrice: Order['paymentPrice'];
 
@@ -330,6 +331,11 @@ export class GetOrderListDto {
   @IsEnum(KkshowOrderStatusExtended, { each: true })
   searchExtendedStatus?: KkshowOrderStatusExtended[];
 
+  /** 앱타입 - "customer"인 경우 받는사람 정보 삭제하고 리턴한다 */
+  @IsOptional()
+  @IsString()
+  appType?: string;
+
   /** 상품ID 목록을 기준으로 조회시 */
   @IsOptional() @IsString({ each: true }) goodsIds?: number[];
 }
@@ -370,6 +376,11 @@ export class GetOneOrderDetailDto {
   @IsNumber()
   @IsOptional()
   orderId?: Order['id'];
+
+  /** 앱타입 - "customer"인 경우 받는사람 정보 삭제하고 리턴한다 */
+  @IsOptional()
+  @IsString()
+  appType?: string;
 
   /** 특정 판매자의 상품 주문내역 조회시 사용. 판매자 고유번호 */
   @Type(() => Number)
