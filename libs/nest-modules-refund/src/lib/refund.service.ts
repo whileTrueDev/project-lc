@@ -224,7 +224,9 @@ export class RefundService {
     let transfer: PaymentTransfer | undefined; // 계좌이체로 결제했을 때 이체 정보가 담기는 객체입니다.
     // 토스페이먼츠로 결제 && 환불한 경우 -> 결제정보 조회
     if (data.transactionKey && data.paymentKey) {
-      const paymentData = await TossPaymentsApi.getPaymentByOrderId(rest.order.orderCode);
+      const paymentData = await TossPaymentsApi.getPaymentByOrderCode(
+        rest.order.orderCode,
+      );
 
       if (paymentData.card) {
         card = paymentData.card;

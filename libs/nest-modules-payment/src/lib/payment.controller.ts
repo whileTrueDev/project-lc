@@ -7,6 +7,7 @@ import {
   Param,
   Get,
 } from '@nestjs/common';
+import { Order } from '@prisma/client';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { Payment, PaymentRequestDto, CreatePaymentRes } from '@project-lc/shared-types';
 import { PaymentService } from './payment.service';
@@ -25,7 +26,9 @@ export class PaymentController {
   }
 
   @Get('/:orderCode')
-  async getPaymentByOrderCode(@Param('orderCode') orderCode: string): Promise<Payment> {
+  async getPaymentByOrderCode(
+    @Param('orderCode') orderCode: Order['orderCode'],
+  ): Promise<Payment> {
     return this.paymentService.getPaymentByOrderCode(orderCode);
   }
 }

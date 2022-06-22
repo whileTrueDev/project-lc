@@ -1,5 +1,5 @@
 import { HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { OrderPayment, PaymentMethod } from '@prisma/client';
+import { Order, OrderPayment, PaymentMethod } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreatePaymentRes,
@@ -73,9 +73,9 @@ export class PaymentService {
   }
 
   /** 주문번호별 결제내역 */
-  async getPaymentByOrderCode(orderId: string): Promise<Payment> {
+  async getPaymentByOrderCode(orderCode: Order['orderCode']): Promise<Payment> {
     try {
-      return TossPaymentsApi.getPaymentByOrderId(orderId);
+      return TossPaymentsApi.getPaymentByOrderCode(orderCode);
     } catch (error) {
       console.error(error.response);
       throw new HttpException(
