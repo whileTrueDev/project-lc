@@ -70,7 +70,9 @@ export function ReceiptOrderItemInfo({
               <Center w="100%" h="100%">
                 <Text fontWeight="bold">
                   {item.options
-                    .map((option) => Number(option.discountPrice))
+                    .map(
+                      (option) => Number(option.discountPrice) * Number(option.quantity),
+                    )
                     .reduce((prev, next) => prev + next)}
                   원
                 </Text>
@@ -164,7 +166,10 @@ export function MobileReceiptOrderItemInfo({
                   <Box />
                   <Text fontWeight="bold">
                     {item.options
-                      .map((option) => Number(option.discountPrice))
+                      .map(
+                        (option) =>
+                          Number(option.discountPrice) * Number(option.quantity),
+                      )
                       .reduce((prev, next) => prev + next)}
                     원
                   </Text>

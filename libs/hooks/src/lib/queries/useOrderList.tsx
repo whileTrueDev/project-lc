@@ -26,6 +26,7 @@ export const getOrderList = async (dto: GetOrderListDto): Promise<OrderListRes> 
         sellerId: dto.sellerId,
         skip: dto.skip,
         take: dto.take,
+        customerId: dto.customerId,
       },
     })
     .then((res) => res.data);

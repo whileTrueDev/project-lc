@@ -20,7 +20,12 @@ import {
 } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { GridColumns, GridRowData } from '@material-ui/data-grid';
+import {
+  GridColumns,
+  GridRowData,
+  GridSelectionModel,
+  GridToolbar,
+} from '@material-ui/data-grid';
 import { AdminCustomerCouponStatusDialog } from '@project-lc/components-admin/AdminCustomerCouponStatusDialog';
 import { useState } from 'react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
@@ -51,6 +56,9 @@ export function CouponManage(): JSX.Element {
   const [rowData, setRowData] = useState<GridRowData>();
   const [customerRowData, setCustomerRowData] = useState<GridRowData>();
   const [toDelete, setToDelete] = useState<GridRowData>();
+  const [manyCustomerCouponIssue, setManyCustomerCouponIssue] =
+    useState<GridSelectionModel>([]);
+
   const { mutateAsync } = useAdminCustomerCouponDeleteMutation();
   const { mutateAsync: couponIssueMutateAsync } = useAdminCustomerCouponPostMutation();
   const { mutateAsync: couponIssueAllMutateAsync } =
@@ -134,7 +142,7 @@ export function CouponManage(): JSX.Element {
       field: 'button',
       headerName: '발급',
       renderCell: ({ row }: GridRowData) => (
-        <Button size="xs" onClick={() => handleIssuerButtonOnClick(row)}>
+        <Button size="xs" onClick={() => handleIssueButtonOnClick(row)}>
           발급
         </Button>
       ),
@@ -145,7 +153,7 @@ export function CouponManage(): JSX.Element {
     deleteOnOpen();
   };
 
-  const handleIssuerButtonOnClick = (row: GridRowData): void => {
+  const handleIssueButtonOnClick = (row: GridRowData): void => {
     setCustomerRowData(row);
     issueOnOpen();
   };
@@ -187,7 +195,7 @@ export function CouponManage(): JSX.Element {
   const handleAllIssueCoupon = (): Promise<void> =>
     couponIssueAllMutateAsync({
       couponId: Number(couponId),
-      customerId: 0,
+      customerIds: manyCustomerCouponIssue as number[],
       status: 'notUsed',
     })
       .then((result: number) => {
@@ -195,6 +203,7 @@ export function CouponManage(): JSX.Element {
           description: `${result}개 발행완료`,
           status: 'success',
         });
+        setManyCustomerCouponIssue([]);
       })
       .catch(() => {
         toast({
@@ -214,6 +223,9 @@ export function CouponManage(): JSX.Element {
               columns={columns}
               minH={500}
               density="compact"
+              components={{
+                Toolbar: GridToolbar,
+              }}
             />
           )}
           <AdminCustomerCouponStatusDialog
@@ -234,16 +246,29 @@ export function CouponManage(): JSX.Element {
         <GridItem colSpan={1}>
           <Flex justifyContent="space-between">
             <Heading size="lg">고객 목록</Heading>
-            <Button onClick={issueAllOnOpen} colorScheme="blue">
-              일괄발급
-            </Button>
+            <Flex direction="column">
+              <Button onClick={issueAllOnOpen} colorScheme="blue">
+                전체/선택 발급
+              </Button>
+            </Flex>
           </Flex>
+          <Text>
+            * 체크박스를 하나도 체크하지 않으면 모든 소비자에게 쿠폰이 발급됩니다.
+          </Text>
           {data && (
             <ChakraDataGrid
               rows={customerData || []}
               columns={customerColumns}
               minH={500}
               density="compact"
+              onSelectionModelChange={(newSelectionModel) => {
+                setManyCustomerCouponIssue(newSelectionModel as number[]);
+              }}
+              selectionModel={manyCustomerCouponIssue}
+              checkboxSelection
+              components={{
+                Toolbar: GridToolbar,
+              }}
             />
           )}
 
@@ -262,7 +287,11 @@ export function CouponManage(): JSX.Element {
             onClose={issueAllOnClose}
             onConfirm={handleAllIssueCoupon}
           >
-            <Text>모든 고객에게 일괄 발급하시겠습니까?</Text>
+            <Text>
+              {manyCustomerCouponIssue.length !== 0
+                ? `${manyCustomerCouponIssue.length} 명의 고객에게 일괄 발급하시겠습니까?`
+                : '모든 고객에게 일괄 발급하시겠습니까?'}
+            </Text>
           </ConfirmDialog>
         </GridItem>
       </Grid>
