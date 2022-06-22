@@ -77,7 +77,7 @@ export function MileageBenefit({
 }
 
 export function PaymentBox(): JSX.Element {
-  const { order, shipping } = useKkshowOrderStore();
+  const { order, shipping, shopNames } = useKkshowOrderStore();
 
   const PRODUCT_PRICE =
     order.orderItems
@@ -201,7 +201,7 @@ export function PaymentBox(): JSX.Element {
       </Center>
 
       <Box mt={6}>
-        <TermBox shopName="테스트" /> {/* // TODO: shopName 변경 */}
+        <TermBox shopNames={shopNames} />
       </Box>
     </Box>
   );

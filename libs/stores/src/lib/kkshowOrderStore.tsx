@@ -44,6 +44,11 @@ export interface KkshowOrderStore {
   shipping: OrderShippingData;
   resetShippingData: () => void;
   setShippingData: (data: OrderShippingData) => void;
+
+  // *** 상점명 저장(주문서에 포함된 모든 판매자 업체명)
+  shopNames: string[];
+  resetShopNames: () => void;
+  setShopNames: (data: string[]) => void;
 }
 
 export const KKSHOW_ORDER_STORAGE_KEY = 'K_OR_STRG';
@@ -84,7 +89,15 @@ export const useKkshowOrderStore = create<KkshowOrderStore>(
       setShippingData: (data: OrderShippingData) => {
         set({ shipping: data });
       },
+
+      // *** 상점명 저장(주문서에 포함된 모든 판매자 업체명)
+      shopNames: [],
+      resetShopNames: () => set({ shopNames: [] }),
+      setShopNames: (data: string[]) => {
+        set({ shopNames: data });
+      },
     }),
-    { name: KKSHOW_ORDER_STORAGE_KEY }, // 로컬스토리지 키값(고유식별값)
+    // 로컬스토리지 키값(고유식별값)
+    { name: KKSHOW_ORDER_STORAGE_KEY },
   ),
 );
