@@ -117,11 +117,10 @@ export function AdminGiftList(props: {
     return data;
   }, [data]);
 
-  // 퍼스트몰 주문정보로 이동하기
-  // TODO: 크크쇼 주문정보로 이동하기 -> [관리자] 주문 및 결제조회 일감 진행 후
+  // 크크쇼 주문정보로 이동(새창)
   const handleRowClick = (param: GridRowParams): void => {
-    if (param.row?.order_seq) {
-      const url = `http://whiletrue.firstmall.kr/admin/order/view?query_string=&no=${param.row?.order_seq}`;
+    if (param.row.id) {
+      const url = `http://localhost:4250/order/list/${param.row.id}`;
       window.open(url, '_blank');
     }
   };
