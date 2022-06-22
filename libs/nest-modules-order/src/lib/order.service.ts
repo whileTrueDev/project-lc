@@ -534,7 +534,7 @@ export class OrderService {
             support: {
               include: { broadcaster: { select: { userNickname: true, avatar: true } } },
             },
-            review: { select: { id: true } },
+            review: true,
             goods: {
               select: {
                 id: true,
@@ -605,7 +605,7 @@ export class OrderService {
             support: {
               include: { broadcaster: { select: { userNickname: true, avatar: true } } },
             },
-            review: { select: { id: true } },
+            review: true,
             goods: {
               select: {
                 id: true,

@@ -5,6 +5,7 @@ import { RelatedRefundData } from '@project-lc/components-shared/order/RelatedRe
 import { useCustomerOrderCancellationDetail } from '@project-lc/hooks';
 import { OrderCancellationData } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/router';
 
 export interface CustomerOrderCancelDetailProps {
   cancelCode: string;
@@ -37,6 +38,7 @@ export function OrderCancelDetailData({
 }: {
   data: OrderCancellationData;
 }): JSX.Element {
+  const router = useRouter();
   const requestDate = dayjs(data.requestDate).format('YYYY-MM-DD');
   const completeDate = data.completeDate
     ? dayjs(data.completeDate).format('YYYY-MM-DD')
@@ -52,9 +54,7 @@ export function OrderCancelDetailData({
 
         <Button
           size="xs"
-          onClick={() => {
-            console.log(`주문상세보기로 이동, 주문코드: ${data.order.orderCode}`);
-          }}
+          onClick={() => router.push(`/mypage/orders/${data.order.orderCode}`)}
         >
           주문상세보기
         </Button>

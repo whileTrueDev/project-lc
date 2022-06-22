@@ -13,6 +13,7 @@ import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { useInView } from 'react-intersection-observer';
+import { useRouter } from 'next/router';
 import { OrderItem } from './CustomerOrderItem';
 import CustomerOrderPeriodFilter from './CustomerOrderPeriodFilter';
 
@@ -129,6 +130,10 @@ export default CustomerOrderList;
 
 function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
   const orderDataBgColor = useColorModeValue('white', 'gray.800');
+  const router = useRouter();
+  const handleDetailClick = (): void => {
+    router.push(`/mypage/orders/${order.orderCode}`);
+  };
   return (
     <Stack borderWidth="1px" borderRadius="md" p={1} boxShadow="md" bg={orderDataBgColor}>
       <Stack direction="row" justifyContent="space-between">
@@ -138,12 +143,7 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
           <Text>주문일자 : {dayjs(order.createDate).format('YYYY-MM-DD')}</Text>
         </Stack>
 
-        <Button
-          size="sm"
-          onClick={() => {
-            console.log('주문 상세보기 페이지로 이동');
-          }}
-        >
+        <Button size="sm" onClick={handleDetailClick}>
           상세보기
         </Button>
       </Stack>
