@@ -254,6 +254,58 @@
         }
       }
     },
+    "batch-virtual-account": {
+      "root": "apps/batch-virtual-account",
+      "sourceRoot": "apps/batch-virtual-account/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:webpack",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/batch-virtual-account",
+            "main": "apps/batch-virtual-account/src/main.ts",
+            "tsConfig": "apps/batch-virtual-account/tsconfig.app.json",
+            "assets": ["apps/batch-virtual-account/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/batch-virtual-account/src/environments/environment.ts",
+                  "with": "apps/batch-virtual-account/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:node",
+          "options": {
+            "buildTarget": "batch-virtual-account:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["apps/batch-virtual-account/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/batch-virtual-account"],
+          "options": {
+            "jestConfig": "apps/batch-virtual-account/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "components-admin": {
       "root": "libs/components-admin",
       "sourceRoot": "libs/components-admin/src",
