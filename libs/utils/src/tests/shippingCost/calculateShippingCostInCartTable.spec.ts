@@ -54,8 +54,6 @@ describe('장바구니 배송비계산', () => {
         customerId: 1,
         tempUserId: null,
         goodsId: 1,
-        shippingCost: new Prisma.Decimal(0), // 장바구니상품은 배송비정보 필요없을듯
-        shippingCostIncluded: false,
         shippingGroupId: 1,
         channel: 'normal',
         options: [
@@ -89,8 +87,6 @@ describe('장바구니 배송비계산', () => {
         customerId: 1,
         tempUserId: null,
         goodsId: 2,
-        shippingCost: new Prisma.Decimal(0), // 장바구니상품은 배송비정보 필요없을듯
-        shippingCostIncluded: false,
         shippingGroupId: 1,
         channel: 'normal',
         options: [
