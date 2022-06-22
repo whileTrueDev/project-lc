@@ -316,6 +316,7 @@ export class OrderService {
       search,
       searchDateType,
       searchStatuses,
+      searchExtendedStatus,
     } = dto;
 
     let where: Prisma.OrderWhereInput = {};
@@ -356,10 +357,23 @@ export class OrderService {
       }
     }
 
+    const OR = [];
+
     // 특정 주문상태로 조회시
     if (searchStatuses) {
-      where = { ...where, step: { in: searchStatuses } };
+      OR.push({ step: { in: searchStatuses } });
     }
+
+    // 교환, 반품, 환불 조회
+    if (searchExtendedStatus) {
+      let extendedStatus = {};
+      searchExtendedStatus.forEach((s) => {
+        extendedStatus[s] = { some: {} };
+        OR.push(extendedStatus);
+        extendedStatus = {};
+      });
+    }
+    where = { ...where, OR };
 
     // 검색어로 특정컬럼값 조회시
     if (search) {
@@ -490,6 +504,11 @@ export class OrderService {
           sellerGoodsOrderItems.flatMap((oi) => oi.options),
         );
       }
+
+      // if (dto.searchExtendedStatus.length) {
+      //   dto.searchExtendedStatus.map((item) => `${item}`)
+      // }
+
       return {
         ...orderRestData,
         step: displaySellerOrderStep,

@@ -196,4 +196,8 @@ export const orderProcessStepKoreanDict = {
   paymentCanceled: '결제취소', // 결제취소,
   orderInvalidated: '주문무효', // 주문무효,
   paymentFailed: '결제실패', // 결제실패,
+  orderCancellations: '취소요청',
+  returns: '반품요청',
+  refunds: '환불요청',
+  exchanges: '교환요청',
 };

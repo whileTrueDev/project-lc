@@ -81,7 +81,6 @@ export type OrderBaseData = Order & {
   orderItems: OrderItemWithRelations[];
   payment?: Nullable<OrderPayment>;
   refunds: Nullable<Refund[]>;
-
   orderCancellations?: Nullable<OrderCancellationBaseData[]>;
   exports: Nullable<ExportBaseData[]>;
   mileageLogs: CustomerMileageLog[] | null;
