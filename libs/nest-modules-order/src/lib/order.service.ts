@@ -776,9 +776,9 @@ export class OrderService {
         where: { orderItem: { orderId } },
         select: { id: true, quantity: true },
       });
-      // 주문상태를 결제확인으로 바꾸는경우(주문접수 -> 결제확인)
+      // 주문상태를 결제확인/결제취소/결제실패로 바꾸는경우(주문접수 -> 결제확인)
       // => 해당 주문에 포함된 주문상품옵션의 상태도 모두 결제확인으로 변경
-      if (rest.step === 'paymentConfirmed') {
+      if (['paymentConfirmed', 'paymentCanceled', 'paymentFailed'].includes(rest.step)) {
         await this.prisma.orderItemOption.updateMany({
           where: { orderItem: { orderId } },
           data: { step: rest.step },
