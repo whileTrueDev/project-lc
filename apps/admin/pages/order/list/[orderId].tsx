@@ -34,7 +34,7 @@ export function OrderDetail(): JSX.Element {
   const router = useRouter();
   const { orderId } = router.query;
   const { data } = useAdminOrder(Number(orderId));
-  const { data: paymentData } = usePaymentByOrderCode(data?.payment?.paymentKey);
+  const { data: paymentData } = usePaymentByOrderCode(data?.orderCode);
   const { mutateAsync } = useAdminOrderPatchMutation(Number(orderId));
   const [isEdit, setIsEdit] = useState(false);
   const [orderStep, setOrderStep] = useState<UpdateOrderDto['step']>('orderReceived');
@@ -206,7 +206,7 @@ export function OrderDetail(): JSX.Element {
             </Flex>
             <Box>
               <Text>결제정보</Text>
-              <Grid templateColumns="repeat(2, 5fr)" width="300px" border="1px" p={1}>
+              <Grid templateColumns="repeat(2, 5fr)" minWidth="300px" border="1px" p={1}>
                 <GridItem>
                   <Text>결제키</Text>
                 </GridItem>
