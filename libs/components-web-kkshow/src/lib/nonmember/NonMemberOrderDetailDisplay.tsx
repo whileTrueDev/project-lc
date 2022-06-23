@@ -44,23 +44,31 @@ export function NonMemberOrderDetailDisplay({
 
         {/* 주문상품정보, 배송비 */}
         <Stack>
-          <Text fontSize="lg">주문상품정보</Text>
+          <Text fontWeight="bold" fontSize="lg">
+            주문상품정보
+          </Text>
           <NonmemberOrderItemsList order={orderData.order} />
         </Stack>
         <Divider />
 
         {/* 결제정보 */}
-        <Text fontSize="lg">결제정보</Text>
+        <Text fontWeight="bold" fontSize="lg">
+          결제정보
+        </Text>
         <NonmemberPaymentInfo paymentData={paymentData} />
         <Divider />
 
         {/* 출고정보 */}
-        <Text fontSize="lg">출고정보</Text>
+        <Text fontWeight="bold" fontSize="lg">
+          출고정보
+        </Text>
         <NonmemberExportInfo order={orderData.order} />
 
         {/* 받는사람 연락처 */}
         <Stack>
-          <Text fontSize="lg">연락처 정보</Text>
+          <Text fontWeight="bold" fontSize="lg">
+            연락처 정보
+          </Text>
           <SuccessDeliveryAddress data={orderData.order} />
         </Stack>
         <Divider />
@@ -82,7 +90,13 @@ export function NonmemberOrderItemsList({
         const orderItemIdList = shipping.items.map((item) => item.id);
         const items = order.orderItems.filter((oi) => orderItemIdList.includes(oi.id));
         return (
-          <Grid templateColumns="repeat(4,1fr)" borderWidth="1px" key={shipping.id} p={1}>
+          <Grid
+            templateColumns="repeat(4,1fr)"
+            borderWidth="1px"
+            rounded="md"
+            key={shipping.id}
+            p={1}
+          >
             <GridItem colSpan={3}>
               <Stack>
                 {items.map((i) => {
@@ -121,7 +135,7 @@ export function NonmemberPaymentInfo({
   paymentData?: Payment;
 }): JSX.Element {
   return (
-    <Grid templateColumns="repeat(2, 1fr)" borderWidth="1px" p={1}>
+    <Grid templateColumns="repeat(2, 1fr)" borderWidth="1px" rounded="md" p={1}>
       <GridItem>
         <Text>결제수단</Text>
       </GridItem>

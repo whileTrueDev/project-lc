@@ -60,12 +60,8 @@ export function NonMemberOrderFindForm(): JSX.Element {
         <Text>주문번호</Text>
         <Input {...register('orderCode', { required: true })} />
         <Text>주문자명</Text>
-        <Input
-          {...register('ordererName', {
-            required: true,
-          })}
-        />
-        <Stack direction="row" justify="space-around">
+        <Input {...register('ordererName', { required: true })} />
+        <Stack direction="row" justify="space-around" pt={2}>
           <Button w="100%" onClick={() => router.back()}>
             취소
           </Button>
