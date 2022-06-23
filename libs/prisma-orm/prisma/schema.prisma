@@ -1607,19 +1607,27 @@ enum OrderProcessStep {
   paymentFailed // 결제실패, 99
 }
 
+enum VirtualAccountDepositStatus {
+  WAITING // 입금대기
+  PARTIAL_DONE // 부분 입금 완료
+  DONE // 입금완료
+  CANCELED // 만료기간동안 미입금 또는 취소
+}
+
 // 주문결제정보 - 기타 전자결제관련 필요한 데이터 저장
 model OrderPayment {
-  id              Int           @id @default(autoincrement()) // 주문결제정보 고유번호
+  id              Int                          @id @default(autoincrement()) // 주문결제정보 고유번호
   method          PaymentMethod // 결제수단
-  orderId         Int?          @unique
+  orderId         Int?                         @unique
   // 연결된 주문데이터가 삭제되는 경우 결제정보 데이터는 유지
-  order           Order?        @relation(fields: [orderId], references: [id], onDelete: SetNull)
-  paymentKey      String        @unique // PG사(토스페이먼츠or...)에서 제공하는 결제 고유ID값
+  order           Order?                       @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  paymentKey      String                       @unique // PG사(토스페이먼츠or...)에서 제공하는 결제 고유ID값
   depositDate     DateTime? // 입금일시
   depositor       String? // 입금자명
   depositSecret   String? // 가상계좌 웹훅 요청이 정상적인 요청인지 검증하기 위한 값입니다. 이 값이 가상계좌 웹훅 이벤트 본문으로 돌아온 secret과 같으면 정상적인 요청입니다.
   depositDueDate  DateTime? // 입금기한
-  depositDoneFlag Boolean       @default(false) // 입금완료여부
+  depositDoneFlag Boolean                      @default(false) // 입금완료여부
+  depositStatus   VirtualAccountDepositStatus?
   account         String? // 주문자가 결제한 금액이 입금될 계좌정보 
 }
 

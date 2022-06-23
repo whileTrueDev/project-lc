@@ -1,5 +1,10 @@
 import { HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { OrderPayment, PaymentMethod } from '@prisma/client';
+import {
+  OrderPayment,
+  PaymentMethod,
+  Prisma,
+  VirtualAccountDepositStatus,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreatePaymentRes,
@@ -28,17 +33,20 @@ export class PaymentService {
     account?: string;
   }): Promise<OrderPayment> {
     let paymentMethod: PaymentMethod = PaymentMethod.card;
+    let depositStatus: VirtualAccountDepositStatus = null;
     if (dto.method === '카드') {
       paymentMethod = PaymentMethod.card;
     } else if (dto.method === '계좌이체') {
       paymentMethod = PaymentMethod.transfer;
     } else if (dto.method === '가상계좌') {
       paymentMethod = PaymentMethod.virtualAccount;
+      depositStatus = VirtualAccountDepositStatus.WAITING;
     }
     return this.prisma.orderPayment.create({
       data: {
         ...dto,
         method: paymentMethod,
+        depositStatus,
       },
     });
   }

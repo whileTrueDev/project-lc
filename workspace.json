@@ -266,7 +266,8 @@
             "outputPath": "dist/apps/batch-virtual-account",
             "main": "apps/batch-virtual-account/src/main.ts",
             "tsConfig": "apps/batch-virtual-account/tsconfig.app.json",
-            "assets": ["apps/batch-virtual-account/src/assets"]
+            "assets": ["apps/batch-virtual-account/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {

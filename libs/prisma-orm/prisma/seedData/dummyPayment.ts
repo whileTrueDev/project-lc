@@ -13,6 +13,7 @@ export const dummyPayments: OrderPayment[] = [
     depositor: null,
     depositSecret: null,
     depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
+    depositStatus: null,
   },
   {
     id: 2,
@@ -25,6 +26,7 @@ export const dummyPayments: OrderPayment[] = [
     depositor: null,
     depositSecret: null,
     depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
+    depositStatus: null,
   },
   {
     id: 3,
@@ -37,6 +39,7 @@ export const dummyPayments: OrderPayment[] = [
     depositor: null,
     depositSecret: 'DEPOSIT_SECRET_TEST1',
     depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
+    depositStatus: 'WAITING',
   },
   {
     id: 4,
@@ -49,6 +52,7 @@ export const dummyPayments: OrderPayment[] = [
     depositor: null,
     depositSecret: 'DEPOSIT_SECRET_TEST2',
     depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
+    depositStatus: 'WAITING',
   },
   {
     id: 5,
@@ -61,6 +65,7 @@ export const dummyPayments: OrderPayment[] = [
     depositor: null,
     depositSecret: null,
     depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
+    depositStatus: null,
   },
   {
     id: 6,
@@ -73,6 +78,7 @@ export const dummyPayments: OrderPayment[] = [
     depositor: null,
     depositSecret: null,
     depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
+    depositStatus: null,
   },
   {
     id: 7,
@@ -85,6 +91,7 @@ export const dummyPayments: OrderPayment[] = [
     depositor: null,
     depositSecret: 'DEPOSIT_SECRET_TEST3',
     depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
+    depositStatus: 'WAITING',
   },
   {
     id: 8,
@@ -97,5 +104,6 @@ export const dummyPayments: OrderPayment[] = [
     depositor: null,
     depositSecret: null,
     depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
+    depositStatus: null,
   },
 ];
