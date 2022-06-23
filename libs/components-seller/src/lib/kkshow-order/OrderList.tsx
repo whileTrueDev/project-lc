@@ -9,11 +9,15 @@ import {
   useBreakpoint,
   useDisclosure,
 } from '@chakra-ui/react';
-import { GridColumns, GridRowId, GridToolbarContainer } from '@material-ui/data-grid';
-import { OrderItemOption, OrderProcessStep } from '@prisma/client';
+import {
+  GridColumns,
+  GridRowId,
+  GridToolbarContainer,
+  GridRowData,
+} from '@material-ui/data-grid';
+import { OrderItemOption } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { TooltipedText } from '@project-lc/components-core/TooltipedText';
-import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { useDisplaySize, useProfile, useSellerOrderList } from '@project-lc/hooks';
 import {
   isOrderExportable,
@@ -26,6 +30,7 @@ import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaTruck } from 'react-icons/fa';
+import { KkshowOrderStatusBadge } from '../KkshowOrderStatusBadge';
 import ExportManyDialog from '../ExportManyDialog';
 import OrderListDownloadDialog from './OrderListDownloadDialog';
 
@@ -126,13 +131,25 @@ const columns: GridColumns = [
     disableColumnMenu: true,
     disableReorder: true,
     width: 120,
-    renderCell: ({ row }) => (
-      <Box lineHeight={2}>
-        <OrderStatusBadge step={row.step as OrderProcessStep} />
-      </Box>
-    ),
+    renderCell: ({ row }) => <Box lineHeight={2}>{OrderStatusBadge(row)}</Box>,
   },
 ];
+
+function OrderStatusBadge(row: GridRowData): JSX.Element {
+  if (row.returns.length) {
+    return <KkshowOrderStatusBadge orderStatus="returns" />;
+  }
+  if (row.refunds.length) {
+    return <KkshowOrderStatusBadge orderStatus="refunds" />;
+  }
+  if (row.exchanges.length) {
+    return <KkshowOrderStatusBadge orderStatus="exchanges" />;
+  }
+  if (row.orderCancellations.length) {
+    return <KkshowOrderStatusBadge orderStatus="orderCancellations" />;
+  }
+  return <KkshowOrderStatusBadge orderStatus={row.step} />;
+}
 
 export function OrderList(): JSX.Element {
   // 페이지당 행 select
@@ -150,8 +167,14 @@ export function OrderList(): JSX.Element {
   const { data: profileData } = useProfile();
 
   const sellerOrderListDto = useMemo(() => {
-    const { search, searchDateType, periodStart, periodEnd, searchStatuses } =
-      sellerOrderStates;
+    const {
+      search,
+      searchDateType,
+      periodStart,
+      periodEnd,
+      searchStatuses,
+      searchExtendedStatus,
+    } = sellerOrderStates;
 
     return {
       search,
@@ -159,6 +182,7 @@ export function OrderList(): JSX.Element {
       periodStart,
       periodEnd,
       searchStatuses,
+      searchExtendedStatus,
       sellerId: profileData?.id,
       take: pageSize,
       skip: pageSize * page,
@@ -205,7 +229,6 @@ export function OrderList(): JSX.Element {
       orders.data?.count ? orders.data.count : prevRowCountState,
     );
   }, [orders.data, setRowCountState]);
-
   return (
     <Box minHeight={{ base: 300, md: 600 }} mb={24}>
       <ChakraDataGrid

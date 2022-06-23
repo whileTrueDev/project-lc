@@ -189,6 +189,13 @@ export function LoginForm({
           </Text>
         </Stack>
       </Stack>
+
+      {/* 비회원 주문조회버튼 - 소비자센터 로그인인 경우에만 표시 */}
+      {userType === 'customer' && router.query.from !== 'purchase' && (
+        <NextLink href="/nonmember" passHref>
+          <Button as={Link}>비회원 주문조회</Button>
+        </NextLink>
+      )}
     </CenterBox>
   );
 }

@@ -69,22 +69,24 @@ export function ExportOrderOptionList({
 
   return (
     <Stack pt={2} spacing={4}>
-      {order.data.shippings?.map((shipping, shippingIndex) => (
-        <ExportOrderShippingListItem
-          key={shipping.id}
-          shipping={shipping}
-          order={order.data}
-          disableSelection={disableSelection}
-          orderIndex={orderIndex}
-          shippingIndex={shippingIndex}
-          onSubmitClick={onSubmitClick}
-        />
-      ))}
+      {order.data.shippings
+        ?.filter((shipping) => shipping.items.length > 0)
+        .map((shipping, shippingIndex) => (
+          <ExportOrderShippingListItem
+            key={shipping.id}
+            shipping={shipping}
+            order={order.data}
+            disableSelection={disableSelection}
+            orderIndex={orderIndex}
+            shippingIndex={shippingIndex}
+            onSubmitClick={onSubmitClick}
+          />
+        ))}
     </Stack>
   );
 }
 
-type ExportOrderShippingListItem = ExportOrderOptionListProps & {
+type ExportOrderShippingListItemProps = ExportOrderOptionListProps & {
   shipping: OrderDetailShipping;
   order: OrderDetailRes;
   shippingIndex: number;
@@ -96,7 +98,7 @@ function ExportOrderShippingListItem({
   orderIndex = 0,
   shippingIndex,
   onSubmitClick,
-}: ExportOrderShippingListItem): JSX.Element {
+}: ExportOrderShippingListItemProps): JSX.Element {
   const { setValue } = useFormContext<CreateKkshowExportDto[]>();
   const selectedOrderShippings = sellerExportStore((s) => s.selectedOrderShippings);
   const handleSelect = sellerExportStore((s) => s.handleOrderShippingSelect);
