@@ -34,6 +34,7 @@ import {
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
   UpdateOrderDto,
+  NonMemberOrderDetailRes,
 } from '@project-lc/shared-types';
 import { calculateShippingCost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
@@ -55,20 +56,6 @@ export class OrderService {
 
   private async hash(pw: string): Promise<string> {
     return this.userPwManager.hashPassword(pw);
-  }
-
-  /** 비회원주문생성시 처리 - 비회원주문비밀번호 암호화하여 리턴, nonMemberOrderFlag: true 설정 */
-  private async handleNonMemberOrder(
-    dto: CreateOrderDto,
-  ): Promise<Partial<Prisma.OrderCreateInput>> {
-    const { nonMemberOrderFlag, nonMemberOrderPassword } = dto;
-    const hashedPassword = nonMemberOrderPassword
-      ? await this.hash(nonMemberOrderPassword)
-      : undefined;
-    return {
-      nonMemberOrderFlag,
-      nonMemberOrderPassword: hashedPassword,
-    };
   }
 
   /** 선물주문생성시 처리 - 방송인 정보(받는사람 주소, 연락처) 리턴, giftFlag: true 설정 */
@@ -203,11 +190,6 @@ export class OrderService {
       payment: paymentId ? { connect: { id: paymentId } } : undefined,
       customer: !nonMemberOrderFlag ? { connect: { id: customerId } } : undefined,
     };
-
-    // 비회원 주문의 경우 비밀번호 해시처리
-    if (nonMemberOrderFlag) {
-      createInput = { ...createInput, ...(await this.handleNonMemberOrder(orderDto)) };
-    }
 
     // 선물하기의 경우(주문상품은 1개, 후원데이터가 존재함)
     if (giftFlag && orderItems.length === 1 && !!orderItems[0].support) {
@@ -373,7 +355,7 @@ export class OrderService {
         extendedStatus = {};
       });
     }
-    where = { ...where, OR };
+    where = { ...where, OR: OR.length > 0 ? OR : undefined };
 
     // 검색어로 특정컬럼값 조회시
     if (search) {
@@ -411,13 +393,7 @@ export class OrderService {
       if (_o.giftFlag) {
         _o = this.removeRecipientInfo(_o);
       }
-      // 비회원 주문인 경우 - 비회원비밀번호 정보 삭제
-      if (_o.nonMemberOrderFlag) {
-        _o = {
-          ..._o,
-          nonMemberOrderPassword: undefined,
-        };
-      }
+
       return _o;
     });
     return {
@@ -735,25 +711,16 @@ export class OrderService {
   /** 비회원 주문 상세 조회 */
   async getNonMemberOrderDetail({
     orderCode,
-    password,
-  }: GetNonMemberOrderDetailDto): Promise<OrderDetailRes> {
-    const order = await this.findOneOrderDetail({ orderCode, deleteFlag: false });
+    ordererName,
+  }: GetNonMemberOrderDetailDto): Promise<NonMemberOrderDetailRes> {
+    const order = await this.findOneOrderDetail({
+      orderCode,
+      ordererName,
+      customerId: null,
+      deleteFlag: false,
+    });
 
-    // 비회원주문 비밀번호 확인
-    const isPasswordCorrect = await this.userPwManager.validatePassword(
-      password,
-      order.nonMemberOrderPassword,
-    );
-    if (!isPasswordCorrect) {
-      throw new BadRequestException(`주문 비밀번호가 일치하지 않습니다.`);
-    }
-
-    // 선물주문인경우 받는사람 정보 삭제하고 리턴
-    if (order.giftFlag) {
-      return this.removeRecipientInfo(order);
-    }
-
-    return order;
+    return { order };
   }
 
   /** 주문수정 */
@@ -761,7 +728,7 @@ export class OrderService {
     // 주문이 존재하는지 확인
     await this.findOneOrder({ id: orderId });
 
-    const { customerId, nonMemberOrderPassword, ...rest } = dto;
+    const { customerId, ...rest } = dto;
 
     let updateInput: Prisma.OrderUpdateInput = { ...rest };
 
@@ -770,16 +737,6 @@ export class OrderService {
       updateInput = {
         ...updateInput,
         customer: { connect: { id: customerId } },
-      };
-    }
-
-    // 비회원 주문 비밀번호 바꾸는 경우
-    if (nonMemberOrderPassword) {
-      updateInput = {
-        ...updateInput,
-        nonMemberOrderPassword: await this.userPwManager.hashPassword(
-          nonMemberOrderPassword,
-        ),
       };
     }
 
