@@ -321,6 +321,14 @@ body {
   box-shadow: 0px 0px 12px 1px #000;
 }
 
+.virtual-video {
+  position:absolute;
+  left:0;
+  top:0;
+  z-index: 300;
+  border-radius: 15px;
+}
+
 /* 좌측 상단 랭킹 */
 .ranking-area {
   display: flex;
