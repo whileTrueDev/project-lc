@@ -51,8 +51,8 @@ export type OriginGoods = {
 type Nullable<T> = T | null;
 
 export type OrderItemWithRelations = OrderItem & {
-  support: Nullable<OrderItemSupportWithBroadcasterInfo>;
-  review?: { id: GoodsReview['id'] };
+  support?: Nullable<OrderItemSupportWithBroadcasterInfo>;
+  review?: GoodsReview | null;
   options: OrderItemOption[];
   goods: OriginGoods;
 };
@@ -81,7 +81,6 @@ export type OrderBaseData = Order & {
   orderItems: OrderItemWithRelations[];
   payment?: Nullable<OrderPayment>;
   refunds: Nullable<Refund[]>;
-
   orderCancellations?: Nullable<OrderCancellationBaseData[]>;
   exports: Nullable<ExportBaseData[]>;
   mileageLogs: CustomerMileageLog[] | null;

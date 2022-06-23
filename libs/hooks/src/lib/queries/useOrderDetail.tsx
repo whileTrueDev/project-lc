@@ -14,7 +14,12 @@ export const getOrderDetail = async (
   dto: GetOneOrderDetailDto,
 ): Promise<OrderDetailRes> => {
   return axios
-    .get<OrderDetailRes>(`/order/detail`, { params: dto })
+    .get<OrderDetailRes>(`/order/detail`, {
+      params: {
+        ...dto,
+        appType: process.env.NEXT_PUBLIC_APP_TYPE,
+      },
+    })
     .then((res) => res.data);
 };
 /** 개별 주문 상세조회 훅 */
