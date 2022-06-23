@@ -238,7 +238,13 @@ export function Receipt(): JSX.Element {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      router.push('/mypage');
+                      if (orderDetailData.nonMemberOrderFlag) {
+                        // 비회원주문인경우 비회원주문조회 페이지로 이동
+                        router.push('/nonmember');
+                      } else {
+                        // 아닌경우 마이페이지-주문상세 로 이동
+                        router.push(`/mypage/orders/${orderCode}`);
+                      }
                     }}
                   >
                     주문 상세보기
