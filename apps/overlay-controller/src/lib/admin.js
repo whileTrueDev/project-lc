@@ -7,7 +7,6 @@ let email;
 let streamerNickname;
 let liveShoppingId;
 let isLogin = true;
-const isUser = false;
 const socket = io(process.env.OVERLAY_HOST, { transports: ['websocket'] });
 
 const liveShoppingStateSocket = io(
@@ -508,6 +507,17 @@ $(document).ready(function ready() {
 
   $('#combo-reset-button').click(function resetCombo() {
     socket.emit('combo reset from admin', roomName);
+  });
+
+  $('.logout-button').click(function logout() {
+    console.log('logout');
+    $.ajax({
+      type: 'POST',
+      url: `http://localhost:3333/auth/logout`,
+      success(data) {
+        window.location.replace('/login');
+      },
+    });
   });
 
   $('form').submit(function formSubmit(event) {

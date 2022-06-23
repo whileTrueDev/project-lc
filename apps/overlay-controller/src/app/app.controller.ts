@@ -8,6 +8,7 @@ import {
   Query,
   Render,
   UseGuards,
+  UseFilters,
 } from '@nestjs/common';
 import {
   LiveShoppingService,
@@ -25,6 +26,7 @@ import {
   getRealtimeApiHost,
 } from '@project-lc/utils';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
+import { ViewAuthFilter } from './forbidden.exception';
 
 @Controller()
 export class AppController {
@@ -34,7 +36,8 @@ export class AppController {
     private readonly purchaseMessageService: PurchaseMessageService,
   ) {}
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @UseFilters(ViewAuthFilter)
   @Get()
   @Render('index')
   async renterTest(): Promise<OverlayControllerMainRes> {
@@ -55,11 +58,11 @@ export class AppController {
 
   @Get('/login')
   @Render('login')
-  async loginPage(): Promise<any> {
+  async loginPage(): Promise<{ message: string }> {
     return { message: 'login' };
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('/purchase-message')
   async getMessage(
     @Query('liveShoppingId') liveShoppingId: number,
@@ -67,14 +70,14 @@ export class AppController {
     return this.purchaseMessageService.getAllMessagesAndPrice(Number(liveShoppingId));
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('/purchase-message')
   async uploadMessage(@Body() data: PurchaseMessageWithLoginFlag): Promise<boolean> {
     const upload = await this.overlayControllerService.uploadPurchase(data);
     return upload;
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete('/purchase-message')
   async deleteMessage(
     @Body('messageId', ParseIntPipe) messageId: number,
