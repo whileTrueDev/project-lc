@@ -6,8 +6,10 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 // import { SellerInfo, UserPayload } from '@project-lc/nest-core';
 import {
@@ -22,6 +24,8 @@ import { ExportService } from './export.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('export')
+@UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('order')
 export class ExportController {
   constructor(private readonly exportService: ExportService) {}
 
