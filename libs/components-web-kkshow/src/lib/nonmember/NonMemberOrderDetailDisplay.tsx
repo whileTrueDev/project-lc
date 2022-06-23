@@ -120,7 +120,7 @@ export function NonmemberOrderItemsList({
               flexDirection="column"
             >
               <Text>{items[0].goods.seller.sellerShop.shopName}</Text>
-              <Text>{Number(shipping.shippingCost).toLocaleString()}원</Text>
+              <Text>배송비 : {Number(shipping.shippingCost).toLocaleString()}원</Text>
             </GridItem>
           </Grid>
         );
