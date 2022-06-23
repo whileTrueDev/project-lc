@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   Flex,
@@ -91,9 +92,12 @@ export function DeliveryAddress(): JSX.Element {
 
   const handleRecipientInfo = async (): Promise<void> => {
     setValue('recipientName', getValues('ordererName'));
-    setValue('recipientPhone1', getValues('ordererPhone').slice(0, 3) || '');
-    setValue('recipientPhone2', getValues('ordererPhone').slice(3, 7) || '');
-    setValue('recipientPhone3', getValues('ordererPhone').slice(7, 12) || '');
+    const ordererPhone1 = getValues('ordererPhone1');
+    const ordererPhone2 = getValues('ordererPhone2');
+    const ordererPhone3 = getValues('ordererPhone3');
+    setValue('recipientPhone1', ordererPhone1 || '');
+    setValue('recipientPhone2', ordererPhone2 || '');
+    setValue('recipientPhone3', ordererPhone3 || '');
     await trigger('recipientName');
     await trigger('recipientPhone1');
     await trigger('recipientPhone2');
@@ -116,7 +120,6 @@ export function DeliveryAddress(): JSX.Element {
   const postalCode = watch('recipientPostalCode');
   useEffect(() => {
     if (address) {
-      console.log('address change');
       const params = {
         address,
         postalCode,
@@ -336,6 +339,27 @@ export type SuccessDeliveryAddressProps = { data: OrderDetailRes };
 
 export function SuccessDeliveryAddress(props: SuccessDeliveryAddressProps): JSX.Element {
   const { data } = props;
+
+  // 선물주문인경우
+  if (data.giftFlag) {
+    // 선물받는 방송인 정보 표시
+    const supportOrderItem = data.orderItems.find((item) => !!item.support);
+    const support = supportOrderItem?.support;
+    if (support) {
+      return (
+        <Stack>
+          <Text fontWeight="bold">선물하기 주문 🎁</Text>
+          <Stack direction="row" alignItems="center">
+            {support.broadcaster.avatar && (
+              <Avatar src={support.broadcaster.avatar} mr={2} />
+            )}
+            <Text fontWeight="bold">{support.broadcaster.userNickname}</Text>
+            <Text>님께 발송됩니다</Text>
+          </Stack>
+        </Stack>
+      );
+    }
+  }
   return (
     <>
       <Flex direction="column" mt={3}>

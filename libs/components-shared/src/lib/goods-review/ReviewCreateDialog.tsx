@@ -2,6 +2,7 @@
 import {
   Modal,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
@@ -71,6 +72,7 @@ export function ReviewCreateDialog({
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>후기 작성</ModalHeader>
+        <ModalCloseButton />
         <ModalBody>
           <ReviewCreateOrUpdateForm onSubmit={onSubmit} onCancel={onClose} />
         </ModalBody>

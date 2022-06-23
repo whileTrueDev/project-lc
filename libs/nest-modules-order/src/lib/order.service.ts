@@ -1,7 +1,9 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import {
+  CouponStatus,
   Goods,
   GoodsOptions,
+  MileageActionType,
   Order,
   OrderItemOption,
   OrderProcessStep,
@@ -32,11 +34,14 @@ import {
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
   UpdateOrderDto,
+  NonMemberOrderDetailRes,
 } from '@project-lc/shared-types';
 import { calculateShippingCost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
+import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
+import { MileageService } from '@project-lc/nest-modules-mileage';
 
 dayjs.extend(isToday);
 @Injectable()
@@ -45,22 +50,12 @@ export class OrderService {
     private readonly prisma: PrismaService,
     private readonly broadcasterService: BroadcasterService,
     private readonly userPwManager: UserPwManager,
+    private readonly customerCouponService: CustomerCouponService,
+    private readonly mileageService: MileageService,
   ) {}
 
   private async hash(pw: string): Promise<string> {
     return this.userPwManager.hashPassword(pw);
-  }
-
-  /** 비회원주문생성시 처리 - 비회원주문비밀번호 암호화하여 리턴, nonMemberOrderFlag: true 설정 */
-  private async handleNonMemberOrder(
-    dto: CreateOrderDto,
-  ): Promise<Partial<Prisma.OrderCreateInput>> {
-    const { nonMemberOrderFlag, nonMemberOrderPassword } = dto;
-    const hashedPassword = await this.hash(nonMemberOrderPassword);
-    return {
-      nonMemberOrderFlag,
-      nonMemberOrderPassword: hashedPassword,
-    };
   }
 
   /** 선물주문생성시 처리 - 방송인 정보(받는사람 주소, 연락처) 리턴, giftFlag: true 설정 */
@@ -82,14 +77,20 @@ export class OrderService {
 
     // 방송인의 주소, 연락처 조회
     const { broadcasterAddress, broadcasterContacts } = broadcaster;
-    const defaultContact = broadcasterContacts.find(
-      (contact) => contact.isDefault === true,
-    );
+    const defaultContact =
+      broadcasterContacts.find((contact) => contact.isDefault === true) ||
+      broadcasterContacts[0];
+
+    let phone = defaultContact?.phoneNumber || '';
+    // Broadcaster.phoneNumber 000-0000-0000 형태로 저장됨 => Order.recipientPhone은 '-' 없는 00000000000 형태로 저장
+    if (phone.includes('-')) {
+      phone = defaultContact.phoneNumber.split('-').join('');
+    }
+
     return {
       giftFlag: true,
       recipientName: defaultContact?.name || broadcaster.userNickname,
-      recipientPhone:
-        defaultContact?.phoneNumber || broadcasterContacts[0]?.phoneNumber || '',
+      recipientPhone: phone,
       recipientEmail: defaultContact?.email || broadcasterContacts[0]?.email || '',
       recipientAddress: broadcasterAddress.address || '',
       recipientDetailAddress: broadcasterAddress.detailAddress || '',
@@ -110,7 +111,7 @@ export class OrderService {
   }
 
   /** 주문에서 주문자 정보 빈 문자열로 바꿔서 리턴 */
-  private removerecipientInfo<T extends Order>(order: T): T {
+  private removeRecipientInfo<T extends Order>(order: T): T {
     return {
       ...order,
       recipientName: '',
@@ -190,11 +191,6 @@ export class OrderService {
       customer: !nonMemberOrderFlag ? { connect: { id: customerId } } : undefined,
     };
 
-    // 비회원 주문의 경우 비밀번호 해시처리
-    if (nonMemberOrderFlag) {
-      createInput = { ...createInput, ...(await this.handleNonMemberOrder(orderDto)) };
-    }
-
     // 선물하기의 경우(주문상품은 1개, 후원데이터가 존재함)
     if (giftFlag && orderItems.length === 1 && !!orderItems[0].support) {
       createInput = { ...createInput, ...(await this.handleGiftOrder(orderDto)) };
@@ -248,6 +244,31 @@ export class OrderService {
     await this.createOrderShippingData(order.id, shippingData);
     /** *************** */
 
+    // 비회원 주문이 아닌경우 - 마일리지, 쿠폰사용처리
+    if (!nonMemberOrderFlag) {
+      // 마일리지 사용시
+      if (usedMileageAmount) {
+        // * 마일리지 차감 처리 customerId, usedMileageAmount
+        await this.mileageService.upsertMileage({
+          customerId,
+          mileage: usedMileageAmount,
+          actionType: MileageActionType.consume,
+          reason: `주문 ${order.orderCode} 에 적립금 ${usedMileageAmount} 사용`,
+          orderId: order.id,
+        });
+      }
+
+      // 쿠폰 사용시
+      if (couponId) {
+        // * 쿠폰 사용처리 customerId, couponId, usedCouponAmount
+        await this.customerCouponService.updateCustomerCouponStatus({
+          id: couponId,
+          status: CouponStatus.used,
+          orderId: order.id,
+        });
+      }
+    }
+
     // * 주문 생성 후 장바구니 비우기
     if (cartItemIdList) {
       await this.prisma.cartItem.deleteMany({
@@ -257,7 +278,7 @@ export class OrderService {
 
     // 선물주문인경우 생성된 주문데이터에서 받는사람(방송인) 정보 삭제하고 리턴
     if (order.giftFlag) {
-      return this.removerecipientInfo(order);
+      return this.removeRecipientInfo(order);
     }
 
     return order;
@@ -277,6 +298,7 @@ export class OrderService {
       search,
       searchDateType,
       searchStatuses,
+      searchExtendedStatus,
     } = dto;
 
     let where: Prisma.OrderWhereInput = {};
@@ -317,10 +339,23 @@ export class OrderService {
       }
     }
 
+    const OR = [];
+
     // 특정 주문상태로 조회시
     if (searchStatuses) {
-      where = { ...where, step: { in: searchStatuses } };
+      OR.push({ step: { in: searchStatuses } });
     }
+
+    // 교환, 반품, 환불 조회
+    if (searchExtendedStatus) {
+      let extendedStatus = {};
+      searchExtendedStatus.forEach((s) => {
+        extendedStatus[s] = { some: {} };
+        OR.push(extendedStatus);
+        extendedStatus = {};
+      });
+    }
+    where = { ...where, OR: OR.length > 0 ? OR : undefined };
 
     // 검색어로 특정컬럼값 조회시
     if (search) {
@@ -356,15 +391,9 @@ export class OrderService {
       let _o = { ...order };
       //  선물하기 주문일 시 받는사람 정보 삭제
       if (_o.giftFlag) {
-        _o = this.removerecipientInfo(_o);
+        _o = this.removeRecipientInfo(_o);
       }
-      // 비회원 주문인 경우 - 비회원비밀번호 정보 삭제
-      if (_o.nonMemberOrderFlag) {
-        _o = {
-          ..._o,
-          nonMemberOrderPassword: undefined,
-        };
-      }
+
       return _o;
     });
     return {
@@ -451,6 +480,11 @@ export class OrderService {
           sellerGoodsOrderItems.flatMap((oi) => oi.options),
         );
       }
+
+      // if (dto.searchExtendedStatus.length) {
+      //   dto.searchExtendedStatus.map((item) => `${item}`)
+      // }
+
       return {
         ...orderRestData,
         step: displaySellerOrderStep,
@@ -495,7 +529,7 @@ export class OrderService {
             support: {
               include: { broadcaster: { select: { userNickname: true, avatar: true } } },
             },
-            review: { select: { id: true } },
+            review: true,
             goods: {
               select: {
                 id: true,
@@ -566,7 +600,7 @@ export class OrderService {
             support: {
               include: { broadcaster: { select: { userNickname: true, avatar: true } } },
             },
-            review: { select: { id: true } },
+            review: true,
             goods: {
               select: {
                 id: true,
@@ -620,6 +654,8 @@ export class OrderService {
 
   /** 개별 주문 상세 조회 */
   async getOrderDetail(dto: GetOneOrderDetailDto): Promise<OrderDetailRes> {
+    const { appType } = dto;
+
     const whereInput: Prisma.OrderWhereInput = dto.orderId
       ? { id: dto.orderId } // orderId 값이 있으면 orderId로 조회
       : { orderCode: dto.orderCode }; // 아니면 orderCode로 조회
@@ -664,25 +700,27 @@ export class OrderService {
       };
     }
 
+    // 소비자센터에서 주문 조회 요청 && 선물주문인경우 => 받는사람 정보 삭제하고 리턴
+    if (appType === 'customer' && result.giftFlag) {
+      result = this.removeRecipientInfo(result);
+    }
+
     return result;
   }
 
   /** 비회원 주문 상세 조회 */
   async getNonMemberOrderDetail({
     orderCode,
-    password,
-  }: GetNonMemberOrderDetailDto): Promise<OrderDetailRes> {
-    const order = await this.findOneOrderDetail({ orderCode, deleteFlag: false });
+    ordererName,
+  }: GetNonMemberOrderDetailDto): Promise<NonMemberOrderDetailRes> {
+    const order = await this.findOneOrderDetail({
+      orderCode,
+      ordererName,
+      customerId: null,
+      deleteFlag: false,
+    });
 
-    // 비회원주문 비밀번호 확인
-    const isPasswordCorrect = await this.userPwManager.validatePassword(
-      password,
-      order.nonMemberOrderPassword,
-    );
-    if (!isPasswordCorrect) {
-      throw new BadRequestException(`주문 비밀번호가 일치하지 않습니다.`);
-    }
-    return order;
+    return { order };
   }
 
   /** 주문수정 */
@@ -690,7 +728,7 @@ export class OrderService {
     // 주문이 존재하는지 확인
     await this.findOneOrder({ id: orderId });
 
-    const { customerId, nonMemberOrderPassword, ...rest } = dto;
+    const { customerId, ...rest } = dto;
 
     let updateInput: Prisma.OrderUpdateInput = { ...rest };
 
@@ -699,16 +737,6 @@ export class OrderService {
       updateInput = {
         ...updateInput,
         customer: { connect: { id: customerId } },
-      };
-    }
-
-    // 비회원 주문 비밀번호 바꾸는 경우
-    if (nonMemberOrderPassword) {
-      updateInput = {
-        ...updateInput,
-        nonMemberOrderPassword: await this.userPwManager.hashPassword(
-          nonMemberOrderPassword,
-        ),
       };
     }
 
@@ -724,9 +752,9 @@ export class OrderService {
         where: { orderItem: { orderId } },
         select: { id: true, quantity: true },
       });
-      // 주문상태를 결제확인으로 바꾸는경우(주문접수 -> 결제확인)
+      // 주문상태를 결제확인/결제취소/결제실패로 바꾸는경우(주문접수 -> 결제확인)
       // => 해당 주문에 포함된 주문상품옵션의 상태도 모두 결제확인으로 변경
-      if (rest.step === 'paymentConfirmed') {
+      if (['paymentConfirmed', 'paymentCanceled', 'paymentFailed'].includes(rest.step)) {
         await this.prisma.orderItemOption.updateMany({
           where: { orderItem: { orderId } },
           data: { step: rest.step },
