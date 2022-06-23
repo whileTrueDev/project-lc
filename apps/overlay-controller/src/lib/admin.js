@@ -7,6 +7,7 @@ let email;
 let streamerNickname;
 let liveShoppingId;
 let isLogin = true;
+const isUser = false;
 const socket = io(process.env.OVERLAY_HOST, { transports: ['websocket'] });
 
 const liveShoppingStateSocket = io(
