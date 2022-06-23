@@ -510,7 +510,6 @@ $(document).ready(function ready() {
   });
 
   $('.logout-button').click(function logout() {
-    console.log('logout');
     $.ajax({
       type: 'POST',
       url: `http://localhost:3333/auth/logout`,
