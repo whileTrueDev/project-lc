@@ -26,9 +26,7 @@ export interface NonMemberOrderDetailDisplayProps {
 export function NonMemberOrderDetailDisplay({
   orderData,
 }: NonMemberOrderDetailDisplayProps): JSX.Element {
-  const { data: paymentData } = usePaymentByOrderCode(
-    orderData.order.payment?.paymentKey || '',
-  );
+  const { data: paymentData } = usePaymentByOrderCode(orderData.order.orderCode || '');
 
   return (
     <Container>
