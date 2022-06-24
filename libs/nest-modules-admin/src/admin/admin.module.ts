@@ -16,6 +16,7 @@ import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { OrderModule } from '@project-lc/nest-modules-order';
+import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { AdminAccountService } from './admin-account.service';
 import { AdminCouponController } from './admin-coupon.controller';
 import { AdminCustomerCouponController } from './admin-customer-coupon.controller';
@@ -79,6 +80,7 @@ export class AdminModule {
     CouponModule.withoutControllers(),
     LiveShoppingModule.withoutControllers(),
     OrderModule.withoutControllers(),
+    CipherModule,
   ];
 
   static withoutControllers(): DynamicModule {
