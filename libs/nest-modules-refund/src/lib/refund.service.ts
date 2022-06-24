@@ -2,13 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CipherService } from '@project-lc/nest-modules-cipher';
 import { OrderCancellationService } from '@project-lc/nest-modules-order';
-import { KKsPaymentProviders, PaymentService } from '@project-lc/nest-modules-payment';
+import { PaymentService } from '@project-lc/nest-modules-payment';
 import { ReturnService } from '@project-lc/nest-modules-return';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateRefundDto,
   CreateRefundRes,
   GetRefundListDto,
+  KKsPaymentProviders,
   PaymentCard,
   PaymentTransfer,
   PaymentVirtualAccount,

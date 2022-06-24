@@ -55,21 +55,24 @@ export function CartActions(): JSX.Element {
 
   /** 장바구니 -> 주문시 판매유형 결정
    * 유입에 따른 처리 방식
-    상품홍보페이지를 통해 유입된 경우
-    상품이 라이브쇼핑중인 경우 - 라이브쇼핑
-    라이브쇼핑중 카트에 담고, 향후 라이브쇼핑이 판매기간이 끝난 이후 주문하고자 하는 경우 - 상품홍보
-    상품이 라이브쇼핑중이 아닌 경우 - 상품홍보
-    카트에 담고, 향후 주문하고자 하는 데 (방송인/판매자/관리자 의지로) 상품홍보가 끝난 경우 - 기본판매
-    방송인 선택 제거한 경우 - 기본판매
-    상품홍보페이지를 통하지 않고 유입된 경우
-    방송인 선택시 - 상품홍보
-    방송인 선택 + 해당 상품이 라이브쇼핑중인 경우 - 라이브쇼핑
-    방송인 선택 안한 경우 - 기본판매
+      
+      상품홍보페이지를 통해 유입된 경우
+        - 상품이 라이브쇼핑중인 경우 - 라이브쇼핑
+        - 라이브쇼핑중 카트에 담고, 향후 라이브쇼핑이 판매기간이 끝난 이후 주문하고자 하는 경우 - 상품홍보
+        - 상품이 라이브쇼핑중이 아닌 경우 - 상품홍보
+        - 카트에 담고, 향후 주문하고자 하는 데 (방송인/판매자/관리자 의지로) 상품홍보가 끝난 경우 - 기본판매
+        - 방송인 선택 제거한 경우 - 기본판매
+      
+      상품홍보페이지를 통하지 않고 유입된 경우
+        - 방송인 선택시 - 상품홍보
+        - 방송인 선택 + 해당 상품이 라이브쇼핑중인 경우 - 라이브쇼핑
+        - 방송인 선택 안한 경우 - 기본판매
    */
   const defineCorrectChannel = useCallback(
     (item: CartItemRes[number]): SellType => {
-      let { channel } = item;
-      // 현재 주문시 상품홍보중인 상품의 경우
+      const prevChannel = item.channel; // 장바구니 담은 시점에 적용된 판매타입
+      let channel: SellType = prevChannel;
+      // 현재 주문이 상품홍보중인 상품의 경우
       if (pp.data?.find((p) => p.broadcasterId === item.support?.broadcasterId)) {
         channel = SellType.productPromotion;
       } else {
@@ -81,22 +84,17 @@ export function CartActions(): JSX.Element {
         (x) =>
           x.goodsId === item.goodsId && x.broadcasterId === item.support?.broadcasterId,
       );
-      // 현재 판매 진행중인 support 방송인의 라이브쇼핑이 있는 경우
+      // support방송인의 라이브쇼핑이 현재 판매 진행중인 경우
       if (liveShoppingOnLive) channel = SellType.liveShopping;
       // 라이브쇼핑 기간동안 장바구니담았으나, 주문시 라이브쇼핑 판매기간이 지난경우
       if (
         !liveShoppingOnLive &&
-        channel === 'liveShopping' &&
+        prevChannel === SellType.liveShopping &&
         item.support?.broadcasterId
       ) {
         channel = SellType.productPromotion;
-        // 근데 상품홍보가 끝난 경우
-        if (
-          !(
-            pp.data &&
-            pp.data.find((p) => p.broadcasterId === item.support?.broadcasterId)
-          )
-        ) {
+        // 상품홍보까지도 끝난 경우
+        if (!pp.data?.find((p) => p.broadcasterId === item.support?.broadcasterId)) {
           channel = SellType.normal;
         }
       }
@@ -108,9 +106,9 @@ export function CartActions(): JSX.Element {
   // 배송그룹별 표시될 배송비(selectedItems, 배송그룹정보) => 배송비 Record<배송그룹id, 부과되는 배송비 정보(기본, 추가)>
   const { groupedSelectedItems, totalShippingCostObjectById } = useCartShippingGroups();
 
-  // 주문 클릭시
   const orderPrepare = useKkshowOrderStore((s) => s.handleOrderPrepare);
   const setShippingData = useKkshowOrderStore((s) => s.setShippingData);
+  // 주문 클릭시
   const handleOrderClick = useCallback((): void => {
     if (!data) return;
     if (!executePurchaseCheck()) return;
@@ -158,16 +156,25 @@ export function CartActions(): JSX.Element {
           }),
           shippingGroupId: i.shippingGroupId || 1,
           channel: defineCorrectChannel(i), // 판매유형 결정
-          support: i.support
-            ? {
-                broadcasterId: i.support.broadcasterId,
-                message: i.support.message || '',
-                nickname: i.support.broadcaster.userNickname,
-                avatar: i.support.broadcaster.avatar,
-                liveShoppingId: i.support.liveShoppingId || undefined,
-                productPromotionId: i.support.productPromotionId || undefined,
-              }
-            : undefined,
+          support:
+            // 현재(주문시점) 진행중인 라이브쇼핑이 있거나
+            (ls.data?.find(
+              (x) =>
+                x.goodsId === i.goodsId && x.broadcasterId === i.support?.broadcasterId,
+            ) ||
+              // 현재(주문시점) 진행중인 상품홍보가 있는 경우
+              pp.data?.find((p) => p.broadcasterId === i.support?.broadcasterId)) &&
+            // + (장바구니담는시점에) 홍보정보를 입력한 경우
+            i.support
+              ? {
+                  broadcasterId: i.support.broadcasterId,
+                  message: i.support.message || '',
+                  nickname: i.support.broadcaster.userNickname,
+                  avatar: i.support.broadcaster.avatar,
+                  liveShoppingId: i.support.liveShoppingId || undefined,
+                  productPromotionId: i.support.productPromotionId || undefined,
+                }
+              : undefined,
         })),
     });
 
@@ -183,7 +190,9 @@ export function CartActions(): JSX.Element {
     defineCorrectChannel,
     executePurchaseCheck,
     groupedSelectedItems,
+    ls.data,
     orderPrepare,
+    pp.data,
     profile.data?.id,
     router,
     selectedItems,

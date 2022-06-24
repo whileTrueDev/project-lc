@@ -12,6 +12,7 @@ import {
   Button,
   ButtonGroup,
   Collapse,
+  ExpandedIndex,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -50,7 +51,7 @@ import {
 import { useGoodsViewStore, useKkshowOrderStore } from '@project-lc/stores';
 import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GoGift } from 'react-icons/go';
 import shallow from 'zustand/shallow';
 import OptionQuantity from '../OptionQuantity';
@@ -196,6 +197,12 @@ function GoodsViewBroadcasterSupportBox({
     }, []);
   }, [goods.LiveShopping, goods.productPromotion]);
 
+  // 방송인 선택 아코디언 여닫기 상태
+  const [accordionIndex, setAccordionIndex] = useState<ExpandedIndex>([]);
+  const handleAccordionIndexChange = (ei: ExpandedIndex): void => {
+    setAccordionIndex(ei);
+  };
+
   // 방송인 페이지로부터 접속시 기본값 처리
   const router = useRouter();
   const bcFromPromotionPage = router.query.bc as string;
@@ -204,7 +211,10 @@ function GoodsViewBroadcasterSupportBox({
       const broadcaster = relatedBroadcasters.find(
         (b) => b.id === Number(bcFromPromotionPage),
       );
-      if (broadcaster) handleSelectBc(broadcaster);
+      if (broadcaster) {
+        handleSelectBc(broadcaster);
+        handleAccordionIndexChange([0]); // 아코디언 열기
+      }
     }
   }, [bcFromPromotionPage, handleSelectBc, relatedBroadcasters]);
 
@@ -213,7 +223,7 @@ function GoodsViewBroadcasterSupportBox({
 
   if (relatedBroadcasters.length === 0) return null;
   return (
-    <Accordion allowToggle>
+    <Accordion allowToggle index={accordionIndex} onChange={handleAccordionIndexChange}>
       <AccordionItem>
         <AccordionButton px={0}>
           <Flex justify="space-between" w="100%">

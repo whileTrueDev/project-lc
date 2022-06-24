@@ -13,11 +13,13 @@ export function BroadcasterAutocomplete(): JSX.Element {
       <Text as="span">방송인</Text>
       <ChakraAutoComplete
         options={data || []}
-        getOptionLabel={(option) => option?.userNickname || ''}
+        getOptionLabel={(option) =>
+          option ? `${option.userNickname} (${option.email})` : ''
+        }
         onChange={(newV) => {
           if (newV) {
             setValue('broadcasterId', newV.id);
-            handleBroadcasterSelect(newV.userNickname);
+            handleBroadcasterSelect(`${newV.userNickname} (${newV.email})`);
           } else {
             setValue('broadcasterId', null);
             handleBroadcasterSelect(null);

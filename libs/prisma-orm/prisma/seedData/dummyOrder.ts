@@ -194,7 +194,6 @@ export const nonMemberOrder: Prisma.OrderCreateInput = {
     orderCode: 'nonmember-order-dummy',
   }),
   nonMemberOrderFlag: true,
-  nonMemberOrderPassword: 'test',
   shippings: {
     create: [
       {

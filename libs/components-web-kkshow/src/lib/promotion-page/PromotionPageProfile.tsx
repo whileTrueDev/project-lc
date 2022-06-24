@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import { Avatar, Box, Flex, Link, Text } from '@chakra-ui/react';
+import { Avatar, Box, Flex, Image, Link, Text } from '@chakra-ui/react';
 import {
   useBroadcaster,
   useBroadcasterChannels,
@@ -43,9 +43,11 @@ export function PromotionPageProfile({
             {channel.url.includes('youtube.com') && <FaYoutube color="red" />}
             {channel.url.includes('instagram.com') && <FaInstagram />}
             {channel.url.includes('afreecatv.com') && (
-              <Text color="GrayText" fontSize="xs">
-                아프리카TV
-              </Text>
+              <Image
+                draggable={false}
+                src="/images/logo/icon-afreecatv-24.png"
+                w="18px"
+              />
             )}
             <Link
               isExternal
