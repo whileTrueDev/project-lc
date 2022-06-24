@@ -17,6 +17,7 @@ export class LCProdVpcStack extends cdk.Stack {
   public readonly redisSecGrp: ec2.SecurityGroup;
   public readonly mailerSecGrp: ec2.SecurityGroup;
   public readonly inactiveBatchSecGrp: ec2.SecurityGroup;
+  public readonly virtualAccountBatchSecGrp: ec2.SecurityGroup;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -35,6 +36,7 @@ export class LCProdVpcStack extends cdk.Stack {
     this.realtimeApiSecGrp = this.createRealtimeApiSecGrp();
     this.mailerSecGrp = this.createMailerSecGrp();
     this.inactiveBatchSecGrp = this.createInactiveBatchSecGrp();
+    this.virtualAccountBatchSecGrp = this.createVirtualAccountBatchSecGrp();
     this.dbSecGrp = this.createDbSecGrp({
       apiSecGrp: this.apiSecGrp,
       overlaySecGrp: this.overlaySecGrp,
@@ -249,6 +251,20 @@ export class LCProdVpcStack extends cdk.Stack {
       {
         vpc: this.vpc,
         description: 'inactive batch sec grp for project-lc (private)',
+        allowAllOutbound: true,
+      },
+    );
+    return inactiveBatchSecGrp;
+  }
+
+  /** 휴면처리 배치 프로그램 보안그룹 생성 */
+  private createVirtualAccountBatchSecGrp(): ec2.SecurityGroup {
+    const inactiveBatchSecGrp = new ec2.SecurityGroup(
+      this,
+      `${ID_PREFIX}virtual-account-batch-SecGrp`,
+      {
+        vpc: this.vpc,
+        description: 'virtual-account batch sec grp for project-lc (private)',
         allowAllOutbound: true,
       },
     );
