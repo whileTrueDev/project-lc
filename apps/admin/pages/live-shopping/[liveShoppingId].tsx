@@ -33,7 +33,7 @@ import { GoodsDetailOptionsInfo } from '@project-lc/components-seller/goods-deta
 import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailPurchaseLimitInfo';
 import { GoodsDetailShippingInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailShippingInfo';
 import { GoodsDetailSummary } from '@project-lc/components-seller/goods-detail/GoodsDetailSummary';
-import { BroadcasterName } from '@project-lc/components-shared/BroadcasterName';
+import { AdminLiveShoppingBroadcasterName } from '@project-lc/components-admin/AdminLiveShoppingBroadcasterName';
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
 import {
   LiveShoppingManage,
@@ -205,7 +205,10 @@ export function LiveShoppingDetail(): JSX.Element {
             <Stack direction="row" alignItems="center">
               <Text as="span">방송인: </Text>
               {liveShopping[0].broadcaster ? (
-                <BroadcasterName data={liveShopping[0].broadcaster} color="blue" />
+                <AdminLiveShoppingBroadcasterName
+                  data={liveShopping[0].broadcaster}
+                  color="blue"
+                />
               ) : (
                 <Text fontWeight="bold">미정</Text>
               )}

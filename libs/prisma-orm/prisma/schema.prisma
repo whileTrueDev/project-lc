@@ -1563,7 +1563,6 @@ model Order {
   ordererEmail               String // 주문자 이메일
   memo                       String // 배송메시지
   nonMemberOrderFlag         Boolean                      @default(false) // 비회원 주문 여부
-  nonMemberOrderPassword     String? // 비회원주문시 입력받는 비밀번호 - 비회원이 주문조회,취소시 사용할예정
   giftFlag                   Boolean                      @default(false) // 선물주문 여부
   supportOrderIncludeFlag    Boolean                      @default(false) // 후원상품 포함여부
   bundleFlag                 Boolean                      @default(false) // 묶음배송여부
@@ -1610,11 +1609,13 @@ model OrderPayment {
   id              Int           @id @default(autoincrement()) // 주문결제정보 고유번호
   method          PaymentMethod // 결제수단
   orderId         Int?          @unique
-  // 연결된 주문데이터가 삭제되는 경우 결제정보 데이터는 유지되어야 하나??
+  // 연결된 주문데이터가 삭제되는 경우 결제정보 데이터는 유지
   order           Order?        @relation(fields: [orderId], references: [id], onDelete: SetNull)
-  paymentKey      String // PG사(토스페이먼츠or...)에서 제공하는 결제 고유ID값
+  paymentKey      String        @unique // PG사(토스페이먼츠or...)에서 제공하는 결제 고유ID값
   depositDate     DateTime? // 입금일시
   depositor       String? // 입금자명
+  depositSecret   String? // 가상계좌 웹훅 요청이 정상적인 요청인지 검증하기 위한 값입니다. 이 값이 가상계좌 웹훅 이벤트 본문으로 돌아온 secret과 같으면 정상적인 요청입니다.
+  depositDueDate  DateTime? // 입금기한
   depositDoneFlag Boolean       @default(false) // 입금완료여부
   account         String? // 주문자가 결제한 금액이 입금될 계좌정보 
 }

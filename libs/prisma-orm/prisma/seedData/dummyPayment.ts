@@ -1,4 +1,5 @@
 import { OrderPayment } from '@prisma/client';
+import dayjs = require('dayjs');
 
 export const dummyPayments: OrderPayment[] = [
   {
@@ -10,6 +11,8 @@ export const dummyPayments: OrderPayment[] = [
     depositDoneFlag: false,
     account: null,
     depositor: null,
+    depositSecret: null,
+    depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
   },
   {
     id: 2,
@@ -20,6 +23,8 @@ export const dummyPayments: OrderPayment[] = [
     depositDoneFlag: false,
     account: null,
     depositor: null,
+    depositSecret: null,
+    depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
   },
   {
     id: 3,
@@ -30,6 +35,8 @@ export const dummyPayments: OrderPayment[] = [
     depositDoneFlag: false,
     account: null,
     depositor: null,
+    depositSecret: 'DEPOSIT_SECRET_TEST1',
+    depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
   },
   {
     id: 4,
@@ -40,6 +47,8 @@ export const dummyPayments: OrderPayment[] = [
     depositDoneFlag: false,
     account: null,
     depositor: null,
+    depositSecret: 'DEPOSIT_SECRET_TEST2',
+    depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
   },
   {
     id: 5,
@@ -50,6 +59,8 @@ export const dummyPayments: OrderPayment[] = [
     depositDoneFlag: false,
     account: null,
     depositor: null,
+    depositSecret: null,
+    depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
   },
   {
     id: 6,
@@ -60,6 +71,8 @@ export const dummyPayments: OrderPayment[] = [
     depositDoneFlag: false,
     account: null,
     depositor: null,
+    depositSecret: null,
+    depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
   },
   {
     id: 7,
@@ -70,6 +83,8 @@ export const dummyPayments: OrderPayment[] = [
     depositDoneFlag: false,
     account: null,
     depositor: null,
+    depositSecret: 'DEPOSIT_SECRET_TEST3',
+    depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
   },
   {
     id: 8,
@@ -80,5 +95,7 @@ export const dummyPayments: OrderPayment[] = [
     depositDoneFlag: false,
     account: null,
     depositor: null,
+    depositSecret: null,
+    depositDueDate: dayjs(new Date()).add(7, 'day').toDate(),
   },
 ];

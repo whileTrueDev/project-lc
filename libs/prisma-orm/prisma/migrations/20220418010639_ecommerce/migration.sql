@@ -285,7 +285,6 @@ CREATE TABLE `Order` (
     `ordererEmail` VARCHAR(191) NOT NULL,
     `memo` VARCHAR(191) NOT NULL,
     `nonMemberOrderFlag` BOOLEAN NOT NULL DEFAULT false,
-    `nonMemberOrderPassword` VARCHAR(191) NULL,
     `giftFlag` BOOLEAN NOT NULL DEFAULT false,
     `supportOrderIncludeFlag` BOOLEAN NOT NULL DEFAULT false,
     `bundleFlag` BOOLEAN NOT NULL DEFAULT false,
@@ -304,10 +303,13 @@ CREATE TABLE `OrderPayment` (
     `paymentKey` VARCHAR(191) NOT NULL,
     `depositDate` DATETIME(3) NULL,
     `depositor` VARCHAR(191) NULL,
+    `depositSecret` VARCHAR(191) NULL,
     `depositDoneFlag` BOOLEAN NOT NULL DEFAULT false,
+    `depositDueDate` DATETIME(3) NULL,
     `account` VARCHAR(191) NULL,
 
     UNIQUE INDEX `OrderPayment_orderId_key`(`orderId`),
+    UNIQUE INDEX `OrderPayment_paymentKey_key`(`paymentKey`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
