@@ -218,7 +218,7 @@ export class ReturnService {
     await this.findUnique({ id });
 
     const { refundId, ...rest } = dto;
-    await this.prisma.return.update({
+    const returnData = await this.prisma.return.update({
       where: { id },
       data: {
         ...rest,
@@ -233,7 +233,28 @@ export class ReturnService {
       },
     });
 
+    // 반품요청 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
+    if (dto.status === 'complete') {
+      await this.updateOrderStateToOrderInvalidated(returnData.orderId);
+    }
+
     return true;
+  }
+
+  /** 주문의 상태를 주문무효 로 변경(반품요청 처리완료(승인)되었을 때 사용)
+   */
+  private async updateOrderStateToOrderInvalidated(orderId: number): Promise<void> {
+    // 변경될 상태 : "주문무효"
+    const targetState = 'orderInvalidated';
+    await this.prisma.$transaction([
+      // 주문 상태 주문무효로 변경
+      this.prisma.order.update({ where: { id: orderId }, data: { step: targetState } }),
+      // 주문상품옵션 상태 주문무효로 변경
+      this.prisma.orderItemOption.updateMany({
+        where: { orderItem: { orderId } },
+        data: { step: targetState },
+      }),
+    ]);
   }
 
   /** 반품요청 삭제 */

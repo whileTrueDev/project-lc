@@ -78,21 +78,17 @@ export class OrderCancellationService {
   /** 주문의 상태를 주문무효 로 변경(주문취소요청이 처리완료(승인)되었을 때 사용)
    */
   private async updateOrderStateToOrderInvalidated(orderId: number): Promise<void> {
-    // 주문 상태 주문무효로 변경
-    await this.prisma.order.update({
-      where: { id: orderId },
-      data: {
-        step: 'orderInvalidated',
-      },
-    });
-
-    // 주문상품옵션 상태 주문무효로 변경
-    await this.prisma.orderItemOption.updateMany({
-      where: { orderItem: { orderId } },
-      data: {
-        step: 'orderInvalidated',
-      },
-    });
+    // 변경될 상태 : "주문무효"
+    const targetState = 'orderInvalidated';
+    await this.prisma.$transaction([
+      // 주문 상태 주문무효로 변경
+      this.prisma.order.update({ where: { id: orderId }, data: { step: targetState } }),
+      // 주문상품옵션 상태 주문무효로 변경
+      this.prisma.orderItemOption.updateMany({
+        where: { orderItem: { orderId } },
+        data: { step: targetState },
+      }),
+    ]);
   }
 
   /* 주문취소 내역 조회 */
