@@ -8,7 +8,6 @@ export const dummyPayments: OrderPayment[] = [
     paymentKey: '20220614104151331pKmvWX',
     depositDate: new Date(),
     depositDoneFlag: false,
-    account: null,
     depositor: null,
   },
   {
@@ -18,7 +17,6 @@ export const dummyPayments: OrderPayment[] = [
     paymentKey: '20220613140004196eUx-Ul',
     depositDate: new Date(),
     depositDoneFlag: false,
-    account: null,
     depositor: null,
   },
   {
@@ -28,7 +26,6 @@ export const dummyPayments: OrderPayment[] = [
     paymentKey: '20220516160437801fUqXGi',
     depositDate: new Date(),
     depositDoneFlag: false,
-    account: null,
     depositor: null,
   },
   {
@@ -38,7 +35,6 @@ export const dummyPayments: OrderPayment[] = [
     paymentKey: '20220516154059927Mx-60e',
     depositDate: new Date(),
     depositDoneFlag: false,
-    account: null,
     depositor: null,
   },
   {
@@ -48,7 +44,6 @@ export const dummyPayments: OrderPayment[] = [
     paymentKey: '20220516144652907Hq1RMm',
     depositDate: new Date(),
     depositDoneFlag: false,
-    account: null,
     depositor: null,
   },
   {
@@ -58,7 +53,6 @@ export const dummyPayments: OrderPayment[] = [
     paymentKey: '20220516141608459wupcUq',
     depositDate: new Date(),
     depositDoneFlag: false,
-    account: null,
     depositor: null,
   },
   {
@@ -68,7 +62,6 @@ export const dummyPayments: OrderPayment[] = [
     paymentKey: '20220516165920231XeWaOv',
     depositDate: new Date(),
     depositDoneFlag: false,
-    account: null,
     depositor: null,
   },
   {
@@ -78,7 +71,6 @@ export const dummyPayments: OrderPayment[] = [
     paymentKey: '20220613154618378F9hUFA',
     depositDate: new Date(),
     depositDoneFlag: false,
-    account: null,
     depositor: null,
   },
 ];

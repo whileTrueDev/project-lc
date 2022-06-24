@@ -307,7 +307,6 @@ CREATE TABLE `OrderPayment` (
     `depositDate` DATETIME(3) NULL,
     `depositor` VARCHAR(191) NULL,
     `depositDoneFlag` BOOLEAN NOT NULL DEFAULT false,
-    `account` VARCHAR(191) NULL,
 
     UNIQUE INDEX `OrderPayment_orderId_key`(`orderId`),
     PRIMARY KEY (`id`)

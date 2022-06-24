@@ -1618,7 +1618,6 @@ model OrderPayment {
   depositDate     DateTime? // 입금일시
   depositor       String? // 입금자명
   depositDoneFlag Boolean       @default(false) // 입금완료여부
-  account         String? // 주문자가 결제한 금액이 입금될 계좌정보 
 }
 
 // [enum] 결제수단
