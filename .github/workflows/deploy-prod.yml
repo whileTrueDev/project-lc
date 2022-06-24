@@ -7,6 +7,7 @@ on:
       - 'apps/overlay-controller/**'
       - 'apps/api-realtime/**'
       - 'apps/batch-inactive-handler/**'
+      - 'apps/batch-virtual-account/**'
       - 'apps/mailer/**'
       - 'libs/firstmall-db/**'
       - 'libs/nest-core/**'
