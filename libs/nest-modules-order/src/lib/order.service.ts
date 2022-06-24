@@ -373,7 +373,7 @@ export class OrderService {
         extendedStatus = {};
       });
     }
-    where = { ...where, OR };
+    where = { ...where, OR: OR.length > 0 ? OR : undefined };
 
     // 검색어로 특정컬럼값 조회시
     if (search) {

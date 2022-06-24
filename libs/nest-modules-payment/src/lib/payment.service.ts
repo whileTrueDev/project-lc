@@ -127,8 +127,10 @@ export class PaymentService {
     } catch (error) {
       console.error(error.response);
       throw new HttpException(
-        error.response.message || 'error in requestCancelTossPayment',
-        error.response.status || 500,
+        error.response.message ||
+          error.response.data.message ||
+          'error in requestCancelTossPayment',
+        error.response.status || error.response.data.code || 500,
       );
     }
   }
