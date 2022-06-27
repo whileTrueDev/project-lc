@@ -144,7 +144,6 @@ export function CustomerAddressForm({
           placeholder="배송메모"
           size="sm"
           {...register('memo', {
-            required: '배송메모를 입력해주세요.',
             maxLength: {
               value: 30,
               message: '배송메모는 30자를 초과할 수 없습니다.',

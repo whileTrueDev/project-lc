@@ -318,7 +318,6 @@ export function DeliveryAddress(): JSX.Element {
               w={{ base: '100%', md: '50%' }}
               placeholder="문 앞 / 직접 받고 부재 시 문 앞 / 경비실 / 택배함"
               {...register('memo', {
-                required: '배송메모를 입력해주세요.',
                 maxLength: {
                   value: 30,
                   message: '30자 이상 작성할 수 없습니다.',
