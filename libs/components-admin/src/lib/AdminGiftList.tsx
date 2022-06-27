@@ -6,6 +6,7 @@ import TooltipedText from '@project-lc/components-core/TooltipedText';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { useAdminLiveShoppingGiftOrderList, useDisplaySize } from '@project-lc/hooks';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
+import { getAdminHost } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
@@ -120,7 +121,7 @@ export function AdminGiftList(props: {
   // 크크쇼 주문정보로 이동(새창)
   const handleRowClick = (param: GridRowParams): void => {
     if (param.row.id) {
-      const url = `http://localhost:4250/order/list/${param.row.id}`;
+      const url = `${getAdminHost()}/order/list/${param.row.id}`;
       window.open(url, '_blank');
     }
   };
