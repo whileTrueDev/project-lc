@@ -162,3 +162,8 @@ export interface RoomNameAndVolume {
   roomName: string;
   volume: 'up' | 'down';
 }
+
+export interface NewsMessage {
+  roomName: string;
+  message: string;
+}
