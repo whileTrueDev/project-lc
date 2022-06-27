@@ -1,5 +1,6 @@
 import { HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import {
+  Order,
   OrderPayment,
   PaymentMethod,
   Prisma,
@@ -87,9 +88,9 @@ export class PaymentService {
   }
 
   /** 주문번호별 결제내역 */
-  public async getPaymentByOrderCode(orderId: string): Promise<Payment> {
+  public async getPaymentByOrderCode(orderCode: Order['orderCode']): Promise<Payment> {
     try {
-      return TossPaymentsApi.getPaymentByOrderId(orderId);
+      return TossPaymentsApi.getPaymentByOrderCode(orderCode);
     } catch (error) {
       console.error(error.response);
       throw new HttpException(

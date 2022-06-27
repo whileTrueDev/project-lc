@@ -160,7 +160,7 @@ export const createDummyOrder = async ({
 export const normalOrder: Prisma.OrderCreateInput = {
   customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
-    orderCode: 'dummy-order-1-asdfasd',
+    orderCode: '20220613154618378F9hUFA',
   }),
   shippings: {
     create: [
@@ -191,10 +191,9 @@ export const normalOrder: Prisma.OrderCreateInput = {
 
 export const nonMemberOrder: Prisma.OrderCreateInput = {
   ...getDummyOrderFundamentalData({
-    orderCode: 'nonmember-order-dummy',
+    orderCode: '20220516165920231XeWaOv',
   }),
   nonMemberOrderFlag: true,
-  nonMemberOrderPassword: 'test',
   shippings: {
     create: [
       {
@@ -224,7 +223,7 @@ export const nonMemberOrder: Prisma.OrderCreateInput = {
 
 export const purchaseConfirmedOrder: Prisma.OrderCreateInput = {
   ...normalOrder,
-  orderCode: 'dummy-order-2-qwer',
+  orderCode: '20220516141608459wupcUq',
   step: 'purchaseConfirmed' as const,
   shippings: {
     create: [
@@ -261,7 +260,7 @@ export const purchaseConfirmedOrder: Prisma.OrderCreateInput = {
 
 export const shippingDoneOrder: Prisma.OrderCreateInput = {
   ...normalOrder,
-  orderCode: 'dummy-order-3-zxcv',
+  orderCode: '20220516144652907Hq1RMm',
   step: 'shippingDone' as const,
   shippings: {
     create: [
@@ -299,7 +298,7 @@ export const shippingDoneOrder: Prisma.OrderCreateInput = {
 export const orderExportReady: Prisma.OrderCreateInput = {
   customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
-    orderCode: 'orderExportReady-for-exchange-return',
+    orderCode: '20220516154059927Mx-60e',
     step: 'exportReady',
   }),
   shippings: {
@@ -346,7 +345,7 @@ export const orderExportReady: Prisma.OrderCreateInput = {
 export const createDummyOrderWithCancellation = async (): Promise<void> => {
   // 주문취소 연결된 주문(입금확인된 상태)
   const { orderId, orderItemId, orderItemOptionId } = await createDummyOrder({
-    orderCode: 'orderWithCancellation',
+    orderCode: '20220516160437801fUqXGi',
     step: 'paymentConfirmed',
   });
   // 주문취소데이터
@@ -369,7 +368,7 @@ export const createDummyOrderWithCancellation = async (): Promise<void> => {
 export const createDummyOrderWithExchange = async (): Promise<void> => {
   // 교환요청 연결된 주문(배송중 상태)
   const { orderId, orderItemId, orderItemOptionId } = await createDummyOrder({
-    orderCode: 'orderWithExchange',
+    orderCode: '20220613140004196eUx-Ul',
     step: 'shipping',
   });
 
@@ -394,7 +393,7 @@ export const createDummyOrderWithExchange = async (): Promise<void> => {
 // 반품요청 연결된 주문(배송완료 상태)
 export const createDummyOrderWithReturn = async (): Promise<void> => {
   const { orderId, orderItemId, orderItemOptionId } = await createDummyOrder({
-    orderCode: 'orderWithReturn',
+    orderCode: '20220614104151331pKmvWX',
     step: 'shippingDone',
   });
   // 교환요청데이터

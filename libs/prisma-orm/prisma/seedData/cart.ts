@@ -4,8 +4,6 @@ export const cartSample = {
   customerId: 1,
   tempUserId: null,
   goodsId: 1,
-  shippingCost: '2500',
-  shippingCostIncluded: false,
   shippingGroupId: 1,
   options: {
     create: {
@@ -31,8 +29,6 @@ export const tempUserCartItemSample = {
   customerId: null,
   tempUserId: 'temp-user-id',
   goodsId: 1,
-  shippingCost: '2500',
-  shippingCostIncluded: false,
   shippingGroupId: 1,
   options: {
     create: [

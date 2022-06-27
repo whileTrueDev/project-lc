@@ -72,9 +72,8 @@ export function AdminMileageLogDetailDialog(
               </HStack>
               <HStack>
                 <Text>연결된 주문</Text>
-                {/** //todo : 개별 주문서 조회 기능 이후, 해당 주문서로 이동하도록 변경 */}
-                <NextLink href="*" passHref>
-                  <Link href="*">
+                <NextLink href={`/order/list/${mileageLogDetail?.orderId}`} passHref>
+                  <Link>
                     <Text fontWeight="bold" color="blue">
                       연결된 주문서 보기
                     </Text>

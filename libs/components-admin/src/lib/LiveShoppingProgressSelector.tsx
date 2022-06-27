@@ -13,8 +13,8 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { LiveShopppingProgressType } from '@prisma/client';
-import { LiveShoppingDTO, LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
-import { useMemo } from 'react';
+import { LiveShoppingUpdateDTO, LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
+import { useEffect, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 export function LiveShoppingProgressSelector(): JSX.Element {
@@ -23,10 +23,20 @@ export function LiveShoppingProgressSelector(): JSX.Element {
     watch,
     register,
     formState: { errors },
-  } = useFormContext<LiveShoppingDTO>();
+  } = useFormContext<LiveShoppingUpdateDTO>();
 
   const whcr = watch('whiletrueCommissionRate');
   const bccr = watch('broadcasterCommissionRate');
+
+  const progress = watch('progress');
+
+  // 상태가 '확정됨' 이 아닌경우 formState의 수수료율 undefined로 리셋
+  useEffect(() => {
+    if (progress !== 'confirmed') {
+      setValue('whiletrueCommissionRate', undefined);
+      setValue('broadcasterCommissionRate', undefined);
+    }
+  }, [progress, setValue]);
 
   const isOverThan100 = useMemo(() => Number(whcr) + Number(bccr) > 100, [bccr, whcr]);
 
@@ -64,6 +74,7 @@ export function LiveShoppingProgressSelector(): JSX.Element {
                 <InputGroup>
                   <Input
                     placeholder="5"
+                    defaultValue="5"
                     type="number"
                     {...register('whiletrueCommissionRate', {
                       valueAsNumber: true,
@@ -85,6 +96,7 @@ export function LiveShoppingProgressSelector(): JSX.Element {
                 <InputGroup>
                   <Input
                     placeholder="10"
+                    defaultValue="10"
                     type="number"
                     {...register('broadcasterCommissionRate', {
                       valueAsNumber: true,

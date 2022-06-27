@@ -46,7 +46,11 @@ export type OrderCancellationItemData = ExchangeReturnCancelItemBaseData & {
 };
 export type OrderCancellationData = Omit<OrderCancellation, 'items'> & {
   refund: Refund | null;
-  order: { orderCode: Order['orderCode']; id: Order['id'] };
+  order: {
+    orderCode: Order['orderCode'];
+    id: Order['id'];
+    paymentPrice: Order['paymentPrice'];
+  };
   items: OrderCancellationItemData[];
 };
 export type OrderCancellationListRes = {

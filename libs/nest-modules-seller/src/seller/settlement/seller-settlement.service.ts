@@ -37,6 +37,19 @@ export class SellerSettlementService {
       { ea: 0, price: 0, commission: 0 },
     );
 
+    // 출고고유번호로 출고상품 조회 -> 출고상품에 연결된 주문상품의 배송비정보(OrderShipping) 찾기
+    const sellerExportItem = await this.prisma.exportItem.findFirst({
+      where: {
+        export: { id: dto.exportId },
+      },
+      select: {
+        orderItem: { select: { orderShipping: true } },
+      },
+    });
+    const shipping = sellerExportItem.orderItem.orderShipping;
+    const shippingId = shipping ? shipping.id : 0; // 출고상품이 포함된 OrderShipping 고유번호(id) 찾기
+    const shippingCost = shipping ? shipping.shippingCost : 0; // 출고상품이 포함된 OrderShipping의 배송비
+
     // 주문정보 불러오기
     // 라이브쇼핑 주문의 경우, 일반 주문의 경우 분기처리
     const today = dayjs().format('YYYY/MM');
@@ -46,8 +59,8 @@ export class SellerSettlementService {
         exportCode: dto.exportCode,
         orderId: String(dto.orderId),
         round: `${today}/${dto.round}차`,
-        shippingCost: dto.shippingCost,
-        shippingId: dto.shippingId,
+        shippingCost,
+        shippingId,
         startDate: dto.startDate,
         date: new Date(),
         doneDate: dto.doneDate, // 구매확정일
@@ -185,8 +198,6 @@ export class SellerSettlementService {
                     },
                   },
                 },
-                shippingCost: true,
-                shippingCostIncluded: true,
               },
             },
             orderItemOption: true,

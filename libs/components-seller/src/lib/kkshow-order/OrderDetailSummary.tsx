@@ -1,8 +1,9 @@
 import { OrderItemOption } from '@prisma/client';
 import { SummaryList } from '@project-lc/components-core/SummaryList';
 import { OrderDetailRes, OrderItemWithRelations } from '@project-lc/shared-types';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
-import { FaBoxOpen, FaShoppingBag, FaUser } from 'react-icons/fa';
+import { FaBoxOpen, FaShippingFast, FaShoppingBag, FaUser } from 'react-icons/fa';
 import { MdDateRange } from 'react-icons/md';
 
 export interface OrderDetailSummaryProps {
@@ -40,20 +41,18 @@ export function OrderDetailSummary({ order }: OrderDetailSummaryProps): JSX.Elem
           icon: FaShoppingBag,
           value: `주문상품 종류 총 ${totalType} 종, 주문상품 수량 총 ${totalEa} 개`,
         },
-        // TODO: 주문-배송비 테이블 생성 후 작업하기
-        // {
-        //   id: '배송비',
-        //   icon: FaShippingFast,
-        //   value: (() => {
-        //     const cost = Number(order.totalShippingCost);
-        //     if (Number.isNaN(cost) || cost === 0) return '무료배송';
-        //     let costFieldName = '배송비';
-        //     if (order.shippings.length > 1) {
-        //       costFieldName = '총 배송비';
-        //     }
-        //     return `${costFieldName} ${getLocaleNumber(order.totalShippingCost)}원`;
-        //   })(),
-        // },
+        {
+          id: '배송비',
+          icon: FaShippingFast,
+          value: (() => {
+            const shippings = order.shippings || [];
+            const cost = shippings
+              .map((s) => s.shippingCost)
+              .reduce((sum, cur) => sum + Number(cur), 0);
+            if (Number.isNaN(cost) || cost === 0) return '무료배송';
+            return `총 배송비 ${getLocaleNumber(cost)}원`;
+          })(),
+        },
       ]}
     />
   );

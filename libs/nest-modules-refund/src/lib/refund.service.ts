@@ -28,57 +28,6 @@ export class RefundService {
     private readonly returnService: ReturnService,
   ) {}
 
-  /** 결제취소 테스트위해 결제데이터 필요하여 만들었음. // TODO: 프론트 작업시 삭제 */
-  async makeFakeOrderWithFakePayment(): Promise<any> {
-    const paymentResultData = await TossPaymentsApi.makeDummyTossPaymentData();
-
-    // 결제완료상태(orderPayment데이터 존재) + 주문취소요청 존재하는 주문 생성
-    const orderWithPayment = await this.prisma.order.create({
-      data: {
-        orderCode: paymentResultData.orderId,
-        customer: { connect: { id: 1 } },
-        step: 'paymentConfirmed',
-        recipientName: '받는사람명',
-        recipientPhone: '01012341234',
-        recipientEmail: 'sjdkfl@sdf.com',
-        recipientAddress: '받는사람ㅁ주소',
-        recipientDetailAddress: '받는사람상세주소',
-        recipientPostalCode: '23423',
-        ordererName: '주문자명',
-        ordererPhone: '0101231242',
-        ordererEmail: 'sdlkfj@gasd.com',
-        memo: '결제취소 api 테스트 위한 가짜 결제정보 담은 주문생성',
-        orderPrice: paymentResultData.totalAmount,
-        paymentPrice: paymentResultData.totalAmount,
-        payment: {
-          create: {
-            method: 'card', // fakePayment가 카드결제라서 카드
-            paymentKey: paymentResultData.paymentKey,
-            depositDate: paymentResultData.approvedAt,
-            depositDoneFlag: !!paymentResultData.approvedAt,
-          },
-        },
-        orderCancellations: {
-          create: {
-            cancelCode: nanoid(),
-            responsibility: 'customer',
-            items: {
-              create: [
-                {
-                  orderItem: { connect: { id: 1 } },
-                  orderItemOption: { connect: { id: 1 } },
-                  amount: 1,
-                },
-              ],
-            },
-          },
-        },
-      },
-    });
-
-    return orderWithPayment;
-  }
-
   private createRefundCode(): string {
     return nanoid();
   }
@@ -276,7 +225,9 @@ export class RefundService {
     let transfer: PaymentTransfer | undefined; // 계좌이체로 결제했을 때 이체 정보가 담기는 객체입니다.
     // 토스페이먼츠로 결제 && 환불한 경우 -> 결제정보 조회
     if (data.transactionKey && data.paymentKey) {
-      const paymentData = await TossPaymentsApi.getPaymentByOrderId(rest.order.orderCode);
+      const paymentData = await TossPaymentsApi.getPaymentByOrderCode(
+        rest.order.orderCode,
+      );
 
       if (paymentData.card) {
         card = paymentData.card;

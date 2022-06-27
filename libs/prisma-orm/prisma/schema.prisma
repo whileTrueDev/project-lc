@@ -1401,19 +1401,17 @@ enum CouponLogType {
 // *****************
 // 장바구니 상품
 model CartItem {
-  id                   Int              @id @default(autoincrement()) // 장바구니 상품 고유번호
-  createDate           DateTime         @default(now())
-  customerId           Int? // 비로그인 상태로 장바구니에 담은것도 디비에 저장해야 하나? 쿠키에만 저장하면 되나??
-  customer             Customer?        @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  tempUserId           String? // 비로그인한 유저 식별값(세션id?)
-  goodsId              Int?
-  goods                Goods?           @relation(fields: [goodsId], references: [id], onDelete: SetNull)
-  options              CartItemOption[] // 선택된 장바구니 상품 옵션
-  support              CartItemSupport? // 연결된 후원정보
-  shippingCost         Decimal          @default("0.00") @db.Decimal(10, 2) // 장바구니 담았을 당시 이 장바구니 상품에 포함된  배송비
-  shippingCostIncluded Boolean          @default(false) // 이 장바구니 상품에 동일 판매자의 배송비가 포함되었는지 여부
-  shippingGroupId      Int? // 연결된 배송정책 id
-  shippingGroup        ShippingGroup?   @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
+  id              Int              @id @default(autoincrement()) // 장바구니 상품 고유번호
+  createDate      DateTime         @default(now())
+  customerId      Int? // 비로그인 상태로 장바구니에 담은것도 디비에 저장해야 하나? 쿠키에만 저장하면 되나??
+  customer        Customer?        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  tempUserId      String? // 비로그인한 유저 식별값(세션id?)
+  goodsId         Int?
+  goods           Goods?           @relation(fields: [goodsId], references: [id], onDelete: SetNull)
+  options         CartItemOption[] // 선택된 장바구니 상품 옵션
+  support         CartItemSupport? // 연결된 후원정보
+  shippingGroupId Int? // 연결된 배송정책 id
+  shippingGroup   ShippingGroup?   @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
 
   channel SellType @default(normal) // 판매유형(주문경로)
 }
@@ -1565,7 +1563,6 @@ model Order {
   ordererEmail               String // 주문자 이메일
   memo                       String // 배송메시지
   nonMemberOrderFlag         Boolean                      @default(false) // 비회원 주문 여부
-  nonMemberOrderPassword     String? // 비회원주문시 입력받는 비밀번호 - 비회원이 주문조회,취소시 사용할예정
   giftFlag                   Boolean                      @default(false) // 선물주문 여부
   supportOrderIncludeFlag    Boolean                      @default(false) // 후원상품 포함여부
   bundleFlag                 Boolean                      @default(false) // 묶음배송여부

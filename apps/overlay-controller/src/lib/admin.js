@@ -509,6 +509,16 @@ $(document).ready(function ready() {
     socket.emit('combo reset from admin', roomName);
   });
 
+  $('.logout-button').click(function logout() {
+    $.ajax({
+      type: 'POST',
+      url: `http://localhost:3333/auth/logout`,
+      success(data) {
+        window.location.replace('/login');
+      },
+    });
+  });
+
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
 

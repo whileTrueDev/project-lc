@@ -50,7 +50,10 @@ export function ExportBundleDialog({
   orders,
 }: ExportBundleDialogProps): JSX.Element {
   const toast = useToast();
-  const { getValues } = useFormContext<CreateKkshowExportDto[]>();
+  const {
+    getValues,
+    formState: { isSubmitting },
+  } = useFormContext<CreateKkshowExportDto[]>();
   const selectedOrderShippings = sellerExportStore((s) => s.selectedOrderShippings);
   const [deliveryCompany, setDeliveryCompany] = useState('');
   const [deliveryNumber, setDeliveryNumber] = useState('');
@@ -194,6 +197,7 @@ export function ExportBundleDialog({
         </ModalBody>
         <ModalFooter>
           <Button
+            isLoading={exportBundledOrders.isLoading || isSubmitting}
             isDisabled={!deliveryCompany || !deliveryNumber}
             colorScheme="pink"
             onClick={() => onBundledExportSubmit()}

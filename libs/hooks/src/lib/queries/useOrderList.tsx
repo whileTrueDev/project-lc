@@ -23,6 +23,7 @@ export const getOrderList = async (dto: GetOrderListDto): Promise<OrderListRes> 
         periodStart: dto.periodStart,
         periodEnd: dto.periodEnd,
         searchStatuses: dto.searchStatuses,
+        searchExtendedStatus: dto.searchExtendedStatus,
         sellerId: dto.sellerId,
         skip: dto.skip,
         take: dto.take,
@@ -61,6 +62,7 @@ export const useSellerOrderList = (
         periodStart: dto.periodStart,
         periodEnd: dto.periodEnd,
         searchStatuses: dto.searchStatuses,
+        searchExtendedStatus: dto.searchExtendedStatus,
         sellerId: dto.sellerId,
         skip: dto.skip,
         take: dto.take,
@@ -71,7 +73,8 @@ export const useSellerOrderList = (
         dto.search ||
         dto.periodStart ||
         dto.periodEnd ||
-        dto.searchStatuses
+        dto.searchStatuses ||
+        dto.searchExtendedStatus
       ),
     },
   );
