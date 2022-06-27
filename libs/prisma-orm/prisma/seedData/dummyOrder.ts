@@ -80,17 +80,6 @@ export const createDummyOrder = async ({
         orderCode,
         step,
       }),
-      shippings: {
-        create: [
-          {
-            shippingCost: '2500',
-            shippingCostPayType: 'prepay',
-            shippingGroupId: 1,
-            shippingMethod: 'delivery',
-            shippingSetId: 1,
-          },
-        ],
-      },
     },
   });
 
