@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { CipherService } from '@project-lc/nest-modules-cipher';
 import { OrderCancellationService } from '@project-lc/nest-modules-order';
 import { PaymentService } from '@project-lc/nest-modules-payment';
 import { ReturnService } from '@project-lc/nest-modules-return';
@@ -27,6 +28,7 @@ export class RefundService {
     private readonly orderCancellationService: OrderCancellationService,
     private readonly paymentService: PaymentService,
     private readonly returnService: ReturnService,
+    private readonly cipherService: CipherService,
   ) {}
 
   private createRefundCode(): string {
@@ -62,7 +64,15 @@ export class RefundService {
    * 3. 연결된 Return, OrderCancellation 상태 업데이트...?
    */
   async createRefund(dto: CreateRefundDto): Promise<CreateRefundRes> {
-    const { orderId, orderCancellationId, returnId, items, refundBank, ...rest } = dto;
+    const {
+      orderId,
+      orderCancellationId,
+      returnId,
+      items,
+      refundBank,
+      refundAccount,
+      ...rest
+    } = dto;
 
     let transactionKey: string | undefined;
     // 1. 토스페이먼츠 결제취소 api 사용하는 경우 transaction키 받기
@@ -75,10 +85,14 @@ export class RefundService {
       transactionKey = cancelResult.transactionKey;
     }
 
+    // 계좌번호 암호화
+    const encryptedAccount = this.cipherService.getEncryptedText(refundAccount);
+
     // 환불 정보 입력
     const data = await this.prisma.refund.create({
       data: {
         ...rest,
+        refundAccount: encryptedAccount,
         refundBank: refundBank
           ? banks.find((b) => b.bankCode === refundBank)?.bankName || refundBank
           : undefined,
@@ -106,7 +120,6 @@ export class RefundService {
         refundId: data.id,
       });
     }
-
     return data;
   }
 
@@ -149,12 +162,17 @@ export class RefundService {
       },
     });
 
+    const refundResults = data.map((d) => ({
+      ...d,
+      refundAccount: this.cipherService.getDecryptedText(d.refundAccount),
+    }));
+
     const count = await this.prisma.refund.count({ where });
     const nextCursor = (skip || 0) + take;
     return {
       count,
       nextCursor: nextCursor >= count ? undefined : nextCursor,
-      list: data,
+      list: refundResults,
     };
   }
 
@@ -206,7 +224,7 @@ export class RefundService {
       },
     });
 
-    const { items, ...rest } = data;
+    const { items, refundAccount, ...rest } = data;
 
     const refundItemList = items.map((item) => {
       const { orderItem, orderItemOption } = item;
@@ -244,6 +262,7 @@ export class RefundService {
 
     return {
       ...rest,
+      refundAccount: this.cipherService.getDecryptedText(refundAccount),
       items: refundItemList,
       card,
       virtualAccount,

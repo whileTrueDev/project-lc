@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   OrderCancellation,
   OrderProcessStep,
@@ -13,7 +13,6 @@ import {
   GetOrderCancellationListDto,
   OrderCancellationDetailRes,
   OrderCancellationListRes,
-  OrderCancellationRemoveRes,
   OrderCancellationUpdateRes,
   UpdateOrderCancellationStatusDto,
 } from '@project-lc/shared-types';
@@ -71,28 +70,41 @@ export class OrderCancellationService {
 
     // 주문취소요청이 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
     if (status === 'complete') {
-      await this.updateOrderStateToCancel(orderId, 'paymentCanceled');
+      await this.updateOrderStateAfterOrderCancelApproved(orderId);
     }
     return data;
   }
 
-  /** 주문의 상태를 주문무효 로 변경(주문취소요청이 처리완료(승인)되었을 때 사용)
+  /** 주문취소요청이 처리완료(승인) 후 주문의 상태 변경
+   * 주문접수 상태에서 승인시 => 주문무효
+   * 결제확인 상태에서 승인시 => 결제취소
    */
-  private async updateOrderStateToCancel(
-    orderId: number,
-    cancelType: 'orderInvalidated' | 'paymentCanceled',
-  ): Promise<void> {
-    // 주문 상태 주문무효로 변경
-    await this.prisma.order.update({
+  private async updateOrderStateAfterOrderCancelApproved(orderId: number): Promise<void> {
+    const originOrder = await this.prisma.order.findUnique({
       where: { id: orderId },
-      data: { step: cancelType },
+      select: { step: true },
     });
 
-    // 주문상품옵션 상태 주문무효로 변경
-    await this.prisma.orderItemOption.updateMany({
-      where: { orderItem: { orderId } },
-      data: { step: cancelType },
-    });
+    if (originOrder) {
+      let targetState: OrderProcessStep;
+      if (originOrder.step === 'orderReceived') {
+        targetState = 'orderInvalidated';
+      }
+
+      if (originOrder.step === 'paymentConfirmed') {
+        targetState = 'paymentCanceled';
+      }
+
+      await this.prisma.$transaction([
+        // 주문 상태 변경
+        this.prisma.order.update({ where: { id: orderId }, data: { step: targetState } }),
+        // 주문상품옵션 상태 변경
+        this.prisma.orderItemOption.updateMany({
+          where: { orderItem: { orderId } },
+          data: { step: targetState },
+        }),
+      ]);
+    }
   }
 
   /* 주문취소 내역 조회 */
@@ -203,7 +215,7 @@ export class OrderCancellationService {
 
     // 주문취소요청이 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
     if (orderCancellation.status === 'complete') {
-      await this.updateOrderStateToCancel(orderCancellation.orderId, 'paymentCanceled');
+      await this.updateOrderStateAfterOrderCancelApproved(orderCancellation.orderId);
     }
 
     return orderCancellation;
