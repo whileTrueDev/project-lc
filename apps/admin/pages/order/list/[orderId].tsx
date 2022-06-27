@@ -16,16 +16,15 @@ import {
 import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
+import { CardDetail } from '@project-lc/components-shared/payment/CardDetail';
+import { TransferDetail } from '@project-lc/components-shared/payment/TransferDetail';
+import { VirtualAccountDetail } from '@project-lc/components-shared/payment/VirtualAccountDetail';
 import {
   useAdminOrder,
   useAdminOrderPatchMutation,
   usePaymentByOrderCode,
 } from '@project-lc/hooks';
-import {
-  orderProcessStepKoreanDict,
-  Payment,
-  UpdateOrderDto,
-} from '@project-lc/shared-types';
+import { orderProcessStepKoreanDict, UpdateOrderDto } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -34,7 +33,7 @@ export function OrderDetail(): JSX.Element {
   const router = useRouter();
   const { orderId } = router.query;
   const { data } = useAdminOrder(Number(orderId));
-  const { data: paymentData } = usePaymentByOrderCode(data?.payment?.paymentKey);
+  const { data: paymentData } = usePaymentByOrderCode(data?.orderCode);
   const { mutateAsync } = useAdminOrderPatchMutation(Number(orderId));
   const [isEdit, setIsEdit] = useState(false);
   const [orderStep, setOrderStep] = useState<UpdateOrderDto['step']>('orderReceived');
@@ -206,7 +205,7 @@ export function OrderDetail(): JSX.Element {
             </Flex>
             <Box>
               <Text>결제정보</Text>
-              <Grid templateColumns="repeat(2, 5fr)" width="300px" border="1px" p={1}>
+              <Grid templateColumns="repeat(2, 5fr)" minWidth="300px" border="1px" p={1}>
                 <GridItem>
                   <Text>결제키</Text>
                 </GridItem>
@@ -255,98 +254,6 @@ export function OrderDetail(): JSX.Element {
         </Text>
       </ConfirmDialog>
     </AdminPageLayout>
-  );
-}
-
-type TossPaymentDetailProps = {
-  paymentData: Payment;
-};
-
-export function CardDetail(props: TossPaymentDetailProps): JSX.Element {
-  const { paymentData } = props;
-  return (
-    <>
-      <GridItem>
-        <Text>카드사</Text>
-      </GridItem>
-      <GridItem>
-        <Text>{paymentData.card.company}</Text>
-      </GridItem>
-      <GridItem>
-        <Text>카드번호</Text>
-      </GridItem>
-      <GridItem>
-        <Text>{paymentData.card.number}</Text>
-      </GridItem>
-      <GridItem>
-        <Text>할부개월</Text>
-      </GridItem>
-      <GridItem>
-        <Text>{paymentData.card.installmentPlanMonths}</Text>
-      </GridItem>
-    </>
-  );
-}
-
-export function VirtualAccountDetail(props: TossPaymentDetailProps): JSX.Element {
-  const { paymentData } = props;
-  return (
-    <>
-      <GridItem>
-        <Text>은행</Text>
-      </GridItem>
-      <GridItem>
-        <Text>{paymentData.virtualAccount.bank}</Text>
-      </GridItem>
-      <GridItem>
-        <Text>계좌타입</Text>
-      </GridItem>
-      <GridItem>
-        <Text>{paymentData.virtualAccount.accountType}</Text>
-      </GridItem>
-      <GridItem>
-        <Text>입금계좌번호</Text>
-      </GridItem>
-      <GridItem>
-        <Text>{paymentData.virtualAccount.accountNumber}</Text>
-      </GridItem>
-      <GridItem>
-        <Text>입금기한</Text>
-      </GridItem>
-      <GridItem>
-        <Text>{paymentData.virtualAccount.dueDate}</Text>
-      </GridItem>
-      <GridItem>
-        <Text>입금상태</Text>
-      </GridItem>
-      <GridItem>
-        <Text>
-          {paymentData.virtualAccount.settlementStatus === 'COMPLETE'
-            ? '입금완료'
-            : '입금대기'}
-        </Text>
-      </GridItem>
-    </>
-  );
-}
-
-export function TransferDetail(props: TossPaymentDetailProps): JSX.Element {
-  const { paymentData } = props;
-  return (
-    <>
-      <GridItem>
-        <Text>은행</Text>
-      </GridItem>
-      <GridItem>
-        <Text>{paymentData.transfer.bank}</Text>
-      </GridItem>
-      <GridItem>
-        <Text>계좌타입</Text>
-      </GridItem>
-      <GridItem>
-        <Text>{paymentData.transfer.settlementStatus}</Text>
-      </GridItem>
-    </>
   );
 }
 

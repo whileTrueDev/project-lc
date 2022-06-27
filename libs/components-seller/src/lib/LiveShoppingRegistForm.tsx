@@ -92,10 +92,9 @@ export function LiveShoppingRegistForm(): JSX.Element {
     const phoneNumber = `${firstNumber}${secondNumber}${thirdNumber}`;
     const dto: LiveShoppingRegistDTO = {
       requests: '',
-      goods_id: 0,
+      goodsId: 0,
       contactId: 0,
       // streamId: '',
-      progress: LIVE_SHOPPING_PROGRESS.등록됨,
       desiredCommission: data.desiredCommission,
       desiredPeriod: data.desiredPeriod,
     };
@@ -110,7 +109,7 @@ export function LiveShoppingRegistForm(): JSX.Element {
       toast({ title: '상품을 올바르게 선택해주세요.', status: 'error' });
       return;
     }
-    dto.goods_id = goodsId;
+    dto.goodsId = goodsId;
     if (useContact === 'old') {
       mutateAsync(dto).then(onSuccess).catch(onFail);
     } else {

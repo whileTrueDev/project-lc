@@ -34,6 +34,7 @@ import {
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
   UpdateOrderDto,
+  NonMemberOrderDetailRes,
 } from '@project-lc/shared-types';
 import { calculateShippingCost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
@@ -56,20 +57,6 @@ export class OrderService {
 
   private async hash(pw: string): Promise<string> {
     return this.userPwManager.hashPassword(pw);
-  }
-
-  /** 비회원주문생성시 처리 - 비회원주문비밀번호 암호화하여 리턴, nonMemberOrderFlag: true 설정 */
-  private async handleNonMemberOrder(
-    dto: CreateOrderDto,
-  ): Promise<Partial<Prisma.OrderCreateInput>> {
-    const { nonMemberOrderFlag, nonMemberOrderPassword } = dto;
-    const hashedPassword = nonMemberOrderPassword
-      ? await this.hash(nonMemberOrderPassword)
-      : undefined;
-    return {
-      nonMemberOrderFlag,
-      nonMemberOrderPassword: hashedPassword,
-    };
   }
 
   /** 선물주문생성시 처리 - 방송인 정보(받는사람 주소, 연락처) 리턴, giftFlag: true 설정 */
@@ -204,11 +191,6 @@ export class OrderService {
       payment: paymentId ? { connect: { id: paymentId } } : undefined,
       customer: !nonMemberOrderFlag ? { connect: { id: customerId } } : undefined,
     };
-
-    // 비회원 주문의 경우 비밀번호 해시처리
-    if (nonMemberOrderFlag) {
-      createInput = { ...createInput, ...(await this.handleNonMemberOrder(orderDto)) };
-    }
 
     // 선물하기의 경우(주문상품은 1개, 후원데이터가 존재함)
     if (giftFlag && orderItems.length === 1 && !!orderItems[0].support) {
@@ -347,6 +329,7 @@ export class OrderService {
       search,
       searchDateType,
       searchStatuses,
+      searchExtendedStatus,
     } = dto;
 
     let where: Prisma.OrderWhereInput = {};
@@ -387,10 +370,23 @@ export class OrderService {
       }
     }
 
+    const OR = [];
+
     // 특정 주문상태로 조회시
     if (searchStatuses) {
-      where = { ...where, step: { in: searchStatuses } };
+      OR.push({ step: { in: searchStatuses } });
     }
+
+    // 교환, 반품, 환불 조회
+    if (searchExtendedStatus) {
+      let extendedStatus = {};
+      searchExtendedStatus.forEach((s) => {
+        extendedStatus[s] = { some: {} };
+        OR.push(extendedStatus);
+        extendedStatus = {};
+      });
+    }
+    where = { ...where, OR: OR.length > 0 ? OR : undefined };
 
     // 검색어로 특정컬럼값 조회시
     if (search) {
@@ -428,13 +424,7 @@ export class OrderService {
       if (_o.giftFlag) {
         _o = this.removeRecipientInfo(_o);
       }
-      // 비회원 주문인 경우 - 비회원비밀번호 정보 삭제
-      if (_o.nonMemberOrderFlag) {
-        _o = {
-          ..._o,
-          nonMemberOrderPassword: undefined,
-        };
-      }
+
       return _o;
     });
     return {
@@ -521,6 +511,11 @@ export class OrderService {
           sellerGoodsOrderItems.flatMap((oi) => oi.options),
         );
       }
+
+      // if (dto.searchExtendedStatus.length) {
+      //   dto.searchExtendedStatus.map((item) => `${item}`)
+      // }
+
       return {
         ...orderRestData,
         step: displaySellerOrderStep,
@@ -747,25 +742,16 @@ export class OrderService {
   /** 비회원 주문 상세 조회 */
   async getNonMemberOrderDetail({
     orderCode,
-    password,
-  }: GetNonMemberOrderDetailDto): Promise<OrderDetailRes> {
-    const order = await this.findOneOrderDetail({ orderCode, deleteFlag: false });
+    ordererName,
+  }: GetNonMemberOrderDetailDto): Promise<NonMemberOrderDetailRes> {
+    const order = await this.findOneOrderDetail({
+      orderCode,
+      ordererName,
+      customerId: null,
+      deleteFlag: false,
+    });
 
-    // 비회원주문 비밀번호 확인
-    const isPasswordCorrect = await this.userPwManager.validatePassword(
-      password,
-      order.nonMemberOrderPassword,
-    );
-    if (!isPasswordCorrect) {
-      throw new BadRequestException(`주문 비밀번호가 일치하지 않습니다.`);
-    }
-
-    // 선물주문인경우 받는사람 정보 삭제하고 리턴
-    if (order.giftFlag) {
-      return this.removeRecipientInfo(order);
-    }
-
-    return order;
+    return { order };
   }
 
   /** 주문수정 */
@@ -773,7 +759,7 @@ export class OrderService {
     // 주문이 존재하는지 확인
     await this.findOneOrder({ id: orderId });
 
-    const { customerId, nonMemberOrderPassword, ...rest } = dto;
+    const { customerId, ...rest } = dto;
 
     let updateInput: Prisma.OrderUpdateInput = { ...rest };
 
@@ -782,16 +768,6 @@ export class OrderService {
       updateInput = {
         ...updateInput,
         customer: { connect: { id: customerId } },
-      };
-    }
-
-    // 비회원 주문 비밀번호 바꾸는 경우
-    if (nonMemberOrderPassword) {
-      updateInput = {
-        ...updateInput,
-        nonMemberOrderPassword: await this.userPwManager.hashPassword(
-          nonMemberOrderPassword,
-        ),
       };
     }
 
@@ -934,16 +910,24 @@ export class OrderService {
       },
       include: {
         orderItems: { include: { options: true, goods: { select: { sellerId: true } } } },
+        shippings: { include: { shippingGroup: { select: { sellerId: true } } } },
       },
     });
-    // 주문상품 중 판매자의 상품&상품옵션만 추려내기
+    // 주문상품 중 판매자의 상품&상품옵션만 추려내기 && 주문배송비 중 판매자의 주문배송비만 추려내기
     const ordersWithFilteredItems = sellerOrders.map((order) => {
-      const { orderItems, ...orderData } = order;
+      const { orderItems, shippings, ...orderData } = order;
 
       const sellerGoodsOrderItems = orderItems.filter((oi) => {
         return oi.goods.sellerId === sellerId;
       });
-      return { ...orderData, orderItems: sellerGoodsOrderItems };
+      const sellerOrderShippings = shippings.filter((s) => {
+        return s.shippingGroup.sellerId === sellerId;
+      });
+      return {
+        ...orderData,
+        orderItems: sellerGoodsOrderItems,
+        shippings: sellerOrderShippings,
+      };
     });
 
     // 판매자 상품인 주문상품옵션의 상태에 기반한 주문상태 표시
@@ -988,17 +972,18 @@ export class OrderService {
     });
 
     // 추려낸 주문상품의 배송비 + 주문상품옵션가격
-    const sellerOrderItemsToday = sellerOrdersToday.flatMap((order) => order.orderItems);
-    const todaySalesTotal = sellerOrderItemsToday.reduce((total, item) => {
-      return (
-        total +
-        Number(item.shippingCost) +
-        item.options.reduce(
-          (optPriceSum, opt) => optPriceSum + Number(opt.discountPrice),
-          0,
-        )
-      );
-    }, 0);
+    let tempTotalSalesToday = 0;
+    sellerOrdersToday.forEach((order) => {
+      // 주문배송비
+      tempTotalSalesToday += order.shippings
+        .map((s) => Number(s.shippingCost))
+        .reduce((sum, cur) => sum + cur, 0);
+      // 주문상품옵션가격
+      tempTotalSalesToday += order.orderItems
+        .flatMap((i) => i.options)
+        .map((opt) => Number(opt.discountPrice) * Number(opt.quantity))
+        .reduce((sum, cur) => sum + cur, 0);
+    });
 
     // * 판매자의 오늘환불현황
     // 환불상품에 판매자 상품이 포함된 환불조회
@@ -1034,7 +1019,7 @@ export class OrderService {
         배송중: orderStats.shipping,
       },
       sales: {
-        주문: { count: sellerOrdersToday.length, sum: todaySalesTotal },
+        주문: { count: sellerOrdersToday.length, sum: tempTotalSalesToday },
         환불: { count: sellerRefunds.length, sum: todayRefundAmountTotal },
       },
     };

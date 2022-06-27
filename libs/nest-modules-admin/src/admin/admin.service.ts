@@ -4,6 +4,7 @@ import {
   Administrator,
   GoodsConfirmation,
 } from '@prisma/client';
+import { CipherService } from '@project-lc/nest-modules-cipher';
 import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -13,7 +14,7 @@ import {
   AdminSettlementInfoType,
   GoodsConfirmationDto,
   GoodsRejectionDto,
-  LiveShoppingDTO,
+  LiveShoppingUpdateDTO,
   LiveShoppingImageDto,
 } from '@project-lc/shared-types';
 
@@ -22,6 +23,7 @@ export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly productPromotionService: ProductPromotionService,
+    private readonly cipherService: CipherService,
   ) {}
 
   // 관리자 페이지 정산 데이터
@@ -59,7 +61,13 @@ export class AdminService {
     // 단순 데이터를 전달하지 않고 필요한 데이터의형태로 정제해야함.
     users.forEach(({ sellerSettlementAccount, sellerBusinessRegistration }) => {
       if (sellerSettlementAccount.length > 0) {
-        result.sellerSettlementAccount.push(sellerSettlementAccount[0]);
+        // 암호화된 계좌번호 복호화처리
+        const { number } = sellerSettlementAccount[0];
+        const decryptedSettlementAccount = this.cipherService.getDecryptedText(number);
+        result.sellerSettlementAccount.push({
+          ...sellerSettlementAccount[0],
+          number: decryptedSettlementAccount,
+        });
       }
       if (sellerBusinessRegistration.length > 0) {
         result.sellerBusinessRegistration.push(sellerBusinessRegistration[0]);
@@ -192,7 +200,7 @@ export class AdminService {
   }
 
   public async updateLiveShoppings(
-    dto: LiveShoppingDTO,
+    dto: LiveShoppingUpdateDTO,
     videoId?: number | null,
   ): Promise<boolean> {
     const liveShoppingUpdate = await this.prisma.liveShopping.update({

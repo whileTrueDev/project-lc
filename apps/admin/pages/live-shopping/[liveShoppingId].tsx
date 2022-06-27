@@ -33,15 +33,16 @@ import { GoodsDetailOptionsInfo } from '@project-lc/components-seller/goods-deta
 import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailPurchaseLimitInfo';
 import { GoodsDetailShippingInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailShippingInfo';
 import { GoodsDetailSummary } from '@project-lc/components-seller/goods-detail/GoodsDetailSummary';
-import { BroadcasterName } from '@project-lc/components-shared/BroadcasterName';
+import { AdminLiveShoppingBroadcasterName } from '@project-lc/components-admin/AdminLiveShoppingBroadcasterName';
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
 import {
+  LiveShoppingManage,
   useAdminGoodsById,
   useAdminLiveShoppingList,
   useProfile,
   useUpdateLiveShoppingManageMutation,
 } from '@project-lc/hooks';
-import { LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
+import { LiveShoppingUpdateDTO, LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
@@ -60,31 +61,37 @@ function getDuration(startDate: Date, endDate: Date): string {
   return '미정';
 }
 
+export type LiveShoppingFormData = Omit<LiveShoppingUpdateDTO, 'id'>;
 export function LiveShoppingDetail(): JSX.Element {
   const router = useRouter();
   const liveShoppingId = router.query.liveShoppingId as string;
   const { data: profileData } = useProfile();
-  const { data: liveShopping, isLoading: liveShoppingIsLoading } =
-    useAdminLiveShoppingList(
-      { id: Number(liveShoppingId) },
-      { enabled: !!profileData?.id },
-    );
+  const {
+    data: liveShopping,
+    isLoading: liveShoppingIsLoading,
+    refetch,
+  } = useAdminLiveShoppingList(
+    { id: Number(liveShoppingId) },
+    { enabled: !!profileData?.id },
+  );
 
   const goodsId = liveShopping ? liveShopping[0].goodsId : '';
   const goods = useAdminGoodsById(goodsId);
 
   const { mutateAsync } = useUpdateLiveShoppingManageMutation();
-  const methods = useForm({
+  const methods = useForm<LiveShoppingFormData>({
     defaultValues: {
-      progress: '',
+      progress: undefined,
       liveShoppingName: '',
-      broadcasterId: '',
+      broadcasterId: undefined,
       broadcastStartDate: '',
       broadcastEndDate: '',
       sellStartDate: '',
       sellEndDate: '',
       rejectionReason: '',
       videoUrl: '',
+      whiletrueCommissionRate: undefined,
+      broadcasterCommissionRate: undefined,
     },
   });
   const toast = useToast();
@@ -104,17 +111,20 @@ export function LiveShoppingDetail(): JSX.Element {
 
   const onSuccess = (): void => {
     reset({
-      progress: '',
+      progress: undefined,
       liveShoppingName: '',
-      broadcasterId: '',
+      broadcasterId: undefined,
       broadcastStartDate: '',
       broadcastEndDate: '',
       sellStartDate: '',
       sellEndDate: '',
       rejectionReason: '',
       videoUrl: '',
+      whiletrueCommissionRate: undefined,
+      broadcasterCommissionRate: undefined,
     });
     toast({ title: '변경 완료', status: 'success' });
+    refetch();
   };
 
   const onFail = (err?: AxiosError): void => {
@@ -126,13 +136,12 @@ export function LiveShoppingDetail(): JSX.Element {
   };
 
   const { handleSubmit, register, watch, reset } = methods;
-  const onSubmit = async (
-    // TODO: 타입 관련 정리 필요. build 실패로 any로 임시 처리 220411 hwasurr
-    data: any,
-    // data: Omit<LiveShoppingDTO, 'sellerId' | 'goods_id' | 'contactId' | 'requests'>,
-  ): Promise<void> => {
+  const onSubmit = async (data: LiveShoppingFormData): Promise<void> => {
     const videoUrlExist = Boolean(liveShopping[0]?.liveShoppingVideo?.youtubeUrl);
-    const dto = Object.assign(data, { id: liveShoppingId });
+    const { sellerId, goodsId: _, contactId, requests, ...restData } = data; // formData타입에서 LiveShoppingManage 타입으로 바꾸기 위해
+    const dto: LiveShoppingManage = Object.assign(restData, {
+      id: Number(liveShoppingId),
+    });
     mutateAsync({ dto, videoUrlExist }).then(onSuccess).catch(onFail);
   };
   if (liveShoppingIsLoading || goods.isLoading)
@@ -196,7 +205,10 @@ export function LiveShoppingDetail(): JSX.Element {
             <Stack direction="row" alignItems="center">
               <Text as="span">방송인: </Text>
               {liveShopping[0].broadcaster ? (
-                <BroadcasterName data={liveShopping[0].broadcaster} color="blue" />
+                <AdminLiveShoppingBroadcasterName
+                  data={liveShopping[0].broadcaster}
+                  color="blue"
+                />
               ) : (
                 <Text fontWeight="bold">미정</Text>
               )}
@@ -337,7 +349,6 @@ export function LiveShoppingDetail(): JSX.Element {
               <LiveShoppingDatePicker
                 title="방송 종료시간"
                 registerName="broadcastEndDate"
-                min={watch('broadcastStartDate')}
               />
               {dayjs(watch('broadcastStartDate')) > dayjs(watch('broadcastEndDate')) && (
                 <Text as="em" color="tomato">

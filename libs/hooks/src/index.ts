@@ -145,7 +145,6 @@ export * from './lib/queries/useGoodsInquiries';
 export * from './lib/queries/useGoodsStock';
 export * from './lib/queries/useHealthCheck';
 export * from './lib/queries/useKkshowMain';
-export * from './lib/queries/useKkshowOrder';
 export * from './lib/queries/useKkshowSearchResults';
 export * from './lib/queries/useKkshowShopping';
 export * from './lib/queries/useLiveShoppingList';

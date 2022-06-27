@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { CipherService } from '@project-lc/nest-modules-cipher';
 import { OrderCancellationService } from '@project-lc/nest-modules-order';
 import { PaymentService } from '@project-lc/nest-modules-payment';
 import { ReturnService } from '@project-lc/nest-modules-return';
@@ -27,58 +28,8 @@ export class RefundService {
     private readonly orderCancellationService: OrderCancellationService,
     private readonly paymentService: PaymentService,
     private readonly returnService: ReturnService,
+    private readonly cipherService: CipherService,
   ) {}
-
-  /** 결제취소 테스트위해 결제데이터 필요하여 만들었음. // TODO: 프론트 작업시 삭제 */
-  async makeFakeOrderWithFakePayment(): Promise<any> {
-    const paymentResultData = await TossPaymentsApi.makeDummyTossPaymentData();
-
-    // 결제완료상태(orderPayment데이터 존재) + 주문취소요청 존재하는 주문 생성
-    const orderWithPayment = await this.prisma.order.create({
-      data: {
-        orderCode: paymentResultData.orderId,
-        customer: { connect: { id: 1 } },
-        step: 'paymentConfirmed',
-        recipientName: '받는사람명',
-        recipientPhone: '01012341234',
-        recipientEmail: 'sjdkfl@sdf.com',
-        recipientAddress: '받는사람ㅁ주소',
-        recipientDetailAddress: '받는사람상세주소',
-        recipientPostalCode: '23423',
-        ordererName: '주문자명',
-        ordererPhone: '0101231242',
-        ordererEmail: 'sdlkfj@gasd.com',
-        memo: '결제취소 api 테스트 위한 가짜 결제정보 담은 주문생성',
-        orderPrice: paymentResultData.totalAmount,
-        paymentPrice: paymentResultData.totalAmount,
-        payment: {
-          create: {
-            method: 'card', // fakePayment가 카드결제라서 카드
-            paymentKey: paymentResultData.paymentKey,
-            depositDate: paymentResultData.approvedAt,
-            depositDoneFlag: !!paymentResultData.approvedAt,
-          },
-        },
-        orderCancellations: {
-          create: {
-            cancelCode: nanoid(),
-            responsibility: 'customer',
-            items: {
-              create: [
-                {
-                  orderItem: { connect: { id: 1 } },
-                  orderItemOption: { connect: { id: 1 } },
-                  amount: 1,
-                },
-              ],
-            },
-          },
-        },
-      },
-    });
-
-    return orderWithPayment;
-  }
 
   private createRefundCode(): string {
     return nanoid();
@@ -113,7 +64,15 @@ export class RefundService {
    * 3. 연결된 Return, OrderCancellation 상태 업데이트...?
    */
   async createRefund(dto: CreateRefundDto): Promise<CreateRefundRes> {
-    const { orderId, orderCancellationId, returnId, items, refundBank, ...rest } = dto;
+    const {
+      orderId,
+      orderCancellationId,
+      returnId,
+      items,
+      refundBank,
+      refundAccount,
+      ...rest
+    } = dto;
 
     let transactionKey: string | undefined;
     // 1. 토스페이먼츠 결제취소 api 사용하는 경우 transaction키 받기
@@ -126,10 +85,14 @@ export class RefundService {
       transactionKey = cancelResult.transactionKey;
     }
 
+    // 계좌번호 암호화
+    const encryptedAccount = this.cipherService.getEncryptedText(refundAccount);
+
     // 환불 정보 입력
     const data = await this.prisma.refund.create({
       data: {
         ...rest,
+        refundAccount: encryptedAccount,
         refundBank: refundBank
           ? banks.find((b) => b.bankCode === refundBank)?.bankName || refundBank
           : undefined,
@@ -157,7 +120,6 @@ export class RefundService {
         refundId: data.id,
       });
     }
-
     return data;
   }
 
@@ -200,12 +162,18 @@ export class RefundService {
       },
     });
 
+    const refundResults = data.map((d) => ({
+      ...d,
+      // 환불계좌정보 복호화
+      refundAccount: this.cipherService.getDecryptedText(d.refundAccount),
+    }));
+
     const count = await this.prisma.refund.count({ where });
     const nextCursor = (skip || 0) + take;
     return {
       count,
       nextCursor: nextCursor >= count ? undefined : nextCursor,
-      list: data,
+      list: refundResults,
     };
   }
 
@@ -257,8 +225,12 @@ export class RefundService {
       },
     });
 
-    const { items, ...rest } = data;
+    const { items, refundAccount, ...rest } = data;
 
+    // * 환불받을 계좌정보
+    const decryptedRefundAccount = this.cipherService.getDecryptedText(refundAccount); // 환불계좌정보 복호화
+
+    // * 환불상품 정보
     const refundItemList = items.map((item) => {
       const { orderItem, orderItemOption } = item;
       const { goods, ...orderItemRest } = orderItem;
@@ -273,12 +245,15 @@ export class RefundService {
       };
     });
 
+    // * 토스페이먼츠 결제정보
     let card: PaymentCard | undefined; // 카드로 결제하면 제공되는 카드 관련 정보입니다.
     let virtualAccount: PaymentVirtualAccount | undefined; // 가상계좌로 결제하면 제공되는 가상계좌 관련 정보입니다.
     let transfer: PaymentTransfer | undefined; // 계좌이체로 결제했을 때 이체 정보가 담기는 객체입니다.
     // 토스페이먼츠로 결제 && 환불한 경우 -> 결제정보 조회
     if (data.transactionKey && data.paymentKey) {
-      const paymentData = await TossPaymentsApi.getPaymentByOrderId(rest.order.orderCode);
+      const paymentData = await TossPaymentsApi.getPaymentByOrderCode(
+        rest.order.orderCode,
+      );
 
       if (paymentData.card) {
         card = paymentData.card;
@@ -293,6 +268,7 @@ export class RefundService {
 
     return {
       ...rest,
+      refundAccount: decryptedRefundAccount,
       items: refundItemList,
       card,
       virtualAccount,

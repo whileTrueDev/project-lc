@@ -172,8 +172,6 @@ CREATE TABLE `CartItem` (
     `customerId` INTEGER NULL,
     `tempUserId` VARCHAR(191) NULL,
     `goodsId` INTEGER NULL,
-    `shippingCost` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    `shippingCostIncluded` BOOLEAN NOT NULL DEFAULT false,
     `shippingGroupId` INTEGER NOT NULL,
     `channel` ENUM('liveShopping', 'productPromotion', 'normal') NOT NULL DEFAULT 'normal',
 
@@ -287,7 +285,6 @@ CREATE TABLE `Order` (
     `ordererEmail` VARCHAR(191) NOT NULL,
     `memo` VARCHAR(191) NOT NULL,
     `nonMemberOrderFlag` BOOLEAN NOT NULL DEFAULT false,
-    `nonMemberOrderPassword` VARCHAR(191) NULL,
     `giftFlag` BOOLEAN NOT NULL DEFAULT false,
     `supportOrderIncludeFlag` BOOLEAN NOT NULL DEFAULT false,
     `bundleFlag` BOOLEAN NOT NULL DEFAULT false,

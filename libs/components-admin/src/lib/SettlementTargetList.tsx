@@ -212,12 +212,6 @@ function SettlementItemInfoDialog({
         exportId: selectedSettleItem.id,
         orderId: selectedSettleItem.orderId,
         paymentMethod: selectedSettleItem.order.payment?.method || 'card',
-        shippingCost: selectedSettleItem.items.reduce(
-          (prev, curr) => prev + Number(curr.orderItem.shippingCost),
-          0,
-        ),
-        // TODO orderShipping 구성 이후 처리 필요
-        shippingId: 0,
         items: selectedSettleItem.items.map((item) => {
           let whiletrueCommissionRate: string | null;
           let broadcasterCommissionRate: string | null;
@@ -293,12 +287,6 @@ function SettlementItemInfoDialog({
         <ModalHeader>정산 대상 {selectedSettleItem.exportCode}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          {/* <Box>
-            배송비:{' '}
-            {selectedSettleItem.shippingCostAlreadyCalculated
-              ? '이미 다른출고에 의해 정산됨'
-              : selectedSettleItem.shipping_cost}
-          </Box> */}
           {selectedSettleItem.items.map((item) => (
             <SettlementItemOptionDetail
               key={item.id}

@@ -31,7 +31,9 @@ export class CustomerCouponService {
             email: true,
           },
         },
-        coupon: true,
+        coupon: {
+          include: { goods: { select: { id: true } } },
+        },
       },
     });
   }

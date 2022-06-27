@@ -71,15 +71,8 @@ export function GiftOrderPolicy(): JSX.Element {
       </ListItem>
       <ListItem>
         <Text>
-          선물시, 배송지를 입력하지 않아도 주문상품이 방송인에게 올바르게 배송 됩니다.
+          선물시, 배송지를 입력하지 않아도 주문상품이 방송인에게 올바르게 배송됩니다.
         </Text>
-      </ListItem>
-      <ListItem>
-        {/* // TODO: 문구 수정 */}
-        <Text>선물 주문을 취소할 수 있습니다.?</Text>
-      </ListItem>
-      <ListItem>
-        <Text>선물 주문은 주문 완료 이후 취소할 수 없습니다.?</Text>
       </ListItem>
     </UnorderedList>
   );

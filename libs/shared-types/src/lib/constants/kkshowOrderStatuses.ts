@@ -17,7 +17,11 @@ export interface KkshowOrderStatus {
     | '구매확정'
     | '결제취소'
     | '주문무효'
-    | '결제실패';
+    | '결제실패'
+    | '취소요청'
+    | '환불요청'
+    | '교환요청'
+    | '반품요청';
   chakraColor: string;
 }
 
@@ -38,7 +42,24 @@ export const kkshowOrderStatusNames = [
   '주문무효',
   '결제실패',
 ];
-export const kkshowOrderStatuses: Record<OrderProcessStep, KkshowOrderStatus> = {
+
+export const KkshowOrderCancelEnum = {
+  orderCancellations: 'orderCancellations' as const,
+  returns: 'returns' as const,
+  // refunds: 'refunds' as const,
+  exchanges: 'exchanges' as const,
+};
+
+export const KkshowOrderStatusExtended = Object.assign(
+  OrderProcessStep,
+  KkshowOrderCancelEnum,
+);
+
+export type KkshowOrderStatusExtendedType = keyof typeof KkshowOrderCancelEnum;
+
+export type KkshowOrderStatusExtended = OrderProcessStep | KkshowOrderStatusExtendedType;
+
+export const kkshowOrderStatuses: Record<KkshowOrderStatusExtended, KkshowOrderStatus> = {
   orderReceived: { name: '주문접수', chakraColor: 'yellow' },
   paymentConfirmed: { name: '결제확인', chakraColor: 'green' },
   goodsReady: { name: '상품준비', chakraColor: 'cyan' },
@@ -54,6 +75,11 @@ export const kkshowOrderStatuses: Record<OrderProcessStep, KkshowOrderStatus> = 
   paymentCanceled: { name: '결제취소', chakraColor: 'gray' },
   orderInvalidated: { name: '주문무효', chakraColor: 'gray' },
   paymentFailed: { name: '결제실패', chakraColor: 'gray' },
+  orderCancellations: { name: '취소요청', chakraColor: 'red' },
+  returns: { name: '반품요청', chakraColor: 'red' },
+  // 환불은 주문취소, 환불/재배송요청(=반품/교환요청)의 결과로 생기는 데이터입니다
+  // refunds: { name: '환불요청', chakraColor: 'red' },
+  exchanges: { name: '교환요청', chakraColor: 'red' },
 };
 
 /**

@@ -20,18 +20,12 @@ import {
 } from '@project-lc/shared-types';
 import { RefundService } from './refund.service';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
 @CacheClearKeys('refund')
 @Controller('refund')
 export class RefundController {
   constructor(private readonly refundService: RefundService) {}
-
-  /** 결제취소 테스트위해 결제데이터 필요하여 만들었음. // TODO: 프론트 작업시 삭제 */
-  @Post('fake-payment')
-  fakePayment(): Promise<any> {
-    return this.refundService.makeFakeOrderWithFakePayment();
-  }
 
   /** 환불데이터 생성 */
   @Post()

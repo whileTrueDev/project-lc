@@ -81,7 +81,6 @@ export type OrderBaseData = Order & {
   orderItems: OrderItemWithRelations[];
   payment?: Nullable<OrderPayment>;
   refunds: Nullable<Refund[]>;
-
   orderCancellations?: Nullable<OrderCancellationBaseData[]>;
   exports: Nullable<ExportBaseData[]>;
   mileageLogs: CustomerMileageLog[] | null;
@@ -206,4 +205,9 @@ export type AdminLiveShoppingGiftOrder = Order & {
     options: OrderItemOption[];
     goods: Omit<OriginGoods, 'image' | 'sellerId'>;
   })[];
+};
+
+/** 비회원 주문상세조회 타입 */
+export type NonMemberOrderDetailRes = {
+  order: OrderDetailRes;
 };

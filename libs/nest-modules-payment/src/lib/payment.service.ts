@@ -1,5 +1,10 @@
 import { HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { OrderPayment, PaymentMethod, VirtualAccountDepositStatus } from '@prisma/client';
+import {
+  Order,
+  OrderPayment,
+  PaymentMethod,
+  VirtualAccountDepositStatus,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreatePaymentRes,
@@ -63,9 +68,6 @@ export class PaymentService {
         depositDoneFlag: !!result.approvedAt,
         depositSecret: result.secret,
         depositor: result.virtualAccount?.customerName,
-        account: result.virtualAccount
-          ? `${result.virtualAccount.bank}_${result.virtualAccount.accountNumber}`
-          : null,
         depositDueDate: result.virtualAccount?.dueDate
           ? new Date(result.virtualAccount?.dueDate)
           : null,
@@ -83,9 +85,9 @@ export class PaymentService {
   }
 
   /** 주문번호별 결제내역 */
-  public async getPaymentByOrderCode(orderId: string): Promise<Payment> {
+  public async getPaymentByOrderCode(orderCode: Order['orderCode']): Promise<Payment> {
     try {
-      return TossPaymentsApi.getPaymentByOrderId(orderId);
+      return TossPaymentsApi.getPaymentByOrderCode(orderCode);
     } catch (error) {
       console.error(error.response);
       throw new HttpException(
@@ -140,8 +142,10 @@ export class PaymentService {
     } catch (error) {
       console.error(error.response);
       throw new HttpException(
-        error.response.message || 'error in requestCancelTossPayment',
-        error.response.status || 500,
+        error.response.message ||
+          error.response.data.message ||
+          'error in requestCancelTossPayment',
+        error.response.status || error.response.data.code || 500,
       );
     }
   }

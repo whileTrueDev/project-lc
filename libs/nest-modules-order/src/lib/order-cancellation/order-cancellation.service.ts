@@ -1,10 +1,11 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   OrderCancellation,
   OrderProcessStep,
   Prisma,
   ProcessStatus,
 } from '@prisma/client';
+import { CipherService } from '@project-lc/nest-modules-cipher';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderCancellationDto,
@@ -13,7 +14,6 @@ import {
   GetOrderCancellationListDto,
   OrderCancellationDetailRes,
   OrderCancellationListRes,
-  OrderCancellationRemoveRes,
   OrderCancellationUpdateRes,
   UpdateOrderCancellationStatusDto,
 } from '@project-lc/shared-types';
@@ -21,7 +21,10 @@ import { nanoid } from 'nanoid';
 
 @Injectable()
 export class OrderCancellationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cipherService: CipherService,
+  ) {}
 
   /* 주문취소 생성(소비자가 주문취소 요청 생성) */
   async createOrderCancellation(
@@ -71,28 +74,41 @@ export class OrderCancellationService {
 
     // 주문취소요청이 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
     if (status === 'complete') {
-      await this.updateOrderStateToCancel(orderId, 'paymentCanceled');
+      await this.updateOrderStateAfterOrderCancelApproved(orderId);
     }
     return data;
   }
 
-  /** 주문의 상태를 주문무효 로 변경(주문취소요청이 처리완료(승인)되었을 때 사용)
+  /** 주문취소요청이 처리완료(승인) 후 주문의 상태 변경
+   * 주문접수 상태에서 승인시 => 주문무효
+   * 결제확인 상태에서 승인시 => 결제취소
    */
-  private async updateOrderStateToCancel(
-    orderId: number,
-    cancelType: 'orderInvalidated' | 'paymentCanceled',
-  ): Promise<void> {
-    // 주문 상태 주문무효로 변경
-    await this.prisma.order.update({
+  private async updateOrderStateAfterOrderCancelApproved(orderId: number): Promise<void> {
+    const originOrder = await this.prisma.order.findUnique({
       where: { id: orderId },
-      data: { step: cancelType },
+      select: { step: true },
     });
 
-    // 주문상품옵션 상태 주문무효로 변경
-    await this.prisma.orderItemOption.updateMany({
-      where: { orderItem: { orderId } },
-      data: { step: cancelType },
-    });
+    if (originOrder) {
+      let targetState: OrderProcessStep;
+      if (originOrder.step === 'orderReceived') {
+        targetState = 'orderInvalidated';
+      }
+
+      if (originOrder.step === 'paymentConfirmed') {
+        targetState = 'paymentCanceled';
+      }
+
+      await this.prisma.$transaction([
+        // 주문 상태 변경
+        this.prisma.order.update({ where: { id: orderId }, data: { step: targetState } }),
+        // 주문상품옵션 상태 변경
+        this.prisma.orderItemOption.updateMany({
+          where: { orderItem: { orderId } },
+          data: { step: targetState },
+        }),
+      ]);
+    }
   }
 
   /* 주문취소 내역 조회 */
@@ -123,7 +139,14 @@ export class OrderCancellationService {
       skip,
       orderBy: { requestDate: 'desc' },
       include: {
-        order: { select: { orderCode: true, id: true } },
+        order: {
+          select: {
+            orderCode: true,
+            id: true,
+            payment: { select: { depositDoneFlag: true } },
+            paymentPrice: true,
+          },
+        },
         refund: true,
         items: {
           include: {
@@ -148,7 +171,7 @@ export class OrderCancellationService {
 
     // 조회한 데이터를 필요한 형태로 처리 -> 프론트 작업시 필요한 형태로 수정필요
     const list = data.map((d) => {
-      const { items, ...rest } = d;
+      const { items, refund, ...rest } = d;
 
       const _items = items.map((i) => ({
         id: i.id, // 주문취소상품 고유번호
@@ -164,7 +187,18 @@ export class OrderCancellationService {
         orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
       }));
 
-      return { ...rest, items: _items };
+      const _refund = refund
+        ? {
+            ...refund,
+            refundAccount: this.cipherService.getDecryptedText(refund.refundAccount), // 환불계좌정보 복호화
+          }
+        : undefined;
+
+      return {
+        ...rest,
+        items: _items,
+        refund: _refund,
+      };
     });
 
     const nextCursor = dto.skip + dto.take;
@@ -203,7 +237,7 @@ export class OrderCancellationService {
 
     // 주문취소요청이 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
     if (orderCancellation.status === 'complete') {
-      await this.updateOrderStateToCancel(orderCancellation.orderId, 'paymentCanceled');
+      await this.updateOrderStateAfterOrderCancelApproved(orderCancellation.orderId);
     }
 
     return orderCancellation;
@@ -224,22 +258,6 @@ export class OrderCancellationService {
     return orderCancellation;
   }
 
-  /* 주문취소 삭제(소비자가 자신이 요청했던 주문취소 철회 - 처리진행되기 이전에만 가능) */
-  async deleteOrderCancellation(id: number): Promise<OrderCancellationRemoveRes> {
-    const orderCancellation = await this.findOneOrderCancellation({ id });
-
-    // 주문취소 처리상태 확인
-    if (orderCancellation.status !== 'requested') {
-      throw new ForbiddenException(`상태가 '요청됨'인 주문취소만 삭제할 수 있습니다`);
-    }
-
-    const data = await this.prisma.orderCancellation.delete({
-      where: { id },
-    });
-
-    return !!data;
-  }
-
   /** 주문취소 상세조회
    */
   async getOrderCancellationDetail({
@@ -250,7 +268,14 @@ export class OrderCancellationService {
     const orderCancel = await this.prisma.orderCancellation.findUnique({
       where: { cancelCode },
       include: {
-        order: { select: { orderCode: true, id: true } },
+        order: {
+          select: {
+            orderCode: true,
+            id: true,
+            payment: { select: { depositDoneFlag: true } },
+            paymentPrice: true,
+          },
+        },
         refund: true,
         items: {
           include: {
@@ -273,7 +298,7 @@ export class OrderCancellationService {
       },
     });
 
-    const { items, ...rest } = orderCancel;
+    const { items, refund, ...rest } = orderCancel;
 
     const _items = items.map((i) => ({
       id: i.id, // 주문취소상품 고유번호
@@ -289,9 +314,17 @@ export class OrderCancellationService {
       orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
     }));
 
+    const _refund = refund
+      ? {
+          ...refund,
+          refundAccount: this.cipherService.getDecryptedText(refund.refundAccount), // 환불계좌정보 복호화
+        }
+      : undefined;
+
     return {
       ...rest,
       items: _items,
+      refund: _refund,
     };
   }
 }

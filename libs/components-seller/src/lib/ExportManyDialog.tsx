@@ -122,8 +122,6 @@ export function ExportManyDialog({
     await exportAll({ exportOrders: dto });
   }
 
-  console.log(selectedOrders);
-
   return (
     <Modal
       isOpen={isOpen}
@@ -170,6 +168,7 @@ export function ExportManyDialog({
               ml={2}
               colorScheme="pink"
               type="submit"
+              isLoading={formMethods.formState.isSubmitting || exportOrders.isLoading}
               isDisabled={selectedOrderShippings.length === 0}
             >
               일괄출고처리

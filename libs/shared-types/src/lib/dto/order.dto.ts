@@ -26,6 +26,10 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import {
+  KkshowOrderStatusExtended,
+  KkshowOrderCancelEnum,
+} from '../constants/kkshowOrderStatuses';
 
 // ------------------생성 dto--------------------
 
@@ -133,12 +137,6 @@ export class CreateOrderDto {
   @IsBoolean()
   @IsOptional()
   nonMemberOrderFlag?: Order['nonMemberOrderFlag'];
-
-  /** 비회원 주문인 경우 입력받는 비밀번호 - 비회원이 주문조회, 취소시 사용할예정, 비회원주문인경우에만 validate */
-  @ValidateIf((o) => o.nonMemberOrderFlag)
-  @IsOptional()
-  @IsString()
-  nonMemberOrderPassword?: Order['nonMemberOrderPassword'];
 
   /** 주문금액 = 실제 주문 상품/상품옵션 의 금액 합 */
   @IsNumber()
@@ -256,6 +254,8 @@ export type CreateOrderForm = CreateOrderDto & {
   recipientPhone3?: string;
 };
 
+// export type OrderProcessStepExtended = OrderProcessStep & KkshowOrderCancelEnum;
+
 // ------------------조회 dto--------------------
 /** 주문 목록 조회 dto */
 export class GetOrderListDto {
@@ -321,6 +321,10 @@ export class GetOrderListDto {
   @IsEnum(OrderProcessStep, { each: true })
   searchStatuses?: OrderProcessStep[];
 
+  @IsOptional()
+  @IsEnum(KkshowOrderStatusExtended, { each: true })
+  searchExtendedStatus?: KkshowOrderStatusExtended[];
+
   /** 앱타입 - "customer"인 경우 받는사람 정보 삭제하고 리턴한다 */
   @IsOptional()
   @IsString()
@@ -336,9 +340,9 @@ export class GetNonMemberOrderDetailDto {
   @IsString()
   orderCode: string;
 
-  /** 비회원주문 비밀번호 */
+  /** 주문자명 */
   @IsString()
-  password: string;
+  ordererName: string;
 }
 
 /** 내보내기 위한 주문상세 여러개 조회 dto */
@@ -396,11 +400,6 @@ export class UpdateOrderDto {
   @IsBoolean()
   @IsOptional()
   nonMemberOrderFlag?: Order['nonMemberOrderFlag'];
-
-  /** 비회원 주문인 경우 입력받는 비밀번호 - 비회원이 주문조회, 취소시 사용할예정, 비회원주문인경우에만 validate */
-  @IsString()
-  @IsOptional()
-  nonMemberOrderPassword?: Order['nonMemberOrderPassword'];
 
   /** 주문금액 = 실제 주문 상품/상품옵션 의 금액 합 */
   @IsNumber()
