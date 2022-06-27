@@ -68,7 +68,7 @@ export function OrderItemActionButtons({
       disabled: false,
     },
     {
-      label: cancelDataIncludingThisOrderItem ? '주문 취소' : '취소정보조회',
+      label: !cancelDataIncludingThisOrderItem ? '주문 취소' : '취소정보조회',
       onClick: () => {
         if (!cancelDataIncludingThisOrderItem) {
           orderCancelDialog.onOpen();
@@ -79,7 +79,9 @@ export function OrderItemActionButtons({
           );
         }
       },
-      display: orderCancellationAbleSteps.includes(step), // 상품준비 이전에만 표시
+      display:
+        orderCancellationAbleSteps.includes(step) || //  // 상품준비 이전에만 표시
+        step === 'paymentCanceled', // 실제 신청은불가, 정보를 보여주는 버튼을 위해
       disabled: false,
     },
     {

@@ -95,7 +95,7 @@ export const dummyPayments: OrderPayment[] = [
   },
   {
     id: 8,
-    method: 'card',
+    method: 'virtualAccount',
     orderId: 1,
     paymentKey: '20220613154618378F9hUFA',
     depositDate: new Date(),

@@ -1,8 +1,10 @@
 import {
   CreateOrderCancellationDto,
   CreateOrderCancellationRes,
+  OrderCancellationListRes,
   OrderCancellationRemoveRes,
   OrderCancellationUpdateRes,
+  OrderListRes,
   UpdateOrderCancellationStatusDto,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
@@ -41,13 +43,28 @@ export const useCustomerOrderCancelMutation = (
         .post<CreateOrderCancellationRes>('order/cancellation', dto)
         .then((res) => res.data),
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY, {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries<OrderListRes>(INFINITE_ORDER_LIST_QUERY_KEY, {
           refetchInactive: true,
+          refetchPage: (_lastPage, idx, pages) => {
+            const targetPageIdx = pages.findIndex(
+              (page) => page.orders.findIndex((order) => order.id === data.orderId) > -1,
+            );
+            return idx === targetPageIdx;
+          },
         });
-        queryClient.invalidateQueries(INFINITE_ORDER_CANCEL_LIST_QUERY_KEY, {
-          refetchInactive: true,
-        });
+        queryClient.invalidateQueries<OrderCancellationListRes>(
+          INFINITE_ORDER_CANCEL_LIST_QUERY_KEY,
+          {
+            refetchInactive: true,
+            refetchPage: (_lastPage, idx, pages) => {
+              const targetPageIdx = pages.findIndex(
+                (page) => page.list.findIndex((cancel) => cancel.id === data.id) > -1,
+              );
+              return idx === targetPageIdx;
+            },
+          },
+        );
       },
       ...options,
     },

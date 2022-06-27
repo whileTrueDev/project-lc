@@ -1,5 +1,10 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
-import { OrderCancellation, Prisma, ProcessStatus } from '@prisma/client';
+import {
+  OrderCancellation,
+  OrderProcessStep,
+  Prisma,
+  ProcessStatus,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderCancellationDto,
@@ -66,28 +71,27 @@ export class OrderCancellationService {
 
     // 주문취소요청이 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
     if (status === 'complete') {
-      await this.updateOrderStateToOrderInvalidated(orderId);
+      await this.updateOrderStateToCancel(orderId, 'paymentCanceled');
     }
     return data;
   }
 
   /** 주문의 상태를 주문무효 로 변경(주문취소요청이 처리완료(승인)되었을 때 사용)
    */
-  private async updateOrderStateToOrderInvalidated(orderId: number): Promise<void> {
+  private async updateOrderStateToCancel(
+    orderId: number,
+    cancelType: 'orderInvalidated' | 'paymentCanceled',
+  ): Promise<void> {
     // 주문 상태 주문무효로 변경
     await this.prisma.order.update({
       where: { id: orderId },
-      data: {
-        step: 'orderInvalidated',
-      },
+      data: { step: cancelType },
     });
 
     // 주문상품옵션 상태 주문무효로 변경
     await this.prisma.orderItemOption.updateMany({
       where: { orderItem: { orderId } },
-      data: {
-        step: 'orderInvalidated',
-      },
+      data: { step: cancelType },
     });
   }
 
@@ -199,7 +203,7 @@ export class OrderCancellationService {
 
     // 주문취소요청이 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
     if (orderCancellation.status === 'complete') {
-      await this.updateOrderStateToOrderInvalidated(orderCancellation.orderId);
+      await this.updateOrderStateToCancel(orderCancellation.orderId, 'paymentCanceled');
     }
 
     return orderCancellation;

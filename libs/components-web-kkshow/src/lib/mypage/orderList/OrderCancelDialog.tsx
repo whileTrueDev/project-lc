@@ -148,11 +148,12 @@ export function OrderCancelDialog({
             </Box>
           </Box>
 
-          {orderDetailData.payment?.method === 'virtualAccount' && (
-            <FormProvider {...formMethods}>
-              <RefundAccountForm />
-            </FormProvider>
-          )}
+          {orderDetailData.payment?.method === 'virtualAccount' &&
+            orderDetailData.step === 'paymentConfirmed' && (
+              <FormProvider {...formMethods}>
+                <RefundAccountForm />
+              </FormProvider>
+            )}
         </Stack>
       ) : (
         <Center>

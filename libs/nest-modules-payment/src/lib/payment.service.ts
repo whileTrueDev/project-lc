@@ -1,10 +1,5 @@
 import { HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import {
-  OrderPayment,
-  PaymentMethod,
-  Prisma,
-  VirtualAccountDepositStatus,
-} from '@prisma/client';
+import { OrderPayment, PaymentMethod, VirtualAccountDepositStatus } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreatePaymentRes,
@@ -15,6 +10,7 @@ import {
   TossPaymentCancelDto,
 } from '@project-lc/shared-types';
 import { PaymentsByDateRequestType, TossPaymentsApi } from '@project-lc/utils';
+import { PaymentCancelDto } from './IPaymentCancelKeyMap';
 
 @Injectable()
 export class PaymentService {
@@ -150,11 +146,3 @@ export class PaymentService {
     }
   }
 }
-/** Payment프로바이더별 DTO 맵 { TossPayments:{ ...TossDto }, NaverPay: { ...NaverDto} } */
-type IPaymentCancelKeyMap = Record<
-  KKsPaymentProviders.TossPayments,
-  TossPaymentCancelDto
-> &
-  Record<KKsPaymentProviders.NaverPay, { dtoExampleField: unknown }>;
-/** Payment프로바이더별 결제 취소 DTO */
-type PaymentCancelDto<T extends KKsPaymentProviders> = IPaymentCancelKeyMap[T];
