@@ -922,15 +922,21 @@ socket.on('get virtual character audio from server', async () => {
 socket.on('get chicken move from server', async () => {
   $('.chicken-move').css({ display: 'flex' });
   chickenMovement();
-  await setTimeout(() => {
+  setTimeout(() => {
     $('.chicken-move').hide();
   }, 15000);
 });
 
-// socket.on('reset theme from server', () => {
-//   $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').removeClass(
-//     currentThemeType,
-//   );
-// });
+socket.on('get news message from server', (data) => {
+  $('.news-banner p').html(
+    `<span>${data}</span> 
+    `,
+  );
+  $('.news-banner').show();
+
+  setTimeout(() => {
+    $('.news-banner').hide();
+  }, 5000);
+});
 
 export {};

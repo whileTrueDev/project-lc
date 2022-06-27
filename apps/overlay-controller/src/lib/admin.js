@@ -519,6 +519,14 @@ $(document).ready(function ready() {
     });
   });
 
+  $('#news-message-button').click(function resetCombo() {
+    let message = $('#news-message').val();
+    if (message.length > 23) {
+      message = `${message.slice(0, 21)}`;
+    }
+    socket.emit('news message from admin', { roomName, message });
+  });
+
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
 
