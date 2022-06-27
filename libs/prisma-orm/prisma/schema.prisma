@@ -1617,6 +1617,7 @@ model OrderPayment {
   depositSecret   String? // 가상계좌 웹훅 요청이 정상적인 요청인지 검증하기 위한 값입니다. 이 값이 가상계좌 웹훅 이벤트 본문으로 돌아온 secret과 같으면 정상적인 요청입니다.
   depositDueDate  DateTime? // 입금기한
   depositDoneFlag Boolean       @default(false) // 입금완료여부
+  account         String? // 주문자가 결제한 금액이 입금될 계좌정보 
 }
 
 // [enum] 결제수단

@@ -25,6 +25,7 @@ export class PaymentService {
     depositSecret?: string;
     depositDueDate?: Date;
     depositDoneFlag: boolean;
+    account?: string;
   }): Promise<OrderPayment> {
     let paymentMethod: PaymentMethod = PaymentMethod.card;
     if (dto.method === '카드') {
