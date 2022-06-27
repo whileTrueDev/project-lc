@@ -58,9 +58,6 @@ export class PaymentService {
         depositDoneFlag: !!result.approvedAt,
         depositSecret: result.secret,
         depositor: result.virtualAccount?.customerName,
-        account: result.virtualAccount
-          ? `${result.virtualAccount.bank}_${result.virtualAccount.accountNumber}`
-          : null,
         depositDueDate: result.virtualAccount?.dueDate
           ? new Date(result.virtualAccount?.dueDate)
           : null,
