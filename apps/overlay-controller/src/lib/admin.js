@@ -509,6 +509,24 @@ $(document).ready(function ready() {
     socket.emit('combo reset from admin', roomName);
   });
 
+  $('.logout-button').click(function logout() {
+    $.ajax({
+      type: 'POST',
+      url: `http://localhost:3333/auth/logout`,
+      success(data) {
+        window.location.replace('/login');
+      },
+    });
+  });
+
+  $('#news-message-button').click(function resetCombo() {
+    let message = $('#news-message').val();
+    if (message.length > 23) {
+      message = `${message.slice(0, 21)}`;
+    }
+    socket.emit('news message from admin', { roomName, message });
+  });
+
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
 

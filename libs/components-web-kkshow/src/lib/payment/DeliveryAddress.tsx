@@ -120,7 +120,6 @@ export function DeliveryAddress(): JSX.Element {
   const postalCode = watch('recipientPostalCode');
   useEffect(() => {
     if (address) {
-      console.log('address change');
       const params = {
         address,
         postalCode,

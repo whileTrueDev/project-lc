@@ -36,6 +36,7 @@ import {
   useCartShippingGroups,
   useCartTruncateMutation,
   useIsThisGoodsNowOnLive,
+  useProductPromotions,
 } from '@project-lc/hooks';
 import { CartItemRes } from '@project-lc/shared-types';
 import { useCartStore } from '@project-lc/stores';
@@ -321,6 +322,12 @@ export function CartItemDisplay({
     cartItem.goods.id,
     cartItem.support?.broadcasterId || undefined,
   );
+  // 각 상품의 상품홍보 정보
+  const pp = useProductPromotions({ goodsIds: [cartItem.goods.id] });
+  const nowAvailablePp = useMemo(
+    () => pp.data?.some((p) => p.broadcasterId === cartItem.support.broadcasterId),
+    [cartItem.support.broadcasterId, pp.data],
+  );
 
   return (
     <>
@@ -357,7 +364,7 @@ export function CartItemDisplay({
               <CartTableRowOption key={opt.id} index={idx} option={opt} />
             ))}
 
-            {cartItem.support && cartItem.support.broadcaster && (
+            {nowAvailablePp && cartItem.support && cartItem.support.broadcaster && (
               <Flex alignItems="center" gap={1} color="GrayText">
                 <Badge>후원방송인</Badge>
                 <Avatar

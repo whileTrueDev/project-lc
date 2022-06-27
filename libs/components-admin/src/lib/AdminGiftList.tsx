@@ -6,6 +6,7 @@ import TooltipedText from '@project-lc/components-core/TooltipedText';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { useAdminLiveShoppingGiftOrderList, useDisplaySize } from '@project-lc/hooks';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
+import { getAdminHost } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
@@ -117,11 +118,10 @@ export function AdminGiftList(props: {
     return data;
   }, [data]);
 
-  // 퍼스트몰 주문정보로 이동하기
-  // TODO: 크크쇼 주문정보로 이동하기 -> [관리자] 주문 및 결제조회 일감 진행 후
+  // 크크쇼 주문정보로 이동(새창)
   const handleRowClick = (param: GridRowParams): void => {
-    if (param.row?.order_seq) {
-      const url = `http://whiletrue.firstmall.kr/admin/order/view?query_string=&no=${param.row?.order_seq}`;
+    if (param.row.id) {
+      const url = `${getAdminHost()}/order/list/${param.row.id}`;
       window.open(url, '_blank');
     }
   };

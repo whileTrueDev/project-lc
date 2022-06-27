@@ -32,6 +32,9 @@
     </script>
   </head>
   <body>
+    <div style='width:100%;display:flex;justify-content:flex-end'>
+      <button class='logout-button' style='background-color:red'>로그아웃</button>
+    </div>
     <div class='upper-area'>
       <div class='search-box'>
         <table class='display compact' id='liveshopping-table'>
@@ -572,6 +575,12 @@
           <button id='fever-message-button' style='background-color:red;'>피버메세지 전송</button>
           <button id='bottom-message-button' style='background-color:gray;'>하단메세지
             전송</button>
+        </div>
+        <div class='news-message-box'>
+          <input type='text' id='news-message' style='width:40%' maxlength='22' />
+          <button id='news-message-button' style='background-color:green;'>뉴스 메세지
+            전송</button>
+          <p>최대 22자까지 입력가능</p>
         </div>
         <h2>
           테마선택

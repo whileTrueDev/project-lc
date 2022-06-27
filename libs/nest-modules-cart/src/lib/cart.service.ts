@@ -106,44 +106,6 @@ export class CartService {
         );
         return alreadyInserted;
       }
-
-      // * 동일 '판매자'의 상품에 대해 배송비 0원 처리
-      const sellerIds = [...new Set(items.map((x) => x.goods.seller.id))];
-      // 배송비 0원 처리를 위해 카드 등록 요청한 goods의 정보와 배송정책 정보를 조회
-      const goods = await this.prisma.goods.findFirst({
-        where: { id: dto.goodsId, sellerId: { in: sellerIds } },
-        include: {
-          ShippingGroup: {
-            include: { shippingSets: { include: { shippingOptions: true } } },
-          },
-        },
-      });
-
-      // 카트에 현재 등록 요청한 상품의 판매자의 상품이 없는 경우
-      if (!goods) {
-        // 기본 카트 상품 등록 (배송비 포함)
-        return this.prisma.cartItem.create({ data: cartItemData });
-      }
-
-      // 이미 카트에 들어있는 상품 중, 현재 요청한 카트 상품의 판매자와 동일한 판매자의 상품이 있는 경우
-      if (goods) {
-        const shippingOpts = goods.ShippingGroup.shippingSets.map(
-          (x) => x.shippingOptions,
-        );
-        const shippingOptsSetTypes = flatten(shippingOpts).map(
-          (x) => x.shipping_set_type,
-        );
-        // 배송정책 타입이 'add' 인 경우에는 배송비 추가 처리
-        if (shippingOptsSetTypes.filter((x) => x === 'add').length > 0) {
-          return this.prisma.cartItem.create({ data: cartItemData });
-        }
-
-        // 그렇지 않은 경우 0원 처리
-        // 배송비 0원 처리
-        return this.prisma.cartItem.create({
-          data: { ...cartItemData, shippingCost: 0, shippingCostIncluded: true },
-        });
-      }
     }
     // 최초 카트 상품 등록 시
     return this.prisma.cartItem.create({ data: cartItemData });

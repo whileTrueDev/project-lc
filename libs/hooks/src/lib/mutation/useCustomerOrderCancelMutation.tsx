@@ -71,32 +71,6 @@ export const useCustomerOrderCancelMutation = (
   );
 };
 
-/** 소비자 주문취소 삭제 뮤테이션 훅 */
-export const useDeleteCustomerOrderCancel = (): UseMutationResult<
-  OrderCancellationRemoveRes,
-  AxiosError,
-  number
-> => {
-  const queryClient = useQueryClient();
-
-  return useMutation<OrderCancellationRemoveRes, AxiosError, number>(
-    (orderCancellationId: number) =>
-      axios
-        .delete<OrderCancellationRemoveRes>(`order/cancellation/${orderCancellationId}`)
-        .then((res) => res.data),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY, {
-          refetchInactive: true,
-        });
-        queryClient.invalidateQueries(INFINITE_ORDER_CANCEL_LIST_QUERY_KEY, {
-          refetchInactive: true,
-        });
-      },
-    },
-  );
-};
-
 /** 주문취소 상태 업데이트 훅 */
 export type OrderCancelMutationDto = {
   orderCancelId: number;

@@ -8,7 +8,12 @@ import {
   Get,
 } from '@nestjs/common';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
-import { Payment, PaymentRequestDto, CreatePaymentRes } from '@project-lc/shared-types';
+import {
+  Payment,
+  PaymentRequestDto,
+  CreatePaymentRes,
+  GetPaymentByOrderCodeDto,
+} from '@project-lc/shared-types';
 import { PaymentService } from './payment.service';
 
 @Controller('payment')
@@ -25,7 +30,9 @@ export class PaymentController {
   }
 
   @Get('/:orderCode')
-  async getPaymentByOrderCode(@Param('orderCode') orderCode: string): Promise<Payment> {
+  async getPaymentByOrderCode(
+    @Param(ValidationPipe) { orderCode }: GetPaymentByOrderCodeDto,
+  ): Promise<Payment> {
     return this.paymentService.getPaymentByOrderCode(orderCode);
   }
 }

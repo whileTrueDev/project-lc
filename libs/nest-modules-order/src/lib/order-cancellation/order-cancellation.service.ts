@@ -123,7 +123,7 @@ export class OrderCancellationService {
       skip,
       orderBy: { requestDate: 'desc' },
       include: {
-        order: { select: { orderCode: true, id: true } },
+        order: { select: { orderCode: true, id: true, paymentPrice: true } },
         refund: true,
         items: {
           include: {
@@ -224,22 +224,6 @@ export class OrderCancellationService {
     return orderCancellation;
   }
 
-  /* 주문취소 삭제(소비자가 자신이 요청했던 주문취소 철회 - 처리진행되기 이전에만 가능) */
-  async deleteOrderCancellation(id: number): Promise<OrderCancellationRemoveRes> {
-    const orderCancellation = await this.findOneOrderCancellation({ id });
-
-    // 주문취소 처리상태 확인
-    if (orderCancellation.status !== 'requested') {
-      throw new ForbiddenException(`상태가 '요청됨'인 주문취소만 삭제할 수 있습니다`);
-    }
-
-    const data = await this.prisma.orderCancellation.delete({
-      where: { id },
-    });
-
-    return !!data;
-  }
-
   /** 주문취소 상세조회
    */
   async getOrderCancellationDetail({
@@ -250,7 +234,7 @@ export class OrderCancellationService {
     const orderCancel = await this.prisma.orderCancellation.findUnique({
       where: { cancelCode },
       include: {
-        order: { select: { orderCode: true, id: true } },
+        order: { select: { orderCode: true, id: true, paymentPrice: true } },
         refund: true,
         items: {
           include: {

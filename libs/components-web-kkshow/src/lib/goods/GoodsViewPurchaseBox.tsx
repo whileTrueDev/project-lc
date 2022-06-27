@@ -12,6 +12,7 @@ import {
   Button,
   ButtonGroup,
   Collapse,
+  ExpandedIndex,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -50,7 +51,7 @@ import {
 import { useGoodsViewStore, useKkshowOrderStore } from '@project-lc/stores';
 import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GoGift } from 'react-icons/go';
 import shallow from 'zustand/shallow';
 import OptionQuantity from '../OptionQuantity';
@@ -196,6 +197,12 @@ function GoodsViewBroadcasterSupportBox({
     }, []);
   }, [goods.LiveShopping, goods.productPromotion]);
 
+  // 방송인 선택 아코디언 여닫기 상태
+  const [accordionIndex, setAccordionIndex] = useState<ExpandedIndex>([]);
+  const handleAccordionIndexChange = (ei: ExpandedIndex): void => {
+    setAccordionIndex(ei);
+  };
+
   // 방송인 페이지로부터 접속시 기본값 처리
   const router = useRouter();
   const bcFromPromotionPage = router.query.bc as string;
@@ -204,7 +211,10 @@ function GoodsViewBroadcasterSupportBox({
       const broadcaster = relatedBroadcasters.find(
         (b) => b.id === Number(bcFromPromotionPage),
       );
-      if (broadcaster) handleSelectBc(broadcaster);
+      if (broadcaster) {
+        handleSelectBc(broadcaster);
+        handleAccordionIndexChange([0]); // 아코디언 열기
+      }
     }
   }, [bcFromPromotionPage, handleSelectBc, relatedBroadcasters]);
 
@@ -213,7 +223,7 @@ function GoodsViewBroadcasterSupportBox({
 
   if (relatedBroadcasters.length === 0) return null;
   return (
-    <Accordion allowToggle>
+    <Accordion allowToggle index={accordionIndex} onChange={handleAccordionIndexChange}>
       <AccordionItem>
         <AccordionButton px={0}>
           <Flex justify="space-between" w="100%">
@@ -474,11 +484,18 @@ function GoodsViewButtonSet({
   ]);
 
   const orderPrepare = useKkshowOrderStore((s) => s.handleOrderPrepare);
+  const setShopNames = useKkshowOrderStore((s) => s.setShopNames);
   // 주문 클릭시
   const handleOrderClick = useCallback(
     (type: 'gift' | 'instant-order' = 'instant-order'): void => {
       if (!executePurchaseCheck()) return;
       const isGiftOrder = type === 'gift';
+
+      // 상점명 저장
+      const shopName = goods.seller.sellerShop?.shopName || '';
+      setShopNames([shopName]);
+
+      // 주문정보 저장
       orderPrepare({
         orderPrice: totalInfo.price,
         giftFlag: !!isGiftOrder, // 선물주문플래그
@@ -520,13 +537,15 @@ function GoodsViewButtonSet({
     },
     [
       executePurchaseCheck,
+      goods.seller.sellerShop?.shopName,
+      goods.goods_name,
+      goods.id,
+      goods.shippingGroupId,
+      setShopNames,
       orderPrepare,
       totalInfo.price,
       selectedBc,
       profile.data?.id,
-      goods.goods_name,
-      goods.id,
-      goods.shippingGroupId,
       selectedOpts,
       sellType,
       supportMessage,

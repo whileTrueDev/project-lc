@@ -1,4 +1,10 @@
-import { CreateOrderForm, ShippingCostByShippingGroupId } from '@project-lc/shared-types';
+import {
+  CreateOrderForm,
+  ShippingCostByShippingGroupId,
+  FindKkshowOrderDto,
+  OrderFilterFormType,
+} from '@project-lc/shared-types';
+import { GridRowId, GridSelectionModel } from '@material-ui/data-grid';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -44,6 +50,11 @@ export interface KkshowOrderStore {
   shipping: OrderShippingData;
   resetShippingData: () => void;
   setShippingData: (data: OrderShippingData) => void;
+
+  // *** 상점명 저장(주문서에 포함된 모든 판매자 업체명)
+  shopNames: string[];
+  resetShopNames: () => void;
+  setShopNames: (data: string[]) => void;
 }
 
 export const KKSHOW_ORDER_STORAGE_KEY = 'K_OR_STRG';
@@ -70,9 +81,9 @@ export const useKkshowOrderStore = create<KkshowOrderStore>(
       resetOrder: () => set({ order: orderNeedToFillInDefault }),
       /** 상품상세페이지or장바구니 -> 바로구매 주문페이지 이동 처리 */
       handleOrderPrepare: (orderPrepareData: OrderPrepareData) => {
-        set(({ order: prevOrderData }) => ({
+        set(() => ({
           order: {
-            ...prevOrderData,
+            ...orderNeedToFillInDefault, // 초기화 후 주문정보 저장
             ...orderPrepareData,
           },
         }));
@@ -84,7 +95,46 @@ export const useKkshowOrderStore = create<KkshowOrderStore>(
       setShippingData: (data: OrderShippingData) => {
         set({ shipping: data });
       },
+
+      // *** 상점명 저장(주문서에 포함된 모든 판매자 업체명)
+      shopNames: [],
+      resetShopNames: () => set({ shopNames: [] }),
+      setShopNames: (data: string[]) => {
+        set({ shopNames: data });
+      },
     }),
-    { name: KKSHOW_ORDER_STORAGE_KEY }, // 로컬스토리지 키값(고유식별값)
+    // 로컬스토리지 키값(고유식별값)
+    { name: KKSHOW_ORDER_STORAGE_KEY },
   ),
+);
+
+export interface KkshowOrderSearchStoreState extends FindKkshowOrderDto {
+  handleOrderSearchStates(dto: OrderFilterFormType): void;
+  selectedOrders: GridRowId[];
+  handleOrderSelected: (s: GridSelectionModel) => void;
+}
+export const useKkshowOrderSearchStore = create<KkshowOrderSearchStoreState>(
+  (set, get) => ({
+    search: '',
+    searchDateType: '주문일',
+    searchStartDate: null,
+    searchEndDate: null,
+    searchStatuses: [],
+    searchExtendedStatuses: [],
+    handleOrderSearchStates(dto: OrderFilterFormType) {
+      set({
+        search: dto.search,
+        searchDateType: dto.searchDateType,
+        searchStartDate: dto.searchStartDate || undefined,
+        searchEndDate: dto.searchEndDate || undefined,
+        searchStatuses: dto.searchStatuses,
+        searchExtendedStatuses: dto.searchExtendedStatuses,
+      });
+    },
+
+    selectedOrders: [],
+    handleOrderSelected(s: GridSelectionModel) {
+      set({ selectedOrders: s });
+    },
+  }),
 );
