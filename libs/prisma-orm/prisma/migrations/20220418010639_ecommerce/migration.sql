@@ -172,8 +172,6 @@ CREATE TABLE `CartItem` (
     `customerId` INTEGER NULL,
     `tempUserId` VARCHAR(191) NULL,
     `goodsId` INTEGER NULL,
-    `shippingCost` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    `shippingCostIncluded` BOOLEAN NOT NULL DEFAULT false,
     `shippingGroupId` INTEGER NOT NULL,
     `channel` ENUM('liveShopping', 'productPromotion', 'normal') NOT NULL DEFAULT 'normal',
 

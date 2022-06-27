@@ -14,7 +14,7 @@ import {
   AdminSettlementInfoType,
   GoodsConfirmationDto,
   GoodsRejectionDto,
-  LiveShoppingDTO,
+  LiveShoppingUpdateDTO,
   LiveShoppingImageDto,
 } from '@project-lc/shared-types';
 
@@ -200,7 +200,7 @@ export class AdminService {
   }
 
   public async updateLiveShoppings(
-    dto: LiveShoppingDTO,
+    dto: LiveShoppingUpdateDTO,
     videoId?: number | null,
   ): Promise<boolean> {
     const liveShoppingUpdate = await this.prisma.liveShopping.update({

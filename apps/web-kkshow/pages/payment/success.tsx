@@ -55,7 +55,8 @@ export function Success(): JSX.Element {
   const paymentKey = router.query.paymentKey as string;
   const redirectAmount = Number(router.query.amount as string);
 
-  const { order, shipping, resetOrder, resetShippingData } = useKkshowOrderStore();
+  const { order, shipping, resetOrder, resetShippingData, resetShopNames } =
+    useKkshowOrderStore();
 
   const { mutateAsync } = usePaymentMutation();
 
@@ -112,6 +113,7 @@ export function Success(): JSX.Element {
               // 주문스토어 주문,배송비정보 리셋
               resetOrder();
               resetShippingData();
+              resetShopNames();
 
               // 주문완료페이지로 이동
               const orderId = res.id;

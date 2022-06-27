@@ -50,8 +50,6 @@ export class ExecuteSettlementDto {
   @IsNumber() exportId: SellerSettlements['exportId'];
   @IsString() exportCode: SellerSettlements['exportCode'];
   @IsNumber() orderId: Order['id'];
-  @IsDefined() shippingCost: SellerSettlements['shippingCost'] | number | string;
-  @IsNumber() shippingId: OrderShipping['id'];
   @IsDateString() startDate: SellerSettlements['startDate'];
   @IsDateString() doneDate: SellerSettlements['doneDate'];
   @IsString() buyer: SellerSettlements['buyer'];

@@ -11,7 +11,7 @@ export const usePaymentByOrderCode = (
   orderCode: string,
 ): UseQueryResult<Payment, AxiosError> => {
   return useQuery<Payment, AxiosError>(
-    'getPaymentByOrderId',
+    ['getPaymentByOrderCode', { orderCode }],
     () => getPaymentByOrderCode(orderCode),
     { enabled: !!orderCode },
   );

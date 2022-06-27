@@ -40,11 +40,11 @@ export function GoodsDetailInfo({ goods }: GoodsDetailInfoProps): JSX.Element {
 
       <Box>
         <Text fontWeight="bold">카테고리</Text>
-        <Text>
+        <Box>
           {goods.categories.map((category) => (
             <Text key={category.id}>{category.name}</Text>
           ))}
-        </Text>
+        </Box>
       </Box>
 
       {goods.informationNotice && (

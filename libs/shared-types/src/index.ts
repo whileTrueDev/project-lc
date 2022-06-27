@@ -88,7 +88,6 @@ export * from './lib/dto/orderCancellation.dto';
 export * from './lib/dto/orderItem.dto';
 export * from './lib/dto/pagination.dto';
 export * from './lib/dto/passwordValidate.dto';
-export * from './lib/dto/paymentPage.dto';
 export * from './lib/dto/paymentRequest.dto';
 export * from './lib/dto/policy.dto';
 export * from './lib/dto/post.dto';

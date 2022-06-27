@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { OrderCancellation, Prisma, ProcessStatus } from '@prisma/client';
 import { CipherService } from '@project-lc/nest-modules-cipher';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -9,7 +9,6 @@ import {
   GetOrderCancellationListDto,
   OrderCancellationDetailRes,
   OrderCancellationListRes,
-  OrderCancellationRemoveRes,
   OrderCancellationUpdateRes,
   UpdateOrderCancellationStatusDto,
 } from '@project-lc/shared-types';
@@ -124,6 +123,7 @@ export class OrderCancellationService {
             orderCode: true,
             id: true,
             payment: { select: { depositDoneFlag: true } },
+            paymentPrice: true,
           },
         },
         refund: true,
@@ -237,22 +237,6 @@ export class OrderCancellationService {
     return orderCancellation;
   }
 
-  /* 주문취소 삭제(소비자가 자신이 요청했던 주문취소 철회 - 처리진행되기 이전에만 가능) */
-  async deleteOrderCancellation(id: number): Promise<OrderCancellationRemoveRes> {
-    const orderCancellation = await this.findOneOrderCancellation({ id });
-
-    // 주문취소 처리상태 확인
-    if (orderCancellation.status !== 'requested') {
-      throw new ForbiddenException(`상태가 '요청됨'인 주문취소만 삭제할 수 있습니다`);
-    }
-
-    const data = await this.prisma.orderCancellation.delete({
-      where: { id },
-    });
-
-    return !!data;
-  }
-
   /** 주문취소 상세조회
    */
   async getOrderCancellationDetail({
@@ -268,6 +252,7 @@ export class OrderCancellationService {
             orderCode: true,
             id: true,
             payment: { select: { depositDoneFlag: true } },
+            paymentPrice: true,
           },
         },
         refund: true,

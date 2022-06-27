@@ -52,6 +52,7 @@ export type OrderCancellationData = Omit<OrderCancellation, 'items'> & {
     payment?: {
       depositDoneFlag: boolean;
     };
+    paymentPrice: Order['paymentPrice'];
   };
   items: OrderCancellationItemData[];
 };

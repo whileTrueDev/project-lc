@@ -21,7 +21,6 @@ export function CartActions(): JSX.Element {
   const { data } = useCart();
   const selectedItems = useCartStore((s) => s.selectedItems);
   const calculated = useCartCalculatedMetrics();
-
   const goodsIds = data?.map((cartItem) => cartItem.goodsId as number) || undefined;
   // 각 상품의 라이브쇼핑 정보
   const ls = useLiveShoppingNowOnLive({ goodsIds });
@@ -104,10 +103,16 @@ export function CartActions(): JSX.Element {
   );
   // 배송그룹별 선택된 카트아이템 Record<배송그룹id, 선택된 카트상품id[]>
   // 배송그룹별 표시될 배송비(selectedItems, 배송그룹정보) => 배송비 Record<배송그룹id, 부과되는 배송비 정보(기본, 추가)>
-  const { groupedSelectedItems, totalShippingCostObjectById } = useCartShippingGroups();
+  const {
+    groupedSelectedItems,
+    totalShippingCostObjectById,
+    shippingGroupIdList,
+    shippingGroupWithShopNameObject,
+  } = useCartShippingGroups();
 
   const orderPrepare = useKkshowOrderStore((s) => s.handleOrderPrepare);
   const setShippingData = useKkshowOrderStore((s) => s.setShippingData);
+  const setShopNames = useKkshowOrderStore((s) => s.setShopNames);
   // 주문 클릭시
   const handleOrderClick = useCallback((): void => {
     if (!data) return;
@@ -130,6 +135,12 @@ export function CartActions(): JSX.Element {
       };
     });
     setShippingData(shippingData);
+
+    // 상점명 저장
+    const shopNames = shippingGroupIdList.map((shippingGroupId) => {
+      return shippingGroupWithShopNameObject[shippingGroupId].shopName || '';
+    });
+    setShopNames(shopNames);
 
     // kkshowOrderStore에 주문정보 저장
     orderPrepare({
@@ -198,6 +209,9 @@ export function CartActions(): JSX.Element {
     selectedItems,
     setShippingData,
     totalShippingCostObjectById,
+    setShopNames,
+    shippingGroupIdList,
+    shippingGroupWithShopNameObject,
   ]);
 
   return (
