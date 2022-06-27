@@ -484,11 +484,18 @@ function GoodsViewButtonSet({
   ]);
 
   const orderPrepare = useKkshowOrderStore((s) => s.handleOrderPrepare);
+  const setShopNames = useKkshowOrderStore((s) => s.setShopNames);
   // 주문 클릭시
   const handleOrderClick = useCallback(
     (type: 'gift' | 'instant-order' = 'instant-order'): void => {
       if (!executePurchaseCheck()) return;
       const isGiftOrder = type === 'gift';
+
+      // 상점명 저장
+      const shopName = goods.seller.sellerShop?.shopName || '';
+      setShopNames([shopName]);
+
+      // 주문정보 저장
       orderPrepare({
         orderPrice: totalInfo.price,
         giftFlag: !!isGiftOrder, // 선물주문플래그
@@ -530,13 +537,15 @@ function GoodsViewButtonSet({
     },
     [
       executePurchaseCheck,
+      goods.seller.sellerShop?.shopName,
+      goods.goods_name,
+      goods.id,
+      goods.shippingGroupId,
+      setShopNames,
       orderPrepare,
       totalInfo.price,
       selectedBc,
       profile.data?.id,
-      goods.goods_name,
-      goods.id,
-      goods.shippingGroupId,
       selectedOpts,
       sellType,
       supportMessage,

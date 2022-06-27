@@ -31,7 +31,7 @@ export class LiveShoppingService {
         requests: dto.requests,
         desiredPeriod: dto.desiredPeriod,
         desiredCommission: dto.desiredCommission || '0.00',
-        goods: { connect: { id: dto.goods_id } },
+        goods: { connect: { id: dto.goodsId } },
         sellerContacts: { connect: { id: dto.contactId } },
       },
     });

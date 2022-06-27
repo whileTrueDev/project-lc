@@ -65,11 +65,12 @@ import {
   EmailDupCheckDto,
   ExecuteSettlementDto,
   FindBcSettlementHistoriesRes,
+  FindLiveShoppingDto,
   FindManyDto,
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
-  LiveShoppingDTO,
+  LiveShoppingUpdateDTO,
   LiveShoppingImageDto,
   OrderCancelRequestDetailRes,
   OrderCancelRequestList,
@@ -247,8 +248,10 @@ export class AdminController {
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/live-shoppings')
-  getLiveShoppings(): Promise<LiveShopping[]> {
-    return this.liveShoppingService.findLiveShoppings();
+  getLiveShoppings(
+    @Query(new ValidationPipe({ transform: true })) dto: FindLiveShoppingDto,
+  ): Promise<LiveShopping[]> {
+    return this.liveShoppingService.findLiveShoppings(dto);
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
@@ -257,7 +260,7 @@ export class AdminController {
   @CacheClearKeys('live-shoppings')
   @Patch('/live-shopping')
   async updateLiveShoppings(
-    @Body() data: { dto: LiveShoppingDTO; videoUrlExist?: boolean },
+    @Body() data: { dto: LiveShoppingUpdateDTO; videoUrlExist?: boolean },
   ): Promise<boolean> {
     let videoId;
     if (data.dto.videoUrl) {
