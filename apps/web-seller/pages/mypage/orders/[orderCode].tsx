@@ -158,7 +158,7 @@ export function OrderDetail(): JSX.Element {
           <SectionWithTitle title={exchangeSectionTitle}>
             {order.data.exchanges.map((exchangeData) => (
               <Box key={exchangeData.exchangeCode} mt={6} pb={4}>
-                <OrderDetailExchangeInfo exchangeData={exchangeData} />
+                <OrderDetailExchangeInfo exchangeData={exchangeData} order={order.data} />
               </Box>
             ))}
           </SectionWithTitle>
