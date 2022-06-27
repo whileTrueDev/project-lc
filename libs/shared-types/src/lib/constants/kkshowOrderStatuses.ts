@@ -46,7 +46,7 @@ export const kkshowOrderStatusNames = [
 export const KkshowOrderCancelEnum = {
   orderCancellations: 'orderCancellations' as const,
   returns: 'returns' as const,
-  refunds: 'refunds' as const,
+  // refunds: 'refunds' as const,
   exchanges: 'exchanges' as const,
 };
 
@@ -77,7 +77,8 @@ export const kkshowOrderStatuses: Record<KkshowOrderStatusExtended, KkshowOrderS
   paymentFailed: { name: '결제실패', chakraColor: 'gray' },
   orderCancellations: { name: '취소요청', chakraColor: 'red' },
   returns: { name: '반품요청', chakraColor: 'red' },
-  refunds: { name: '환불요청', chakraColor: 'red' },
+  // 환불은 주문취소, 환불/재배송요청(=반품/교환요청)의 결과로 생기는 데이터입니다
+  // refunds: { name: '환불요청', chakraColor: 'red' },
   exchanges: { name: '교환요청', chakraColor: 'red' },
 };
 

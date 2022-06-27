@@ -5,6 +5,7 @@ import {
   Prisma,
   ProcessStatus,
 } from '@prisma/client';
+import { CipherService } from '@project-lc/nest-modules-cipher';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderCancellationDto,
@@ -20,7 +21,10 @@ import { nanoid } from 'nanoid';
 
 @Injectable()
 export class OrderCancellationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cipherService: CipherService,
+  ) {}
 
   /* 주문취소 생성(소비자가 주문취소 요청 생성) */
   async createOrderCancellation(
@@ -135,7 +139,14 @@ export class OrderCancellationService {
       skip,
       orderBy: { requestDate: 'desc' },
       include: {
-        order: { select: { orderCode: true, id: true, paymentPrice: true } },
+        order: {
+          select: {
+            orderCode: true,
+            id: true,
+            payment: { select: { depositDoneFlag: true } },
+            paymentPrice: true,
+          },
+        },
         refund: true,
         items: {
           include: {
@@ -160,7 +171,7 @@ export class OrderCancellationService {
 
     // 조회한 데이터를 필요한 형태로 처리 -> 프론트 작업시 필요한 형태로 수정필요
     const list = data.map((d) => {
-      const { items, ...rest } = d;
+      const { items, refund, ...rest } = d;
 
       const _items = items.map((i) => ({
         id: i.id, // 주문취소상품 고유번호
@@ -176,7 +187,18 @@ export class OrderCancellationService {
         orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
       }));
 
-      return { ...rest, items: _items };
+      const _refund = refund
+        ? {
+            ...refund,
+            refundAccount: this.cipherService.getDecryptedText(refund.refundAccount), // 환불계좌정보 복호화
+          }
+        : undefined;
+
+      return {
+        ...rest,
+        items: _items,
+        refund: _refund,
+      };
     });
 
     const nextCursor = dto.skip + dto.take;
@@ -246,7 +268,14 @@ export class OrderCancellationService {
     const orderCancel = await this.prisma.orderCancellation.findUnique({
       where: { cancelCode },
       include: {
-        order: { select: { orderCode: true, id: true, paymentPrice: true } },
+        order: {
+          select: {
+            orderCode: true,
+            id: true,
+            payment: { select: { depositDoneFlag: true } },
+            paymentPrice: true,
+          },
+        },
         refund: true,
         items: {
           include: {
@@ -269,7 +298,7 @@ export class OrderCancellationService {
       },
     });
 
-    const { items, ...rest } = orderCancel;
+    const { items, refund, ...rest } = orderCancel;
 
     const _items = items.map((i) => ({
       id: i.id, // 주문취소상품 고유번호
@@ -285,9 +314,17 @@ export class OrderCancellationService {
       orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
     }));
 
+    const _refund = refund
+      ? {
+          ...refund,
+          refundAccount: this.cipherService.getDecryptedText(refund.refundAccount), // 환불계좌정보 복호화
+        }
+      : undefined;
+
     return {
       ...rest,
       items: _items,
+      refund: _refund,
     };
   }
 }

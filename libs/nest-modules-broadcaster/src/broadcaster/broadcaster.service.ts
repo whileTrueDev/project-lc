@@ -131,7 +131,7 @@ export class BroadcasterService {
         overlayUrl: `/${dto.email}`,
       },
     });
-    return broadcaster;
+    return new BroadcasterRes(broadcaster); // for password serialization
   }
 
   /**

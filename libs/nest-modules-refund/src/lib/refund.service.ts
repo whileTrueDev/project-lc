@@ -164,6 +164,7 @@ export class RefundService {
 
     const refundResults = data.map((d) => ({
       ...d,
+      // 환불계좌정보 복호화
       refundAccount: this.cipherService.getDecryptedText(d.refundAccount),
     }));
 
@@ -226,6 +227,10 @@ export class RefundService {
 
     const { items, refundAccount, ...rest } = data;
 
+    // * 환불받을 계좌정보
+    const decryptedRefundAccount = this.cipherService.getDecryptedText(refundAccount); // 환불계좌정보 복호화
+
+    // * 환불상품 정보
     const refundItemList = items.map((item) => {
       const { orderItem, orderItemOption } = item;
       const { goods, ...orderItemRest } = orderItem;
@@ -240,6 +245,7 @@ export class RefundService {
       };
     });
 
+    // * 토스페이먼츠 결제정보
     let card: PaymentCard | undefined; // 카드로 결제하면 제공되는 카드 관련 정보입니다.
     let virtualAccount: PaymentVirtualAccount | undefined; // 가상계좌로 결제하면 제공되는 가상계좌 관련 정보입니다.
     let transfer: PaymentTransfer | undefined; // 계좌이체로 결제했을 때 이체 정보가 담기는 객체입니다.
@@ -262,7 +268,7 @@ export class RefundService {
 
     return {
       ...rest,
-      refundAccount: this.cipherService.getDecryptedText(refundAccount),
+      refundAccount: decryptedRefundAccount,
       items: refundItemList,
       card,
       virtualAccount,
