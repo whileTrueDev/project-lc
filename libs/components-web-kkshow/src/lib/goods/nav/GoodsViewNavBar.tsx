@@ -26,7 +26,7 @@ export function GoodsViewNavBar(): JSX.Element {
         <Flex gap={2} alignItems="center">
           <IconButton
             rounded="full"
-            variant="ghost"
+            variant="unstyled"
             aria-label="back-button"
             onClick={() => router.back()}
             icon={<ChevronLeftIcon fontSize="xl" />}
