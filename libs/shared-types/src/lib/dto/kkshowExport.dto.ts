@@ -6,9 +6,17 @@
  * 크크쇼 스키마에 fm_order_shipping(주문과 연결된 배송비정책??)과 대응되는 테이블이 없어 추가하지 않음
  */
 
-import { Order, Seller } from '@prisma/client';
+import { Exchange, Order, Seller } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsArray, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateIf,
+  ValidateNested,
+} from 'class-validator';
 import { DefaultPaginationDto } from './pagination.dto';
 
 /** 출고상품 생성 dto */
@@ -50,6 +58,17 @@ export class CreateKkshowExportDto {
   @IsOptional()
   /** 출고 진행한 판매자 고유번호 */
   sellerId?: Seller['id'];
+
+  @IsOptional()
+  @IsBoolean()
+  /** 재배송 요청에 의한 출고인지 여부 */
+  exchangeExportedFlag?: boolean;
+
+  @ValidateIf((d) => !!d.exchangeExportedFlag) // 재배송요청에 의한 출고인 경우에만 확인
+  @IsOptional()
+  @IsNumber()
+  /** 재배송(교환)요청 고유번호 - 재출고와 연결하기 위함 */
+  exchangeId?: Exchange['id'];
 }
 
 /** 크크쇼 일괄출고처리, 합포장처리 dto */

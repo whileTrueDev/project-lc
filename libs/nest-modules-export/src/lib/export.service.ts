@@ -55,6 +55,8 @@ export class ExportService {
             amount: item.amount,
           })),
         },
+        exchangeExportedFlag: Boolean(dto.exchangeExportedFlag),
+        exchange: dto.exchangeId ? { connect: { id: dto.exchangeId } } : undefined, //  재출고인경우(재배송요청에 대한 출고) 재배송요청과 출고데이터 연결
       },
     });
   }
@@ -150,7 +152,12 @@ export class ExportService {
     const exportCode = this.generateExportCode({ type: 'normal' });
 
     /** 출고처리 (Export, ExportItem 테이블에 데이터 생성) */
-    await this.createExportRecord({ dto, exportCode, bundleExportCode });
+    const exportRecord = await this.createExportRecord({
+      dto,
+      exportCode,
+      bundleExportCode,
+    });
+
     /** 재고차감 */
     await this.updateGoodsSupplies(dto);
     /** 주문상품옵션의 상태변경 -> 주문상태변경보다 먼저 진행 */

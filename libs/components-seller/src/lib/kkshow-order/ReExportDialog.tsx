@@ -1,53 +1,44 @@
 import {
   Alert,
   AlertIcon,
+  AlertTitle,
+  Box,
   Button,
+  FormControl,
+  FormErrorMessage,
+  HStack,
+  Image,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
   ModalProps,
-  useDisclosure,
-  useToast,
-  Text,
-  HStack,
-  Stack,
-  Box,
-  FormControl,
-  FormErrorMessage,
-  Input,
   Select,
-  useColorModeValue,
-  Image,
+  Stack,
   Table,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
+  useColorModeValue,
+  useToast,
 } from '@chakra-ui/react';
 import TextDotConnector from '@project-lc/components-core/TextDotConnector';
-import {
-  checkShippingCanExport,
-  checkShippingExportIsDone,
-  useExportOrderMutation,
-  useOrderExportableCheck,
-  useProfile,
-} from '@project-lc/hooks';
+import { useExportOrderMutation, useProfile } from '@project-lc/hooks';
 import {
   CreateKkshowExportDto,
   ExchangeDataWithImages,
   OrderDetailRes,
 } from '@project-lc/shared-types';
-import { sellerExportStore } from '@project-lc/stores';
+import { deliveryCompanies } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { deliveryCompanies, getLocaleNumber } from '@project-lc/utils-frontend';
-import ExportOrderOptionList from '../ExportOrderOptionList';
 
 type ReExportData = CreateKkshowExportDto;
 
@@ -64,8 +55,6 @@ export function ReExportDialog({
   order,
   exchangeData,
 }: ReExportDialogProps): JSX.Element {
-  // 이미 출고가 끝난 주문인 지 체크
-  const { isDone } = useOrderExportableCheck(order);
   const { data: profileData } = useProfile();
   const submitBtnVariant = useColorModeValue('solid', 'outline');
 
@@ -84,9 +73,7 @@ export function ReExportDialog({
   const {
     register,
     formState: { errors },
-    trigger,
   } = formMethods;
-  const exportOrder = useExportOrderMutation();
 
   const onExportSuccess = useCallback(() => {
     toast({ status: 'success', description: '출고 처리가 성공적으로 완료되었습니다.' });
@@ -104,32 +91,15 @@ export function ReExportDialog({
     [toast],
   );
 
-  /** 개별 출고 처리 */
-  const onExportOneOrder = useCallback(async () => {
-    const isValid = true;
-    if (isValid) {
-      const dto = formMethods.getValues();
-      const result = await trigger();
-      console.log(dto, result);
-      // const realDto = { ...dto, items: dto.items.filter((x) => !!x.amount) };
-      // // 보낼 수량이 0개 인지 체크
-      // if (realDto.items.every((o) => Number(o.amount) === 0)) {
-      //   toast({
-      //     status: 'warning',
-      //     description:
-      //       '모든 주문상품의 보낼 수량이 0 입니다. 보낼 수량을 올바르게 입력해주세요.',
-      //   });
-      // } else {
-      //   // 출고 처리 API 요청
-      //   exportOrder.mutateAsync(realDto).then(onExportSuccess).catch(onExportFail);
-      // }
-    }
-  }, [formMethods, trigger]);
+  const exportOrder = useExportOrderMutation();
 
-  const processReExport = (): void => {
-    const dto = formMethods.getValues();
-    console.log(dto, exchangeData.exchangeItems);
-    console.log('재출고버튼 클릭');
+  const processReExport = (data: ReExportData): void => {
+    const dto = {
+      ...data,
+      exchangeExportedFlag: true, // 재출고 처리
+      exchangeId: exchangeData.id, // 재출고와 연결할 교환요청 고유번호
+    };
+    exportOrder.mutateAsync(dto).then(onExportSuccess).catch(onExportFail);
   };
 
   const orderItemOptions = order.orderItems.flatMap((item) => item.options);
@@ -144,7 +114,7 @@ export function ReExportDialog({
     >
       <ModalOverlay />
       <FormProvider {...formMethods}>
-        <ModalContent as="form">
+        <ModalContent as="form" onSubmit={formMethods.handleSubmit(processReExport)}>
           <ModalHeader>{order.orderCode} 재배송 요청에 대한 출고 처리</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -158,17 +128,17 @@ export function ReExportDialog({
                 <Table>
                   <Thead>
                     <Tr>
+                      {/* 이미지 */}
                       <Th />
                       <Th>상품명</Th>
                       <Th>옵션</Th>
                       <Th>요청수량</Th>
-                      <Th>보낼수량</Th>
                     </Tr>
                   </Thead>
 
                   <Tbody>
                     {/* 재배송 요청 상품 */}
-                    {exchangeData.exchangeItems.map((exchangeItem, index) => {
+                    {exchangeData.exchangeItems.map((exchangeItem) => {
                       const orderItem = order.orderItems.find(
                         (oi) => oi.id === exchangeItem.orderItemId,
                       );
@@ -203,30 +173,6 @@ export function ReExportDialog({
                           <Td>
                             <Text>{exchangeItem.amount} 개 </Text>
                           </Td>
-
-                          <Td>
-                            <FormControl
-                              isInvalid={!!(errors.items && errors.items[index]?.amount)}
-                            >
-                              <Input
-                                {...register(`items.${index}.amount`, {
-                                  required: '보낼 수량을 입력해주세요.',
-                                  valueAsNumber: true,
-                                  min: { value: 0, message: '0보다 작을 수 없습니다.' },
-                                  max: {
-                                    value: exchangeItem.amount,
-                                    message: '요청 수량 보다 클 수 없습니다.',
-                                  },
-                                })}
-                                w="60px"
-                              />
-                              <FormErrorMessage fontSize="xs">
-                                {errors.items &&
-                                  errors.items[index]?.amount &&
-                                  errors.items[index]?.amount?.message}
-                              </FormErrorMessage>
-                            </FormControl>
-                          </Td>
                         </Tr>
                       );
                     })}
@@ -241,7 +187,7 @@ export function ReExportDialog({
                   <FormControl isInvalid={!!errors.deliveryCompany}>
                     <Select
                       {...register(`deliveryCompany`, {
-                        // required: { message: '택배사를 선택하세요.' },
+                        required: '택배사를 선택하세요',
                       })}
                       placeholder="택배사 선택"
                     >
@@ -260,7 +206,7 @@ export function ReExportDialog({
                   <FormControl isInvalid={!!errors.deliveryNumber}>
                     <Input
                       {...register(`deliveryNumber`, {
-                        // required: { message: '송장번호를 입력하세요.' },
+                        required: '송장번호를 입력하세요.',
                       })}
                       placeholder="송장번호"
                     />
@@ -274,16 +220,19 @@ export function ReExportDialog({
                     variant={submitBtnVariant}
                     colorScheme="pink"
                     size="sm"
-                    onClick={() => {
-                      processReExport();
-                    }}
-                    // type="submit"
+                    type="submit"
                   >
                     출고처리
                   </Button>
                 </Stack>
               </Box>
             </Stack>
+            <Alert status="info" mt={4}>
+              <AlertIcon />
+              <AlertTitle mr={2}>
+                출고처리 후 교환(재배송) 상태를 &quot;완료&quot;로 변경해주세요!
+              </AlertTitle>
+            </Alert>
           </ModalBody>
         </ModalContent>
       </FormProvider>
@@ -293,7 +242,10 @@ export function ReExportDialog({
 
 export default ReExportDialog;
 
-/** 재배송요청 정보 중 재출고시 필요한 정보 - 주소& 배송메모는 재배송 요청시 받은 정보 표시, 나머지는 원래 주문시 기입했던 정보 표시 */
+/** 재배송요청 정보 중 재출고시 필요한 정보
+ * - 주소& 배송메모는 재배송 요청시 받은 정보 표시
+ * - 나머지는 원래 주문시 기입했던 정보 표시
+ * */
 function ExchangeRequestSummary({
   exchangeData,
   order,
@@ -312,7 +264,8 @@ function ExchangeRequestSummary({
       </HStack>
       <HStack>
         <Text fontSize="sm">
-          {exchangeData.recipientAddress} {exchangeData.recipientDetailAddress || ''}
+          {exchangeData.recipientAddress} {exchangeData.recipientDetailAddress || ''} (
+          {exchangeData.recipientPostalCode})
         </Text>
         <Text fontSize="sm">
           {order.recipientName} {order.recipientPhone}
@@ -320,7 +273,7 @@ function ExchangeRequestSummary({
       </HStack>
       {exchangeData.memo && (
         <HStack>
-          <Text fontSize="sm">(배송메시지) {exchangeData.memo}</Text>
+          <Text fontSize="sm">(배송메시지) {exchangeData.recipientShippingMemo}</Text>
         </HStack>
       )}
     </Stack>
