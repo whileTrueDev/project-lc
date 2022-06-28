@@ -1,4 +1,4 @@
-import { CheckCircleIcon, DeleteIcon, Icon } from '@chakra-ui/icons';
+import { CheckCircleIcon, DeleteIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   Badge,
@@ -43,7 +43,6 @@ import { useCartStore } from '@project-lc/stores';
 import { getCartKey, getLocaleNumber } from '@project-lc/utils-frontend';
 import NextLink from 'next/link';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { MdOutlineShoppingCart } from 'react-icons/md';
 import shallow from 'zustand/shallow';
 import OptionQuantity from '../OptionQuantity';
 
@@ -92,8 +91,7 @@ export function CartTable(): JSX.Element {
   if (!isLoading && (!data || (data && data.length === 0)))
     return (
       <Center>
-        <Box my={12} textAlign="center">
-          <Icon as={MdOutlineShoppingCart} width={20} height={20} color="GrayText" />
+        <Box my={24} textAlign="center">
           <Text fontSize={{ base: 'md', lg: 'lg' }} whiteSpace="break-spaces">
             {`아직 장바구니에 담은 상품이 없습니다.\n상품을 추가해보세요.`}
           </Text>

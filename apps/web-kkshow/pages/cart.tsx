@@ -9,11 +9,13 @@ export function Cart(): JSX.Element {
   return (
     <Box overflow="hidden" position="relative">
       <KkshowLayout>
-        <CartLayout>
-          <CartTable />
-          <CartSummary />
-          <CartActions />
-        </CartLayout>
+        <Box minH="65vh">
+          <CartLayout>
+            <CartTable />
+            <CartSummary />
+            <CartActions />
+          </CartLayout>
+        </Box>
       </KkshowLayout>
     </Box>
   );
