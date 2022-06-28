@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 import { QuickMenuLink } from '@project-lc/components-constants/quickMenu';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
-import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
+import { useDisplaySize, useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { AiOutlineSetting } from 'react-icons/ai';
 import { FaMoon, FaSun } from 'react-icons/fa';
@@ -101,7 +101,7 @@ export function PersonalPopoverMenu({
   const router = useRouter();
   const { logout } = useLogout();
   const { data: profileData } = useProfile();
-
+  const { isMobileSize } = useDisplaySize();
   const { colorMode, toggleColorMode } = useColorMode();
   const SwitchIcon = useColorModeValue(FaMoon, FaSun);
 
@@ -139,7 +139,7 @@ export function PersonalPopoverMenu({
                 my={1}
                 icon={<SwitchIcon />}
                 onClick={toggleColorMode}
-                closeOnSelect={false}
+                closeOnSelect={!!isMobileSize}
               >
                 {colorMode === 'light' ? '다크모드' : '라이트모드'}
               </MenuItem>
