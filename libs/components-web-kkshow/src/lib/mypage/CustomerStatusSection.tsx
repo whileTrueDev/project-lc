@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Stack,
   Stat,
@@ -8,6 +7,7 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { AvatarChangeButton } from '@project-lc/components-shared/AvatarChangeButton';
 import { useCustomerStatus, useProfile } from '@project-lc/hooks';
 
 interface CustomerStatusSectionProps {
@@ -36,7 +36,7 @@ export function CustomerStatusSection({
       display={{ base: mobileVisibility ? 'flex' : 'none', md: 'flex' }}
     >
       <Box textAlign="center">
-        <Avatar src={profileData?.avatar || ''} size="lg" />
+        <AvatarChangeButton />
         <Box mt={2}>
           <Text fontWeight="bold" fontSize={{ base: 'lg', md: 'xl' }}>
             {profileData?.name} 님
