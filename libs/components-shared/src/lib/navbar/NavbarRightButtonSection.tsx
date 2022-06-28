@@ -107,55 +107,59 @@ export function PersonalPopoverMenu({
 
   return (
     <Menu>
-      <MenuButton as={Avatar} size="sm" cursor="pointer" src={profileData?.avatar} />
+      {({ onClose }) => (
+        <>
+          <MenuButton as={Avatar} size="sm" cursor="pointer" src={profileData?.avatar} />
 
-      <Portal>
-        <MenuList w={{ base: 280, sm: 300 }} zIndex="popover">
-          {/* 프로필 표시 */}
-          <Box p={3}>
-            <ProfileBox allowAvatarChange />
-          </Box>
-          <Divider />
+          <Portal>
+            <MenuList w={{ base: 280, sm: 300 }} zIndex="popover">
+              {/* 프로필 표시 */}
+              <Box p={3}>
+                <ProfileBox allowAvatarChange onAvatarChangeButtonClick={onClose} />
+              </Box>
+              <Divider />
 
-          {menuItems.map((menuItem) => (
-            <MenuItem
-              key={menuItem.name}
-              my={1}
-              icon={<Icon fontSize="md" as={menuItem.icon} />}
-              onClick={() => {
-                if (menuItem.type === 'link' && !!menuItem.href) {
-                  router.push(menuItem.href);
-                }
-              }}
-            >
-              {menuItem.name}
-            </MenuItem>
-          ))}
+              {menuItems.map((menuItem) => (
+                <MenuItem
+                  key={menuItem.name}
+                  my={1}
+                  icon={<Icon fontSize="md" as={menuItem.icon} />}
+                  onClick={() => {
+                    if (menuItem.type === 'link' && !!menuItem.href) {
+                      router.push(menuItem.href);
+                    }
+                  }}
+                >
+                  {menuItem.name}
+                </MenuItem>
+              ))}
 
-          {/* 다크모드 버튼 */}
-          <MenuItem
-            my={1}
-            icon={<SwitchIcon />}
-            onClick={toggleColorMode}
-            closeOnSelect={false}
-          >
-            {colorMode === 'light' ? '다크모드' : '라이트모드'}
-          </MenuItem>
+              {/* 다크모드 버튼 */}
+              <MenuItem
+                my={1}
+                icon={<SwitchIcon />}
+                onClick={toggleColorMode}
+                closeOnSelect={false}
+              >
+                {colorMode === 'light' ? '다크모드' : '라이트모드'}
+              </MenuItem>
 
-          {/* 알림버튼 - 기존 알림버튼 누를시 팝오버로 알림을 표시했음. 별도 알림페이지 존재하지 않음
+              {/* 알림버튼 - 기존 알림버튼 누를시 팝오버로 알림을 표시했음. 별도 알림페이지 존재하지 않음
         알림을 메뉴에 포함시켰을 때 알림목록 표시할 방법이 떠오르지 않아 개인메뉴에 포함시키지 않음
         */}
 
-          {/* 로그아웃 버튼 */}
-          <MenuItem
-            my={1}
-            icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
-            onClick={logout}
-          >
-            로그아웃
-          </MenuItem>
-        </MenuList>
-      </Portal>
+              {/* 로그아웃 버튼 */}
+              <MenuItem
+                my={1}
+                icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
+                onClick={logout}
+              >
+                로그아웃
+              </MenuItem>
+            </MenuList>
+          </Portal>
+        </>
+      )}
     </Menu>
   );
 }

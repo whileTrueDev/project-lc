@@ -31,7 +31,10 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 import { getCroppedImage } from '@project-lc/utils-frontend';
 
-export function AvatarChangeButton(): JSX.Element {
+interface AvatarChangeButtonProps {
+  onClick?: () => void;
+}
+export function AvatarChangeButton({ onClick }: AvatarChangeButtonProps): JSX.Element {
   const { data: profileData } = useProfile();
   const avatarDialog = useDisclosure();
   const confirmDialog = useDisclosure();
@@ -130,6 +133,11 @@ export function AvatarChangeButton(): JSX.Element {
     removeAvatar.mutateAsync().then(resetSuccessHandler).catch(resetErrorHandler);
   };
 
+  const handleClick = (): void => {
+    avatarDialog.onOpen();
+    if (onClick) onClick();
+  };
+
   return (
     <>
       <Button
@@ -137,7 +145,7 @@ export function AvatarChangeButton(): JSX.Element {
         variant="unstyled"
         cursor="pointer"
         position="relative"
-        onClick={avatarDialog.onOpen}
+        onClick={handleClick}
         onMouseEnter={() => setBackdropShow(true)}
         onMouseLeave={() => setBackdropShow(false)}
       >
@@ -153,7 +161,7 @@ export function AvatarChangeButton(): JSX.Element {
       </Button>
 
       {/* 프로필 사진 변경하기 다이얼로그 */}
-      <Modal isOpen={avatarDialog.isOpen} onClose={avatarDialog.onClose}>
+      <Modal isOpen={avatarDialog.isOpen} onClose={avatarDialog.onClose} isCentered>
         <ModalOverlay />
         <ModalContent as="form" encType="multipart/form-data">
           <ModalHeader>프로필 사진 변경하기</ModalHeader>
