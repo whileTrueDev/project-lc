@@ -14,9 +14,17 @@ export class ShutdownManager {
   /** 애플리케이션 종료 핸들러 */
   async shutdown(): Promise<void> {
     Logger.log(`Shutdown triggered.`, this.logContext);
-    await this.queue.clean(process.uptime()).then((value) => {
-      if (value.length > 0) Logger.log(`Queue cleaned.`, this.logContext);
-    });
+    // Queue Cleaning - 현재(220628 올바르게 작동하지 않음.) 향후 수정필요
+    // const uptime = Math.floor(process.uptime() * 1000); // seconds to milliseconds
+    // await this.queue
+    //   .clean(uptime)
+    //   .then((value) => {
+    //     if (value.length > 0) Logger.log(`Queue cleaned.`, this.logContext);
+    //   })
+    //   .catch((err) => {
+    //     Logger.warn(`Error occurred during cleaning queue`, this.logContext);
+    //     console.log(err);
+    //   });
     return this.shutdownListeners.next();
   }
 

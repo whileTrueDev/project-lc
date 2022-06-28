@@ -28,4 +28,10 @@ async function bootstrap(): Promise<void> {
   await appStarter.start();
 }
 
-bootstrap();
+bootstrap().catch((err) => {
+  Logger.error('Error occured. process will be terminated', 'GlobalErrorHandler');
+  console.error(err);
+
+  // 에러 발생으로 인해  알림 추가할 수 있을 것.
+  process.exit(1);
+});
