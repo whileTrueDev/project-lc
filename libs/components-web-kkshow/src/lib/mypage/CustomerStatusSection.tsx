@@ -1,31 +1,51 @@
-import { Stack, Text } from '@chakra-ui/react';
+import {
+  Avatar,
+  Box,
+  Stack,
+  Stat,
+  StatLabel,
+  StatNumber,
+  Text,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import { useCustomerStatus, useProfile } from '@project-lc/hooks';
 
-export function CustomerStatusSection(): JSX.Element {
+interface CustomerStatusSectionProps {
+  mobileVisibility?: boolean;
+}
+export function CustomerStatusSection({
+  mobileVisibility = false,
+}: CustomerStatusSectionProps): JSX.Element {
+  const bgColor = useColorModeValue('gray.50', 'gray.800');
   const { data: profileData } = useProfile();
   const { data: customerStatus } = useCustomerStatus(profileData?.id);
 
   return (
     <Stack
+      maxW="5xl"
+      m="auto"
+      mb={2}
+      w="100%"
+      bgColor={bgColor}
+      rounded="md"
       direction={{ base: 'column', md: 'row' }}
-      justifyContent={{ base: 'center', md: 'flex-start' }}
+      justifyContent="center"
       alignItems="center"
-      p={{ base: 4, md: 8 }}
+      p={4}
       spacing={{ base: 6, md: 10 }}
+      display={{ base: mobileVisibility ? 'flex' : 'none', md: 'flex' }}
     >
-      <Stack direction="row" alignItems="center" flexWrap="wrap">
-        <Text fontWeight="bold" fontSize="xl">
-          {profileData?.name} 님
-        </Text>
-        <Text>({profileData?.email})</Text>
-      </Stack>
-      <Stack
-        direction="row"
-        width={{ base: '100%', md: 'auto' }}
-        spacing={{ base: 0, md: 10 }}
-        px={8}
-        justifyContent="space-around"
-      >
+      <Box textAlign="center">
+        <Avatar src={profileData?.avatar || ''} size="lg" />
+        <Box mt={2}>
+          <Text fontWeight="bold" fontSize={{ base: 'lg', md: 'xl' }}>
+            {profileData?.name} 님
+          </Text>
+          <Text>({profileData?.email})</Text>
+        </Box>
+      </Box>
+
+      <Stack direction="row" spacing={{ base: 4, md: 10 }} justifyContent="space-between">
         <StatusBox label="팔로잉" value={customerStatus?.followingBroadcasters} />
         <StatusBox label="라이브알림" value={customerStatus?.followingLiveShoppings} />
         <StatusBox label="배송중" value={customerStatus?.shippingOrders} />
@@ -36,9 +56,9 @@ export function CustomerStatusSection(): JSX.Element {
 
 function StatusBox({ label, value }: { label: string; value?: number }): JSX.Element {
   return (
-    <Stack textAlign="center">
-      <Text>{label}</Text>
-      <Text>{value}</Text>
-    </Stack>
+    <Stat textAlign="center" minW="60px">
+      <StatLabel>{label}</StatLabel>
+      <StatNumber>{value}</StatNumber>
+    </Stat>
   );
 }

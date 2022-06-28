@@ -1,31 +1,26 @@
-import { ChevronLeftIcon } from '@chakra-ui/icons';
-import { Box, Button, Stack, Text } from '@chakra-ui/react';
+import { Box, Stack, Text } from '@chakra-ui/react';
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
 import { OrderInfoExportsList } from '@project-lc/components-web-kkshow/mypage/order/OrderInfoExportsList';
 import { OrderInfoItemsList } from '@project-lc/components-web-kkshow/mypage/order/OrderInfoItemsList';
 import { OrderInfoPayment } from '@project-lc/components-web-kkshow/mypage/order/OrderInfoPayment';
 import { useOrderDetail } from '@project-lc/hooks';
+import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 
 export function OrderDetail(): JSX.Element | null {
+  const title = '주문상세';
   const router = useRouter();
   const orderCode = router.query.orderCode as string;
   const orderDetail = useOrderDetail({ orderCode });
 
   if (!orderDetail.data) return null;
   return (
-    <CustomerMypageLayout>
+    <CustomerMypageLayout title={title}>
       <Box p={[2, 2, 4]}>
-        <Box my={2}>
-          <Button leftIcon={<ChevronLeftIcon />} size="sm" onClick={() => router.back()}>
-            뒤로가기
-          </Button>
-        </Box>
-
         <Stack spacing={6}>
           <Box>
-            <Text fontWeight="bold" fontSize="xl">
-              주문상세
+            <Text fontWeight="bold">
+              {dayjs(orderDetail.data.createDate).format('YYYY. MM. DD')} 주문
             </Text>
             <Text>주문번호 {orderCode}</Text>
           </Box>

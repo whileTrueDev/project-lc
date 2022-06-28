@@ -6,6 +6,7 @@ import { useProfile } from '@project-lc/hooks';
 import { useEffect, useState } from 'react';
 
 export function Info(): JSX.Element {
+  const title = '내 정보 수정';
   const { data: profileData } = useProfile();
   const { onClose } = useDisclosure();
   const [isValidated, setIsValidated] = useState(false);
@@ -22,10 +23,10 @@ export function Info(): JSX.Element {
   }, [setIsValidated, profileData?.hasPassword]);
 
   return (
-    <CustomerMypageLayout>
-      <Box p={3}>
+    <CustomerMypageLayout title={title}>
+      <Box p={[2, 2, 4]}>
         <Text fontSize="xl" fontWeight="bold">
-          내 정보 수정
+          {title}
         </Text>
 
         {!isValidated && (

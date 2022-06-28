@@ -9,7 +9,7 @@ export function OrderList(): JSX.Element {
   const router = useRouter();
   if (isLoading)
     return (
-      <CustomerMypageLayout>
+      <CustomerMypageLayout title="주문/배송내역">
         <Center>
           <Spinner />
         </Center>
@@ -19,7 +19,7 @@ export function OrderList(): JSX.Element {
     router.push('/login');
   }
   return (
-    <CustomerMypageLayout>
+    <CustomerMypageLayout title="주문/배송내역">
       <Box p={[2, 2, 4]}>
         <CustomerOrderList customerId={data.id} />
       </Box>

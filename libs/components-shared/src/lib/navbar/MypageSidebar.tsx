@@ -171,7 +171,7 @@ export function SidebarItem({ link, isMatched }: SidebarItemProps): JSX.Element 
 }
 
 interface SidebarChildItemProps {
-  link: Omit<SidebarItemProps['link'], 'icon'>;
+  link: SidebarItemProps['link'];
   hoverColor: string;
   leftSpacing?: boolean;
 }

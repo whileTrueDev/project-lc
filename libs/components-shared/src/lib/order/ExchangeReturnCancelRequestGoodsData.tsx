@@ -17,7 +17,7 @@ export function ExchangeReturnCancelRequestGoodsData(
       {/* 이미지 */}
       <Image objectFit="cover" w="40px" h="40px" src={image} alt="" rounded="md" />
       {/* 주문상품 옵션 */}
-      <Stack spacing={1}>
+      <Stack spacing={0}>
         <Text fontWeight="bold">{goodsName}</Text>
         <Stack direction="row" fontSize="sm">
           <Text>

@@ -10,8 +10,7 @@ export function ExchangeReturnWrite(): JSX.Element {
   const _orderId = orderId ? Number(orderId) : undefined;
 
   return (
-    <CustomerMypageLayout>
-      재배송/환불 신청(작성)페이지
+    <CustomerMypageLayout title="재배송/환불 신청">
       <ExchangeReturnWriteSection orderId={_orderId} />
     </CustomerMypageLayout>
   );
