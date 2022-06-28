@@ -5,6 +5,7 @@ import {
   Flex,
   FormControl,
   FormErrorMessage,
+  FormLabel,
   HStack,
   Input,
   Radio,
@@ -18,10 +19,9 @@ import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import {
   getOrderShippingCheck,
   useDefaultCustomerAddress,
-  useGetOrderShippingCheck,
   useProfile,
 } from '@project-lc/hooks';
-import { OrderDetailRes, CreateOrderForm } from '@project-lc/shared-types';
+import { CreateOrderForm, OrderDetailRes } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
 import { useCallback, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -152,7 +152,7 @@ export function DeliveryAddress(): JSX.Element {
     <SectionWithTitle title="배송지 정보">
       {!isLoading && (
         <RadioGroup onChange={(value) => handleRadio(value)} value={addressType}>
-          <Stack direction="row">
+          <Stack direction={{ base: 'column', sm: 'row' }} alignItems="flex-start">
             {profile && (
               <>
                 <Button onClick={addressListOnOpen} size="sm" variant="outline">
@@ -167,33 +167,36 @@ export function DeliveryAddress(): JSX.Element {
       )}
       {!isLoading && (
         <Stack mt={4}>
+          {/* 수령인 */}
           <FormControl isInvalid={!!errors.recipientName}>
-            <Flex direction="column">
-              <Text fontWeight="semibold">수령인</Text>
-              <Box>
-                <Input
-                  w={{ base: '100%', md: '15%' }}
-                  placeholder="수령인"
-                  {...register('recipientName', {
-                    required: {
-                      value: true,
-                      message: '받는사람의 이름을 입력해주세요(2글자 이상)',
-                    },
-                    minLength: 2,
-                  })}
-                  mr={1}
-                />
+            <Box>
+              <Flex>
+                <FormLabel fontWeight="semibold">수령인</FormLabel>
                 <Button size="xs" onClick={() => handleRecipientInfo()}>
                   구매자와 동일
                 </Button>
-              </Box>
+              </Flex>
+              <Input
+                w="100%"
+                maxW={270}
+                placeholder="수령인"
+                {...register('recipientName', {
+                  required: {
+                    value: true,
+                    message: '받는사람의 이름을 입력해주세요(2글자 이상)',
+                  },
+                  minLength: 2,
+                })}
+                mr={1}
+              />
               <FormErrorMessage mt={0}>
                 {errors.recipientName && errors.recipientName.message}
               </FormErrorMessage>
-            </Flex>
+            </Box>
           </FormControl>
+
+          {/* 연락처 */}
           <Flex direction="column">
-            <Text fontWeight="semibold">연락처</Text>
             <FormControl
               isInvalid={
                 !!errors.recipientPhone1 ||
@@ -201,9 +204,10 @@ export function DeliveryAddress(): JSX.Element {
                 !!errors.recipientPhone3
               }
             >
+              <FormLabel fontWeight="semibold">연락처</FormLabel>
               <HStack>
                 <Input
-                  w={{ base: '20%', md: '15%' }}
+                  w={{ base: '100%', md: '15%' }}
                   type="number"
                   maxLength={3}
                   {...register('recipientPhone1', {
@@ -217,7 +221,7 @@ export function DeliveryAddress(): JSX.Element {
                 />
                 <Text>-</Text>
                 <Input
-                  w={{ base: '20%', md: '15%' }}
+                  w={{ base: '100%', md: '15%' }}
                   type="number"
                   maxLength={4}
                   {...register('recipientPhone2', {
@@ -231,7 +235,7 @@ export function DeliveryAddress(): JSX.Element {
                 />
                 <Text>-</Text>
                 <Input
-                  w={{ base: '20%', md: '15%' }}
+                  w={{ base: '100%', md: '15%' }}
                   type="number"
                   maxLength={4}
                   {...register('recipientPhone3', {
@@ -257,12 +261,11 @@ export function DeliveryAddress(): JSX.Element {
             }
           >
             <Flex direction="column" alignItems="flex-start">
-              <Text fontWeight="semibold">배송지주소</Text>
+              <FormLabel fontWeight="semibold">배송지주소</FormLabel>
               <Flex direction="column" mb={2}>
                 <HStack>
                   <Input
                     isReadOnly
-                    w="15"
                     placeholder="우편번호"
                     {...register('recipientPostalCode', {
                       required: { value: true, message: '우편번호를 입력해주세요' },
@@ -303,8 +306,7 @@ export function DeliveryAddress(): JSX.Element {
                     })}
                   />
                   <FormErrorMessage mt={0}>
-                    {errors.recipientDetailAddress &&
-                      errors.recipientDetailAddress.message}
+                    {errors.recipientDetailAddress?.message}
                   </FormErrorMessage>
                 </Flex>
               </Flex>
@@ -312,8 +314,7 @@ export function DeliveryAddress(): JSX.Element {
           </FormControl>
 
           <FormControl isInvalid={!!errors.memo}>
-            <Text fontWeight="semibold">배송메모</Text>
-
+            <FormLabel fontWeight="semibold">배송메모</FormLabel>
             <Input
               w={{ base: '100%', md: '50%' }}
               placeholder="문 앞 / 직접 받고 부재 시 문 앞 / 경비실 / 택배함"

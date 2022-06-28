@@ -1,6 +1,5 @@
 /* eslint-disable react/no-array-index-key */
 import { Box, Flex, Image, Spinner, Stack, Text } from '@chakra-ui/react';
-import { Decimal } from '@prisma/client/runtime';
 import TextDotConnector from '@project-lc/components-core/TextDotConnector';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { useGoodsById } from '@project-lc/hooks';
@@ -64,18 +63,25 @@ export function OrderItem({
         <Image
           draggable={false}
           src={goods.data.image[1].image}
-          w={85}
-          h={85}
+          w={{ base: 45, sm: 85 }}
+          h={{ base: 45, sm: 85 }}
           rounded="md"
           objectFit="cover"
         />
         <Box>
           {goods.data.seller.sellerShop && (
-            <Text>{goods.data.seller.sellerShop?.shopName}</Text>
+            <Text fontSize={{ base: 'xs', sm: 'sm' }}>
+              {goods.data.seller.sellerShop?.shopName}
+            </Text>
           )}
-          <Text>{goods.data.goods_name}</Text>
+          <Text fontSize={{ base: 'sm', sm: 'md' }}>{goods.data.goods_name}</Text>
           {orderItem.options.map((option) => (
-            <Stack direction="row" key={option.goodsOptionId} fontSize="sm" spacing={1}>
+            <Flex
+              key={option.goodsOptionId}
+              fontSize={{ base: 'xs', sm: 'sm' }}
+              flexWrap="wrap"
+              gap={{ base: 0.5, sm: 1 }}
+            >
               <Text>
                 {option.name} : {option.value}
               </Text>
@@ -85,7 +91,7 @@ export function OrderItem({
               <Text>
                 {getLocaleNumber(Number(option.discountPrice) * option.quantity)}원
               </Text>
-            </Stack>
+            </Flex>
           ))}
           <Box fontSize="sm">
             {!disableSupportInfo && (
