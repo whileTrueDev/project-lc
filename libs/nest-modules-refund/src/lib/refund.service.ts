@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { CipherService } from '@project-lc/nest-modules-cipher';
 import { OrderCancellationService } from '@project-lc/nest-modules-order';
 import { PaymentService } from '@project-lc/nest-modules-payment';
 import { ReturnService } from '@project-lc/nest-modules-return';
@@ -26,6 +27,7 @@ export class RefundService {
     private readonly orderCancellationService: OrderCancellationService,
     private readonly paymentService: PaymentService,
     private readonly returnService: ReturnService,
+    private readonly cipherService: CipherService,
   ) {}
 
   private createRefundCode(): string {
@@ -62,7 +64,7 @@ export class RefundService {
    * 3. 연결된 Return, OrderCancellation 상태 업데이트...?
    */
   async createRefund(dto: CreateRefundDto): Promise<CreateRefundRes> {
-    const { orderId, orderCancellationId, returnId, items, ...rest } = dto;
+    const { orderId, orderCancellationId, returnId, items, refundAccount, ...rest } = dto;
 
     let transactionKey: string | undefined;
     // 1. 토스페이먼츠 결제취소 api 사용하는 경우 transaction키 받기
@@ -74,9 +76,12 @@ export class RefundService {
       transactionKey = cancelResult.transactionKey;
     }
 
+    // 크크쇼 환불정보 저장시에는 환불받을 계좌정보 암호화하여 저장
+    const encryptedAccount = this.cipherService.getEncryptedText(refundAccount);
     const data = await this.prisma.refund.create({
       data: {
         ...rest,
+        refundAccount: encryptedAccount,
         refundCode: this.createRefundCode(),
         order: { connect: { id: orderId } },
         items: { create: items },
@@ -152,7 +157,10 @@ export class RefundService {
     return {
       count,
       nextCursor: nextCursor >= count ? undefined : nextCursor,
-      list: data,
+      list: data.map((d) => ({
+        ...d,
+        refundAccount: this.cipherService.getDecryptedText(d.refundAccount), // 환불계좌정보 복호화
+      })),
     };
   }
 
@@ -204,8 +212,12 @@ export class RefundService {
       },
     });
 
-    const { items, ...rest } = data;
+    const { items, refundAccount, ...rest } = data;
 
+    // * 환불받을 계좌정보
+    const decryptedRefundAccount = this.cipherService.getDecryptedText(refundAccount); // 환불계좌정보 복호화
+
+    // * 환불상품 정보
     const refundItemList = items.map((item) => {
       const { orderItem, orderItemOption } = item;
       const { goods, ...orderItemRest } = orderItem;
@@ -220,6 +232,7 @@ export class RefundService {
       };
     });
 
+    // * 토스페이먼츠 결제정보
     let card: PaymentCard | undefined; // 카드로 결제하면 제공되는 카드 관련 정보입니다.
     let virtualAccount: PaymentVirtualAccount | undefined; // 가상계좌로 결제하면 제공되는 가상계좌 관련 정보입니다.
     let transfer: PaymentTransfer | undefined; // 계좌이체로 결제했을 때 이체 정보가 담기는 객체입니다.
@@ -242,6 +255,7 @@ export class RefundService {
 
     return {
       ...rest,
+      refundAccount: decryptedRefundAccount,
       items: refundItemList,
       card,
       virtualAccount,

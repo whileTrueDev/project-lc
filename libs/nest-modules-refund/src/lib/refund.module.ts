@@ -1,4 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
+import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { OrderModule } from '@project-lc/nest-modules-order';
 import { PaymentModule } from '@project-lc/nest-modules-payment';
 import { ReturnModule } from '@project-lc/nest-modules-return';
@@ -15,6 +16,7 @@ export class RefundModule {
     OrderModule.withoutControllers(),
     PaymentModule.withoutControllers(),
     ReturnModule.withoutControllers(),
+    CipherModule,
   ];
 
   static withoutControllers(): DynamicModule {

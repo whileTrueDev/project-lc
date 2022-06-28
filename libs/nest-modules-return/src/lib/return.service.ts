@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, Return } from '@prisma/client';
+import { CipherService } from '@project-lc/nest-modules-cipher';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminReturnRes,
@@ -16,7 +17,10 @@ import { nanoid } from 'nanoid';
 
 @Injectable()
 export class ReturnService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cipherService: CipherService,
+  ) {}
 
   /** 반품코드 생성 */
   private createReturnCode(): string {
@@ -25,10 +29,12 @@ export class ReturnService {
 
   /** 반품요청 생성 */
   async createReturn(dto: CreateReturnDto): Promise<CreateReturnRes> {
-    const { orderId, items, images, ...rest } = dto;
+    const { orderId, items, images, returnBankAccount, ...rest } = dto;
+    const encryptedBankAccount = this.cipherService.getEncryptedText(returnBankAccount);
     const data = await this.prisma.return.create({
       data: {
         ...rest,
+        returnBankAccount: encryptedBankAccount,
         returnCode: this.createReturnCode(),
         order: { connect: { id: orderId } },
         items: {
@@ -94,7 +100,9 @@ export class ReturnService {
 
     // 조회한 데이터를 필요한 형태로 처리
     const list = data.map((d) => {
-      const { items, ...rest } = d;
+      const { items, returnBankAccount, refund, ...rest } = d;
+
+      const decryptedBankAccount = this.cipherService.getDecryptedText(returnBankAccount);
 
       const _items = items.map((i) => ({
         id: i.id, // 반품 상품 고유번호
@@ -110,7 +118,19 @@ export class ReturnService {
         orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
       }));
 
-      return { ...rest, items: _items };
+      const _refund = refund
+        ? {
+            ...refund,
+            refundAccount: this.cipherService.getDecryptedText(refund.refundAccount), // 환불계좌정보 복호화
+          }
+        : undefined;
+
+      return {
+        ...rest,
+        items: _items,
+        returnBankAccount: decryptedBankAccount,
+        refund: _refund,
+      };
     });
 
     return {
@@ -161,7 +181,10 @@ export class ReturnService {
         images: true,
       },
     });
-    const { items, ...rest } = data;
+    const { items, returnBankAccount, refund, ...rest } = data;
+
+    const decryptedBankAccount = this.cipherService.getDecryptedText(returnBankAccount);
+
     const _items = items.map((i) => ({
       id: i.id, // 반품 상품 고유번호
       amount: i.amount, // 반품 상품 개수
@@ -176,9 +199,18 @@ export class ReturnService {
       orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
     }));
 
+    const _refund = refund
+      ? {
+          ...refund,
+          refundAccount: this.cipherService.getDecryptedText(refund.refundAccount), // 환불계좌정보 복호화
+        }
+      : undefined;
+
     return {
       ...rest,
       items: _items,
+      returnBankAccount: decryptedBankAccount,
+      refund: _refund,
     };
   }
 
@@ -187,7 +219,7 @@ export class ReturnService {
     await this.findUnique({ id });
 
     const { refundId, ...rest } = dto;
-    await this.prisma.return.update({
+    const returnData = await this.prisma.return.update({
       where: { id },
       data: {
         ...rest,
@@ -202,7 +234,28 @@ export class ReturnService {
       },
     });
 
+    // 반품요청 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
+    if (dto.status === 'complete') {
+      await this.updateOrderStateToOrderInvalidated(returnData.orderId);
+    }
+
     return true;
+  }
+
+  /** 주문의 상태를 주문무효 로 변경(반품요청 처리완료(승인)되었을 때 사용)
+   */
+  private async updateOrderStateToOrderInvalidated(orderId: number): Promise<void> {
+    // 변경될 상태 : "주문무효"
+    const targetState = 'orderInvalidated';
+    await this.prisma.$transaction([
+      // 주문 상태 주문무효로 변경
+      this.prisma.order.update({ where: { id: orderId }, data: { step: targetState } }),
+      // 주문상품옵션 상태 주문무효로 변경
+      this.prisma.orderItemOption.updateMany({
+        where: { orderItem: { orderId } },
+        data: { step: targetState },
+      }),
+    ]);
   }
 
   /** 반품요청 삭제 */

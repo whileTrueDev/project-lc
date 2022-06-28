@@ -9,6 +9,7 @@ import {
   SellerSettlementAccount,
 } from '@prisma/client';
 import { UserPayload } from '@project-lc/nest-core';
+import { CipherService } from '@project-lc/nest-modules-cipher';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BusinessRegistrationDto,
@@ -31,7 +32,10 @@ export type SellerSettlementInfo = {
 
 @Injectable()
 export class SellerSettlementInfoService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cipherService: CipherService,
+  ) {}
 
   // 사업자 등록증 번호 포맷만들기
   private makeRegistrationNumberFormat(num: string): string {
@@ -187,11 +191,13 @@ export class SellerSettlementInfoService {
     sellerInfo: UserPayload,
   ): Promise<SellerSettlementAccount> {
     const sellerId = sellerInfo.id;
+
+    const encryptedAccountNumber = this.cipherService.getEncryptedText(dto.number);
     const settlementAccount = await this.prisma.sellerSettlementAccount.create({
       data: {
         sellerId,
         name: dto.name,
-        number: dto.number,
+        number: encryptedAccountNumber,
         bank: dto.bank,
         settlementAccountImageName: dto.settlementAccountImageName,
       },
@@ -254,7 +260,13 @@ export class SellerSettlementInfoService {
       },
     });
 
-    return settlementInfo;
+    const { sellerSettlementAccount } = settlementInfo;
+    const decryptedSettlementAccount = sellerSettlementAccount.map((data) => ({
+      ...data,
+      number: this.cipherService.getDecryptedText(data.number), // 계좌번호 복호화처리
+    }));
+
+    return { ...settlementInfo, sellerSettlementAccount: decryptedSettlementAccount };
   }
 
   public createSettlementConfirmHistory(dto: ConfirmHistoryDto): Promise<ConfirmHistory> {

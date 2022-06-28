@@ -74,7 +74,7 @@ export function OrderCancelDialog({
     >
       {orderDetailData ? (
         <Stack>
-          <Text>이 주문을 취소하시겠습니까? {orderDetailData.step}</Text>
+          <Text>이 주문을 취소하시겠습니까?</Text>
           <Text>주문번호 : {orderDetailData.orderCode}</Text>
           <Text>주문상품</Text>
           {orderDetailData.orderItems.flatMap((item) =>

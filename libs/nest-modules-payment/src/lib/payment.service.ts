@@ -59,9 +59,6 @@ export class PaymentService {
         depositDoneFlag: !!result.approvedAt,
         depositSecret: result.secret,
         depositor: result.virtualAccount?.customerName,
-        account: result.virtualAccount
-          ? `${result.virtualAccount.bank}_${result.virtualAccount.accountNumber}`
-          : null,
         depositDueDate: result.virtualAccount?.dueDate
           ? new Date(result.virtualAccount?.dueDate)
           : null,
@@ -136,8 +133,10 @@ export class PaymentService {
     } catch (error) {
       console.error(error.response);
       throw new HttpException(
-        error.response.message || 'error in requestCancelTossPayment',
-        error.response.status || 500,
+        error.response.message ||
+          error.response.data.message ||
+          'error in requestCancelTossPayment',
+        error.response.status || error.response.data.code || 500,
       );
     }
   }

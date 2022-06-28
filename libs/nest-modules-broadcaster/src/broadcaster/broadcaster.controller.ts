@@ -47,6 +47,7 @@ import { BroadcasterContactsService } from './broadcaster-contacts.service';
 import { BroadcasterService } from './broadcaster.service';
 import { BroadcasterSettlementInfoService } from './settlement-info/broadcaster-settlement-info.service';
 
+@UseInterceptors(ClassSerializerInterceptor)
 @CacheClearKeys('broadcaster')
 @Controller('broadcaster')
 export class BroadcasterController {
@@ -61,7 +62,7 @@ export class BroadcasterController {
 
   /** 방송인 정보 조회 */
   @Get()
-  @UseInterceptors(ClassSerializerInterceptor, HttpCacheInterceptor)
+  @UseInterceptors(HttpCacheInterceptor)
   public async findBroadcaster(
     @Query(ValidationPipe) dto: FindBroadcasterDto,
   ): Promise<BroadcasterRes | null> {

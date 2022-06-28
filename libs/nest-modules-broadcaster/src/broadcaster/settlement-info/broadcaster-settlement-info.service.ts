@@ -34,23 +34,27 @@ export class BroadcasterSettlementInfoService {
       );
     }
 
-    // 주민등록번호, 휴대전화는 암호화하여 저장
-    const { idCardNumber, phoneNumber } = data;
+    // 주민등록번호, 휴대전화, 계좌번호는 암호화하여 저장
+    const { idCardNumber, phoneNumber, accountNumber } = data;
+
+    const encryptedData = {
+      idCardNumber: this.cipherService.getEncryptedText(idCardNumber),
+      phoneNumber: this.cipherService.getEncryptedText(phoneNumber),
+      accountNumber: this.cipherService.getEncryptedText(accountNumber),
+    };
 
     try {
       const result = await this.prisma.broadcasterSettlementInfo.upsert({
         where: { broadcasterId },
         create: {
           ...data,
-          idCardNumber: this.cipherService.getEncryptedText(idCardNumber),
-          phoneNumber: this.cipherService.getEncryptedText(phoneNumber),
+          ...encryptedData,
           broadcaster: { connect: { id: broadcasterId } },
           confirmation: { create: { rejectionReason: null } },
         },
         update: {
           ...data,
-          idCardNumber: this.cipherService.getEncryptedText(idCardNumber),
-          phoneNumber: this.cipherService.getEncryptedText(phoneNumber),
+          ...encryptedData,
           confirmation: { update: { status: 'waiting' } },
         },
       });
@@ -107,13 +111,14 @@ export class BroadcasterSettlementInfoService {
       });
       if (!data) return null;
 
-      // 주민등록번호, 휴대전화는 복호화 한 후 일부를 가린상태로 전송
-      const { idCardNumber, phoneNumber } = data;
+      // 주민등록번호, 휴대전화는 복호화 한 후 일부를 가린상태로 전송, 계좌번호는 그냥 복호화
+      const { idCardNumber, phoneNumber, accountNumber } = data;
 
       return {
         ...data,
         idCardNumber: this.decryptIdCardNumber(idCardNumber, { blind: true }),
         phoneNumber: this.decryptPhoneNumber(phoneNumber, { blind: true }),
+        accountNumber: this.cipherService.getDecryptedText(accountNumber),
       };
     } catch (error) {
       throw new InternalServerErrorException(error);
@@ -185,6 +190,7 @@ export class BroadcasterSettlementInfoService {
       ...d,
       idCardNumber: this.decryptIdCardNumber(d.idCardNumber),
       phoneNumber: this.decryptPhoneNumber(d.phoneNumber),
+      accountNumber: this.cipherService.getDecryptedText(d.accountNumber),
     }));
   }
 }

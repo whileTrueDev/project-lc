@@ -163,7 +163,7 @@ export function ExchangeReturnWriteSection({
               '재배송 요청이 접수되었습니다. 처리과정 및 결과는 반품/교환 내역에서 확인 가능합니다.',
             status: 'success',
           });
-          router.push('/mypage/order-list');
+          router.push('/mypage/orders');
         })
         .catch((e) => {
           console.error(e);
@@ -209,7 +209,7 @@ export function ExchangeReturnWriteSection({
               '환불 요청이 접수되었습니다. 처리과정 및 결과는 반품/교환 내역에서 확인 가능합니다.',
             status: 'success',
           });
-          router.push('/mypage/order-list');
+          router.push('/mypage/orders');
         })
         .catch((e) => {
           console.error(e);
@@ -245,11 +245,7 @@ export function ExchangeReturnWriteSection({
           <SolutionSection />
 
           <Stack direction="row" justifyContent="space-around">
-            <Button
-              type="button"
-              onClick={() => router.push('/mypage/order-list')}
-              flex="1"
-            >
+            <Button type="button" onClick={() => router.push('/mypage/orders')} flex="1">
               취소하기
             </Button>
             <Button type="submit" flex="1" colorScheme="blue">
@@ -267,7 +263,7 @@ export default ExchangeReturnWriteSection;
 function ExchangeReturnNotAllowed(): JSX.Element {
   const router = useRouter();
   useEffect(() => {
-    router.push('/mypage/order-list');
+    router.push('/mypage/orders');
   }, [router]);
 
   return <Text>재배송/환불 신청이 불가능한 주문입니다</Text>;
