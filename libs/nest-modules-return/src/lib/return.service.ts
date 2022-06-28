@@ -234,23 +234,23 @@ export class ReturnService {
       },
     });
 
-    // 반품요청 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
+    // 반품요청 처리완료(승인)되면 주문 상태를 결제취소 로 업데이트
     if (dto.status === 'complete') {
-      await this.updateOrderStateToOrderInvalidated(returnData.orderId);
+      await this.updateOrderStateAfterRefundFinish(returnData.orderId);
     }
 
     return true;
   }
 
-  /** 주문의 상태를 주문무효 로 변경(반품요청 처리완료(승인)되었을 때 사용)
+  /** 주문의 상태를 결제취소 로 변경(반품요청 처리완료(승인)되었을 때 사용)
    */
-  private async updateOrderStateToOrderInvalidated(orderId: number): Promise<void> {
-    // 변경될 상태 : "주문무효"
-    const targetState = 'orderInvalidated';
+  private async updateOrderStateAfterRefundFinish(orderId: number): Promise<void> {
+    // 변경될 상태 : "결제취소" (반품요청시 이미 결제가 완료된 상태이므로 결제취소로 변경함)
+    const targetState = 'paymentCanceled';
     await this.prisma.$transaction([
-      // 주문 상태 주문무효로 변경
+      // 주문 상태 결제취소 변경
       this.prisma.order.update({ where: { id: orderId }, data: { step: targetState } }),
-      // 주문상품옵션 상태 주문무효로 변경
+      // 주문상품옵션 상태 결제취소로 변경
       this.prisma.orderItemOption.updateMany({
         where: { orderItem: { orderId } },
         data: { step: targetState },
