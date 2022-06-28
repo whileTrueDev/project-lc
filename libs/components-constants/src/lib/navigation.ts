@@ -368,11 +368,11 @@ const customerMypageShoppingChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
 /** 크크쇼 소비자 마이페이지 사이드바 - "활동" 하위 탭 */
 const customerMypageActivityChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
   { name: '후원내역', href: '/mypage/후원내역', checkIsActive: defaultIsActiveChecker },
-  {
-    name: '라이브 알림 내역',
-    href: '/mypage/내역',
-    checkIsActive: defaultIsActiveChecker,
-  },
+  // {
+  //   name: '라이브 알림 내역',
+  //   href: '/mypage/내역',
+  //   checkIsActive: defaultIsActiveChecker,
+  // },
   { name: '후기 관리', href: '/mypage/review', checkIsActive: defaultIsActiveChecker },
 ];
 /** 크크쇼 소비자 마이페이지 사이드바 - "정보" 하위 탭 */

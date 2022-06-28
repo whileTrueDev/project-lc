@@ -1,15 +1,17 @@
 import {
-  Text,
+  Box,
+  Button,
+  ButtonGroup,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
   ModalProps,
 } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
-import SettingSectionLayout from '@project-lc/components-layout/SettingSectionLayout';
 import PasswordChangeForm from './PasswordChangeForm';
 
 export type DialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
@@ -27,15 +29,23 @@ export function PasswordChangeDialog(props: DialogProps): JSX.Element {
         {headerText && <ModalHeader>{headerText}</ModalHeader>}
         <ModalCloseButton />
         <ModalBody>
-          <SettingSectionLayout title="새 비밀번호">
-            <Text>새로운 비밀번호를 입력해주세요</Text>
+          <Box>
             <PasswordChangeForm
               email={profileData?.email}
               onCancel={onClose}
               onConfirm={onConfirm}
             />
-          </SettingSectionLayout>
+          </Box>
         </ModalBody>
+
+        <ModalFooter>
+          <ButtonGroup>
+            <Button onClick={onClose}>취소</Button>
+            <Button colorScheme="blue" type="submit" form="password-change-form">
+              비밀번호 변경
+            </Button>
+          </ButtonGroup>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

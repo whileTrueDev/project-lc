@@ -42,6 +42,7 @@ export function PasswordSection(): JSX.Element {
         }}
       />
       <PasswordChangeDialog
+        headerText="새 비밀번호"
         isOpen={pwChangeflag}
         onClose={closePwChangeDialog}
         onConfirm={closePwChangeDialog}

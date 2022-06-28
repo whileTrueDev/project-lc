@@ -17,7 +17,7 @@ export function UserInfo({ userId }: { userId: number }): JSX.Element {
   } = useDisclosure();
 
   return (
-    <Grid p={3} templateColumns="repeat(4, 11fr)" gap={6}>
+    <Grid templateColumns="repeat(4, 1fr)" gap={4}>
       {data && (
         <>
           <GridItem colSpan={1}>
@@ -82,7 +82,12 @@ export function UserInfo({ userId }: { userId: number }): JSX.Element {
             <CustomerDelete userId={userId} />
           </GridItem>
           <GridItem colSpan={3} />
-          <PasswordChangeDialog isOpen={isOpen} onClose={onClose} onConfirm={onClose} />
+          <PasswordChangeDialog
+            headerText="새 비밀번호"
+            isOpen={isOpen}
+            onClose={onClose}
+            onConfirm={onClose}
+          />
           <CustomerNicknameChangeDialog
             isOpen={nicknameIsOpen}
             onClose={nicknameOnClose}

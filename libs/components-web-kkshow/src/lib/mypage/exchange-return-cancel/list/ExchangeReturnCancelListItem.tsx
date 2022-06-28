@@ -54,8 +54,9 @@ export function ExchangeReturnCancelListItem({
               <ExchangeReturnCancelRequestGoodsData key={item.id} {...item} />
             ))}
           </Stack>
-          <Box>
-            <Stack direction="row">
+
+          <Box fontSize="sm">
+            <Stack direction="row" align="center">
               <Text>상태 :</Text>
               <ExchangeReturnCancelRequestStatusBadge status={data.status} />
             </Stack>

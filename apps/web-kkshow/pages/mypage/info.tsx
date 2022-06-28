@@ -1,9 +1,9 @@
-import { Box, Heading, Text, useDisclosure, Flex, VStack } from '@chakra-ui/react';
-import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
-import { useProfile, useCustomerInfo } from '@project-lc/hooks';
+import { Box, Flex, Stack, Text, useDisclosure } from '@chakra-ui/react';
 import { PasswordCheckForm } from '@project-lc/components-shared/PasswordCheckForm';
-import { useEffect, useState } from 'react';
+import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
 import { UserInfo } from '@project-lc/components-web-kkshow/mypage/info/UserInfo';
+import { useProfile } from '@project-lc/hooks';
+import { useEffect, useState } from 'react';
 
 export function Info(): JSX.Element {
   const { data: profileData } = useProfile();
@@ -24,27 +24,28 @@ export function Info(): JSX.Element {
   return (
     <CustomerMypageLayout>
       <Box p={3}>
-        <Heading>내 정보 수정</Heading>
+        <Text fontSize="xl" fontWeight="bold">
+          내 정보 수정
+        </Text>
 
         {!isValidated && (
-          <VStack>
+          <Stack>
             <Text>
               회원님의 개인정보를 안전하게 보호하기 위해 인증 후 변경이 가능합니다.
             </Text>
-            <Flex
+            <Stack
               p={3}
               border="solid 1px"
               borderColor="gray.300"
               borderRadius="5px"
-              w="xs"
-              direction="column"
               alignItems="space-between"
               justifyContent="flex-start"
             >
-              <Flex mb={5}>
+              <Flex>
                 <Text mr={2}>이메일:</Text>
                 <Text>{profileData?.email}</Text>
               </Flex>
+
               <Box>
                 <Text>비밀번호 입력</Text>
                 <PasswordCheckForm
@@ -53,10 +54,14 @@ export function Info(): JSX.Element {
                   onConfirm={onConfirm}
                 />
               </Box>
-            </Flex>
-          </VStack>
+            </Stack>
+          </Stack>
         )}
-        {isValidated && profileData && <UserInfo userId={profileData.id} />}
+        {isValidated && profileData && (
+          <Box mt={4}>
+            <UserInfo userId={profileData.id} />
+          </Box>
+        )}
       </Box>
     </CustomerMypageLayout>
   );

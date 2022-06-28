@@ -45,5 +45,13 @@ export const createChakraTheme = () =>
         parts: ['tabpanel'],
         baseStyle: { tabpanel: { px: 0 } },
       },
+      FormError: {
+        parts: ['text'],
+        baseStyle: { text: { fontSize: ['xs', 'sm'], mt: 0.5 } },
+      },
+      Form: {
+        parts: ['helperText'],
+        baseStyle: { helperText: { fontSize: ['xs', 'sm'], mt: 0.5 } },
+      },
     },
   });

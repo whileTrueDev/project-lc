@@ -7,6 +7,7 @@ import {
   FormControl,
   FormErrorMessage,
   useToast,
+  ButtonGroup,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -57,6 +58,11 @@ export function CustomerPhoneNumberChage(
         onError(err);
       });
   };
+
+  const handleCancel = (): void => {
+    reset();
+    setIsEditMode(false);
+  };
   return (
     <>
       {!isEditMode ? (
@@ -77,35 +83,31 @@ export function CustomerPhoneNumberChage(
             <HStack>
               <Input
                 size="xs"
-                w="10%"
                 {...register('phone1', { minLength: 3, maxLength: 3, required: true })}
               />
               <Text>-</Text>
               <Input
                 size="xs"
-                w="10%"
                 {...register('phone2', { minLength: 3, maxLength: 4, required: true })}
               />
               <Text>-</Text>
               <Input
                 size="xs"
-                w="10%"
                 {...register('phone3', { minLength: 4, maxLength: 4, required: true })}
               />
-              <Button size="xs" type="submit" colorScheme="blue">
-                변경
-              </Button>
-              <Button
-                size="xs"
-                onClick={() => {
-                  reset();
-                  setIsEditMode(false);
-                }}
-              >
-                취소
-              </Button>
             </HStack>
             <FormErrorMessage>휴대전화번호를 확인해주세요</FormErrorMessage>
+
+            <Box mt={2}>
+              <ButtonGroup>
+                <Button size="xs" type="submit" colorScheme="blue">
+                  변경
+                </Button>
+                <Button size="xs" onClick={handleCancel}>
+                  취소
+                </Button>
+              </ButtonGroup>
+            </Box>
           </FormControl>
         </Box>
       )}
