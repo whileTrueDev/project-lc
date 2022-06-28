@@ -113,6 +113,7 @@ export * from './lib/queries/useAdminOrder';
 export * from './lib/queries/useAdminOrderCancelRequest';
 export * from './lib/queries/useAdminPolicy';
 export * from './lib/queries/useAdminProductPromotion';
+export * from './lib/queries/useAdminReturnList';
 export * from './lib/queries/useAdminSellerList';
 export * from './lib/queries/useAdminSettlementDoneList';
 export * from './lib/queries/useApprovedGoodsList';

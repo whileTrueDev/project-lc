@@ -98,7 +98,7 @@ export class RefundService {
 
     // 연결된 반품요청 있는경우
     if (returnId) {
-      // 환불정보와 연결
+      // 환불정보와 연결 & 반품요청 상태 완료로 변경
       await this.returnService.updateReturnStatus(returnId, {
         status: 'complete',
         refundId: data.id,

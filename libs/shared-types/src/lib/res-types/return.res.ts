@@ -28,3 +28,9 @@ export type ReturnDetailRes = ReturnData & { images: ReturnImage[] };
 export type UpdateReturnRes = boolean;
 
 export type DeleteReturnRes = boolean;
+
+export type AdminReturnRes = any;
+// export type AdminReturnRes = Return & {
+//   order: {orderCode: string, payment: OrderPayment, ordererName: string},
+//   items: ({id: OrderItem['id'], goods: {id}})[]
+// };

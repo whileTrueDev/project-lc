@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, Return } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  AdminReturnRes,
   CreateReturnDto,
   CreateReturnRes,
   DeleteReturnRes,
@@ -213,5 +214,44 @@ export class ReturnService {
 
     await this.prisma.return.delete({ where: { id } });
     return true;
+  }
+
+  /** 관리자 환불처리 위해 승인된 반품요청 & 주문 & 결제정보 조회 */
+  async getAdminReturnList(): Promise<AdminReturnRes> {
+    return this.prisma.return.findMany({
+      where: { status: 'processing' }, // = 판매자가 반품 승인한 경우만 조회. 판매자가 반품(환불) 승인시 상태 processing으로 변경됨..
+      orderBy: { requestDate: 'asc' }, // 요청일 오름차순
+      include: {
+        order: {
+          select: {
+            id: true,
+            orderCode: true,
+            payment: true,
+            orderPrice: true, // 주문상품옵션 할인가 총합
+            paymentPrice: true, // 실 결제금액 = 주문상품옵션 할인가 총합 + 총 배송비 - 쿠폰할인 - 마일리지할인
+            ordererName: true,
+            customerCouponLogs: {
+              include: { customerCoupon: { include: { coupon: true } } },
+            },
+            mileageLogs: true,
+          },
+        },
+        items: {
+          include: {
+            orderItem: {
+              select: {
+                id: true,
+                goods: {
+                  select: {
+                    seller: { select: { sellerShop: true } },
+                  },
+                },
+              },
+            },
+            orderItemOption: true,
+          },
+        },
+      },
+    });
   }
 }

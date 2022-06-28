@@ -39,6 +39,7 @@ import {
 import { GoodsService } from '@project-lc/nest-modules-goods';
 import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
 import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
+import { ReturnService } from '@project-lc/nest-modules-return';
 import {
   SellerService,
   SellerSettlementInfoService,
@@ -78,6 +79,7 @@ import {
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
   SellerSettlementTargetRes,
+  AdminReturnRes,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
@@ -104,6 +106,7 @@ export class AdminController {
     private readonly config: ConfigService,
     private readonly adminPrivacyApproachSevice: AdminPrivacyApproachSevice,
     private readonly settlementService: BroadcasterSettlementService,
+    private readonly returnService: ReturnService,
   ) {
     const wtIp = config.get('WHILETRUE_IP_ADDRESS');
     if (wtIp) this.allowedIpAddresses.push(wtIp);
@@ -427,5 +430,12 @@ export class AdminController {
   @Delete('/user/:userId')
   async deleteAdminUser(@Param('userId') userId: number): Promise<boolean> {
     return this.adminService.deleteAdminUser(userId);
+  }
+
+  /** 관리자 환불처리위해 판매자에게 승인된 반품요청 & 주문 & 결제정보 조회 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('/returns')
+  async getAdminReturnList(): Promise<AdminReturnRes> {
+    return this.returnService.getAdminReturnList();
   }
 }
