@@ -36,4 +36,14 @@ export const createChakraTheme = () =>
       blue: blueColorPalette,
       brand: blueColorPalette,
     },
+    components: {
+      Modal: {
+        parts: ['dialog'],
+        baseStyle: { dialog: { mx: 2 } },
+      },
+      Tabs: {
+        parts: ['tabpanel'],
+        baseStyle: { tabpanel: { px: 0 } },
+      },
+    },
   });

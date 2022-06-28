@@ -24,6 +24,7 @@
                 "feat",
                 "fix",
                 "perf",
+                "improve",
                 "refactor",
                 "revert",
                 "style",

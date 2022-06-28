@@ -1,18 +1,17 @@
 import {
-  Box,
-  Text,
   Flex,
   Grid,
   GridItem,
-  Tabs,
-  TabList,
-  TabPanels,
   Tab,
+  TabList,
   TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
 } from '@chakra-ui/react';
 import { useCustomerCouponList, useCustomerMileage } from '@project-lc/hooks';
-import { CustomerCouponList } from './CustomerCouponList';
 import { CustomerCouponHistoryList } from './CustomerCouponHistoryList';
+import { CustomerCouponList } from './CustomerCouponList';
 import { CustomerMileagenHistoryList } from './CustomerMileageHistory';
 
 export function Benefits(): JSX.Element {
@@ -26,32 +25,29 @@ export function Benefits(): JSX.Element {
       </Text>
       <Grid templateColumns="repeat(2, 2fr)" mt={5} gap={2}>
         <GridItem mb={5}>
-          <Box mb={5}>
-            <Flex justifyContent="space-between">
-              <Text>보유쿠폰 수</Text>
-              <Flex>
-                <Text fontWeight="bold">{couponLength} 장</Text>
-              </Flex>
+          <Flex justifyContent="space-between">
+            <Text>보유쿠폰 수</Text>
+            <Flex>
+              <Text fontWeight="bold">{couponLength} 장</Text>
             </Flex>
-          </Box>
-          <Box>
-            <Flex justifyContent="space-between">
-              <Text>보유 마일리지</Text>
-              <Text fontWeight="bold">{mileage?.mileage?.toLocaleString() || 0} 원</Text>
-            </Flex>
-          </Box>
+          </Flex>
+          <Flex justifyContent="space-between">
+            <Text>보유 마일리지</Text>
+            <Text fontWeight="bold">{mileage?.mileage?.toLocaleString() || 0} 원</Text>
+          </Flex>
         </GridItem>
+
         <GridItem colSpan={2}>
           <Tabs>
             <TabList>
-              <Tab>보유 쿠폰목록</Tab>
-              <Tab>쿠폰 사용내역</Tab>
-              <Tab>마일리지 사용내역</Tab>
+              <Tab fontSize={{ base: 'sm', sm: 'md' }}>보유 쿠폰목록</Tab>
+              <Tab fontSize={{ base: 'sm', sm: 'md' }}>쿠폰 사용내역</Tab>
+              <Tab fontSize={{ base: 'sm', sm: 'md' }}>마일리지 사용내역</Tab>
             </TabList>
 
             <TabPanels>
               <TabPanel>
-                <CustomerCouponList data={coupons} />
+                <CustomerCouponList />
               </TabPanel>
               <TabPanel>
                 <CustomerCouponHistoryList />

@@ -1,101 +1,135 @@
 import {
+  Button,
+  Grid,
+  GridItem,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Button,
-  Flex,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Text,
 } from '@chakra-ui/react';
-import dayjs from 'dayjs';
-import { GridRowData } from '@material-ui/data-grid';
 import {
   DiscountApplyFieldBadge,
   DiscountApplyTypeBadge,
 } from '@project-lc/components-shared/CouponBadge';
+import { CustomerCouponRes } from '@project-lc/shared-types';
+import dayjs from 'dayjs';
 
 type CustomerCouponDetailDialogProps = {
   isOpen: boolean;
   onClose: () => void;
-  data: GridRowData;
+  customerCoupon: CustomerCouponRes;
 };
 
-export function CustomerCouponDetailDialog(
-  props: CustomerCouponDetailDialogProps,
-): JSX.Element {
-  const { isOpen, onClose, data } = props;
-  const { coupon } = data;
+export function CustomerCouponDetailDialog({
+  isOpen,
+  onClose,
+  customerCoupon,
+}: CustomerCouponDetailDialogProps): JSX.Element {
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered size="xs">
         <ModalOverlay />
         <ModalContent>
-          {coupon && (
+          {customerCoupon && (
             <>
-              <ModalHeader>{coupon.name}</ModalHeader>
+              <ModalHeader>{customerCoupon.coupon.name}</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
-                <Flex direction="column" justifyContent="space-evenly" minH={250}>
-                  <Flex justifyContent="space-between">
-                    <Text>{coupon.unit === 'P' ? '할인율' : '할인액'}</Text>
+                <Grid
+                  gridTemplateColumns="repeat(4, 1fr)"
+                  fontSize={{ base: 'sm', md: 'md' }}
+                  rowGap={1}
+                >
+                  <GridItem>
                     <Text>
-                      {coupon.unit === 'P'
-                        ? `${coupon.amount}%`
-                        : `${coupon.amount.toLocaleString()}원`}
+                      {customerCoupon.coupon.unit === 'P' ? '할인율' : '할인액'}
                     </Text>
-                  </Flex>
-                  <Flex justifyContent="space-between">
+                  </GridItem>
+                  <GridItem colSpan={3} textAlign="right">
+                    <Text>
+                      {customerCoupon.coupon.unit === 'P'
+                        ? `${customerCoupon.coupon.amount}%`
+                        : `${customerCoupon.coupon.amount.toLocaleString()}원`}
+                    </Text>
+                  </GridItem>
+
+                  <GridItem>
                     <Text>할인유형</Text>
-                    <Text>{DiscountApplyFieldBadge(coupon.applyField)}</Text>
-                  </Flex>
-                  <Flex justifyContent="space-between">
+                  </GridItem>
+                  <GridItem colSpan={3} textAlign="right">
+                    {DiscountApplyFieldBadge(customerCoupon.coupon.applyField)}
+                  </GridItem>
+
+                  <GridItem>
                     <Text>할인대상</Text>
-                    <Text>{DiscountApplyTypeBadge(coupon.applyType)}</Text>
-                  </Flex>
-                  <Flex justifyContent="space-between">
+                  </GridItem>
+                  <GridItem colSpan={3} textAlign="right">
+                    {DiscountApplyTypeBadge(customerCoupon.coupon.applyType)}
+                  </GridItem>
+
+                  <GridItem>
                     <Text>최소주문액</Text>
+                  </GridItem>
+                  <GridItem colSpan={3} textAlign="right">
                     <Text>
-                      {coupon.minOrderAmountWon
-                        ? `${coupon.minOrderAmountWon.toLocaleString()}원`
+                      {customerCoupon.coupon.minOrderAmountWon
+                        ? `${customerCoupon.coupon.minOrderAmountWon.toLocaleString()}원`
                         : '-'}
                     </Text>
-                  </Flex>
-                  <Flex justifyContent="space-between">
+                  </GridItem>
+
+                  <GridItem>
                     <Text>최대할인액</Text>
+                  </GridItem>
+                  <GridItem colSpan={3} textAlign="right">
                     <Text>
-                      {coupon.maxDiscountWon
-                        ? `${coupon.maxDiscountWon.toLocaleString()}원`
+                      {customerCoupon.coupon.maxDiscountAmountWon
+                        ? `${customerCoupon.coupon.maxDiscountAmountWon.toLocaleString()}원`
                         : '-'}
                     </Text>
-                  </Flex>
-                  <Flex justifyContent="space-between">
+                  </GridItem>
+
+                  <GridItem>
                     <Text>할인시작일</Text>
+                  </GridItem>
+                  <GridItem colSpan={3} textAlign="right">
                     <Text>
-                      {coupon.startDate
-                        ? dayjs(coupon.startDate).format('YYYY-MM-DD HH:mm:ss')
+                      {customerCoupon.coupon.startDate
+                        ? dayjs(customerCoupon.coupon.startDate).format(
+                            'YYYY-MM-DD HH:mm:ss',
+                          )
                         : '-'}
                     </Text>
-                  </Flex>
-                  <Flex justifyContent="space-between">
+                  </GridItem>
+
+                  <GridItem>
                     <Text>사용기한</Text>
+                  </GridItem>
+                  <GridItem colSpan={3} textAlign="right">
                     <Text>
-                      {coupon.endDate
-                        ? dayjs(coupon.endDate).format('YYYY-MM-DD HH:mm:ss')
+                      {customerCoupon.coupon.endDate
+                        ? dayjs(customerCoupon.coupon.endDate).format(
+                            'YYYY-MM-DD HH:mm:ss',
+                          )
                         : '-'}
                     </Text>
-                  </Flex>
-                  <Flex justifyContent="space-between">
+                  </GridItem>
+
+                  <GridItem>
                     <Text>발급일</Text>
+                  </GridItem>
+                  <GridItem colSpan={3} textAlign="right">
                     <Text>
-                      {data.issueDate
-                        ? dayjs(data.issueDate).format('YYYY-MM-DD HH:mm:ss')
+                      {customerCoupon.issueDate
+                        ? dayjs(customerCoupon.issueDate).format('YYYY-MM-DD HH:mm:ss')
                         : '-'}
                     </Text>
-                  </Flex>
-                </Flex>
+                  </GridItem>
+                </Grid>
               </ModalBody>
 
               <ModalFooter>

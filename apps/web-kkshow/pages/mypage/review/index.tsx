@@ -60,9 +60,7 @@ export function ReviewIndex(): JSX.Element {
 
             <TabPanels>
               {tabInfos.map((tab) => (
-                <TabPanel key={tab.title} px={0}>
-                  {tab.component}
-                </TabPanel>
+                <TabPanel key={tab.title}>{tab.component}</TabPanel>
               ))}
             </TabPanels>
           </Tabs>
