@@ -9,6 +9,7 @@ import {
   Text,
   useBoolean,
 } from '@chakra-ui/react';
+import { PaymentMethod } from '@prisma/client';
 import { useDefaultCustomerAddress, useProfile } from '@project-lc/hooks';
 import { banks } from '@project-lc/shared-types';
 import { useCallback, useEffect } from 'react';
@@ -20,7 +21,11 @@ export type Solution =
   | 'exchange'
   // 환불(=수거없는 반품)
   | 'return'; //
-export function SolutionSection(): JSX.Element {
+export function SolutionSection({
+  paymentMethod,
+}: {
+  paymentMethod?: PaymentMethod;
+}): JSX.Element {
   const { setValue, watch } = useFormContext();
   return (
     <Stack spacing={4}>
@@ -35,7 +40,9 @@ export function SolutionSection(): JSX.Element {
         </Stack>
       </RadioGroup>
       {watch('solution') === 'exchange' && <ReExportRequestSection />}
-      {watch('solution') === 'return' && <RefundOnlyRequestSection />}
+      {watch('solution') === 'return' && (
+        <RefundOnlyRequestSection paymentMethod={paymentMethod} />
+      )}
     </Stack>
   );
 }
@@ -92,18 +99,26 @@ export function ReExportRequestSection(): JSX.Element {
   );
 }
 
-export function RefundOnlyRequestSection(): JSX.Element {
+export function RefundOnlyRequestSection({
+  paymentMethod,
+}: {
+  paymentMethod?: PaymentMethod;
+}): JSX.Element {
   const { register } = useFormContext();
-  return (
-    <Stack>
-      <Text>환불받을 은행 계좌를 입력해주세요</Text>
-      <Select {...register('returnBank')}>
-        {banks.map((bank) => (
-          <option key={bank.bankCode}>{bank.bankName}</option>
-        ))}
-      </Select>
-      <Text>계좌번호</Text>
-      <Input type="number" {...register('returnBankAccount')} />
-    </Stack>
-  );
+  if (paymentMethod && paymentMethod === 'virtualAccount') {
+    return (
+      <Stack>
+        <Text>환불받을 은행 계좌를 입력해주세요</Text>
+        <Select {...register('returnBank')}>
+          {banks.map((bank) => (
+            <option key={bank.bankCode}>{bank.bankName}</option>
+          ))}
+        </Select>
+        <Text>계좌번호</Text>
+        <Input type="number" {...register('returnBankAccount')} />
+      </Stack>
+    );
+  }
+
+  return <></>;
 }

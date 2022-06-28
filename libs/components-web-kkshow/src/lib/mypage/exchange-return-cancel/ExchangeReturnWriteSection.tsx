@@ -7,11 +7,13 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
+import { PaymentMethod } from '@prisma/client';
 import { Preview } from '@project-lc/components-core/ImageInputDialog';
 import {
   useCustomerExchangeMutation,
   useCustomerReturnMutation,
   useOrderDetail,
+  usePaymentByOrderCode,
 } from '@project-lc/hooks';
 import {
   CreateExchangeDto,
@@ -77,6 +79,8 @@ export function ExchangeReturnWriteSection({
   });
 
   const { data, isLoading, isError } = useOrderDetail({ orderId });
+
+  const { data: paymentData } = usePaymentByOrderCode(data?.orderCode || '');
 
   const exchangeRequest = useCustomerExchangeMutation();
   const returnRequest = useCustomerReturnMutation();
@@ -176,10 +180,14 @@ export function ExchangeReturnWriteSection({
 
     // * 반품(환불)요청 경우  --------------------------
     if (solution === 'return') {
-      // 필수값 : returnBank, returnBankAccount
+      // payment.method === 'virtualAccount'인 경우에만 필수값 : returnBank, returnBankAccount =>
       const { returnBank, returnBankAccount } = rest;
       // * 필수값이 있는지 확인
-      if (!returnBank || !returnBankAccount) {
+      if (
+        paymentData &&
+        paymentData.method === 'virtualAccount' &&
+        (!returnBank || !returnBankAccount)
+      ) {
         toast({
           title: '환불받을 계좌정보를 입력하지 않았습니다.',
           status: 'warning',
@@ -242,7 +250,7 @@ export function ExchangeReturnWriteSection({
           <PhotoSection description="재배송/환불 요청과 관련된 사진을 등록해주세요" />
           <Divider />
 
-          <SolutionSection />
+          <SolutionSection paymentMethod={paymentData?.method as PaymentMethod} />
 
           <Stack direction="row" justifyContent="space-around">
             <Button type="button" onClick={() => router.push('/mypage/orders')} flex="1">

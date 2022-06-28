@@ -1,3 +1,4 @@
+import { Heading } from '@chakra-ui/react';
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
 import { ExchangeReturnWriteSection } from '@project-lc/components-web-kkshow/mypage/exchange-return-cancel/ExchangeReturnWriteSection';
 
@@ -11,7 +12,8 @@ export function ExchangeReturnWrite(): JSX.Element {
 
   return (
     <CustomerMypageLayout>
-      재배송/환불 신청(작성)페이지
+      <Heading size="sm">재배송/환불 신청(작성)페이지</Heading>
+
       <ExchangeReturnWriteSection orderId={_orderId} />
     </CustomerMypageLayout>
   );
