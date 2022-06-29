@@ -53,6 +53,8 @@ export class VirtualAccountService implements VirtualAccountServiceInterface {
         data: { step: OrderProcessStep.paymentCanceled },
       }),
     ]);
+
+    console.log(result);
     return result.length;
   }
 }
