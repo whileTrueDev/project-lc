@@ -97,10 +97,7 @@ export function AdminReturnRequestList(): JSX.Element {
   if (!data) return <Text>환불요청이 없습니다</Text>;
   return (
     <Stack>
-      <Text>
-        판매자에 의해 승인된 소비자의 환불요청 목록. 클릭시 해당 요청, 주문 내용 확인 가능
-        환불처리
-      </Text>
+      <Text>판매자가 승인한 소비자 환불요청 목록(환불처리 해야 할 목록) </Text>
       <ChakraDataGrid
         borderWidth={0}
         hideFooter

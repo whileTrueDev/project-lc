@@ -1,23 +1,22 @@
 import {
-  Thead,
-  Tr,
-  Th,
-  Td,
-  Tbody,
-  Table,
-  Stack,
-  Text,
   Box,
-  Grid,
-  GridItem,
-  Tfoot,
-  Input,
-  Divider,
   Button,
   FormControl,
   FormErrorMessage,
+  Grid,
+  GridItem,
+  Input,
   Link,
   Spinner,
+  Stack,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Tfoot,
+  Th,
+  Thead,
+  Tr,
 } from '@chakra-ui/react';
 import { CardDetail } from '@project-lc/components-shared/payment/CardDetail';
 import { TransferDetail } from '@project-lc/components-shared/payment/TransferDetail';
@@ -30,8 +29,8 @@ import {
   ReturnItemWithOriginOrderItemInfo,
 } from '@project-lc/shared-types';
 import { getAdminHost } from '@project-lc/utils';
-import NextLink from 'next/link';
 import dayjs from 'dayjs';
+import NextLink from 'next/link';
 import { useForm } from 'react-hook-form';
 
 type AdminRefundCreateFormData = {
@@ -69,7 +68,6 @@ export function AdminReturnRequestDetail({
   const { mutateAsync } = useCreateRefundMutation();
   const submitHandler = (formData: AdminRefundCreateFormData): void => {
     if (!data) return;
-    console.log(formData);
 
     // 결제수단이 가상계좌인 경우 환불받을 은행, 계좌, 예금주 정보를 함께 전송해야함
     const virtualAccountRefundInfo =
