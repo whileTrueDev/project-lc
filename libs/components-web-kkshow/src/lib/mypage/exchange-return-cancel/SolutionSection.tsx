@@ -24,7 +24,7 @@ export type Solution =
 export function SolutionSection({
   paymentMethod,
 }: {
-  paymentMethod?: PaymentMethod;
+  paymentMethod?: string; // '카드' | '계좌이체' | '가상계좌'
 }): JSX.Element {
   const { setValue, watch } = useFormContext();
   return (
@@ -102,10 +102,10 @@ export function ReExportRequestSection(): JSX.Element {
 export function RefundOnlyRequestSection({
   paymentMethod,
 }: {
-  paymentMethod?: PaymentMethod;
+  paymentMethod?: string; // '카드' | '계좌이체' | '가상계좌'
 }): JSX.Element {
   const { register } = useFormContext();
-  if (paymentMethod && paymentMethod === 'virtualAccount') {
+  if (paymentMethod && paymentMethod === '가상계좌') {
     return (
       <Stack>
         <Text>환불받을 은행 계좌를 입력해주세요</Text>

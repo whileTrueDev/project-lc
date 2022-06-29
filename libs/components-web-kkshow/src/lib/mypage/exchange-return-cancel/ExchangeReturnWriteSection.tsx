@@ -185,7 +185,7 @@ export function ExchangeReturnWriteSection({
       // * 필수값이 있는지 확인
       if (
         paymentData &&
-        paymentData.method === 'virtualAccount' &&
+        paymentData.method === '가상계좌' &&
         (!returnBank || !returnBankAccount)
       ) {
         toast({
@@ -250,7 +250,7 @@ export function ExchangeReturnWriteSection({
           <PhotoSection description="재배송/환불 요청과 관련된 사진을 등록해주세요" />
           <Divider />
 
-          <SolutionSection paymentMethod={paymentData?.method as PaymentMethod} />
+          <SolutionSection paymentMethod={paymentData?.method} />
 
           <Stack direction="row" justifyContent="space-around">
             <Button type="button" onClick={() => router.push('/mypage/orders')} flex="1">
