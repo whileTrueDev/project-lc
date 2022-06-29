@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   InternalServerErrorException,
@@ -33,6 +34,7 @@ export class PaymentWebhookController {
   @Post('toss')
   public async tossCallback(): Promise<any> {
     //
+    throw new NotFoundException('TossPayments - 아직 웹훅 처리 준비되지 않음');
   }
 
   /**
@@ -60,7 +62,8 @@ export class PaymentWebhookController {
       KKsPaymentProviders.TossPayments,
       dto,
     );
-    if (!secretValidated) throw new NotFoundException('TossPayments - Secret mismatched');
+    if (!secretValidated)
+      throw new BadRequestException('TossPayments - Secret mismatched');
     // status 에 따른 가상계좌 작업 처리
     const result = await this.paymentWebhookService.depositProcessing(
       KKsPaymentProviders.TossPayments,

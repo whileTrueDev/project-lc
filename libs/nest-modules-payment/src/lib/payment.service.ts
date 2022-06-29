@@ -1,5 +1,10 @@
 import { HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Order, OrderPayment, PaymentMethod } from '@prisma/client';
+import {
+  Order,
+  OrderPayment,
+  PaymentMethod,
+  VirtualAccountDepositStatus,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreatePaymentRes,
@@ -10,6 +15,7 @@ import {
   TossPaymentCancelDto,
 } from '@project-lc/shared-types';
 import { PaymentsByDateRequestType, TossPaymentsApi } from '@project-lc/utils';
+import { PaymentCancelDto } from './IPaymentCancelKeyMap';
 
 @Injectable()
 export class PaymentService {
@@ -28,17 +34,20 @@ export class PaymentService {
     account?: string;
   }): Promise<OrderPayment> {
     let paymentMethod: PaymentMethod = PaymentMethod.card;
+    let depositStatus: VirtualAccountDepositStatus = null;
     if (dto.method === '카드') {
       paymentMethod = PaymentMethod.card;
     } else if (dto.method === '계좌이체') {
       paymentMethod = PaymentMethod.transfer;
     } else if (dto.method === '가상계좌') {
       paymentMethod = PaymentMethod.virtualAccount;
+      depositStatus = VirtualAccountDepositStatus.WAITING;
     }
     return this.prisma.orderPayment.create({
       data: {
         ...dto,
         method: paymentMethod,
+        depositStatus,
       },
     });
   }
@@ -141,11 +150,3 @@ export class PaymentService {
     }
   }
 }
-/** Payment프로바이더별 DTO 맵 { TossPayments:{ ...TossDto }, NaverPay: { ...NaverDto} } */
-type IPaymentCancelKeyMap = Record<
-  KKsPaymentProviders.TossPayments,
-  TossPaymentCancelDto
-> &
-  Record<KKsPaymentProviders.NaverPay, { dtoExampleField: unknown }>;
-/** Payment프로바이더별 결제 취소 DTO */
-type PaymentCancelDto<T extends KKsPaymentProviders> = IPaymentCancelKeyMap[T];

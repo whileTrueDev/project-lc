@@ -1,9 +1,10 @@
-import { Box, Stack, Text } from '@chakra-ui/react';
+import { Box, Image, Stack, Text } from '@chakra-ui/react';
 import { OrderItemOption } from '@prisma/client';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { OrderDataWithRelations, OrderItemWithRelations } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
+import { useRouter } from 'next/router';
 
 export interface OrderItemOptionInfoProps {
   option: OrderItemOption;
@@ -16,34 +17,33 @@ export function OrderItemOptionInfo({
   orderItem,
   displayStatus = true,
 }: OrderItemOptionInfoProps): JSX.Element {
+  const router = useRouter();
   const goodsId = orderItem.goods.id;
   const goodsName = orderItem.goods.goods_name;
   const goodsImage = orderItem.goods.image?.[0]?.image;
   return (
     <Stack direction="row" alignItems="center">
-      <Box
-        cursor="pointer"
-        onClick={() => {
-          alert(`상품고유번호 ${goodsId}의 상세페이지로 이동`);
-        }}
-      >
-        {/* 이미지 */}
-        <img width="40px" height="40px" src={goodsImage} alt="" />
+      <Box cursor="pointer" onClick={() => router.push(`goods/${goodsId}`)}>
+        <Image
+          objectFit="cover"
+          rounded="md"
+          width="48px"
+          height="48px"
+          src={goodsImage}
+          alt=""
+        />
       </Box>
       {/* 주문상품 옵션 */}
-      <Stack>
+      <Stack spacing={0}>
         {displayStatus && (
           <Stack direction="row">
             <OrderStatusBadge step={option.step} />
           </Stack>
         )}
-
         <Text
           fontWeight="bold"
           cursor="pointer"
-          onClick={() => {
-            alert(`상품고유번호 ${goodsId}의 상세페이지로 이동`);
-          }}
+          onClick={() => router.push(`goods/${goodsId}`)}
         >
           {goodsName}
         </Text>
