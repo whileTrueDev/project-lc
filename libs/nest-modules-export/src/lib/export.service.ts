@@ -102,13 +102,13 @@ export class ExportService {
       select: { id: true, quantity: true, exportItems: true },
     });
     // 주문상품옵션.quantity 가 총합(주문상품옵션.출고상품옵션.amount)보다 작으면 부분출고
-    // 같으면 전체출고로 주문상품옵션의 상태 업데이트
+    // 아니면 전체출고로 주문상품옵션의 상태 업데이트
     const updateDataList = await Promise.all(
       orderItemOptions.map(async (orderItemOption) => {
         const { quantity: originOrderAmount, exportItems, id } = orderItemOption; // 주문상품옵션 원래 주문개수
         const totalExportedAmount = exportItems.reduce((sum, cur) => sum + cur.amount, 0); // 주문상품옵션에 연결된 출고상품의 출고개수 합
         const newOrderItemOptionStepAfterExport: OrderProcessStep =
-          originOrderAmount === totalExportedAmount ? 'exportDone' : 'partialExportDone';
+          originOrderAmount <= totalExportedAmount ? 'exportDone' : 'partialExportDone';
         return { id, step: newOrderItemOptionStepAfterExport };
       }),
     );
