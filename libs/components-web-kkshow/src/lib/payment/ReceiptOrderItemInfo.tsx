@@ -14,6 +14,7 @@ import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { BsShopWindow } from 'react-icons/bs';
 import { OrderDetailRes } from '@project-lc/shared-types';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
+import { getCustomerWebHost } from '@project-lc/utils';
 
 export function ReceiptOrderItemInfo({
   data,
@@ -37,7 +38,7 @@ export function ReceiptOrderItemInfo({
             <GridItem colSpan={5} mb={4}>
               <Link
                 isTruncated
-                href={`http://localhost:3000/goods/${item.id}`}
+                href={`${getCustomerWebHost()}/goods/${item.goods.id}`}
                 fontWeight="bold"
                 colorScheme="blue"
                 isExternal
@@ -107,7 +108,7 @@ export function MobileReceiptOrderItemInfo({
               <Link
                 w="100%"
                 isTruncated
-                href={`http://localhost:3000/goods/${item.id}`}
+                href={`${getCustomerWebHost()}/goods/${item.goods.id}`}
                 fontWeight="bold"
                 colorScheme="blue"
                 isExternal
@@ -130,7 +131,7 @@ export function MobileReceiptOrderItemInfo({
               <Link
                 w="100%"
                 isTruncated
-                href={`http://localhost:3000/goods/${item.id}`}
+                href={`${getCustomerWebHost()}/goods/${item.goods.id}`}
                 fontWeight="bold"
                 colorScheme="blue"
                 isExternal
