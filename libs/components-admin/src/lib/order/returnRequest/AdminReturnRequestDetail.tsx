@@ -16,12 +16,21 @@ import {
   Button,
   FormControl,
   FormErrorMessage,
+  Link,
+  Spinner,
 } from '@chakra-ui/react';
 import { CardDetail } from '@project-lc/components-shared/payment/CardDetail';
 import { TransferDetail } from '@project-lc/components-shared/payment/TransferDetail';
 import { VirtualAccountDetail } from '@project-lc/components-shared/payment/VirtualAccountDetail';
 import { useCreateRefundMutation, usePaymentByOrderCode } from '@project-lc/hooks';
-import { CreateRefundDto } from '@project-lc/shared-types';
+import {
+  AdminReturnData,
+  CreateRefundDto,
+  CreateRefundRes,
+  ReturnItemWithOriginOrderItemInfo,
+} from '@project-lc/shared-types';
+import { getAdminHost } from '@project-lc/utils';
+import NextLink from 'next/link';
 import dayjs from 'dayjs';
 import { useForm } from 'react-hook-form';
 
@@ -30,20 +39,27 @@ type AdminRefundCreateFormData = {
 };
 
 export interface AdminReturnRequestDetailProps {
-  data?: any;
+  data?: AdminReturnData | null;
+  /** '환불처리하기' 버튼 눌렀을때 실행할 콜백함수 */
+  onSubmit?: () => void;
+  /** '취소' 버튼 눌렀을때 실행할 콜백함수 */
+  onCancel?: () => void;
 }
 export function AdminReturnRequestDetail({
   data,
+  onSubmit,
+  onCancel,
 }: AdminReturnRequestDetailProps): JSX.Element {
-  const { data: paymentData } = usePaymentByOrderCode(data?.order?.orderCode);
+  const { data: paymentData } = usePaymentByOrderCode(data?.order.orderCode || '');
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<AdminRefundCreateFormData>();
 
-  const handleSuccess = (res: any): void => {
+  const handleSuccess = (res: CreateRefundRes): void => {
     console.log('success', res);
+    if (onSubmit) onSubmit();
   };
 
   const handleError = (e: any): void => {
@@ -52,34 +68,37 @@ export function AdminReturnRequestDetail({
 
   const { mutateAsync } = useCreateRefundMutation();
   const submitHandler = (formData: AdminRefundCreateFormData): void => {
+    if (!data) return;
     console.log(formData);
 
+    // 결제수단이 가상계좌인 경우 환불받을 은행, 계좌, 예금주 정보를 함께 전송해야함
+    const virtualAccountRefundInfo =
+      data?.order?.payment?.method === 'virtualAccount'
+        ? {
+            refundAccount: data.returnBankAccount || undefined,
+            refundBank: data.returnBank || undefined,
+            refundAccountHolder: paymentData?.virtualAccount?.customerName || undefined,
+          }
+        : undefined;
+
     const dto: CreateRefundDto = {
-      orderId: data?.order?.id,
+      orderId: data.order.id,
       reason: '소비자 환불 요청',
-      items: data?.items.map((i: any) => {
+      items: data.items.map((i: ReturnItemWithOriginOrderItemInfo) => {
         const { orderItemId, orderItemOptionId, amount } = i;
         return { orderItemId, orderItemOptionId, amount };
       }),
-      returnId: data?.id, // 연결된 반품(환불)요청
+      returnId: data.id, // 연결된 반품(환불)요청
       refundAmount: formData.refundAmount, // 환불금액
-      // 가상계좌로 결제했을 경우 - 환불요청시 소비자가 입력한 계좌
-      refundAccount:
-        data?.order?.payment?.method === 'virtualAccount'
-          ? data?.returnBankAccount
-          : undefined,
-      // 가상계좌로 결제했을 경우 - 환불요청시 소비자가 입력한 은행
-      refundBank:
-        data?.order?.payment?.methods === 'virtualAccount' ? data?.returnBank : undefined,
-      // 환불요청을 진행하는 단계에서는 이미 결제가 완료된 상태이므로 결제키가 존재한다
-      paymentKey: data?.order?.payment?.paymentKey,
+      paymentKey: data.order.payment?.paymentKey, // 환불요청을 진행하는 단계에서는 이미 결제가 완료된 상태이므로 결제키가 존재한다
+      ...virtualAccountRefundInfo, // 가상계좌 환불수단 정보
     };
 
     mutateAsync(dto).then(handleSuccess).catch(handleError);
   };
 
   const defaultTotalRefundAmount = data?.items
-    ? data?.items.reduce((sum: number, i: any) => {
+    ? data?.items.reduce((sum: number, i) => {
         return (
           sum +
           Number(i?.orderItemOption?.quantity) * Number(i?.orderItemOption?.discountPrice)
@@ -87,11 +106,17 @@ export function AdminReturnRequestDetail({
       }, 0)
     : 0;
 
-  // 토스페이먼츠 결제취소요청 후 refund 데이터 생성
+  if (!data) return <Spinner />;
+
   return (
     <Stack as="form" onSubmit={handleSubmit(submitHandler)}>
-      <Text>주문코드 {data?.order?.orderCode}</Text>
-      <Text>환불(반품)요청코드 {data?.returnCode}</Text>
+      <Text>
+        주문코드
+        <NextLink passHref href={`${getAdminHost()}/order/list/${data.order.id}`}>
+          <Link color="blue.500"> {data.order.orderCode}</Link>
+        </NextLink>
+      </Text>
+      <Text>환불(반품)요청코드 {data.returnCode}</Text>
 
       <Box>
         <Text>주문 결제정보</Text>
@@ -101,56 +126,63 @@ export function AdminReturnRequestDetail({
           </GridItem>
           <GridItem>
             <Text>
-              {data?.order?.paymentPrice && data?.order?.paymentPrice.toLocaleString()} 원
+              {data.order.paymentPrice && data.order.paymentPrice.toLocaleString()} 원
             </Text>
           </GridItem>
           <GridItem>
             <Text>결제키</Text>
           </GridItem>
           <GridItem>
-            <Text>{data?.order?.payment?.paymentKey}</Text>
+            <Text>{data.order.payment?.paymentKey}</Text>
           </GridItem>
-          <GridItem>
-            <Text>결제수단</Text>
-          </GridItem>
-          <GridItem>
-            <Text>{paymentData?.method}</Text>
-          </GridItem>
-          {paymentData?.method === '카드' && <CardDetail paymentData={paymentData} />}
-          {paymentData?.method === '가상계좌' && (
-            <VirtualAccountDetail paymentData={paymentData} />
+          {paymentData && (
+            <>
+              <GridItem>
+                <Text>결제수단</Text>
+              </GridItem>
+              <GridItem>
+                <Text>{paymentData.method}</Text>
+              </GridItem>
+              {paymentData.method === '카드' && <CardDetail paymentData={paymentData} />}
+              {paymentData.method === '가상계좌' && (
+                <VirtualAccountDetail paymentData={paymentData} />
+              )}
+              {paymentData.method === '계좌이체' && (
+                <TransferDetail paymentData={paymentData} />
+              )}
+              <GridItem>
+                <Text>요청일시</Text>
+              </GridItem>
+              <GridItem>
+                <Text>
+                  {dayjs(paymentData?.requestedAt).format('YYYY-MM-DD HH:mm:ss')}
+                </Text>
+              </GridItem>
+            </>
           )}
-          {paymentData?.method === '계좌이체' && (
-            <TransferDetail paymentData={paymentData} />
-          )}
-          <GridItem>
-            <Text>요청일시</Text>
-          </GridItem>
-          <GridItem>
-            <Text>{dayjs(paymentData?.requestedAt).format('YYYY-MM-DD HH:mm:ss')}</Text>
-          </GridItem>
         </Grid>
       </Box>
 
-      <Box>
-        <Text>환불요청정보</Text>
-        {/* // TODO : 환불요청시 결제수단에 따라 환불요청 입력 optional 혹은 안보이게 처리 */}
-        <Grid templateColumns="repeat(2, 1fr)" border="1px" p={1}>
-          <GridItem>
-            <Text>환불 은행</Text>
-          </GridItem>
-          <GridItem>
-            <Text>{data?.returnBank}</Text>
-          </GridItem>
+      {data.returnBank && data.returnBankAccount && (
+        <Box>
+          <Text>환불요청정보</Text>
+          <Grid templateColumns="repeat(2, 1fr)" border="1px" p={1}>
+            <GridItem>
+              <Text>환불 은행</Text>
+            </GridItem>
+            <GridItem>
+              <Text>{data.returnBank}</Text>
+            </GridItem>
 
-          <GridItem>
-            <Text>환불 계좌</Text>
-          </GridItem>
-          <GridItem>
-            <Text>{data?.returnBankAccount}</Text>
-          </GridItem>
-        </Grid>
-      </Box>
+            <GridItem>
+              <Text>환불 계좌</Text>
+            </GridItem>
+            <GridItem>
+              <Text>{data.returnBankAccount}</Text>
+            </GridItem>
+          </Grid>
+        </Box>
+      )}
 
       <Box>
         <Text>마일리지, 쿠폰 사용 내역</Text>
@@ -164,9 +196,9 @@ export function AdminReturnRequestDetail({
             </Thead>
 
             <Tbody>
-              {data?.order?.mileageLogs
-                .filter((log: any) => log.actionType === 'consume')
-                .map((i: any) => {
+              {data.order.mileageLogs
+                .filter((log) => log.actionType === 'consume')
+                .map((i) => {
                   return (
                     <Tr key={i.id}>
                       <Td>{i?.reason}</Td>
@@ -185,9 +217,9 @@ export function AdminReturnRequestDetail({
             </Thead>
 
             <Tbody>
-              {data?.order?.customerCouponLogs
-                .filter((log: any) => log.type === 'use')
-                .map((i: any) => {
+              {data.order.customerCouponLogs
+                .filter((log) => log.type === 'use')
+                .map((i) => {
                   return (
                     <Tr key={i.id}>
                       <Td>{i?.customerCoupon?.coupon?.name}</Td>
@@ -214,7 +246,7 @@ export function AdminReturnRequestDetail({
         </Thead>
 
         <Tbody>
-          {data?.items.map((i: any) => {
+          {data?.items.map((i) => {
             return (
               <Tr key={i.id}>
                 <Td>
@@ -263,7 +295,7 @@ export function AdminReturnRequestDetail({
         <Button type="submit" colorScheme="red">
           환불처리하기
         </Button>
-        <Button>취소</Button>
+        <Button onClick={onCancel}>취소</Button>
       </Stack>
     </Stack>
   );

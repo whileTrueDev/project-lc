@@ -1,4 +1,18 @@
-import { Order, Refund, Return, ReturnImage, ReturnItem } from '@prisma/client';
+import {
+  Coupon,
+  CustomerCoupon,
+  CustomerCouponLog,
+  CustomerMileageLog,
+  Order,
+  OrderItem,
+  OrderItemOption,
+  OrderPayment,
+  Refund,
+  Return,
+  ReturnImage,
+  ReturnItem,
+  SellerShop,
+} from '@prisma/client';
 import { ExchangeReturnCancelItemBaseData } from './orderCancellation.res';
 
 export type CreateReturnRes = Return;
@@ -29,8 +43,32 @@ export type UpdateReturnRes = boolean;
 
 export type DeleteReturnRes = boolean;
 
-export type AdminReturnRes = any;
-// export type AdminReturnRes = Return & {
-//   order: {orderCode: string, payment: OrderPayment, ordererName: string},
-//   items: ({id: OrderItem['id'], goods: {id}})[]
-// };
+// ------------------------
+
+export type CustomerCouponLogWithCouponInfo = CustomerCouponLog & {
+  customerCoupon: CustomerCoupon & { coupon: Coupon };
+};
+
+/** 관리자페이지에서 환불처리 위해 필요한 주문 데이터와 마일리지, 쿠폰사용로그 */
+export type OrderWithPaymentData = {
+  id: Order['id'];
+  orderCode: Order['orderCode'];
+  payment: OrderPayment;
+  orderPrice: Order['orderPrice'];
+  paymentPrice: Order['paymentPrice'];
+  ordererName: Order['ordererName'];
+  customerCouponLogs: CustomerCouponLogWithCouponInfo[];
+  mileageLogs: CustomerMileageLog[];
+};
+
+export type ReturnItemWithOriginOrderItemInfo = ReturnItem & {
+  orderItem: { id: OrderItem['id']; goods: { seller: { sellerShop: SellerShop } } };
+  orderItemOption: OrderItemOption;
+};
+
+export type AdminReturnData = Return & {
+  order: OrderWithPaymentData;
+  items: ReturnItemWithOriginOrderItemInfo[];
+};
+/** 관리자페이지에서 환불처리 위해 필요한 교환요청(Return) 데이터와 기타 연관 정보 */
+export type AdminReturnRes = AdminReturnData[];

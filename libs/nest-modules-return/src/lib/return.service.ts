@@ -271,9 +271,9 @@ export class ReturnService {
 
   /** 관리자 환불처리 위해 승인된 반품요청 & 주문 & 결제정보 조회 */
   async getAdminReturnList(): Promise<AdminReturnRes> {
-    return this.prisma.return.findMany({
+    const data = await this.prisma.return.findMany({
       where: { status: 'processing' }, // = 판매자가 반품 승인한 경우만 조회. 판매자가 반품(환불) 승인시 상태 processing으로 변경됨..
-      orderBy: { requestDate: 'asc' }, // 요청일 오름차순
+      orderBy: { requestDate: 'asc' }, // 요청일 오름차순(오래된 요청이 앞쪽에 표시)
       include: {
         order: {
           select: {
@@ -294,17 +294,21 @@ export class ReturnService {
             orderItem: {
               select: {
                 id: true,
-                goods: {
-                  select: {
-                    seller: { select: { sellerShop: true } },
-                  },
-                },
+                goods: { select: { seller: { select: { sellerShop: true } } } },
               },
             },
             orderItemOption: true,
           },
         },
       },
+    });
+
+    return data.map((d) => {
+      const { returnBankAccount } = d;
+
+      return Object.assign(d, {
+        returnBankAccount: this.cipherService.getDecryptedText(returnBankAccount),
+      });
     });
   }
 }

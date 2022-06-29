@@ -14,13 +14,10 @@ import {
 import { GridColumns, GridRowParams } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useAdminReturnList } from '@project-lc/hooks';
+import { AdminReturnData } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import AdminReturnRequestDetail from './AdminReturnRequestDetail';
-
-export interface AdminReturnRequestListProps {
-  propname?: any;
-}
 
 const columns: GridColumns = [
   {
@@ -80,17 +77,14 @@ const columns: GridColumns = [
 
 /** 판매자에 의해 승인된 소비자의 환불요청 목록
  * 해당 요청, 주문 내용 확인 가능 */
-export function AdminReturnRequestList({
-  propname,
-}: AdminReturnRequestListProps): JSX.Element {
+export function AdminReturnRequestList(): JSX.Element {
   const dialog = useDisclosure();
   const { data, isLoading } = useAdminReturnList();
 
-  const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<AdminReturnData | null>(null);
 
   const handleRowClick = (param: GridRowParams): void => {
-    console.log(param);
-    setSelectedRequest(param.row as any);
+    setSelectedRequest(param.row as AdminReturnData);
     dialog.onOpen();
   };
 
@@ -129,7 +123,11 @@ export function AdminReturnRequestList({
           <ModalHeader>환불처리</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <AdminReturnRequestDetail data={selectedRequest} />
+            <AdminReturnRequestDetail
+              data={selectedRequest}
+              onSubmit={handleClose}
+              onCancel={handleClose}
+            />
           </ModalBody>
         </ModalContent>
       </Modal>
