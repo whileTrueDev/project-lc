@@ -17,6 +17,7 @@ import {
   Th,
   Thead,
   Tr,
+  useToast,
 } from '@chakra-ui/react';
 import { CardDetail } from '@project-lc/components-shared/payment/CardDetail';
 import { TransferDetail } from '@project-lc/components-shared/payment/TransferDetail';
@@ -50,6 +51,7 @@ export function AdminReturnRequestDetail({
   onCancel,
 }: AdminReturnRequestDetailProps): JSX.Element {
   const { data: paymentData } = usePaymentByOrderCode(data?.order.orderCode || '');
+  const toast = useToast();
   const {
     register,
     handleSubmit,
@@ -58,10 +60,16 @@ export function AdminReturnRequestDetail({
 
   const handleSuccess = (res: CreateRefundRes): void => {
     console.log('success', res);
+    toast({ status: 'success', title: '결제취소 성공' });
     if (onSubmit) onSubmit();
   };
 
   const handleError = (e: any): void => {
+    toast({
+      status: 'error',
+      title: '결제취소 실패',
+      description: e?.response?.data?.message,
+    });
     console.log('error', e);
   };
 
