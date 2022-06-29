@@ -36,6 +36,11 @@ export class AppController {
     private readonly purchaseMessageService: PurchaseMessageService,
   ) {}
 
+  @Get('health-check')
+  healthCheck(): string {
+    return 'Alive';
+  }
+
   @UseGuards(JwtAuthGuard)
   @UseFilters(ViewAuthFilter)
   @Get()

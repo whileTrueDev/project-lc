@@ -452,7 +452,7 @@ export class LCDevAppStack extends cdk.Stack {
         protocol: elbv2.ApplicationProtocol.HTTP,
         healthCheck: {
           enabled: true,
-          path: '/',
+          path: '/health-check',
           interval: cdk.Duration.minutes(1),
         },
         targets: [overlayControllerService],
