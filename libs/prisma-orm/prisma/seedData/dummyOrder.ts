@@ -14,7 +14,7 @@ export const getDummyOrderFundamentalData = ({
     orderCode,
     step,
     orderPrice: 123123,
-    paymentPrice: 0,
+    paymentPrice: 123123,
     recipientName: '받는사람이름',
     recipientPhone: '01023232323',
     recipientEmail: 'reccipient@gasdf.com',
@@ -149,6 +149,7 @@ export const createDummyOrder = async ({
 export const normalOrder: Prisma.OrderCreateInput = {
   customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
+    step: 'paymentConfirmed',
     orderCode: '20220613154618378F9hUFA',
   }),
   shippings: {
@@ -172,7 +173,7 @@ export const normalOrder: Prisma.OrderCreateInput = {
       const { options, ...rest } = item;
       return {
         ...rest,
-        options: { create: options },
+        options: { create: options.map((opt) => ({ ...opt, step: 'paymentConfirmed' })) },
       };
     }),
   },

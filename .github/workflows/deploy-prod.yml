@@ -7,6 +7,7 @@ on:
       - 'apps/overlay-controller/**'
       - 'apps/api-realtime/**'
       - 'apps/batch-inactive-handler/**'
+      - 'apps/batch-virtual-account/**'
       - 'apps/mailer/**'
       - 'libs/firstmall-db/**'
       - 'libs/nest-core/**'
@@ -343,6 +344,49 @@ jobs:
           task-definition: apps/batch-inactive-handler/task-definition.json
           container-name: project-lc-inactive-batch
           image: ${{ steps.login-ecr.outputs.registry }}/project-lc-inactive-batch:prod-${{ github.sha }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: airfordable/ecs-deploy-task-definition-to-scheduled-task@v2.0.0
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          cluster: project-lc-prod
+          wait-for-service-stability: false
+
+  DeployVirtualAccountBatch:
+    name: Deploy VirtualAccount Batch Job
+    runs-on: [self-hosted, linux, project-lc]
+    needs: [Build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Install dependencies #  Install All Dependencies
+        run: yarn install
+
+      - name: Check VirtualAccountBatch affected
+        run: tools/check-need-deploy.sh batch-virtual-account
+
+      - name: Configure AWS credentials
+        if: ${{ success() }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROJECT_LC }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Fill in the new image ID in the Amazon ECS task definition VirtualAccountBatch
+        if: ${{ success() }}
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: apps/batch-virtual-account/task-definition.json
+          container-name: project-lc-virtual-account-batch
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-virtual-account-batch:prod-${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition
         uses: airfordable/ecs-deploy-task-definition-to-scheduled-task@v2.0.0

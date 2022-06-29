@@ -7,6 +7,7 @@ import { ReturnService } from '@project-lc/nest-modules-return';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminRefundRes,
+  banks,
   CreateRefundDto,
   CreateRefundRes,
   GetRefundListDto,
@@ -59,15 +60,23 @@ export class RefundService {
 
   /** 환불데이터 생성
    * 1. (토스 결제취소 사용시)주문에 연결된 결제키로 토스페이먼츠 결제취소 요청하여 transactionKey 받기
-   *   -> 이걸 여기서 실행해야 하는지 잘 모르겠음.. 프론트에서 호출하고 transaction 키 받아서, 환불정보 생성하는 요청을 한번 더 호출하는 방식으로 진행할 수 있을거같기는 함
    * 2. 결과를 Refund, RefundItem으로 저장 dto, res
    * 3. 연결된 Return, OrderCancellation 상태 업데이트...?
    */
   async createRefund(dto: CreateRefundDto): Promise<CreateRefundRes> {
-    const { orderId, orderCancellationId, returnId, items, refundAccount, ...rest } = dto;
+    const {
+      orderId,
+      orderCancellationId,
+      returnId,
+      items,
+      refundBank,
+      refundAccount,
+      ...rest
+    } = dto;
 
     let transactionKey: string | undefined;
     // 1. 토스페이먼츠 결제취소 api 사용하는 경우 transaction키 받기
+    // 이 과정 실패시 다음 과정 진행되지 않음.
     if (rest.paymentKey) {
       const cancelResult = await this.paymentService.requestCancel(
         KKsPaymentProviders.TossPayments,
@@ -76,19 +85,22 @@ export class RefundService {
       transactionKey = cancelResult.transactionKey;
     }
 
-    // 크크쇼 환불정보 저장시에는 환불받을 계좌정보 암호화하여 저장
+    // 계좌번호 암호화
     const encryptedAccount = this.cipherService.getEncryptedText(refundAccount);
-    const refundData = {
-      ...rest,
-      refundAccount: encryptedAccount,
-      refundCode: this.createRefundCode(),
-      order: { connect: { id: orderId } },
-      items: { create: items },
-      transactionKey,
-    };
 
+    // 환불 정보 입력
     const data = await this.prisma.refund.create({
-      data: refundData,
+      data: {
+        ...rest,
+        refundAccount: encryptedAccount,
+        refundBank: refundBank
+          ? banks.find((b) => b.bankCode === refundBank)?.bankName || refundBank
+          : undefined,
+        refundCode: this.createRefundCode(),
+        order: { connect: { id: orderId } },
+        items: { create: items },
+        transactionKey,
+      },
     });
 
     // 연결된 주문취소 있는경우
@@ -96,10 +108,7 @@ export class RefundService {
       // 환불정보와 연결 + 주문취소 상태를 완료로 업데이트
       await this.orderCancellationService.updateOrderCancellationStatus(
         orderCancellationId,
-        {
-          status: 'complete',
-          refundId: data.id,
-        },
+        { status: 'complete', refundId: data.id },
       );
     }
 
@@ -111,7 +120,6 @@ export class RefundService {
         refundId: data.id,
       });
     }
-
     return data;
   }
 
@@ -154,15 +162,18 @@ export class RefundService {
       },
     });
 
+    const refundResults = data.map((d) => ({
+      ...d,
+      // 환불계좌정보 복호화
+      refundAccount: this.cipherService.getDecryptedText(d.refundAccount),
+    }));
+
     const count = await this.prisma.refund.count({ where });
     const nextCursor = (skip || 0) + take;
     return {
       count,
       nextCursor: nextCursor >= count ? undefined : nextCursor,
-      list: data.map((d) => ({
-        ...d,
-        refundAccount: this.cipherService.getDecryptedText(d.refundAccount), // 환불계좌정보 복호화
-      })),
+      list: refundResults,
     };
   }
 

@@ -65,14 +65,14 @@ export function OrderCancelStatusDialog({
   const toast = useToast();
   const onSuccess = (): void => {
     toast({
-      title: '반품 상태를 변경하였습니다',
+      title: '주문취소 상태를 변경하였습니다',
       status: 'success',
     });
   };
 
   const onFail = (): void => {
     toast({
-      title: '반품 상태 변경 중 오류가 발생하였습니다',
+      title: '주문취소 상태 변경 중 오류가 발생하였습니다',
       status: 'error',
     });
   };
