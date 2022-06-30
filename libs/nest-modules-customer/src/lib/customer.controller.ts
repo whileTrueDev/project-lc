@@ -105,13 +105,6 @@ export class CustomerController {
     return this.customerService.update(id, dto);
   }
 
-  @UseInterceptors(HttpCacheInterceptor)
-  @Delete(':customerId')
-  @UseGuards(JwtAuthGuard)
-  deleteOne(@Param('customerId', ParseIntPipe) id: number): Promise<boolean> {
-    return this.customerService.deleteOne(id);
-  }
-
   /** 소비자 아바타 이미지 s3업로드 후 url 저장 */
   @Post('/avatar')
   @UseGuards(JwtAuthGuard)
@@ -132,5 +125,12 @@ export class CustomerController {
   @CacheClearKeys('customer')
   async deleteCustomerAvatar(@CustomerInfo() customer: UserPayload): Promise<boolean> {
     return this.customerService.removeCustomerAvatar(customer.sub);
+  }
+
+  @UseInterceptors(HttpCacheInterceptor)
+  @Delete(':customerId')
+  @UseGuards(JwtAuthGuard)
+  deleteOne(@Param('customerId', ParseIntPipe) id: number): Promise<boolean> {
+    return this.customerService.deleteOne(id);
   }
 }
