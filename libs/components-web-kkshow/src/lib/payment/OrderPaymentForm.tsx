@@ -28,7 +28,7 @@ export function OrderPaymentForm(): JSX.Element | null {
     },
   });
 
-  const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
+  const CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_PAYMENTS_CLIENT_KEY!;
   const { paymentType, order, shipping, handleOrderPrepare } = useKkshowOrderStore();
   const { selectedItems } = useCartStore();
   const toast = useToast();

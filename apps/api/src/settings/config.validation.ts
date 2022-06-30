@@ -40,4 +40,7 @@ export const validationSchema = Joi.object({
 
   // Redis as Message Queue host url
   MQ_REDIS_URL: Joi.string().required(),
+
+  // Toss Payments API Client Key
+  TOSS_PAYMENTS_SECRET_KEY: Joi.string().required(),
 });
