@@ -41,16 +41,16 @@ export class VirtualAccountService implements VirtualAccountServiceInterface {
         },
       }),
 
-      // 주문취소처리
+      // 주문취소처리 (결제실패 상태)
       this.prisma.order.update({
         where: { id: payment.orderId },
-        data: { step: OrderProcessStep.paymentCanceled },
+        data: { step: OrderProcessStep.paymentFailed },
       }),
 
       // 주문상품취소처리
       this.prisma.orderItemOption.updateMany({
         where: { orderItem: { orderId: payment.orderId } },
-        data: { step: OrderProcessStep.paymentCanceled },
+        data: { step: OrderProcessStep.paymentFailed },
       }),
     ]);
     return result.length;

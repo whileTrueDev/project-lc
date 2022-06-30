@@ -26,17 +26,7 @@ services:
       - 6399:6379
 
   ###############
-  # REDIS for Bull Queue
-  ###############
-  redis-bull-queue:
-    platform: linux/x86_64
-    image: redis:6.2
-    container_name: redis-bull-queue
-    ports:
-      - 6401:6379
-
-  ###############
-  # REDIS
+  # REDIS Cluster
   ###############
   redis-cluster:
     platform: linux/x86_64

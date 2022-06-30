@@ -444,7 +444,7 @@ export class LCProdAppStack extends cdk.Stack {
         protocol: ApplicationProtocol.HTTP,
         healthCheck: {
           enabled: true,
-          path: '/',
+          path: '/health-check',
           interval: cdk.Duration.minutes(1),
         },
         targets: [this.overlayControllerService],

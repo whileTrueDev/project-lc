@@ -55,6 +55,7 @@ export class PaymentWebhookService {
         });
         return true;
       }
+      case 'WATING_FOR_DEPOSIT':
       case 'CANCELED': {
         await this.prisma.orderPayment.update({
           where: { id: targetPayment.id },

@@ -2,9 +2,10 @@ import { OnQueueActive, OnQueueCompleted, Process, Processor } from '@nestjs/bul
 import { Logger } from '@nestjs/common';
 import { OrderPayment } from '@prisma/client';
 import { Job } from 'bull';
-import { ShutdownManager } from './shutdown.manager';
+import { ShutdownManager } from '../shutdown-manager/shutdown.manager';
+
 import { QueueKey } from './virtual-account.constant';
-import VirtualAccountService from './virtual-account.service';
+import { VirtualAccountServiceProxy } from './virtual-account.proxy.service';
 
 /** 가상계좌 미입금 큐에 대한 처리 Consumer */
 @Processor(QueueKey)
@@ -12,7 +13,7 @@ export class VirtualAccountConsumer {
   private readonly logContext = `😊 ${VirtualAccountConsumer.name}`;
 
   constructor(
-    private readonly virtualAccountService: VirtualAccountService,
+    private readonly virtualAccountService: VirtualAccountServiceProxy,
     private readonly shutdownManager: ShutdownManager,
   ) {}
 
@@ -26,7 +27,10 @@ export class VirtualAccountConsumer {
   /** Queue Job 시작시 */
   @OnQueueActive()
   public async onQueueActive(job: Job<OrderPayment>): Promise<void> {
-    Logger.log(`가상계좌 임금기간만료 처리 시작(job.id:${job.id})`, this.logContext);
+    Logger.log(
+      `가상계좌 임금기간만료 처리 시작(job.id:${job.id},job.name:${job.name})`,
+      this.logContext,
+    );
   }
 
   /** Queue Job 완료시 */
@@ -44,5 +48,8 @@ export class VirtualAccountConsumer {
     );
     // Queue에 남은 Job이 없다면 애플리케이션 셧다운 작업 실행
     if (remainJobs.length === 0) this.shutdownManager.shutdown();
+    else {
+      job.queue.resume(true);
+    }
   }
 }
