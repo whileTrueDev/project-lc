@@ -30,6 +30,7 @@ export function OrderDetail(): JSX.Element | null {
             <OrderInfoPayment
               orderPrice={orderDetail.data.orderPrice}
               paymentPrice={orderDetail.data.paymentPrice}
+              payment={orderDetail.data.payment}
             />
           </Box>
 

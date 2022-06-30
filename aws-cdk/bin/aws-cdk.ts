@@ -89,6 +89,7 @@ new LCBatchAppStack(app, 'LC-PROD-BATCH-APP', {
   vpc: prodVpcStack.vpc,
   cluster: prodAppStack.cluster,
   inactiveBatchSecGrp: prodVpcStack.inactiveBatchSecGrp,
+  virtualAccountBatchSecGrp: prodVpcStack.virtualAccountBatchSecGrp,
 });
 
 // ************************************

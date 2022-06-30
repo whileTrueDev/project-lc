@@ -4,6 +4,7 @@ import { OrderProcessStep } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { useAdminOrderList } from '@project-lc/hooks';
+import { convertPaymentMethodToKrString } from '@project-lc/shared-types';
 import { useSellerOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
@@ -41,7 +42,8 @@ const columns: GridColumns = [
   {
     field: 'paymentType',
     headerName: '결제수단',
-    valueFormatter: ({ row }: GridRowData) => PaymentTypeSwitch(row.payment?.method),
+    valueFormatter: ({ row }: GridRowData) =>
+      convertPaymentMethodToKrString(row.payment?.method),
   },
   { field: 'paymentPrice', headerName: '결제금액' },
   {
@@ -67,19 +69,6 @@ const columns: GridColumns = [
     flex: 1,
   },
 ];
-
-function PaymentTypeSwitch(paymentType: string): string {
-  switch (paymentType) {
-    case 'card':
-      return '카드';
-    case 'virtualAccount':
-      return '가상계좌';
-    case 'transfer':
-      return '계좌이체';
-    default:
-      return '';
-  }
-}
 
 export function AdminOrderList(): JSX.Element {
   // 페이지당 행 select

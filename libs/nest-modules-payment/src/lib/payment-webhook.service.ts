@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { OrderProcessStep } from '@prisma/client';
+import { OrderProcessStep, VirtualAccountDepositStatus } from '@prisma/client';
 import { OrderService } from '@project-lc/nest-modules-order';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -44,13 +44,18 @@ export class PaymentWebhookService {
       case 'DONE': {
         await this.prisma.orderPayment.update({
           where: { id: targetPayment.id },
-          data: { depositDate: new Date(dto.createdAt), depositDoneFlag: true },
+          data: {
+            depositDate: new Date(dto.createdAt),
+            depositDoneFlag: true,
+            depositStatus: VirtualAccountDepositStatus.DONE,
+          },
         });
         await this.orderService.updateOrder(order.id, {
           step: OrderProcessStep.paymentConfirmed,
         });
         return true;
       }
+      case 'WATING_FOR_DEPOSIT':
       case 'CANCELED': {
         await this.prisma.orderPayment.update({
           where: { id: targetPayment.id },

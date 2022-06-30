@@ -306,6 +306,7 @@ CREATE TABLE `OrderPayment` (
     `depositSecret` VARCHAR(191) NULL,
     `depositDoneFlag` BOOLEAN NOT NULL DEFAULT false,
     `depositDueDate` DATETIME(3) NULL,
+    `depositStatus` ENUM('WAITING', 'PARTIAL_DONE', 'DONE', 'CANCELED') NULL DEFAULT NULL,
     `account` VARCHAR(191) NULL,
 
     UNIQUE INDEX `OrderPayment_orderId_key`(`orderId`),

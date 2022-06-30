@@ -44,6 +44,7 @@ import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
 import { MileageService } from '@project-lc/nest-modules-mileage';
 
 dayjs.extend(isToday);
+
 @Injectable()
 export class OrderService {
   constructor(
@@ -196,18 +197,43 @@ export class OrderService {
       createInput = { ...createInput, ...(await this.handleGiftOrder(orderDto)) };
     }
 
-    // 주문에 연결된 주문상품, 주문상품옵션, 주문상품후원 생성
+    // 주문에 연결될 상품 정보 조회
     const orderItemsConnectedGoodsIds = orderItems.map((i) => i.goodsId);
     const orderItemConnectedGoodsData = await this.prisma.goods.findMany({
       where: { id: { in: orderItemsConnectedGoodsIds } },
       select: { id: true, goods_name: true, image: true },
     });
 
+    // 주문 기본 상태 설정 (결제완료시 결제확인, 이외의 경우 주문접수)
+    let orderStep: OrderProcessStep = 'orderReceived';
+    if (paymentId) {
+      // 결제정보 조회
+      const paymentInfo = await this.prisma.orderPayment.findUnique({
+        where: { id: paymentId },
+      });
+      if (paymentInfo.method === 'virtualAccount') {
+        // 가상계좌 결제 && 가상계좌에 입금 완료시
+        if (
+          paymentInfo.depositStatus === 'DONE' &&
+          paymentInfo.depositDoneFlag &&
+          paymentInfo.depositDate
+        ) {
+          orderStep = 'paymentConfirmed';
+        }
+      }
+      // 카드결제 OR 계좌이체 결제시
+      if (['card', 'transfer'].includes(paymentInfo.method) && paymentInfo.depositDate) {
+        orderStep = 'paymentConfirmed';
+      }
+    }
+
+    // 주문상품, 주문상품옵션, 주문상품후원 생성
     const order = await this.prisma.order.create({
       data: {
         ...createInput,
         supportOrderIncludeFlag:
           supportOrderIncludeFlag || this.hasSupportOrderItem(orderDto),
+        step: orderStep,
         orderItems: {
           // 주문에 연결된 주문상품 생성
           create: orderItems.map((item) => {
@@ -221,7 +247,12 @@ export class OrderService {
               ...rest,
               // 주문상품옵션들 생성
               options: {
-                create: options.map((opt) => ({ ...opt, goodsName, imageUrl })),
+                create: options.map((opt) => ({
+                  ...opt,
+                  goodsName,
+                  imageUrl,
+                  step: orderStep,
+                })),
               },
               // 주문상품에 후원정보가 있는경우 주문상품후원생성
               support: support

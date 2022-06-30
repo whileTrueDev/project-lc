@@ -25,9 +25,8 @@ services:
     ports:
       - 6399:6379
 
-
   ###############
-  # REDIS
+  # REDIS Cluster
   ###############
   redis-cluster:
     platform: linux/x86_64
