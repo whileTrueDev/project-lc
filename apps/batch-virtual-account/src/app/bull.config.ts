@@ -10,9 +10,9 @@ export class BullConfig implements SharedBullConfigurationFactory {
   constructor(private readonly configService: ConfigService) {}
 
   private getLimiterConfig(): Bull.RateLimiter {
-    let max: number;
+    let max = 2;
     const envMax = this.configService.get<string | undefined>('MAX_QUEUE_EXEC_SIZE');
-    if (!envMax || Number.isNaN(Number(envMax))) max = 2;
+    if (envMax && !Number.isNaN(Number(envMax))) max = Number(envMax);
     return {
       max,
       duration: 5000,
