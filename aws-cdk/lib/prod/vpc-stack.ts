@@ -42,6 +42,7 @@ export class LCProdVpcStack extends cdk.Stack {
       overlaySecGrp: this.overlaySecGrp,
       overlayControllerSecGrp: this.overlayControllerSecGrp,
       inactiveBatchSecGrp: this.inactiveBatchSecGrp,
+      virtualAccountBatchSecGrp: this.virtualAccountBatchSecGrp,
     });
   }
 
@@ -134,8 +135,13 @@ export class LCProdVpcStack extends cdk.Stack {
     overlaySecGrp,
     overlayControllerSecGrp,
     inactiveBatchSecGrp,
+    virtualAccountBatchSecGrp,
   }: Record<
-    'apiSecGrp' | 'overlaySecGrp' | 'overlayControllerSecGrp' | 'inactiveBatchSecGrp',
+    | 'apiSecGrp'
+    | 'overlaySecGrp'
+    | 'overlayControllerSecGrp'
+    | 'inactiveBatchSecGrp'
+    | 'virtualAccountBatchSecGrp',
     ec2.SecurityGroup
   >): ec2.SecurityGroup {
     // * 보안그룹
@@ -192,6 +198,12 @@ export class LCProdVpcStack extends cdk.Stack {
       inactiveBatchSecGrp || this.inactiveBatchSecGrp,
       ec2.Port.tcp(DATABASE_PORT),
       'Allow inactive batch',
+    );
+
+    dbSecGrp.addIngressRule(
+      virtualAccountBatchSecGrp || this.virtualAccountBatchSecGrp,
+      ec2.Port.tcp(DATABASE_PORT),
+      'Allow virtual-account batch',
     );
     return dbSecGrp;
   }
