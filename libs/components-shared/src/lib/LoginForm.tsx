@@ -62,7 +62,8 @@ export function LoginForm({
   const onSubmit = useCallback(
     async (data: LoginUserDto) => {
       const user = await login.mutateAsync(data).catch((err) => {
-        setFormError(getMessage(err?.response.data?.status));
+        console.log(err);
+        setFormError(getMessage(err?.response?.data?.status));
         setValue('password', '');
       });
       if (user && (user as InactiveUserPayload).inactiveFlag) {
