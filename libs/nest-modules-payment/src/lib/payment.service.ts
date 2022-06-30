@@ -3,7 +3,6 @@ import {
   Order,
   OrderPayment,
   PaymentMethod,
-  Prisma,
   VirtualAccountDepositStatus,
 } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -16,6 +15,7 @@ import {
   TossPaymentCancelDto,
 } from '@project-lc/shared-types';
 import { PaymentsByDateRequestType, TossPaymentsApi } from '@project-lc/utils';
+import { PaymentCancelDto } from './IPaymentCancelKeyMap';
 
 @Injectable()
 export class PaymentService {
@@ -68,9 +68,6 @@ export class PaymentService {
         depositDoneFlag: !!result.approvedAt,
         depositSecret: result.secret,
         depositor: result.virtualAccount?.customerName,
-        account: result.virtualAccount
-          ? `${result.virtualAccount.bank}_${result.virtualAccount.accountNumber}`
-          : null,
         depositDueDate: result.virtualAccount?.dueDate
           ? new Date(result.virtualAccount?.dueDate)
           : null,
@@ -145,17 +142,11 @@ export class PaymentService {
     } catch (error) {
       console.error(error.response);
       throw new HttpException(
-        error.response.message || 'error in requestCancelTossPayment',
-        error.response.status || 500,
+        error.response.message ||
+          error.response.data.message ||
+          'error in requestCancelTossPayment',
+        error.response.status || error.response.data.code || 500,
       );
     }
   }
 }
-/** Payment프로바이더별 DTO 맵 { TossPayments:{ ...TossDto }, NaverPay: { ...NaverDto} } */
-type IPaymentCancelKeyMap = Record<
-  KKsPaymentProviders.TossPayments,
-  TossPaymentCancelDto
-> &
-  Record<KKsPaymentProviders.NaverPay, { dtoExampleField: unknown }>;
-/** Payment프로바이더별 결제 취소 DTO */
-type PaymentCancelDto<T extends KKsPaymentProviders> = IPaymentCancelKeyMap[T];

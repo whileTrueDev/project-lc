@@ -56,8 +56,6 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
     refetch();
   }, [dto, queryClient, refetch]);
 
-  const orderListBgColor = useColorModeValue('gray.50', 'gray.900');
-
   if (status === 'error')
     return <Text>주문내역을 조회하던 중 오류가 발생하였습니다 {error.message}</Text>;
   return (
@@ -77,7 +75,7 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
         }}
       />
 
-      <Stack bg={orderListBgColor} px={1} py={4}>
+      <Stack px={1} py={4}>
         {/* 주문내역목록 */}
         {data?.pages.map((group, i) => (
           // eslint-disable-next-line react/no-array-index-key
