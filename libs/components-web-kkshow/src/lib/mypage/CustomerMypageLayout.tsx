@@ -28,9 +28,7 @@ export function CustomerMypageLayout({
       <KkshowNavbar variant="white" />
       <Box>
         {title && <MobileNavSection title={title} />}
-        {enableCustomerStatusOnMobile && (
-          <CustomerStatusSection mobileVisibility={enableCustomerStatusOnMobile} />
-        )}
+        <CustomerStatusSection mobileVisibility={enableCustomerStatusOnMobile} />
         <Flex
           height="100%"
           overflow="hidden"

@@ -178,7 +178,7 @@ export function CartActions(): JSX.Element {
             // + (장바구니담는시점에) 홍보정보를 입력한 경우
             i.support
               ? {
-                  broadcasterId: i.support.broadcasterId,
+                  broadcasterId: i.support?.broadcasterId,
                   message: i.support.message || '',
                   nickname: i.support.broadcaster.userNickname,
                   avatar: i.support.broadcaster.avatar,

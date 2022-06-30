@@ -56,7 +56,7 @@ export function PeriodButtonSet({
   );
 }
 
-type PeriodInputs = {
+export type PeriodInputs = {
   periodStart?: GetOrderListDto['periodStart'];
   periodEnd?: GetOrderListDto['periodEnd'];
 };

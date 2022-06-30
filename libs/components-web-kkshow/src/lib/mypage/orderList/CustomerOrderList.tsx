@@ -15,7 +15,7 @@ import { useQueryClient } from 'react-query';
 import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/router';
 import { OrderItem } from './CustomerOrderItem';
-import CustomerOrderPeriodFilter from './CustomerOrderPeriodFilter';
+import CustomerOrderPeriodFilter, { PeriodInputs } from './CustomerOrderPeriodFilter';
 
 export function CustomerOrderList({ customerId }: { customerId: number }): JSX.Element {
   const queryClient = useQueryClient();
@@ -36,17 +36,17 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
     isLoading,
   } = useInfiniteOrderList(dto);
 
+  // * 무한 스크롤링
   const { ref, inView } = useInView({ threshold: 1 });
-
   // ref 전달한 더보기버튼이 화면에 들어왔는지 확인하여 다음목록 요청
   useEffect(() => {
-    if (inView) {
-      fetchNextPage();
-    }
+    if (inView) fetchNextPage();
   }, [fetchNextPage, inView]);
 
-  // 필터 적용으로 dto 가 변경되는 경우
-  useEffect(() => {
+  // * 필터링
+  const handleFilter = ({ periodStart, periodEnd }: PeriodInputs): void => {
+    setDto((prev) => ({ ...prev, periodStart, periodEnd }));
+    // 필터 적용으로 dto 가 변경되는 경우
     // 수동으로 InfiniteOrderList 쿼리 데이터(조회했던 page와 skip)를 초기화
     queryClient.setQueriesData(INFINITE_ORDER_LIST_QUERY_KEY, () => ({
       pages: [],
@@ -54,7 +54,7 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
     }));
     // 변경된 dto로 조회하기 위해 refetch 실행한다
     refetch();
-  }, [dto, queryClient, refetch]);
+  };
 
   if (status === 'error')
     return <Text>주문내역을 조회하던 중 오류가 발생하였습니다 {error.message}</Text>;
@@ -65,15 +65,7 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
       </Text>
 
       {/* 주문내역 조회 필터 - 기간 */}
-      <CustomerOrderPeriodFilter
-        changePeriod={({ periodStart, periodEnd }) => {
-          setDto((prev) => ({
-            ...prev,
-            periodStart,
-            periodEnd,
-          }));
-        }}
-      />
+      <CustomerOrderPeriodFilter changePeriod={handleFilter} />
 
       <Stack px={1} py={4}>
         {/* 주문내역목록 */}
