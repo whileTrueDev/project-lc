@@ -224,7 +224,10 @@ export function ReviewDetail({
           </Box>
         )}
 
-        <StarRating rating={review.rating} color="orange.300" />
+        <Box my={1}>
+          <StarRating rating={review.rating} color="orange.300" />
+        </Box>
+
         <Text color="GrayText">
           {displayName} | {dayjs(review.createDate).format('YYYY-MM-DD')}
         </Text>

@@ -4,12 +4,13 @@ import { CustomerAddressList } from '@project-lc/components-web-kkshow/address/C
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
 
 export function ContactsIndex(): JSX.Element {
+  const title = '배송지 관리';
   return (
-    <CustomerMypageLayout>
+    <CustomerMypageLayout title={title}>
       <Box p={{ base: 2, md: 4 }}>
         {/* 제목 */}
         <Text fontSize="xl" fontWeight="bold">
-          배송지 관리
+          {title}
         </Text>
 
         <Stack mt={4} spacing={4} alignItems="flex-start">

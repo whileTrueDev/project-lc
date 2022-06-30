@@ -40,9 +40,11 @@ export function ExchangeReturnListSection(): JSX.Element {
           <Tab key={t.key}>{t.text}</Tab>
         ))}
       </TabList>
+
       <Stack mt={4} display={{ base: 'none', md: 'block' }}>
         <DesktopExchangeReturnCancelListHeader />
       </Stack>
+
       <TabPanels>
         <TabPanel>
           <CustomerOrderCancelList customerId={profileData.id} />

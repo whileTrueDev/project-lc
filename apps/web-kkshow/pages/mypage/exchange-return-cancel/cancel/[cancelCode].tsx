@@ -7,7 +7,7 @@ export function OrderCancelDetailPage(): JSX.Element {
   const router = useRouter();
   const { cancelCode } = router.query;
   return (
-    <CustomerMypageLayout>
+    <CustomerMypageLayout title="반품/교환/취소 내역">
       <Box p={[2, 2, 4]}>
         <CustomerOrderCancelDetail cancelCode={cancelCode as string} />
       </Box>

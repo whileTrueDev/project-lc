@@ -1,9 +1,11 @@
 import {
+  Button,
   Center,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/react';
@@ -57,6 +59,9 @@ export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX
             />
           </Center>
         </ModalBody>
+        <ModalFooter>
+          <Button onClick={onClose}>닫기</Button>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

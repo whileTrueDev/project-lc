@@ -1,4 +1,4 @@
-import { Stack, Box, Text } from '@chakra-ui/react';
+import { Image, Stack, Text } from '@chakra-ui/react';
 import TextDotConnector from '@project-lc/components-core/TextDotConnector';
 import { ExchangeReturnCancelItemBaseData } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
@@ -13,15 +13,13 @@ export function ExchangeReturnCancelRequestGoodsData(
 ): JSX.Element {
   const { goodsName, image, optionName, optionValue, amount, price } = props;
   return (
-    <Stack direction="row" alignItems="center">
-      <Box>
-        {/* 이미지 */}
-        <img width="40px" height="40px" src={image} alt="" />
-      </Box>
+    <Stack direction="row">
+      {/* 이미지 */}
+      <Image objectFit="cover" w="40px" h="40px" src={image} alt="" rounded="md" />
       {/* 주문상품 옵션 */}
-      <Stack>
+      <Stack spacing={0}>
         <Text fontWeight="bold">{goodsName}</Text>
-        <Stack direction="row">
+        <Stack direction="row" fontSize="sm">
           <Text>
             {optionName} : {optionValue}
           </Text>

@@ -3,11 +3,12 @@ import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/Custo
 import ExchangeReturnListSection from '@project-lc/components-web-kkshow/mypage/exchange-return-cancel/ExchangeReturnListSection';
 
 export function ExchangeReturnIndex(): JSX.Element {
+  const title = '재배송/환불 신청 내역';
   return (
-    <CustomerMypageLayout>
+    <CustomerMypageLayout title={title}>
       <Box p={[2, 2, 4]}>
         <Text fontSize="xl" fontWeight="bold">
-          재배송/환불 신청 내역
+          {title}
         </Text>
         <ExchangeReturnListSection />
       </Box>

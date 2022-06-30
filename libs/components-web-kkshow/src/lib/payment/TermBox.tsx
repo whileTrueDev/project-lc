@@ -4,6 +4,7 @@ import {
   HStack,
   ListItem,
   Popover,
+  PopoverAnchor,
   PopoverArrow,
   PopoverBody,
   PopoverCloseButton,
@@ -154,29 +155,33 @@ export function TermBox({ shopNames }: { shopNames: string[] }): JSX.Element {
     <Flex direction="column">
       {terms.map((item) => (
         <Popover key={item.title}>
-          <PopoverTrigger>
-            <HStack>
+          <HStack>
+            <PopoverAnchor>
               <Text fontSize="xs">{item.title}</Text>
+            </PopoverAnchor>
+            <PopoverTrigger>
+              <Text as="u" fontSize="xs" color="gray.500">
+                보기
+              </Text>
+            </PopoverTrigger>
+          </HStack>
 
-              <Box as="button" color="gray.500" type="button">
-                <Text as="u" fontSize="xs">
-                  보기
-                </Text>
-              </Box>
-            </HStack>
-          </PopoverTrigger>
-          <PopoverContent>
+          <PopoverContent maxW={260}>
             <PopoverArrow />
             <PopoverHeader>
+              <Text>개인정보 제공 동의</Text>
               <PopoverCloseButton />
             </PopoverHeader>
             <PopoverBody>
               <Box
                 overflow="scroll"
-                h="200px"
+                minH="100px"
+                maxH="140px"
                 mb={3}
                 border="1px solid"
                 borderColor="gray.300"
+                rounded="md"
+                p={2}
               >
                 {item.component}
               </Box>

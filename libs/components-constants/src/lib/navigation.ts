@@ -8,9 +8,11 @@ import { BsBox } from 'react-icons/bs';
 import {
   FcAdvertising,
   FcBiohazard,
+  FcBusinessman,
   FcCloseUpMode,
   FcDislike,
   FcFaq,
+  FcFinePrint,
   FcInspection,
   FcList,
   FcMoneyTransfer,
@@ -18,11 +20,16 @@ import {
   FcRating,
   FcSms,
   FcVideoCall,
-  FcBusinessman,
-  FcFinePrint,
 } from 'react-icons/fc';
 import { IconType } from 'react-icons/lib';
-import { MdLiveTv, MdOutlineShoppingCart, MdPayment } from 'react-icons/md';
+import {
+  MdAccountCircle,
+  MdLiveTv,
+  MdOutlineShoppingCart,
+  MdPayment,
+  MdShoppingBasket,
+} from 'react-icons/md';
+import { RiFootprintFill } from 'react-icons/ri';
 
 export interface NavItem {
   label: string;
@@ -368,16 +375,16 @@ const customerMypageShoppingChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
 ];
 /** 크크쇼 소비자 마이페이지 사이드바 - "활동" 하위 탭 */
 const customerMypageActivityChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
-  { name: '후원내역', href: '/mypage/후원내역', checkIsActive: defaultIsActiveChecker },
-  {
-    name: '라이브 알림 내역',
-    href: '/mypage/내역',
-    checkIsActive: defaultIsActiveChecker,
-  },
+  // { name: '후원내역', href: '/mypage/후원내역', checkIsActive: defaultIsActiveChecker },
+  // {
+  //   name: '라이브 알림 내역',
+  //   href: '/mypage/내역',
+  //   checkIsActive: defaultIsActiveChecker,
+  // },
   { name: '후기 관리', href: '/mypage/review', checkIsActive: defaultIsActiveChecker },
 ];
 /** 크크쇼 소비자 마이페이지 사이드바 - "정보" 하위 탭 */
-const customerMypageInfoChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
+const customerMypageInfoChildrenNavLinks: MypageLink[] = [
   {
     name: '회원 정보 수정',
     href: '/mypage/info',
@@ -395,6 +402,7 @@ export const customerMypageNavLinks: MypageLink[] = [
   {
     name: '쇼핑',
     href: '',
+    icon: MdShoppingBasket,
     checkIsActive: (pathname: string, _: string) => {
       // 하위탭 링크 중 하나라도 active해당되면 active처리
       return customerMypageShoppingChildrenNavLinks.some((link) =>
@@ -406,6 +414,7 @@ export const customerMypageNavLinks: MypageLink[] = [
   {
     name: '활동',
     href: '',
+    icon: RiFootprintFill,
     checkIsActive: (pathname: string, _: string) => {
       return customerMypageActivityChildrenNavLinks.some((link) =>
         link.checkIsActive(pathname, link.href),
@@ -416,6 +425,7 @@ export const customerMypageNavLinks: MypageLink[] = [
   {
     name: '정보',
     href: '',
+    icon: MdAccountCircle,
     checkIsActive: (pathname: string, _: string) => {
       return customerMypageInfoChildrenNavLinks.some((link) =>
         link.checkIsActive(pathname, link.href),

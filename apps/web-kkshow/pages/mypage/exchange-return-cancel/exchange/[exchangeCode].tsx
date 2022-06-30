@@ -7,7 +7,7 @@ export function ExchangeDetailPage(): JSX.Element {
   const router = useRouter();
   const { exchangeCode } = router.query;
   return (
-    <CustomerMypageLayout>
+    <CustomerMypageLayout title="교환상세">
       <Box p={[2, 2, 4]}>
         <CustomerExchangeDetail exchangeCode={exchangeCode as string} />
       </Box>

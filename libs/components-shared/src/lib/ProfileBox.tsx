@@ -2,11 +2,14 @@ import { Avatar, Grid, GridItem, Text } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
 import { AvatarChangeButton } from './AvatarChangeButton';
 
+interface ProfileBoxProps {
+  allowAvatarChange?: boolean;
+  onAvatarChangeButtonClick?: () => void;
+}
 export function ProfileBox({
   allowAvatarChange = false,
-}: {
-  allowAvatarChange?: boolean;
-}): JSX.Element {
+  onAvatarChangeButtonClick,
+}: ProfileBoxProps): JSX.Element {
   const { data } = useProfile();
 
   return (
@@ -23,7 +26,11 @@ export function ProfileBox({
         justifyContent="center"
         alignItems="center"
       >
-        {allowAvatarChange ? <AvatarChangeButton /> : <Avatar src={data?.avatar} />}
+        {allowAvatarChange ? (
+          <AvatarChangeButton onClick={onAvatarChangeButtonClick} />
+        ) : (
+          <Avatar src={data?.avatar} />
+        )}
       </GridItem>
       <GridItem colSpan={3} isTruncated>
         <Text isTruncated fontWeight="bold">

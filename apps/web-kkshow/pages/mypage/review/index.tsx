@@ -8,6 +8,7 @@ import { useOrderItemReviewNeeded, useProfile } from '@project-lc/hooks';
 import { useMemo } from 'react';
 
 export function ReviewIndex(): JSX.Element {
+  const title = '상품 후기 관리';
   const profile = useProfile();
   const orderItem = useOrderItemReviewNeeded(profile.data?.id);
 
@@ -37,11 +38,11 @@ export function ReviewIndex(): JSX.Element {
   );
 
   return (
-    <CustomerMypageLayout>
+    <CustomerMypageLayout title={title}>
       <Box p={{ base: 2, md: 4 }}>
         {/* 제목 */}
         <Text fontSize="xl" fontWeight="bold">
-          상품 후기 관리
+          {title}
         </Text>
 
         {/* 리뷰 정책 */}
@@ -60,9 +61,7 @@ export function ReviewIndex(): JSX.Element {
 
             <TabPanels>
               {tabInfos.map((tab) => (
-                <TabPanel key={tab.title} px={0}>
-                  {tab.component}
-                </TabPanel>
+                <TabPanel key={tab.title}>{tab.component}</TabPanel>
               ))}
             </TabPanels>
           </Tabs>

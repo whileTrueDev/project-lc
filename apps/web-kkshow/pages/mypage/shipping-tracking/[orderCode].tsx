@@ -8,7 +8,7 @@ export function ShippingTrackingIndex(): JSX.Element {
   const orderCode = router.query.orderCode as string;
   if (!orderCode)
     return (
-      <CustomerMypageLayout>
+      <CustomerMypageLayout title="배송 조회">
         <Box p={[2, 2, 4]}>
           <Center>
             <Text>잘못된 접근입니다</Text>
@@ -17,7 +17,7 @@ export function ShippingTrackingIndex(): JSX.Element {
       </CustomerMypageLayout>
     );
   return (
-    <CustomerMypageLayout>
+    <CustomerMypageLayout title="배송 조회">
       <Box p={[2, 2, 4]}>
         <Text fontSize="xl" fontWeight="bold">
           배송 조회

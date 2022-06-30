@@ -1,6 +1,7 @@
 import {
   AspectRatio,
   Box,
+  Button,
   Flex,
   Grid,
   GridItem,
@@ -9,9 +10,9 @@ import {
   Skeleton,
   Text,
   UnorderedList,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { Goods, GoodsStatus } from '@prisma/client';
-import TextWithPopperButton from '@project-lc/components-core/TextWithPopperButton';
 import { GoodsStatusBadge } from '@project-lc/components-shared/GoodsStatusBadge';
 import ShippingGroupSets from '@project-lc/components-shared/shipping/ShippingGroupSets';
 import { useGoodsById } from '@project-lc/hooks';
@@ -207,8 +208,16 @@ export function GoodsViewPriceTag({
     [shippingGroup],
   );
 
+  const deliveryFeeToggle = useDisclosure();
+
   return (
-    <Grid templateColumns="1fr 2fr" mt={6} mb={1} gap={2}>
+    <Grid
+      templateColumns="1fr 2fr"
+      mt={6}
+      mb={1}
+      gap={2}
+      fontSize={{ base: 'sm', md: 'md' }}
+    >
       <GridItem>
         <Text>정가</Text>
       </GridItem>
@@ -231,13 +240,18 @@ export function GoodsViewPriceTag({
             <Text>배송비</Text>
           </GridItem>
           <GridItem>
-            <TextWithPopperButton
-              iconAriaLabel="shipping-cost"
-              title={`${getLocaleNumber(standardShippingCost)}원`}
-            >
-              <ShippingGroupSets shippingSets={shippingGroup.shippingSets} />
-            </TextWithPopperButton>
+            <Flex flexWrap="wrap" gap={1} alignItems="center">
+              {`${getLocaleNumber(standardShippingCost)}원`}
+              <Button size="xs" onClick={deliveryFeeToggle.onToggle}>
+                자세히보기
+              </Button>
+            </Flex>
           </GridItem>
+          {deliveryFeeToggle.isOpen && (
+            <GridItem colSpan={2}>
+              <ShippingGroupSets shippingSets={shippingGroup.shippingSets} />
+            </GridItem>
+          )}
         </>
       )}
     </Grid>

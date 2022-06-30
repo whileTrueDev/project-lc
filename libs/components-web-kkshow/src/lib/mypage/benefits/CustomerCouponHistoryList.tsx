@@ -7,31 +7,38 @@ import { ActionTypeBadge } from '@project-lc/components-shared/CouponBadge';
 
 const column: GridColumns = [
   {
+    width: 120,
     field: 'couponName',
-    headerName: '쿠폰이름',
+    headerName: '쿠폰명',
     valueGetter: ({ row }: GridRowData) => row.customerCoupon.coupon.name,
-    flex: 1,
   },
   {
+    width: 80,
     field: 'type',
     headerName: '유형',
+    sortable: false,
     renderCell: ({ row }: GridRowData) => ActionTypeBadge(row.type),
-    flex: 1,
   },
   {
+    width: 160,
     field: 'createDate',
     headerName: '날짜',
     valueFormatter: ({ row }: GridRowData) =>
       dayjs(row.createDate).format('YYYY-MM-DD HH:mm:ss'),
-    flex: 1,
   },
 ];
 
 export function CustomerCouponHistoryList(): JSX.Element {
-  const { data } = useCustomerCouponHistory();
+  const { data, isLoading } = useCustomerCouponHistory();
   return (
     <Box>
-      <ChakraDataGrid rows={data || []} columns={column} minH={500} density="compact" />
+      <ChakraDataGrid
+        loading={isLoading}
+        rows={data || []}
+        columns={column}
+        minH={500}
+        density="compact"
+      />
     </Box>
   );
 }

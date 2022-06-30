@@ -1,20 +1,20 @@
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  Input,
   Button,
-  Text,
   FormControl,
   FormErrorMessage,
+  FormLabel,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   useToast,
 } from '@chakra-ui/react';
 import { useCustomerInfoMutation } from '@project-lc/hooks';
-import { useForm } from 'react-hook-form';
 import { parseErrorObject } from '@project-lc/utils-frontend';
+import { useForm } from 'react-hook-form';
 
 type CustomerNicknameChangeDialogProps = {
   isOpen: boolean;
@@ -69,19 +69,25 @@ export function CustomerNicknameChangeDialog(
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(onSubmit)}>
         <ModalHeader>닉네임 변경</ModalHeader>
         <ModalBody>
           <FormControl isInvalid={!!errors.nickname}>
-            <Text>변경할 닉네임을 입력해주세요</Text>
-            <Input isRequired {...register('nickname', { required: true })} />
-            {errors.nickname && (
-              <FormErrorMessage>{errors.nickname.message}</FormErrorMessage>
-            )}
+            <FormLabel>변경할 닉네임</FormLabel>
+            <Input
+              isRequired
+              placeholder="닉네임을 입력해주세요"
+              {...register('nickname', {
+                required: '닉네임을 입력해주세요.',
+                maxLength: { value: 16, message: '최대 16자까지 가능합니다.' },
+              })}
+            />
+            <FormErrorMessage>{errors.nickname?.message}</FormErrorMessage>
           </FormControl>
         </ModalBody>
+
         <ModalFooter>
           <Button mr={2} onClick={handleCancel}>
             취소

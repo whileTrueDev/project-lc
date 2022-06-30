@@ -1,7 +1,5 @@
 import {
   Box,
-  Button,
-  ButtonGroup,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -60,7 +58,7 @@ export function PasswordChangeForm(props: PasswordChangeFormProps): JSX.Element 
   };
 
   return (
-    <Box as="form" onSubmit={handleSubmit(changePassword)}>
+    <Box as="form" onSubmit={handleSubmit(changePassword)} id="password-change-form">
       {/* SignupForm 참고 */}
       <FormControl isInvalid={!!errors.password} mb={2}>
         <FormLabel htmlFor="password">
@@ -70,6 +68,7 @@ export function PasswordChangeForm(props: PasswordChangeFormProps): JSX.Element 
           </Text>
         </FormLabel>
         <Input
+          autoComplete="off"
           id="password"
           type="password"
           placeholder="********"
@@ -100,15 +99,6 @@ export function PasswordChangeForm(props: PasswordChangeFormProps): JSX.Element 
           {errors.repassword && errors.repassword.message}
         </FormErrorMessage>
       </FormControl>
-
-      <ButtonGroup spacing={2} width="100%">
-        <Button isFullWidth onClick={onCancel}>
-          취소
-        </Button>
-        <Button isFullWidth type="submit" disabled={!watch('password')}>
-          비밀번호 변경
-        </Button>
-      </ButtonGroup>
     </Box>
   );
 }
