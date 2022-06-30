@@ -323,8 +323,8 @@ export function CartItemDisplay({
   // 각 상품의 상품홍보 정보
   const pp = useProductPromotions({ goodsIds: [cartItem.goods.id] });
   const nowAvailablePp = useMemo(
-    () => pp.data?.some((p) => p.broadcasterId === cartItem.support.broadcasterId),
-    [cartItem.support.broadcasterId, pp.data],
+    () => pp.data?.some((p) => p.broadcasterId === cartItem.support?.broadcasterId),
+    [cartItem.support?.broadcasterId, pp.data],
   );
 
   return (
