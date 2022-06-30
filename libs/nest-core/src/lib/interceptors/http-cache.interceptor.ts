@@ -9,7 +9,6 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { Redis } from 'ioredis';
-import _ from 'lodash';
 import { join } from 'path';
 import { delay, from, Observable, of, tap } from 'rxjs';
 import { CACHE_CLEAR_KEY_METADATA } from '../constants/cache-clear-key';
@@ -135,7 +134,7 @@ export class HttpCacheInterceptor extends CacheInterceptor {
             });
           }),
         );
-        const results = _.flatten(_keys);
+        const results = _keys.flat();
         return results.every((r) => !!r);
       }),
     );
