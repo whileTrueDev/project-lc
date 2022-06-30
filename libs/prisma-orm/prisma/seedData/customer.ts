@@ -10,6 +10,7 @@ export const dummyCustomer: Customer = {
   phone: '010-1234-5678',
   createDate: new Date('2022-04-18T02:49:51.674Z'),
   gender: 'unknown',
+  avatar: null,
   birthDate: null,
   agreementFlag: false,
   inactiveFlag: false,

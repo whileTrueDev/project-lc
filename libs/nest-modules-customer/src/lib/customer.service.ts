@@ -7,6 +7,7 @@ import {
   SignUpDto,
   UpdateCustomerDto,
 } from '@project-lc/shared-types';
+import { s3 } from '@project-lc/utils-s3';
 
 @Injectable()
 export class CustomerService {
@@ -174,5 +175,32 @@ export class CustomerService {
       followingLiveShoppings,
       shippingOrders,
     };
+  }
+
+  /** 소비자 아바타 이미지 url 저장 */
+  public async addCustomerAvatar(
+    email: Customer['email'],
+    file: Express.Multer.File,
+  ): Promise<boolean> {
+    const avatarUrl = await s3.uploadProfileImage({
+      key: file.originalname,
+      file: file.buffer,
+      email,
+      userType: 'customer',
+    });
+    await this.prisma.customer.update({
+      where: { email },
+      data: { avatar: avatarUrl },
+    });
+    return true;
+  }
+
+  /** 소비자 아바타 이미지 url null 로 초기화 */
+  public async removeCustomerAvatar(email: Customer['email']): Promise<boolean> {
+    await this.prisma.customer.update({
+      where: { email },
+      data: { avatar: null },
+    });
+    return true;
   }
 }

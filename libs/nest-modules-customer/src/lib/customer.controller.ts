@@ -9,12 +9,19 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Customer } from '@prisma/client';
-import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
+import {
+  CacheClearKeys,
+  CustomerInfo,
+  HttpCacheInterceptor,
+  UserPayload,
+} from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
 import {
@@ -96,6 +103,28 @@ export class CustomerController {
     @Body(ValidationPipe) dto: UpdateCustomerDto,
   ): Promise<Customer> {
     return this.customerService.update(id, dto);
+  }
+
+  /** 소비자 아바타 이미지 s3업로드 후 url 저장 */
+  @Post('/avatar')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('customer')
+  async addCustomerAvatar(
+    @CustomerInfo() customer: UserPayload,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<boolean> {
+    return this.customerService.addCustomerAvatar(customer.sub, file);
+  }
+
+  /** 소비자 아바타 이미지 null로 저장 */
+  @Delete('/avatar')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('customer')
+  async deleteCustomerAvatar(@CustomerInfo() customer: UserPayload): Promise<boolean> {
+    return this.customerService.removeCustomerAvatar(customer.sub);
   }
 
   @UseInterceptors(HttpCacheInterceptor)

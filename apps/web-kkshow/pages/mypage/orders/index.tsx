@@ -15,13 +15,13 @@ export function OrderList(): JSX.Element {
         </Center>
       </CustomerMypageLayout>
     );
-  if (!data || !data.id) {
+  if (!data || !data?.id) {
     router.push('/login');
   }
   return (
     <CustomerMypageLayout title="주문/배송내역">
       <Box p={[2, 2, 4]}>
-        <CustomerOrderList customerId={data.id} />
+        <CustomerOrderList customerId={data?.id} />
       </Box>
     </CustomerMypageLayout>
   );
