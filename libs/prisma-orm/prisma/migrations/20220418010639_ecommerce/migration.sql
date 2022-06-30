@@ -37,6 +37,7 @@ CREATE TABLE `Customer` (
     `email` VARCHAR(191) NULL,
     `nickname` VARCHAR(191) NULL,
     `phone` VARCHAR(191) NULL,
+    `avatar` VARCHAR(191) NULL,
     `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `gender` ENUM('male', 'female', 'unknown') NULL DEFAULT 'unknown',
     `birthDate` DATETIME(3) NULL,

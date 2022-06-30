@@ -1218,6 +1218,7 @@ model Customer {
   email                  String?                      @unique // 이메일
   nickname               String? // 닉네임
   phone                  String? // 연락처
+  avatar                 String?
   createDate             DateTime                     @default(now()) // 생성일
   gender                 Gender?                      @default(unknown) // 성별(male, female)
   birthDate              DateTime? // 생년월일
