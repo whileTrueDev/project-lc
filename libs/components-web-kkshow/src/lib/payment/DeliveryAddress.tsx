@@ -262,7 +262,7 @@ export function DeliveryAddress(): JSX.Element {
           >
             <Flex direction="column" alignItems="flex-start">
               <FormLabel fontWeight="semibold">배송지주소</FormLabel>
-              <Flex direction="column" mb={2}>
+              <Flex direction="column" mb={2} w="100%">
                 <HStack>
                   <Input
                     isReadOnly
