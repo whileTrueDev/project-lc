@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { CartItem, CartItemOption, Customer, Prisma } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { CartItemDto, CartItemRes } from '@project-lc/shared-types';
-import { flatten } from 'lodash';
 
 type CustomerOrTempUser = {
   customerId?: Customer['id'];

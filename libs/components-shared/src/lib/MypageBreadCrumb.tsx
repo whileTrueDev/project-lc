@@ -5,7 +5,6 @@ import {
   broadcasterCenterMypageNavLinks,
 } from '@project-lc/components-constants/navigation';
 import { UserType } from '@project-lc/shared-types';
-import { flatten } from 'lodash';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -57,7 +56,7 @@ export function MypageBreadcrumb(): JSX.Element | null {
 
   const isBreadcrumbLinkable = useCallback(
     (href: string): boolean => {
-      return Boolean(flatten(navLinks).find((l) => l.href === href));
+      return Boolean(navLinks.flat().find((l) => l.href === href));
     },
     [navLinks],
   );
