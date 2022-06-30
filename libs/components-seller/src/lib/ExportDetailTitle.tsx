@@ -12,6 +12,7 @@ export function ExportDetailTitle({ exportData }: ExportDetailTitleProps): JSX.E
     <Box>
       <Heading>출고 {exportData.exportCode}</Heading>
       <HStack alignItems="center">
+        {exportData.exchangeExportedFlag && <Text fontSize="sm">(재출고)</Text>}
         <OrderStatusBadge step={exportData.status} />
         {/* 구매확정 배지 */}
         {exportData.buyConfirmDate && exportData.buyConfirmSubject ? (

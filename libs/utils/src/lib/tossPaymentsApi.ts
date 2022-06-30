@@ -8,9 +8,9 @@ import {
 import axios from 'axios';
 import { nanoid } from 'nanoid';
 
-const ENCODED_SECRET_KEY = Buffer.from(`${process.env.PAYMENTS_SECRET_KEY}:`).toString(
-  'base64',
-);
+const ENCODED_SECRET_KEY = Buffer.from(
+  `${process.env.TOSS_PAYMENTS_SECRET_KEY}:`,
+).toString('base64');
 
 /** 토스페이먼츠 api 요청시 필요한 헤더값  https://docs.tosspayments.com/guides/apis/usage#%EC%9D%B8%EC%A6%9Dauthorization */
 const axiosConfig = {
@@ -50,17 +50,9 @@ const makeDummyTossPaymentData = async (): Promise<any> => {
 };
 
 /** 토스페이먼츠 결제취소요청 */
-const requestCancelPayment = async ({
-  paymentKey,
-  cancelReason,
-  cancelAmount,
-}: TossPaymentCancelDto): Promise<any> => {
-  const postData = {
-    cancelReason,
-    cancelAmount,
-  };
-  const url = `${BASE_URL}/payments/${paymentKey}/cancel`;
-  const response = await axios.post(url, postData, axiosConfig);
+const requestCancelPayment = async (dto: TossPaymentCancelDto): Promise<any> => {
+  const url = `${BASE_URL}/payments/${dto.paymentKey}/cancel`;
+  const response = await axios.post(url, dto, axiosConfig);
   return response.data;
 };
 

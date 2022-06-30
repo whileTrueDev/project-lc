@@ -54,9 +54,20 @@ export class PaymentService {
 
   /** 토스페이먼츠 결제승인 요청 API */
   public async createPayment(dto: PaymentRequestDto): Promise<CreatePaymentRes> {
+    let result: Payment;
     try {
-      const result = await TossPaymentsApi.createPayment(dto);
+      result = await TossPaymentsApi.createPayment(dto);
+    } catch (err) {
+      console.log('error - createPayment > TossPaymentsApi.createPayment');
+      console.error(err.response);
+      return {
+        status: 'error',
+        message: err.response.data.message,
+        orderId: dto.orderId,
+      };
+    }
 
+    try {
       // * 크크쇼 OrderPayment 테이블에 데이터 저장
       // 가상계좌 결제의 경우 소비자가 입금전까지는 승인되지 않으므로 approvedAt이 null로 전달됨
       // 가상계좌 결제시 입금전까지 depositDate : null, depositDoneFlag: false임
@@ -75,7 +86,8 @@ export class PaymentService {
 
       return { status: 'success', orderId: dto.orderId, orderPaymentId: orderPayment.id };
     } catch (err) {
-      console.error(err);
+      console.log('error - createPayment > savePaymentRecord');
+      console.error(err.response);
       return {
         status: 'error',
         message: err.response.data.message,

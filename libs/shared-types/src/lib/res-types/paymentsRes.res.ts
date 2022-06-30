@@ -110,7 +110,8 @@ export interface Payment {
   vat: number;
   cultureExpense: boolean;
   taxFreeAmount: number;
-  cancels: null | [];
+  /** 결제 취소 이력이 담기는 배열입니다. */
+  cancels: null | TossPaymentCancel[];
   isPartialCancelable: boolean;
   card: null | PaymentCard;
   virtualAccount: null | PaymentVirtualAccount;
@@ -130,4 +131,22 @@ export interface CreatePaymentRes {
   message?: string;
   orderId: string;
   orderPaymentId?: number; // OrderPayment 고유번호
+}
+
+/** 결제 취소 이력 */
+export interface TossPaymentCancel {
+  /** 결제를 취소한 금액입니다. */
+  cancelAmount: number;
+  /**  결제를 취소한 이유입니다. */
+  cancelReason: string;
+  /** 취소된 금액 중 면세 금액입니다. */
+  taxFreeAmount: number;
+  /** 과세 처리된 금액입니다. */
+  taxAmount: null | number;
+  /** 결제 취소 후 환불 가능한 잔액입니다. */
+  refundableAmount: number;
+  /** 결제 취소가 일어난 날짜와 시간 정보입니다. ISO 8601 형식인 yyyy-MM-dd'T'HH:mm:ss±hh:mm입니다. (e.g. 2022-01-01T00:00:00+09:00) */
+  canceledAt: string;
+  /** 취소 건에 대한 고유한 키 값입니다. 여러 건의 취소 거래를 구분하는데 사용됩니다. */
+  transactionKey: string;
 }

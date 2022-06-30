@@ -1,3 +1,4 @@
+import { Heading } from '@chakra-ui/react';
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
 import { ExchangeReturnWriteSection } from '@project-lc/components-web-kkshow/mypage/exchange-return-cancel/ExchangeReturnWriteSection';
 
