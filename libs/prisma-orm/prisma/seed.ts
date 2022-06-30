@@ -133,10 +133,10 @@ async function createBroadcasterPromotionPage(
       broadcasterId,
       url: tempCatalogUrl, // 임시로 크크마켓 카테고리 링크
       comment: `✍️Senior 2D Artist 
-      @SecondDinnerGames
-      🎨Illustrator for Hearthstone and MtG
-      Past: Blur, Blizzard, Gearbox, Disney, Valve, Bethesda, etc.
-      `,
+@SecondDinnerGames
+🎨Illustrator for Hearthstone and MtG
+Past: Blur, Blizzard, Gearbox, Disney, Valve, Bethesda, etc.
+`,
     },
   });
 }
