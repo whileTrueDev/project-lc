@@ -17,7 +17,8 @@ export const useCreateRefundMutation = (): UseMutationResult<
       axios.post<useRefundMutationRes>('/refund', dto).then((res) => res.data),
     {
       onSuccess: (data) => {
-        // queryClient.invalidateQueries('');
+        queryClient.invalidateQueries('AdminReturnList');
+        queryClient.invalidateQueries('AdminRefundList');
       },
     },
   );

@@ -50,17 +50,9 @@ const makeDummyTossPaymentData = async (): Promise<any> => {
 };
 
 /** 토스페이먼츠 결제취소요청 */
-const requestCancelPayment = async ({
-  paymentKey,
-  cancelReason,
-  cancelAmount,
-}: TossPaymentCancelDto): Promise<any> => {
-  const postData = {
-    cancelReason,
-    cancelAmount,
-  };
-  const url = `${BASE_URL}/payments/${paymentKey}/cancel`;
-  const response = await axios.post(url, postData, axiosConfig);
+const requestCancelPayment = async (dto: TossPaymentCancelDto): Promise<any> => {
+  const url = `${BASE_URL}/payments/${dto.paymentKey}/cancel`;
+  const response = await axios.post(url, dto, axiosConfig);
   return response.data;
 };
 

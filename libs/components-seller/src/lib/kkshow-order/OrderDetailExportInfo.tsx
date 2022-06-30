@@ -29,6 +29,7 @@ export function OrderDetailExportInfo({
             {exportData.exportCode}
           </Link>
         </NextLink>
+        {exportData.exchangeExportedFlag && <Text fontSize="sm">(재출고)</Text>}
         <OrderStatusBadge step={exportData.status} />
         <TextDotConnector />
         <Text isTruncated>{getLocaleNumber(totalExportedEa)} 개</Text>

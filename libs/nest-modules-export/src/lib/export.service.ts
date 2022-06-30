@@ -55,6 +55,8 @@ export class ExportService {
             amount: item.amount,
           })),
         },
+        exchangeExportedFlag: Boolean(dto.exchangeExportedFlag),
+        exchange: dto.exchangeId ? { connect: { id: dto.exchangeId } } : undefined, //  재출고인경우(재배송요청에 대한 출고) 재배송요청과 출고데이터 연결
       },
     });
   }
@@ -100,13 +102,13 @@ export class ExportService {
       select: { id: true, quantity: true, exportItems: true },
     });
     // 주문상품옵션.quantity 가 총합(주문상품옵션.출고상품옵션.amount)보다 작으면 부분출고
-    // 같으면 전체출고로 주문상품옵션의 상태 업데이트
+    // 아니면 전체출고로 주문상품옵션의 상태 업데이트
     const updateDataList = await Promise.all(
       orderItemOptions.map(async (orderItemOption) => {
         const { quantity: originOrderAmount, exportItems, id } = orderItemOption; // 주문상품옵션 원래 주문개수
         const totalExportedAmount = exportItems.reduce((sum, cur) => sum + cur.amount, 0); // 주문상품옵션에 연결된 출고상품의 출고개수 합
         const newOrderItemOptionStepAfterExport: OrderProcessStep =
-          originOrderAmount === totalExportedAmount ? 'exportDone' : 'partialExportDone';
+          originOrderAmount <= totalExportedAmount ? 'exportDone' : 'partialExportDone';
         return { id, step: newOrderItemOptionStepAfterExport };
       }),
     );
@@ -150,7 +152,12 @@ export class ExportService {
     const exportCode = this.generateExportCode({ type: 'normal' });
 
     /** 출고처리 (Export, ExportItem 테이블에 데이터 생성) */
-    await this.createExportRecord({ dto, exportCode, bundleExportCode });
+    const exportRecord = await this.createExportRecord({
+      dto,
+      exportCode,
+      bundleExportCode,
+    });
+
     /** 재고차감 */
     await this.updateGoodsSupplies(dto);
     /** 주문상품옵션의 상태변경 -> 주문상태변경보다 먼저 진행 */

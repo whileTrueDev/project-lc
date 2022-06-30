@@ -6,6 +6,7 @@ import { PaymentService } from '@project-lc/nest-modules-payment';
 import { ReturnService } from '@project-lc/nest-modules-return';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  AdminRefundRes,
   banks,
   CreateRefundDto,
   CreateRefundRes,
@@ -40,7 +41,9 @@ export class RefundService {
     createRefundDto: CreateRefundDto,
   ): TossPaymentCancelDto {
     const refundReceiveAccount = {
-      bank: createRefundDto.refundBank,
+      bank: createRefundDto.refundBank
+        ? banks.find((b) => b.bankName === createRefundDto.refundBank).bankCodeKr
+        : undefined,
       accountNumber: createRefundDto.refundAccount,
       holderName: createRefundDto.refundAccountHolder,
     };
@@ -49,13 +52,14 @@ export class RefundService {
       createRefundDto.refundAccount &&
       createRefundDto.refundAccountHolder;
 
-    const tossPaymentCancelDto = {
+    const tossCancelDto = {
       paymentKey: createRefundDto.paymentKey,
       cancelReason: createRefundDto.reason,
       cancelAmount: createRefundDto.refundAmount,
       refundReceiveAccount: hasRefundAccountInfo ? refundReceiveAccount : undefined,
     };
-    return tossPaymentCancelDto;
+
+    return tossCancelDto;
   }
 
   /** 환불데이터 생성
@@ -114,7 +118,7 @@ export class RefundService {
 
     // 연결된 반품요청 있는경우
     if (returnId) {
-      // 환불정보와 연결
+      // 환불정보와 연결 & 반품요청 상태 완료로 변경
       await this.returnService.updateReturnStatus(returnId, {
         status: 'complete',
         refundId: data.id,
@@ -274,5 +278,30 @@ export class RefundService {
       virtualAccount,
       transfer,
     };
+  }
+
+  /** 관리자 반품요청에 의해 처리한 환불 내역 조회 */
+  async getAdminRefundList(): Promise<AdminRefundRes> {
+    const data = await this.prisma.refund.findMany({
+      where: { return: { some: {} } },
+      include: {
+        return: { include: { items: { include: { orderItemOption: true } } } },
+        order: {
+          select: {
+            id: true,
+            orderCode: true,
+            payment: true,
+            ordererName: true,
+          },
+        },
+      },
+    });
+
+    return data.map((d) => {
+      const { refundAccount } = d;
+      return Object.assign(d, {
+        refundAccount: this.cipherService.getDecryptedText(refundAccount),
+      });
+    });
   }
 }

@@ -1,20 +1,24 @@
 import { useDisclosure, Box, Stack, Link, Button, Text } from '@chakra-ui/react';
 import TextDotConnector from '@project-lc/components-core/TextDotConnector';
 import { ExchangeReturnCancelRequestStatusBadge } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestStatusBadge';
-import { ExchangeDataWithImages } from '@project-lc/shared-types';
+import { ExchangeDataWithImages, OrderDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import OrderExchangeStatusDialog from './OrderExchangeStatusDialog';
+import ReExportDialog from './ReExportDialog';
 
 export interface OrderDetailExchangeInfoProps {
   exchangeData: ExchangeDataWithImages;
+  order: OrderDetailRes;
 }
 
 const EXCHANGE_TEXT = '교환(재배송)';
 
 export function OrderDetailExchangeInfo({
   exchangeData,
+  order,
 }: OrderDetailExchangeInfoProps): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const reExportDialog = useDisclosure();
   return (
     <Box>
       <Stack direction="row" alignItems="center" my={2} spacing={1.5}>
@@ -45,14 +49,28 @@ export function OrderDetailExchangeInfo({
             {dayjs(exchangeData.completeDate).format('YYYY년 MM월 DD일 HH:mm:ss')}
           </Text>
         )}
-        <Box>
+        <Stack direction="row" spacing={4}>
           <Button size="sm" onClick={onOpen}>
             {EXCHANGE_TEXT} 상태 관리
           </Button>
-        </Box>
+          {/* 해당 재배송 요청과 연결된 출고정보(재출고) 없는경우 재출고 처리버튼 노출 */}
+          {!exchangeData.exportId && (
+            <Button size="sm" onClick={reExportDialog.onOpen}>
+              재배송 처리하기
+            </Button>
+          )}
+        </Stack>
       </Stack>
 
+      {/* 재배송 상태관리 다이얼로그 */}
       <OrderExchangeStatusDialog isOpen={isOpen} onClose={onClose} data={exchangeData} />
+      {/* 재출고 다이얼로그 */}
+      <ReExportDialog
+        exchangeData={exchangeData}
+        isOpen={reExportDialog.isOpen}
+        onClose={reExportDialog.onClose}
+        order={order}
+      />
     </Box>
   );
 }

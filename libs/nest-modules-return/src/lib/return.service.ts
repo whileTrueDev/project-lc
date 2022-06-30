@@ -3,6 +3,7 @@ import { Prisma, Return } from '@prisma/client';
 import { CipherService } from '@project-lc/nest-modules-cipher';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  AdminReturnRes,
   CreateReturnDto,
   CreateReturnRes,
   DeleteReturnRes,
@@ -233,23 +234,23 @@ export class ReturnService {
       },
     });
 
-    // 반품요청 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
+    // 반품요청 처리완료(승인)되면 주문 상태를 결제취소 로 업데이트
     if (dto.status === 'complete') {
-      await this.updateOrderStateToOrderInvalidated(returnData.orderId);
+      await this.updateOrderStateAfterRefundFinish(returnData.orderId);
     }
 
     return true;
   }
 
-  /** 주문의 상태를 주문무효 로 변경(반품요청 처리완료(승인)되었을 때 사용)
+  /** 주문의 상태를 결제취소 로 변경(반품요청 처리완료(승인)되었을 때 사용)
    */
-  private async updateOrderStateToOrderInvalidated(orderId: number): Promise<void> {
-    // 변경될 상태 : "주문무효"
-    const targetState = 'orderInvalidated';
+  private async updateOrderStateAfterRefundFinish(orderId: number): Promise<void> {
+    // 변경될 상태 : "결제취소" (반품요청시 이미 결제가 완료된 상태이므로 결제취소로 변경함)
+    const targetState = 'paymentCanceled';
     await this.prisma.$transaction([
-      // 주문 상태 주문무효로 변경
+      // 주문 상태 결제취소 변경
       this.prisma.order.update({ where: { id: orderId }, data: { step: targetState } }),
-      // 주문상품옵션 상태 주문무효로 변경
+      // 주문상품옵션 상태 결제취소로 변경
       this.prisma.orderItemOption.updateMany({
         where: { orderItem: { orderId } },
         data: { step: targetState },
@@ -266,5 +267,48 @@ export class ReturnService {
 
     await this.prisma.return.delete({ where: { id } });
     return true;
+  }
+
+  /** 관리자 환불처리 위해 승인된 반품요청 & 주문 & 결제정보 조회 */
+  async getAdminReturnList(): Promise<AdminReturnRes> {
+    const data = await this.prisma.return.findMany({
+      where: { status: 'processing' }, // = 판매자가 반품 승인한 경우만 조회. 판매자가 반품(환불) 승인시 상태 processing으로 변경됨..
+      orderBy: { requestDate: 'asc' }, // 요청일 오름차순(오래된 요청이 앞쪽에 표시)
+      include: {
+        order: {
+          select: {
+            id: true,
+            orderCode: true,
+            payment: true,
+            orderPrice: true, // 주문상품옵션 할인가 총합
+            paymentPrice: true, // 실 결제금액 = 주문상품옵션 할인가 총합 + 총 배송비 - 쿠폰할인 - 마일리지할인
+            ordererName: true,
+            customerCouponLogs: {
+              include: { customerCoupon: { include: { coupon: true } } },
+            },
+            mileageLogs: true,
+          },
+        },
+        items: {
+          include: {
+            orderItem: {
+              select: {
+                id: true,
+                goods: { select: { seller: { select: { sellerShop: true } } } },
+              },
+            },
+            orderItemOption: true,
+          },
+        },
+      },
+    });
+
+    return data.map((d) => {
+      const { returnBankAccount } = d;
+
+      return Object.assign(d, {
+        returnBankAccount: this.cipherService.getDecryptedText(returnBankAccount),
+      });
+    });
   }
 }

@@ -9,6 +9,7 @@ import {
   Refund,
   RefundItem,
   Return,
+  ReturnItem,
 } from '@prisma/client';
 import { PaymentCard, PaymentTransfer, PaymentVirtualAccount } from './paymentsRes.res';
 /** 환불생성 리턴데이터 */
@@ -57,3 +58,15 @@ export type RefundDetailRes = Refund & {
   virtualAccount?: PaymentVirtualAccount;
   transfer?: PaymentTransfer;
 };
+
+/** 관리자 환불내역 */
+export type AdminRefundData = Refund & {
+  return: (Return & { items: (ReturnItem & { orderItemOption: OrderItemOption })[] })[];
+  order: {
+    id: Order['id'];
+    orderCode: Order['orderCode'];
+    payment: OrderPayment;
+    ordererName: Order['ordererName'];
+  };
+};
+export type AdminRefundRes = AdminRefundData[];
