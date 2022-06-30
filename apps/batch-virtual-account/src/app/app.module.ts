@@ -4,32 +4,18 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { validationSchema } from '../settings/config.validation';
 import AppStarter from './app.starter';
-import { BullConfigService } from './bull.config';
-import { ShutdownManager } from './shutdown.manager';
-import { QueueKey } from './virtual-account.constant';
-import { VirtualAccountConsumer } from './virtual-account.consumer';
-import { VirtualAccountProducer } from './virtual-account.producer';
-import { VirtualAccountServiceProxy } from './virtual-account.proxy.service';
-import VirtualAccountService from './virtual-account.service';
+import { BullConfig } from './bull.config';
+import { ShutdownManagerModule } from './shutdown-manager/shutdown.manager.module';
+import { VirtualAccountModule } from './virtual-account/virtual-account.module';
 
 @Module({
   imports: [
-    PrismaModule,
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
-    BullModule.forRootAsync({ useClass: BullConfigService }),
-    // A queue name is used as both an injection token
-    //   (for injecting the queue into controllers/providers),
-    // and as an argument to decorators to associate consumer classes
-    //   and listeners with queues.
-    BullModule.registerQueue({ name: QueueKey }),
+    BullModule.forRootAsync({ useClass: BullConfig }),
+    PrismaModule,
+    ShutdownManagerModule.withoutControllers(),
+    VirtualAccountModule.withoutControllers(),
   ],
-  providers: [
-    AppStarter,
-    VirtualAccountProducer,
-    VirtualAccountService,
-    VirtualAccountServiceProxy,
-    VirtualAccountConsumer,
-    ShutdownManager,
-  ],
+  providers: [AppStarter],
 })
 export class AppModule {}

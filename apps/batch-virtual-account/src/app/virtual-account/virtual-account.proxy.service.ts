@@ -19,8 +19,8 @@ export class VirtualAccountServiceProxy implements VirtualAccountServiceInterfac
     return result;
   }
 
-  public async makePaymentFail(payment: OrderPayment): Promise<number | string> {
-    const logContext = `${this.loggerContext} ::${payment.id}::`;
+  public async makePaymentFail(payment: OrderPayment): Promise<number> {
+    const logContext = `${this.loggerContext}|${payment.id}|`;
     Logger.log('가상계좌 미입금 주문/결제 취소 처리 시작', logContext);
     const result = await this.virtualAccountService.makePaymentFail(payment);
     Logger.log('가상계좌 미입금 주문/결제 취소 처리 완료!', logContext);

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { ShutdownManager } from './shutdown.manager';
-import { VirtualAccountProducer } from './virtual-account.producer';
-import { VirtualAccountServiceProxy } from './virtual-account.proxy.service';
+import { ShutdownManager } from './shutdown-manager/shutdown.manager';
+import { VirtualAccountProducer } from './virtual-account/virtual-account.producer';
+import { VirtualAccountServiceProxy } from './virtual-account/virtual-account.proxy.service';
 
 @Injectable()
 export class AppStarter {

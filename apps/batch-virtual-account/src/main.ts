@@ -8,7 +8,7 @@ import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app/app.module';
 import AppStarter from './app/app.starter';
-import { ShutdownManager } from './app/shutdown.manager';
+import { ShutdownManager } from './app/shutdown-manager/shutdown.manager';
 
 async function bootstrap(): Promise<void> {
   const bootstrapContext = '🚀 Application';
@@ -25,7 +25,19 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
-  await appStarter.start();
+  await appStarter.start().catch(async (err) => {
+    Logger.error('Error occured. process will be terminated', 'GlobalErrorHandler');
+    console.error(err);
+    // 에러 발생으로 인해  알림 추가할 수 있을 것.
+
+    await app.close().then(() => {
+      Logger.log(
+        `::JOB_FAILED:: Application termination completed. Goodbye`,
+        bootstrapContext,
+      );
+    });
+    throw err;
+  });
 }
 
 bootstrap();
