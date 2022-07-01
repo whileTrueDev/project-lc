@@ -69,9 +69,7 @@ export class PaymentService {
 
     try {
       // * 크크쇼 OrderPayment 테이블에 데이터 저장
-      // 가상계좌 결제의 경우 소비자가 입금전까지는 승인되지 않으므로 approvedAt이 null로 전달됨
-      // 가상계좌 결제시 입금전까지 depositDate : null, depositDoneFlag: false임
-      // TODO : 입금완료시 웹훅으로 입금완료일시, 입금완료상태 변경 필요
+
       const orderPayment = await this.savePaymentRecord({
         method: result.method as PaymentMethod,
         paymentKey: result.paymentKey,
@@ -79,6 +77,7 @@ export class PaymentService {
         depositDoneFlag: !!result.approvedAt,
         depositSecret: result.secret,
         depositor: result.virtualAccount?.customerName,
+        account: result.virtualAccount?.accountNumber,
         depositDueDate: result.virtualAccount?.dueDate
           ? new Date(result.virtualAccount?.dueDate)
           : null,
