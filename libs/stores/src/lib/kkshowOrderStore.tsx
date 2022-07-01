@@ -37,7 +37,7 @@ export type OrderShippingData = ShippingCostByShippingGroupId;
 export interface KkshowOrderStore {
   handlePaymentType(value: string): void;
   handleAddressType(value: string): void;
-  paymentType: '카드' | '계좌이체' | '가상계좌' | '미선택';
+  paymentType: '카드' | '계좌이체' | '가상계좌';
   addressType: 'default' | 'manual' | 'list';
 
   // ******************************************
@@ -62,9 +62,9 @@ export const useKkshowOrderStore = create<KkshowOrderStore>(
   // 로컬스토리지 사용 => 결제완료 후(토스페이먼츠 결제요청 이후) Order 데이터 생성하려고 하는데 리다이렉트 이후 store에 있는 데이터가 사라져서
   persist(
     (set, get) => ({
-      paymentType: '미선택',
+      paymentType: '카드',
       addressType: 'manual',
-      handlePaymentType(value: '카드' | '계좌이체' | '가상계좌' | '미선택') {
+      handlePaymentType(value: '카드' | '계좌이체' | '가상계좌') {
         set({
           paymentType: value,
         });
