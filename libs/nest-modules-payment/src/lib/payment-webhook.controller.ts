@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   InternalServerErrorException,
   NotFoundException,
   Post,
@@ -34,6 +35,11 @@ export class PaymentWebhookController {
   @Post('toss')
   public async tossCallback(): Promise<any> {
     //
+    throw new NotFoundException('TossPayments - 아직 웹훅 처리 준비되지 않음');
+  }
+
+  @Get('toss')
+  public async tossCallbackHealthCheck(): Promise<string> {
     throw new NotFoundException('TossPayments - 아직 웹훅 처리 준비되지 않음');
   }
 
@@ -74,5 +80,10 @@ export class PaymentWebhookController {
         'TossPayments - VirtualAccount processing failed',
       );
     return 'Ok';
+  }
+
+  @Get('toss/virtual-account')
+  public async tossVirtualAccountCallbackHealthCheck(): Promise<string> {
+    return 'Ready';
   }
 }
