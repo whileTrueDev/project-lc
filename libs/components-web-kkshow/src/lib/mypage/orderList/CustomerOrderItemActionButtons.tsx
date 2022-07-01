@@ -68,7 +68,8 @@ export function OrderItemActionButtons({
       disabled: false,
     },
     {
-      label: !cancelDataIncludingThisOrderItem ? '주문 취소' : '취소정보조회',
+      // label: !cancelDataIncludingThisOrderItem ? '주문 취소' : '취소정보조회',
+      label: '주문 취소',
       onClick: () => {
         if (!cancelDataIncludingThisOrderItem) {
           orderCancelDialog.onOpen();
@@ -79,9 +80,9 @@ export function OrderItemActionButtons({
           );
         }
       },
-      display:
-        orderCancellationAbleSteps.includes(step) || //  // 상품준비 이전에만 표시
-        step === 'paymentCanceled', // 실제 신청은불가, 정보를 보여주는 버튼을 위해
+      display: orderCancellationAbleSteps.includes(step), // || //  // 상품준비 이전에만 표시
+      // step === 'paymentCanceled', // 실제 신청은불가, 정보를 보여주는 버튼을 위해
+      // => 결제취소 외에 환불(=수거없는 반품)요청 처리완료 이후에도 주문의 상태가 '결제취소'상태가 되어서 일단 주석처리함
       disabled: false,
     },
     {
