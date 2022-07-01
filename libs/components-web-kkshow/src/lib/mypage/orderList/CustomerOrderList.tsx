@@ -21,7 +21,7 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
   const queryClient = useQueryClient();
   const [dto, setDto] = useState<GetOrderListDto>({
     // take 값이 없을때 default take 값은 10 => default take 값 변경은 GetOrderListDto에서
-    take: 2,
+    take: 5,
     customerId,
   });
 
