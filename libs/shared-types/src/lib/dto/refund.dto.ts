@@ -71,7 +71,7 @@ export class CreateRefundDto {
   @IsOptional()
   refundAccountHolder?: string;
 
-  /** 환불은행 */
+  /** 환불은행 Bank.bankCode */
   @IsString()
   @IsOptional()
   refundBank?: string;

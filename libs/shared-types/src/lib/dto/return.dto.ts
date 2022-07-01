@@ -57,15 +57,20 @@ export class CreateReturnDto {
   @IsOptional()
   returnAddress?: string;
 
-  /** 환불받을 은행 */
+  /** 환불계좌번호 */
   @IsString()
   @IsOptional()
-  returnBank?: string;
+  refundAccount?: string;
 
-  /** 환불받을 은행계좌 */
+  /** 환불계좌예금주명 */
   @IsString()
   @IsOptional()
-  returnBankAccount?: string;
+  refundAccountHolder?: string;
+
+  /** 환불은행 Bank.bankCode */
+  @IsString()
+  @IsOptional()
+  refundBank?: string;
 
   /** 반품 상품들 */
   @IsArray()

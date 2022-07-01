@@ -29,12 +29,12 @@ export class ReturnService {
 
   /** 반품요청 생성 */
   async createReturn(dto: CreateReturnDto): Promise<CreateReturnRes> {
-    const { orderId, items, images, returnBankAccount, ...rest } = dto;
-    const encryptedBankAccount = this.cipherService.getEncryptedText(returnBankAccount);
+    const { orderId, items, images, refundAccount, ...rest } = dto;
+    const encryptedBankAccount = this.cipherService.getEncryptedText(refundAccount);
     const data = await this.prisma.return.create({
       data: {
         ...rest,
-        returnBankAccount: encryptedBankAccount,
+        refundAccount: encryptedBankAccount,
         returnCode: this.createReturnCode(),
         order: { connect: { id: orderId } },
         items: {
@@ -100,9 +100,9 @@ export class ReturnService {
 
     // 조회한 데이터를 필요한 형태로 처리
     const list = data.map((d) => {
-      const { items, returnBankAccount, refund, ...rest } = d;
+      const { items, refundAccount, refund, ...rest } = d;
 
-      const decryptedBankAccount = this.cipherService.getDecryptedText(returnBankAccount);
+      const decryptedBankAccount = this.cipherService.getDecryptedText(refundAccount);
 
       const _items = items.map((i) => ({
         id: i.id, // 반품 상품 고유번호
@@ -128,7 +128,7 @@ export class ReturnService {
       return {
         ...rest,
         items: _items,
-        returnBankAccount: decryptedBankAccount,
+        refundAccount: decryptedBankAccount,
         refund: _refund,
       };
     });
@@ -181,9 +181,9 @@ export class ReturnService {
         images: true,
       },
     });
-    const { items, returnBankAccount, refund, ...rest } = data;
+    const { items, refundAccount, refund, ...rest } = data;
 
-    const decryptedBankAccount = this.cipherService.getDecryptedText(returnBankAccount);
+    const decryptedBankAccount = this.cipherService.getDecryptedText(refundAccount);
 
     const _items = items.map((i) => ({
       id: i.id, // 반품 상품 고유번호
@@ -209,7 +209,7 @@ export class ReturnService {
     return {
       ...rest,
       items: _items,
-      returnBankAccount: decryptedBankAccount,
+      refundAccount: decryptedBankAccount,
       refund: _refund,
     };
   }
@@ -304,10 +304,10 @@ export class ReturnService {
     });
 
     return data.map((d) => {
-      const { returnBankAccount } = d;
+      const { refundAccount } = d;
 
       return Object.assign(d, {
-        returnBankAccount: this.cipherService.getDecryptedText(returnBankAccount),
+        refundAccount: this.cipherService.getDecryptedText(refundAccount),
       });
     });
   }
