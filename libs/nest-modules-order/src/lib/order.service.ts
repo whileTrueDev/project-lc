@@ -741,11 +741,11 @@ export class OrderService {
 
   /** 비회원 주문 상세 조회 */
   async getNonMemberOrderDetail({
-    orderCode,
+    ordererPhone,
     ordererName,
   }: GetNonMemberOrderDetailDto): Promise<NonMemberOrderDetailRes> {
     const order = await this.findOneOrderDetail({
-      orderCode,
+      ordererPhone,
       ordererName,
       customerId: null,
       deleteFlag: false,
