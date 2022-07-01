@@ -5,6 +5,7 @@ import {
   PaymentMethod,
   VirtualAccountDepositStatus,
 } from '@prisma/client';
+import { CipherService } from '@project-lc/nest-modules-cipher';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreatePaymentRes,
@@ -19,7 +20,10 @@ import { PaymentCancelDto } from './IPaymentCancelKeyMap';
 
 @Injectable()
 export class PaymentService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cipherService: CipherService,
+  ) {}
 
   /** 크크쇼 OrderPayment 테이블에 결제 데이터 저장 */
   public async savePaymentRecord(dto: {
@@ -68,19 +72,28 @@ export class PaymentService {
     }
 
     try {
-      // * 크크쇼 OrderPayment 테이블에 데이터 저장
+      // 가상계좌 결제의 경우 소비자가 입금전까지는 승인되지 않으므로 approvedAt이 null로 전달됨
+      // 가상계좌 결제시 입금전까지 depositDate : null, depositDoneFlag: false임
+      const virtualAccountInfo = !result.virtualAccount
+        ? undefined
+        : {
+            depositor: result.virtualAccount.customerName,
+            depositDueDate: result.virtualAccount.dueDate
+              ? new Date(result.virtualAccount.dueDate)
+              : null,
+            account: `${result.virtualAccount.bank}_${this.cipherService.getEncryptedText(
+              result.virtualAccount.accountNumber,
+            )}`,
+          };
 
+      // * 크크쇼 OrderPayment 테이블에 데이터 저장
       const orderPayment = await this.savePaymentRecord({
         method: result.method as PaymentMethod,
         paymentKey: result.paymentKey,
         depositDate: result.approvedAt ? new Date(result.approvedAt) : undefined,
         depositDoneFlag: !!result.approvedAt,
         depositSecret: result.secret,
-        depositor: result.virtualAccount?.customerName,
-        account: result.virtualAccount?.accountNumber,
-        depositDueDate: result.virtualAccount?.dueDate
-          ? new Date(result.virtualAccount?.dueDate)
-          : null,
+        ...virtualAccountInfo,
       });
 
       return { status: 'success', orderId: dto.orderId, orderPaymentId: orderPayment.id };
