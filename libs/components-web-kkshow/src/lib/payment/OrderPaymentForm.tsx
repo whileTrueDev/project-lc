@@ -77,32 +77,24 @@ export function OrderPaymentForm(): JSX.Element | null {
       customerId: profile?.id,
       recipientPhone: [recipientPhone1, recipientPhone2, recipientPhone3].join('-'),
     });
-    if (paymentType === '미선택') {
-      toast({
-        title: '결제수단을 선택해주세요',
-        status: 'error',
-        position: 'top',
-      });
-    } else {
-      const amount = getOrderPrice(
-        PRODUCT_PRICE,
-        SHIPPING_COST,
-        DISCOUNT,
-        getValues('usedMileageAmount') || 0,
-        getValues('usedCouponAmount') || 0,
-      );
-      const cookieExpire = new Date();
-      cookieExpire.setMinutes(cookieExpire.getMinutes() + 1);
-      setCookie('amount', amount, { expire: cookieExpire, path: '/' }); // path 설정 안하면 /payment로 저장되기는 함. 이유는 모르겠으나 한번은 path가 /goods로 저장되어 /payment페이지에서 쿠키가 읽히지 않음 -> 결제금액 비교 못하는 문제가 발생하여 '/' 로 저장함
+    const amount = getOrderPrice(
+      PRODUCT_PRICE,
+      SHIPPING_COST,
+      DISCOUNT,
+      getValues('usedMileageAmount') || 0,
+      getValues('usedCouponAmount') || 0,
+    );
+    const cookieExpire = new Date();
+    cookieExpire.setMinutes(cookieExpire.getMinutes() + 1);
+    setCookie('amount', amount, { expire: cookieExpire, path: '/' }); // path 설정 안하면 /payment로 저장되기는 함. 이유는 모르겠으나 한번은 path가 /goods로 저장되어 /payment페이지에서 쿠키가 읽히지 않음 -> 결제금액 비교 못하는 문제가 발생하여 '/' 로 저장함
 
-      await doPayment(
-        paymentType,
-        CLIENT_KEY,
-        amount,
-        productName,
-        getValues('ordererName'),
-      );
-    }
+    return doPayment(
+      paymentType,
+      CLIENT_KEY,
+      amount,
+      productName,
+      getValues('ordererName'),
+    );
   };
 
   return (

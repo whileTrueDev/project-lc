@@ -34,7 +34,7 @@ export async function doPayment(
 ): Promise<void> {
   return loadTossPayments(client_key)
     .then((tossPayments) => {
-      tossPayments.requestPayment(paymentType, {
+      return tossPayments.requestPayment(paymentType, {
         amount,
         orderId: `${dayjs().format('YYYYMMDDHHmmssSSS')}${nanoid(6)}`,
         orderName: `${productName}`,
@@ -104,7 +104,10 @@ export function PaymentBox(): JSX.Element {
     return prev + curr.cost.std + curr.cost.add;
   }, 0);
 
-  const { watch } = useFormContext<CreateOrderForm>();
+  const {
+    watch,
+    formState: { isSubmitting },
+  } = useFormContext<CreateOrderForm>();
 
   const noMileageBenefit =
     mileageSetting.mileageStrategy === 'noMileage' || !watch('customerId'); // 로그인 안한경우도 적립안됨
@@ -191,7 +194,13 @@ export function PaymentBox(): JSX.Element {
         <Text as="sub">하기 필수약관을 확인하였으며, 이에 동의합니다.</Text>
       </Box>
       <Center>
-        <Button type="submit" size="lg" colorScheme="blue" isFullWidth>
+        <Button
+          type="submit"
+          size="lg"
+          colorScheme="blue"
+          isFullWidth
+          isDisabled={isSubmitting}
+        >
           {getLocaleNumber(
             getOrderPrice(
               PRODUCT_PRICE,
