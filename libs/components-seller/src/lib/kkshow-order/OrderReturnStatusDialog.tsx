@@ -188,8 +188,8 @@ export function OrderReturnStatusDialog({
                   .map((item) => item.price)
                   .reduce((sum, price) => sum + price, 0)}
                 // 소비자가 환불요청시 환불요청계좌를 입력했다면, 환불예정계좌료 표시
-                refundAccount={returnDetail.returnBankAccount || undefined}
-                refundBank={returnDetail.returnBank || undefined}
+                refundAccount={returnDetail.refundAccount || undefined}
+                refundBank={returnDetail.refundBank || undefined}
               />
             </Stack>
 

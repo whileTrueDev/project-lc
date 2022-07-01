@@ -1807,8 +1807,6 @@ model Return {
   reason              String // 소비자의 반품사유
   rejectReason        String? // 반품요청이 거절된 이유
   returnAddress       String? // 회수지 주소
-  // returnBank        String? // 환불받을 은행
-  // returnBankAccount String? // 환불받을 은행계좌
   refundAccount       String? // 환불계좌번호
   refundAccountHolder String? // 환불계좌예금주명
   refundBank          String? // 환불계좌 은행
