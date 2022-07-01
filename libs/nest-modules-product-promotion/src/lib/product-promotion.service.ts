@@ -93,8 +93,9 @@ export class ProductPromotionService {
    * @param goodsIds 상품 고유번호 GoodsId 배열 (productPromotion.goodsId)
    */
   public async findProductPromotionsByGoodsIds(
-    goodsIds: Goods['id'][],
+    goodsIds?: Goods['id'][],
   ): Promise<ProductPromotion[]> {
+    if (!goodsIds) return [];
     const _goodsIds = goodsIds.map((s) => Number(s)).filter((x) => !!x);
     return this.prisma.productPromotion.findMany({
       where: { goodsId: { in: _goodsIds } },
