@@ -73,7 +73,7 @@ export function AdminReturnRequestDetail({
     console.log('error', e);
   };
 
-  const { mutateAsync } = useCreateRefundMutation();
+  const { mutateAsync, isLoading } = useCreateRefundMutation();
   const submitHandler = (formData: AdminRefundCreateFormData): void => {
     if (!data) return;
 
@@ -81,9 +81,9 @@ export function AdminReturnRequestDetail({
     const virtualAccountRefundInfo =
       data?.order?.payment?.method === 'virtualAccount'
         ? {
-            refundAccount: data.returnBankAccount || undefined,
-            refundBank: data.returnBank || undefined,
-            refundAccountHolder: paymentData?.virtualAccount?.customerName || undefined,
+            refundAccount: data.refundAccount || undefined,
+            refundBank: data.refundBank || undefined, // 반품 요청시 Bank.bankCode 형태로 저장되어있다
+            refundAccountHolder: data.refundAccountHolder || undefined,
           }
         : undefined;
 
@@ -168,27 +168,6 @@ export function AdminReturnRequestDetail({
           )}
         </Grid>
       </Box>
-
-      {data.returnBank && data.returnBankAccount && (
-        <Box>
-          <Text>환불요청정보</Text>
-          <Grid templateColumns="repeat(2, 1fr)" border="1px" p={1}>
-            <GridItem>
-              <Text>환불 은행</Text>
-            </GridItem>
-            <GridItem>
-              <Text>{data.returnBank}</Text>
-            </GridItem>
-
-            <GridItem>
-              <Text>환불 계좌</Text>
-            </GridItem>
-            <GridItem>
-              <Text>{data.returnBankAccount}</Text>
-            </GridItem>
-          </Grid>
-        </Box>
-      )}
 
       <Box>
         <Text>마일리지, 쿠폰 사용 내역</Text>
@@ -298,7 +277,7 @@ export function AdminReturnRequestDetail({
       </Table>
 
       <Stack spacing={4} direction="row-reverse">
-        <Button type="submit" colorScheme="red">
+        <Button type="submit" colorScheme="red" isLoading={isLoading}>
           환불처리하기
         </Button>
         <Button onClick={onCancel}>취소</Button>

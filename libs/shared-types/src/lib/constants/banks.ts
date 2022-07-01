@@ -63,3 +63,8 @@ export const banks: Bank[] = [
   { bankCodeKr: 'SC제일', bankCodeEn: 'SC', bankCode: '23', bankName: 'SC제일은행' },
   { bankCodeKr: '-', bankCodeEn: 'HSBC', bankCode: '54', bankName: '홍콩상하이은행' },
 ];
+
+/** 환불계좌 은행코드 조회 함수 (결제취소외에 반품요청시에도 환불계좌 입력하므로 동일한 형태로 은행코드 전달하기 위해 함수로 분리함) */
+export function findBankCode(refundBank?: string): string | undefined {
+  return banks.find((bank) => bank.bankName === refundBank)?.bankCode;
+}

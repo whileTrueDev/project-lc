@@ -23,6 +23,7 @@ import {
   banks,
   convertPaymentMethodToKrString,
   CreateRefundDto,
+  findBankCode,
 } from '@project-lc/shared-types';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { OrderItemOptionInfo } from './OrderItemOptionInfo';
@@ -69,35 +70,31 @@ export function OrderCancelDialog({
       ),
     };
 
-    orderCancelMutation
-      .mutateAsync(dto)
-      .then(async (res) => {
-        // 결제완료 주문인 경우 환불처리 진행
-        if (orderDetailData.step === 'paymentConfirmed') {
-          const refundAccountInfo = formMethods.getValues();
-          const refundDto: CreateRefundDto = {
-            orderId: orderDetailData.id,
-            reason: '소비자의 주문취소신청',
-            items: dto.items,
-            orderCancellationId: res.id,
-            refundAmount: orderDetailData.paymentPrice,
-            paymentKey: orderDetailData.payment?.paymentKey,
-            ...refundAccountInfo, // 가상계좌결제의 경우 환불 계좌 정보 추가
-            refundBank: banks.find(
-              (bank) => bank.bankName === refundAccountInfo.refundBank,
-            )?.bankCode,
-          };
-          await createRefundMutation.mutateAsync(refundDto);
-        }
-        toast({ title: '주문 취소 완료', status: 'success' });
-      })
-      .catch((e) => {
-        toast({
-          title: '주문 취소 중 오류가 발생하였습니다.',
-          status: 'error',
-          description: e.response?.data?.message || e.message,
-        });
+    try {
+      const res = await orderCancelMutation.mutateAsync(dto);
+      // 결제완료 주문인 경우 환불처리 진행
+      if (orderDetailData.step === 'paymentConfirmed') {
+        const refundAccountInfo = formMethods.getValues();
+        const refundDto: CreateRefundDto = {
+          orderId: orderDetailData.id,
+          reason: '소비자의 주문취소신청',
+          items: dto.items,
+          orderCancellationId: res.id,
+          refundAmount: orderDetailData.paymentPrice,
+          paymentKey: orderDetailData.payment?.paymentKey,
+          ...refundAccountInfo, // 가상계좌결제의 경우 환불 계좌 정보 추가
+          refundBank: findBankCode(refundAccountInfo.refundBank),
+        };
+        await createRefundMutation.mutateAsync(refundDto);
+      }
+      toast({ title: '주문 취소 완료', status: 'success' });
+    } catch (e: any) {
+      toast({
+        title: '주문 취소 중 오류가 발생하였습니다.',
+        status: 'error',
+        description: e?.response?.data?.message || e?.message,
       });
+    }
   };
 
   return (
@@ -164,11 +161,11 @@ export function OrderCancelDialog({
   );
 }
 
-function RefundAccountForm(): JSX.Element {
+export function RefundAccountForm(): JSX.Element {
   const {
     register,
     formState: { errors },
-  } = useFormContext<RefundAccountDto>();
+  } = useFormContext();
 
   return (
     <Stack p={2} borderWidth="thin" rounded="md">

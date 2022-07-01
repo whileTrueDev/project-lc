@@ -41,9 +41,7 @@ export class RefundService {
     createRefundDto: CreateRefundDto,
   ): TossPaymentCancelDto {
     const refundReceiveAccount = {
-      bank: createRefundDto.refundBank
-        ? banks.find((b) => b.bankName === createRefundDto.refundBank).bankCodeKr
-        : undefined,
+      bank: createRefundDto.refundBank,
       accountNumber: createRefundDto.refundAccount,
       holderName: createRefundDto.refundAccountHolder,
     };
