@@ -1,4 +1,4 @@
-import { Box, Button, Center, Divider, Flex, Text, useToast } from '@chakra-ui/react';
+import { Box, Button, Center, Divider, Flex, Text } from '@chakra-ui/react';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
@@ -32,16 +32,21 @@ export async function doPayment(
   productName: string,
   customerName: string,
 ): Promise<void> {
-  return loadTossPayments(client_key).then((tossPayments) => {
-    tossPayments.requestPayment(paymentType, {
-      amount,
-      orderId: `${dayjs().format('YYYYMMDDHHmmssSSS')}${nanoid(6)}`,
-      orderName: `${productName}`,
-      customerName,
-      successUrl: `${getCustomerWebHost()}/payment/success`,
-      failUrl: `${getCustomerWebHost()}/payment/fail`,
+  return loadTossPayments(client_key)
+    .then((tossPayments) => {
+      tossPayments.requestPayment(paymentType, {
+        amount,
+        orderId: `${dayjs().format('YYYYMMDDHHmmssSSS')}${nanoid(6)}`,
+        orderName: `${productName}`,
+        customerName,
+        successUrl: `${getCustomerWebHost()}/payment/success`,
+        failUrl: `${getCustomerWebHost()}/payment/fail`,
+      });
+    })
+    .catch((err) => {
+      console.error('Error - loadTossPayments');
+      console.error(err);
     });
-  });
 }
 
 export function MileageBenefit({
