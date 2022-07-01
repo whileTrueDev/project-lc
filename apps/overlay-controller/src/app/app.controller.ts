@@ -25,7 +25,7 @@ import {
   getOverlayHost,
   getRealtimeApiHost,
 } from '@project-lc/utils';
-import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
+import { JwtAuthGuard, AdminGuard } from '@project-lc/nest-modules-authguard';
 import { ViewAuthFilter } from './forbidden.exception';
 
 @Controller()
@@ -41,7 +41,7 @@ export class AppController {
     return 'Alive';
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @UseFilters(ViewAuthFilter)
   @Get()
   @Render('index')
@@ -67,7 +67,7 @@ export class AppController {
     return { message: 'login' };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/purchase-message')
   async getMessage(
     @Query('liveShoppingId') liveShoppingId: number,
@@ -75,14 +75,14 @@ export class AppController {
     return this.purchaseMessageService.getAllMessagesAndPrice(Number(liveShoppingId));
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('/purchase-message')
   async uploadMessage(@Body() data: PurchaseMessageWithLoginFlag): Promise<boolean> {
     const upload = await this.overlayControllerService.uploadPurchase(data);
     return upload;
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete('/purchase-message')
   async deleteMessage(
     @Body('messageId', ParseIntPipe) messageId: number,

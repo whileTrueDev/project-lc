@@ -10,7 +10,7 @@ $(document).ready(function ready() {
     $.ajax({
       type: 'POST',
       url: `http://localhost:3333/auth/login?type=admin`,
-      data: { email, password, stayLogedIn: true },
+      data: { email, password, stayLogedIn: true, type: 'admin' },
       success(data) {
         window.location.href = '/';
       },
