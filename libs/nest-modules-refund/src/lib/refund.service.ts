@@ -41,7 +41,7 @@ export class RefundService {
     createRefundDto: CreateRefundDto,
   ): TossPaymentCancelDto {
     const refundReceiveAccount = {
-      bank: createRefundDto.refundBank,
+      bank: banks.find((b) => b.bankName === createRefundDto.refundBank)?.bankCodeKr, // 은행명은 Bank.bankName 형태로 전달된다. 이상태로 토스에 요청하면 유효하지 않은 은행이라는 오류가 뜸 => Bank.bankCodeKr 형태로 변경한다
       accountNumber: createRefundDto.refundAccount,
       holderName: createRefundDto.refundAccountHolder,
     };
@@ -96,7 +96,7 @@ export class RefundService {
         ...rest,
         refundAccount: encryptedAccount,
         refundBank: refundBank
-          ? banks.find((b) => b.bankCode === refundBank)?.bankName || refundBank
+          ? banks.find((b) => b.bankCode === refundBank)?.bankName || refundBank // bankCode가 들어오는 경우 해당 bankCode의 bankName을 저장, 아니면 bankName으로 들어온 값을 그대로 저장
           : undefined,
         refundCode: this.createRefundCode(),
         order: { connect: { id: orderId } },
