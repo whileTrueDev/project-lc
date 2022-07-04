@@ -18,7 +18,6 @@ import {
   CreateExchangeDto,
   CreateReturnDto,
   exchangeReturnAbleSteps,
-  findBankCode,
   RefundAccountDto,
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
