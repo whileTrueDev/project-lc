@@ -1,32 +1,19 @@
-import {
-  Box,
-  Center,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Select,
-  Spinner,
-  Stack,
-  Text,
-  useToast,
-} from '@chakra-ui/react';
+import { Box, Center, Flex, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
+import { RefundAccountForm } from '@project-lc/components-shared/payment/RefundAccountForm';
 import {
   useCreateRefundMutation,
   useCustomerOrderCancelMutation,
   useOrderDetail,
 } from '@project-lc/hooks';
 import {
-  banks,
   convertPaymentMethodToKrString,
+  CreateOrderCancellationDto,
   CreateRefundDto,
-  findBankCode,
   RefundAccountDto,
 } from '@project-lc/shared-types';
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { OrderItemOptionInfo } from './OrderItemOptionInfo';
 
 export function OrderCancelDialog({
@@ -55,7 +42,7 @@ export function OrderCancelDialog({
       if (!isValid) throw new Error('Refund account form data is not valid');
     }
 
-    const dto = {
+    const dto: CreateOrderCancellationDto = {
       orderId: orderDetailData.id,
       items: orderDetailData.orderItems.flatMap((item) =>
         item.options.map((opt) => ({
@@ -79,7 +66,7 @@ export function OrderCancelDialog({
           refundAmount: orderDetailData.paymentPrice,
           paymentKey: orderDetailData.payment?.paymentKey,
           ...refundAccountInfo, // 가상계좌결제의 경우 환불 계좌 정보 추가
-          refundBank: findBankCode(refundAccountInfo.refundBank),
+          refundBank: refundAccountInfo.refundBank,
         };
         await createRefundMutation.mutateAsync(refundDto);
       }
@@ -154,82 +141,5 @@ export function OrderCancelDialog({
         </Center>
       )}
     </ConfirmDialog>
-  );
-}
-
-export function RefundAccountForm(): JSX.Element {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext<RefundAccountDto>();
-
-  return (
-    <Stack p={2} borderWidth="thin" rounded="md">
-      <Text fontWeight="bold">환불계좌 정보입력 (가상계좌결제건)</Text>
-      <Text fontSize="sm">환불계좌정보를 신중히 입력해주세요.</Text>
-      <FormControl isInvalid={!!errors.refundBank}>
-        <FormLabel fontSize="sm" my={0}>
-          은행
-        </FormLabel>
-        <Select
-          id="bank"
-          autoComplete="off"
-          maxW={200}
-          maxLength={10}
-          size="sm"
-          placeholder="환불은행을 선택하세요."
-          {...register('refundBank', {
-            required: '은행을 반드시 선택해주세요.',
-          })}
-        >
-          {banks.map(({ bankCode, bankName }) => (
-            <option key={bankCode} value={bankName}>
-              {bankName}
-            </option>
-          ))}
-        </Select>
-        <FormErrorMessage fontSize="xs">{errors.refundBank?.message}</FormErrorMessage>
-      </FormControl>
-
-      <FormControl isInvalid={!!errors.refundAccount}>
-        <FormLabel fontSize="sm" my={0}>
-          계좌번호
-        </FormLabel>
-        <Input
-          id="refundAccount"
-          size="sm"
-          autoComplete="off"
-          maxW={200}
-          placeholder="계좌번호를 입력하세요.(숫자만)"
-          {...register('refundAccount', {
-            required: '계좌번호를 반드시 입력해주세요.',
-            pattern: {
-              value: /^[0-9]+$/,
-              message: '계좌번호는 숫자만 가능합니다.',
-            },
-          })}
-        />
-        <FormErrorMessage fontSize="xs">{errors.refundAccount?.message}</FormErrorMessage>
-      </FormControl>
-
-      <FormControl isInvalid={!!errors.refundAccountHolder}>
-        <FormLabel fontSize="sm" my={0}>
-          예금주
-        </FormLabel>
-        <Input
-          id="refundAccountHolder"
-          size="sm"
-          placeholder="예금주를 입력하세요."
-          autoComplete="off"
-          maxW={200}
-          {...register('refundAccountHolder', {
-            required: '예금주를 반드시 입력해주세요.',
-          })}
-        />
-        <FormErrorMessage fontSize="xs">
-          {errors.refundAccountHolder && errors.refundAccountHolder.message}
-        </FormErrorMessage>
-      </FormControl>
-    </Stack>
   );
 }
