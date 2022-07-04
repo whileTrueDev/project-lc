@@ -26,8 +26,8 @@ export class OrderCancellationService {
     private readonly cipherService: CipherService,
   ) {}
 
-  /* 주문취소 생성(소비자가 주문취소 요청 생성) */
-  async createOrderCancellation(
+  /* 주문취소 생성(소비자가 주문취소 요청 생성) 혹은 완료되지 않은 요청 반환 - 해당 주문에 대해 완료되지 않은 주문취소요청이 있으면 새로 생성하지 않고 완료되지 않은 주문취소요청을 반환 */
+  async findOrCreateOrderCancellation(
     dto: CreateOrderCancellationDto,
   ): Promise<CreateOrderCancellationRes> {
     const { items, orderId, ...rest } = dto;
@@ -47,8 +47,21 @@ export class OrderCancellationService {
       );
     }
 
-    // 주문취소, 주문취소상품 상태 : 완료
-    const status: ProcessStatus = 'complete';
+    // 주문에 대한 완료되지 않은 주문취소요청이 존재하는지 확인, 있으면 완료되지 않은 주문취소요청을 반환
+    const prevOrderCancellation = await this.prisma.orderCancellation.findFirst({
+      where: { orderId, status: 'requested' },
+    });
+    if (prevOrderCancellation) {
+      return prevOrderCancellation;
+    }
+
+    // 완료되지 않은 주문취소요청이 없다면 새로 생성
+    // 주문취소, 주문취소상품 상태는 승인이 필요하지 않으므로 '완료됨' 상태로 생성한다
+    let status: ProcessStatus = 'complete';
+    // 만약 주문상태가 '결제완료' 상태인경우 환불과정이 필요하므로 '요청됨' 상태로 생성 후, 환불과정이 완료될 때 거기서 주문취소의 상태를 변경한다
+    if (order.step === 'paymentConfirmed') {
+      status = 'requested';
+    }
 
     // 주문취소코드 생성
     const cancelCode = nanoid();

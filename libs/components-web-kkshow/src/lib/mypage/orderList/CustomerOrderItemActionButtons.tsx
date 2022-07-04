@@ -24,13 +24,8 @@ export function OrderItemActionButtons({
   const hasReview = !!orderItem.reviewId;
   const { orderId } = orderItem;
 
-  // 해당 주문상품이 포함된 주문취소요청
-  const cancelDataIncludingThisOrderItem = order.orderCancellations
-    ?.flatMap((c) => {
-      const { items, cancelCode } = c;
-      return items.map((i) => ({ cancelCode, ...i }));
-    })
-    .find((oc) => oc.orderItemOptionId === option.id);
+  // 주문 하나에 대해 여러개의 주문취소요청이 생성될 수 없다(주문취소시 전체 주문상품옵션을 선택하여 취소하게 되어있음)
+  const orderCancel = order.orderCancellations?.[0];
 
   // 해당 주문상품이 포함된 교환(재배송)요청
   const exchangeDataIncludingThisOrderItem = order.exchanges
@@ -71,14 +66,12 @@ export function OrderItemActionButtons({
       // label: !cancelDataIncludingThisOrderItem ? '주문 취소' : '취소정보조회',
       label: '주문 취소',
       onClick: () => {
-        if (!cancelDataIncludingThisOrderItem) {
-          orderCancelDialog.onOpen();
-        } else {
-          // 해당 주문상품이 포함된 주문취소요청이 있는경우 -> 그 주문요청 상세페이지로 이동
-          router.push(
-            `/mypage/exchange-return-cancel/cancel/${cancelDataIncludingThisOrderItem.cancelCode}`,
-          );
+        // 주문취소 요청이 존재하고, 해당 요청이 완료된 경우 주문취소요청 상세조회페이지로 이동
+        if (orderCancel && orderCancel.status === 'complete') {
+          router.push(`/mypage/exchange-return-cancel/cancel/${orderCancel.cancelCode}`);
         }
+        // 아니면 다이얼로그 오픈
+        orderCancelDialog.onOpen();
       },
       display: orderCancellationAbleSteps.includes(step), // || //  // 상품준비 이전에만 표시
       // step === 'paymentCanceled', // 실제 신청은불가, 정보를 보여주는 버튼을 위해

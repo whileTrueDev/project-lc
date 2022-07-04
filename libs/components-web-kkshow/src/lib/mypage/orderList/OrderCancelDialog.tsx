@@ -54,8 +54,9 @@ export function OrderCancelDialog({
     };
 
     try {
-      // 먼저 주문취소요청을 생성함
+      // 먼저 주문취소요청을 생성함(혹은 완료되지 않은 주문취소요청 가져옴)
       const res = await orderCancelMutation.mutateAsync(dto);
+
       // 이후 결제완료 주문인 경우에만 환불처리 진행
       if (orderDetailData.step === 'paymentConfirmed') {
         const refundAccountInfo = formMethods.getValues();
