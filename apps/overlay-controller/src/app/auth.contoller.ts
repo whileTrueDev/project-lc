@@ -1,5 +1,9 @@
 import { Body, Controller, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard, LocalAuthGuard } from '@project-lc/nest-modules-authguard';
+import {
+  JwtAuthGuard,
+  LocalAuthGuard,
+  AdminGuard,
+} from '@project-lc/nest-modules-authguard';
 import { loginUserRes, UserType } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { AuthService, LoginHistoryService } from '@project-lc/nest-modules-auth';
@@ -21,7 +25,7 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<Response> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const user = req.body;
+    const { user } = req;
 
     const loginToken: loginUserRes = this.authService.issueToken(
       user,
@@ -35,7 +39,7 @@ export class AuthController {
     return res.status(200).send({ ...loginToken, id: user.id, userType: user.type });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('logout')
   logout(@Res() res): void {
     this.authService.handleLogout(res);

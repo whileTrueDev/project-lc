@@ -1,4 +1,4 @@
-import { Stack, Box, useColorModeValue, Heading, Text } from '@chakra-ui/react';
+import { Box, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 import React from 'react';
 
 export interface CenterBoxProps {
@@ -24,7 +24,9 @@ export function CenterBox({
         p={8}
       >
         <Stack>
-          <Heading fontSize="3xl">{header.title}</Heading>
+          <Text fontWeight="bold" fontSize="3xl">
+            {header.title}
+          </Text>
           <Text
             fontSize="sm"
             color={useColorModeValue('gray.600', 'gray.400')}
