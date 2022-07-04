@@ -27,6 +27,7 @@ import {
   AdminReturnData,
   CreateRefundDto,
   CreateRefundRes,
+  findBankCode,
   ReturnItemWithOriginOrderItemInfo,
 } from '@project-lc/shared-types';
 import { getAdminHost } from '@project-lc/utils';
@@ -82,7 +83,7 @@ export function AdminReturnRequestDetail({
       data?.order?.payment?.method === 'virtualAccount'
         ? {
             refundAccount: data.refundAccount || undefined,
-            refundBank: data.refundBank || undefined, // 반품 요청시 Bank.bankCode 형태로 저장되어있다
+            refundBank: findBankCode(data.refundBank || undefined), // Return.refundBank에는 Bank.bankName 형태로 저장되어있다, Refund 생성요청시 bankCode 형태로 바꿔서 요청한다
             refundAccountHolder: data.refundAccountHolder || undefined,
           }
         : undefined;
