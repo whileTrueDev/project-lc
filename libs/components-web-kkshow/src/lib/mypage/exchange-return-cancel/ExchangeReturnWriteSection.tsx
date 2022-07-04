@@ -7,7 +7,6 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { PaymentMethod } from '@prisma/client';
 import { Preview } from '@project-lc/components-core/ImageInputDialog';
 import {
   useCustomerExchangeMutation,
@@ -19,6 +18,7 @@ import {
   CreateExchangeDto,
   CreateReturnDto,
   exchangeReturnAbleSteps,
+  RefundAccountDto,
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { useRouter } from 'next/router';
@@ -60,7 +60,8 @@ async function uploadImages({
 type ExchangeReturnFormData = {
   previews: Preview[];
   solution: Solution;
-} & Record<string, any>;
+} & RefundAccountDto &
+  Record<string, any>;
 export interface ExchangeReturnWriteFormProps {
   orderId?: number;
 }
@@ -180,13 +181,13 @@ export function ExchangeReturnWriteSection({
 
     // * 반품(환불)요청 경우  --------------------------
     if (solution === 'return') {
-      // payment.method === 'virtualAccount'인 경우에만 필수값 : returnBank, returnBankAccount =>
-      const { returnBank, returnBankAccount } = rest;
+      // payment.method === 'virtualAccount'인 경우에만 필수값 : refundBank, refundAccount, refundAccountHolder=>
+      const { refundBank, refundAccount, refundAccountHolder } = rest;
       // * 필수값이 있는지 확인
       if (
         paymentData &&
         paymentData.method === '가상계좌' &&
-        (!returnBank || !returnBankAccount)
+        (!refundBank || !refundAccount || !refundAccountHolder)
       ) {
         toast({
           title: '환불받을 계좌정보를 입력하지 않았습니다.',
@@ -199,8 +200,9 @@ export function ExchangeReturnWriteSection({
         orderId,
         reason,
         items: selectedItems,
-        returnBank,
-        returnBankAccount,
+        refundBank, // Bank.bankName 형태로 저장
+        refundAccount,
+        refundAccountHolder,
         images:
           previews.length > 0
             ? await uploadImages({ type: 'return', previews })

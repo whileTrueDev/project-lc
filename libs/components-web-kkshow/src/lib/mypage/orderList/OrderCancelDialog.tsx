@@ -1,36 +1,20 @@
-import {
-  Box,
-  Center,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Select,
-  Spinner,
-  Stack,
-  Text,
-  useToast,
-} from '@chakra-ui/react';
+import { Box, Center, Flex, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
+import { RefundAccountForm } from '@project-lc/components-shared/payment/RefundAccountForm';
 import {
   useCreateRefundMutation,
   useCustomerOrderCancelMutation,
   useOrderDetail,
 } from '@project-lc/hooks';
 import {
-  banks,
   convertPaymentMethodToKrString,
+  CreateOrderCancellationDto,
   CreateRefundDto,
+  RefundAccountDto,
 } from '@project-lc/shared-types';
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { OrderItemOptionInfo } from './OrderItemOptionInfo';
-
-type RefundAccountDto = Pick<
-  CreateRefundDto,
-  'refundAccount' | 'refundAccountHolder' | 'refundBank'
->;
 
 export function OrderCancelDialog({
   isOpen,
@@ -58,7 +42,7 @@ export function OrderCancelDialog({
       if (!isValid) throw new Error('Refund account form data is not valid');
     }
 
-    const dto = {
+    const dto: CreateOrderCancellationDto = {
       orderId: orderDetailData.id,
       items: orderDetailData.orderItems.flatMap((item) =>
         item.options.map((opt) => ({
@@ -69,35 +53,33 @@ export function OrderCancelDialog({
       ),
     };
 
-    orderCancelMutation
-      .mutateAsync(dto)
-      .then(async (res) => {
-        // 결제완료 주문인 경우 환불처리 진행
-        if (orderDetailData.step === 'paymentConfirmed') {
-          const refundAccountInfo = formMethods.getValues();
-          const refundDto: CreateRefundDto = {
-            orderId: orderDetailData.id,
-            reason: '소비자의 주문취소신청',
-            items: dto.items,
-            orderCancellationId: res.id,
-            refundAmount: orderDetailData.paymentPrice,
-            paymentKey: orderDetailData.payment?.paymentKey,
-            ...refundAccountInfo, // 가상계좌결제의 경우 환불 계좌 정보 추가
-            refundBank: banks.find(
-              (bank) => bank.bankName === refundAccountInfo.refundBank,
-            )?.bankCode,
-          };
-          await createRefundMutation.mutateAsync(refundDto);
-        }
-        toast({ title: '주문 취소 완료', status: 'success' });
-      })
-      .catch((e) => {
-        toast({
-          title: '주문 취소 중 오류가 발생하였습니다.',
-          status: 'error',
-          description: e.response?.data?.message || e.message,
-        });
+    try {
+      // 먼저 주문취소요청을 생성함(혹은 완료되지 않은 주문취소요청 가져옴)
+      const res = await orderCancelMutation.mutateAsync(dto);
+
+      // 이후 결제완료 주문인 경우에만 환불처리 진행
+      if (orderDetailData.step === 'paymentConfirmed') {
+        const refundAccountInfo = formMethods.getValues();
+        const refundDto: CreateRefundDto = {
+          orderId: orderDetailData.id,
+          reason: '소비자의 주문취소신청',
+          items: dto.items,
+          orderCancellationId: res.id,
+          refundAmount: orderDetailData.paymentPrice,
+          paymentKey: orderDetailData.payment?.paymentKey,
+          ...refundAccountInfo, // 가상계좌결제의 경우 환불 계좌 정보 추가
+          refundBank: refundAccountInfo.refundBank,
+        };
+        await createRefundMutation.mutateAsync(refundDto);
+      }
+      toast({ title: '주문 취소 완료', status: 'success' });
+    } catch (e: any) {
+      toast({
+        title: '주문 취소 중 오류가 발생하였습니다.',
+        status: 'error',
+        description: e?.response?.data?.message || e?.message,
       });
+    }
   };
 
   return (
@@ -161,82 +143,5 @@ export function OrderCancelDialog({
         </Center>
       )}
     </ConfirmDialog>
-  );
-}
-
-function RefundAccountForm(): JSX.Element {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext<RefundAccountDto>();
-
-  return (
-    <Stack p={2} borderWidth="thin" rounded="md">
-      <Text fontWeight="bold">환불계좌 정보입력 (가상계좌결제건)</Text>
-      <Text fontSize="sm">환불계좌정보를 신중히 입력해주세요.</Text>
-      <FormControl isInvalid={!!errors.refundBank}>
-        <FormLabel fontSize="sm" my={0}>
-          은행
-        </FormLabel>
-        <Select
-          id="bank"
-          autoComplete="off"
-          maxW={200}
-          maxLength={10}
-          size="sm"
-          placeholder="환불은행을 선택하세요."
-          {...register('refundBank', {
-            required: '은행을 반드시 선택해주세요.',
-          })}
-        >
-          {banks.map(({ bankCode, bankName }) => (
-            <option key={bankCode} value={bankName}>
-              {bankName}
-            </option>
-          ))}
-        </Select>
-        <FormErrorMessage fontSize="xs">{errors.refundBank?.message}</FormErrorMessage>
-      </FormControl>
-
-      <FormControl isInvalid={!!errors.refundAccount}>
-        <FormLabel fontSize="sm" my={0}>
-          계좌번호
-        </FormLabel>
-        <Input
-          id="refundAccount"
-          size="sm"
-          autoComplete="off"
-          maxW={200}
-          placeholder="계좌번호를 입력하세요.(숫자만)"
-          {...register('refundAccount', {
-            required: '계좌번호를 반드시 입력해주세요.',
-            pattern: {
-              value: /^[0-9]+$/,
-              message: '계좌번호는 숫자만 가능합니다.',
-            },
-          })}
-        />
-        <FormErrorMessage fontSize="xs">{errors.refundAccount?.message}</FormErrorMessage>
-      </FormControl>
-
-      <FormControl isInvalid={!!errors.refundAccountHolder}>
-        <FormLabel fontSize="sm" my={0}>
-          예금주
-        </FormLabel>
-        <Input
-          id="refundAccountHolder"
-          size="sm"
-          placeholder="예금주를 입력하세요."
-          autoComplete="off"
-          maxW={200}
-          {...register('refundAccountHolder', {
-            required: '예금주를 반드시 입력해주세요.',
-          })}
-        />
-        <FormErrorMessage fontSize="xs">
-          {errors.refundAccountHolder && errors.refundAccountHolder.message}
-        </FormErrorMessage>
-      </FormControl>
-    </Stack>
   );
 }

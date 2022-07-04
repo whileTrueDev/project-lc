@@ -4,14 +4,12 @@ import {
   Input,
   Radio,
   RadioGroup,
-  Select,
   Stack,
   Text,
   useBoolean,
 } from '@chakra-ui/react';
-import { PaymentMethod } from '@prisma/client';
+import { RefundAccountForm } from '@project-lc/components-shared/payment/RefundAccountForm';
 import { useDefaultCustomerAddress, useProfile } from '@project-lc/hooks';
-import { banks } from '@project-lc/shared-types';
 import { useCallback, useEffect } from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
 import { useFormContext } from 'react-hook-form';
@@ -104,20 +102,8 @@ export function RefundOnlyRequestSection({
 }: {
   paymentMethod?: string; // '카드' | '계좌이체' | '가상계좌'
 }): JSX.Element {
-  const { register } = useFormContext();
   if (paymentMethod && paymentMethod === '가상계좌') {
-    return (
-      <Stack>
-        <Text>환불받을 은행 계좌를 입력해주세요</Text>
-        <Select {...register('returnBank')}>
-          {banks.map((bank) => (
-            <option key={bank.bankCode}>{bank.bankName}</option>
-          ))}
-        </Select>
-        <Text>계좌번호</Text>
-        <Input type="number" {...register('returnBankAccount')} />
-      </Stack>
-    );
+    return <RefundAccountForm />;
   }
 
   return <></>;

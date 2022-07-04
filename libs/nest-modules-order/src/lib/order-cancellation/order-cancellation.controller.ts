@@ -40,7 +40,7 @@ export class OrderCancellationController {
   createOrderCancellation(
     @Body(ValidationPipe) dto: CreateOrderCancellationDto,
   ): Promise<CreateOrderCancellationRes> {
-    return this.orderCancellationService.createOrderCancellation(dto);
+    return this.orderCancellationService.findOrCreateOrderCancellation(dto);
   }
 
   /** 주문취소코드로 특정 주문취소 상세조회 */
