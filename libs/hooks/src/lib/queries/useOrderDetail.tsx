@@ -69,6 +69,6 @@ export const useNonmemberOrderDetail = (
   return useQuery<NonMemberOrderDetailRes, AxiosError>(
     ['NonmemberOrderDetail', dto],
     () => getNonmemberOrderDetail(dto),
-    { enabled: !!dto.orderCode && !!dto.ordererName },
+    { enabled: !!dto.ordererPhone && !!dto.ordererName },
   );
 };

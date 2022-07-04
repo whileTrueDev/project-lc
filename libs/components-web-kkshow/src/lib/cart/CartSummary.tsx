@@ -50,7 +50,7 @@ export function CartSummary(): JSX.Element | null {
         w="100%"
       >
         <Text fontSize="sm">총 할인 금액</Text>
-        <Text fontSize={{ base: 'md', md: 'xl' }} fontWeight="bold">
+        <Text fontSize={{ base: 'md', md: 'xl' }} fontWeight="bold" color="red">
           <Text as="span" visibility={{ base: 'visible', md: 'hidden' }}>
             -
           </Text>

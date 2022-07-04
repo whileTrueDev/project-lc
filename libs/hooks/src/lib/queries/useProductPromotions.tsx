@@ -16,8 +16,8 @@ export const useProductPromotions = (
   dto: FindProductPromotionsDto,
 ): UseQueryResult<ProductPromotion[], AxiosError> => {
   return useQuery<ProductPromotion[], AxiosError>(
-    'ProductPromotions',
+    ['ProductPromotions', dto],
     () => getProductPromotions(dto),
-    { enabled: !!dto },
+    { enabled: !!dto.goodsIds },
   );
 };

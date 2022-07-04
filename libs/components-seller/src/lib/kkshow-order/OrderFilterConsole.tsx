@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Divider,
   Flex,
   Input,
   InputGroup,
@@ -11,16 +12,15 @@ import {
   Select,
   Stack,
   Text,
-  Divider,
 } from '@chakra-ui/react';
 import { OrderProcessStep } from '@prisma/client';
 import { useDisplaySize } from '@project-lc/hooks';
 import {
   getOrderProcessStepNameByStringNumber,
-  orderProcessStepDict,
-  kkshowOrderStatuses,
   KkshowOrderCancelEnum,
+  kkshowOrderStatuses,
   KkshowOrderStatusExtendedType,
+  orderProcessStepDict,
   orderStatuses,
 } from '@project-lc/shared-types';
 import { SellerOrderFilterFormType, useSellerOrderStore } from '@project-lc/stores';
@@ -35,16 +35,25 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 export function OrderFilterConsole(): JSX.Element {
   const { isMobileSize } = useDisplaySize();
 
-  const handleOrderSearchStates = useSellerOrderStore((s) => s.handleOrderSearchStates);
+  const orderStore = useSellerOrderStore();
   const { handleSubmit, control, register, watch, setValue, getValues } =
-    useForm<SellerOrderFilterFormType>();
+    useForm<SellerOrderFilterFormType>({
+      defaultValues: {
+        search: orderStore.search,
+        searchDateType: orderStore.searchDateType,
+        searchEndDate: orderStore.periodEnd,
+        searchStartDate: orderStore.periodStart,
+        searchExtendedStatus: orderStore.searchExtendedStatus,
+        searchStatuses: orderStore.searchStatuses,
+      },
+    });
 
   // * react-dates 상태
   const [focusedInput, setFocusedInput] = useState<'startDate' | 'endDate' | null>(null);
 
   // * 필터/검색 폼 제출
   const onSubmit: SubmitHandler<SellerOrderFilterFormType> = (data) => {
-    handleOrderSearchStates(data);
+    orderStore.handleOrderSearchStates(data);
   };
 
   const resetCheckBox = (): void => {

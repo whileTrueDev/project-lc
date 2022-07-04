@@ -5,6 +5,7 @@ import {
   Flex,
   Grid,
   GridItem,
+  Heading,
   Image,
   ListItem,
   Skeleton,
@@ -17,7 +18,11 @@ import { GoodsStatusBadge } from '@project-lc/components-shared/GoodsStatusBadge
 import ShippingGroupSets from '@project-lc/components-shared/shipping/ShippingGroupSets';
 import { useGoodsById } from '@project-lc/hooks';
 import { GoodsByIdRes } from '@project-lc/shared-types';
-import { getLocaleNumber, getStandardShippingCost } from '@project-lc/utils-frontend';
+import {
+  getDiscountedRate,
+  getLocaleNumber,
+  getStandardShippingCost,
+} from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import GoodsViewInformationNotice from './GoodsViewInformationNotice';
@@ -231,7 +236,20 @@ export function GoodsViewPriceTag({
         <Text>판매가</Text>
       </GridItem>
       <GridItem>
-        <Text fontWeight="medium">{getLocaleNumber(defaultOption?.price)}원</Text>
+        <Flex gap={1} flexWrap="wrap" alignItems="center">
+          <Text id="price" fontWeight="medium">
+            {getLocaleNumber(defaultOption?.price)}원
+          </Text>
+          {defaultOption && (
+            <Heading ml={2} as="span" fontSize="lg" color="blue.500" id="discount-rate">
+              {getDiscountedRate(
+                Number(defaultOption.consumer_price),
+                Number(defaultOption.price),
+              )}
+              %
+            </Heading>
+          )}
+        </Flex>
       </GridItem>
 
       {shippingGroup && (
