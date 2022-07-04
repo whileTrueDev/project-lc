@@ -72,10 +72,6 @@ export class OrderCancellationService {
       },
     });
 
-    // 주문취소요청이 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
-    if (status === 'complete') {
-      await this.updateOrderStateAfterOrderCancelApproved(orderId);
-    }
     return data;
   }
 
