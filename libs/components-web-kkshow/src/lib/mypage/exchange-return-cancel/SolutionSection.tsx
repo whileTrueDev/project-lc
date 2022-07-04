@@ -8,11 +8,11 @@ import {
   Text,
   useBoolean,
 } from '@chakra-ui/react';
+import { RefundAccountForm } from '@project-lc/components-shared/payment/RefundAccountForm';
 import { useDefaultCustomerAddress, useProfile } from '@project-lc/hooks';
 import { useCallback, useEffect } from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
 import { useFormContext } from 'react-hook-form';
-import { RefundAccountForm } from '../orderList/OrderCancelDialog';
 
 export type Solution =
   // 재배송(=수거없는 교환)
