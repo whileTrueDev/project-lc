@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { OrderProcessStep, VirtualAccountDepositStatus } from '@prisma/client';
 import { OrderService } from '@project-lc/nest-modules-order';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -25,7 +25,7 @@ export class PaymentWebhookService {
     const targetPayment = await this.prisma.orderPayment.findFirst({
       where: { order: { orderCode: dto.orderCode } },
     });
-    if (targetPayment.depositSecret === dto.secret) return true;
+    if (targetPayment?.depositSecret === dto.secret) return true;
     return false;
   }
 
@@ -40,6 +40,7 @@ export class PaymentWebhookService {
     const targetPayment = await this.prisma.orderPayment.findUnique({
       where: { orderId: order.id },
     });
+    if (!targetPayment) throw new NotFoundException('Target payment record not founded');
     switch (dto.status) {
       case 'DONE': {
         await this.prisma.orderPayment.update({

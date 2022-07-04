@@ -336,9 +336,9 @@ export class GetOrderListDto {
 
 /** 비회원 주문 조회 dto */
 export class GetNonMemberOrderDetailDto {
-  /** 주문코드 */
+  /** 주문자 휴대전화번호 */
   @IsString()
-  orderCode: string;
+  ordererPhone: string;
 
   /** 주문자명 */
   @IsString()

@@ -2,18 +2,15 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Get,
   InternalServerErrorException,
   NotFoundException,
   Post,
-  Req,
 } from '@nestjs/common';
 import {
   KKsPaymentProviders,
   TossVirtualAccountDto,
   TossVirtualAccountTranslatedDto,
 } from '@project-lc/shared-types';
-import { Request } from 'express';
 import PaymentWebhookService from './payment-webhook.service';
 
 /**
@@ -40,11 +37,6 @@ export class PaymentWebhookController {
     throw new NotFoundException('TossPayments - 아직 웹훅 처리 준비되지 않음');
   }
 
-  @Get('toss')
-  public async tossCallbackHealthCheck(): Promise<string> {
-    throw new NotFoundException('TossPayments - 아직 웹훅 처리 준비되지 않음');
-  }
-
   /**
    * 가상계좌로 결제한 고객이 금액을 입금하거나 입금을 취소하면 토스페이먼츠에 의해 여기로 요청됨.
    * 가상계좌 웹훅 이벤트 본문은 아래와 같은 형태입니다.
@@ -65,6 +57,21 @@ export class PaymentWebhookController {
       status: body.status,
       orderCode: body.orderId,
     });
+    /**
+     * webhook url 입력 검증 (웹훅 URL 설정싱 tossPayments 측에서 테스트 데이터를 전송하고,
+     * 올바른 응답 (HTTP status code 200 OK)이 도착하는 지 확인하는 절차
+     * 이 때 요청되는 데이터는 다음과 같음
+     * {
+        "createdAt": "2022-07-01T15:17:27.434608",
+        "secret": "test_secret",
+        "orderId": "01234567890",
+        "status": "READY"
+      }
+     * */
+    if (dto.secret === 'test_secret' && dto.orderCode === '01234567890') {
+      return 'Ready';
+    }
+
     // secret 검증
     const secretValidated = await this.paymentWebhookService.checkDepositSecret(
       KKsPaymentProviders.TossPayments,
@@ -81,11 +88,7 @@ export class PaymentWebhookController {
       throw new InternalServerErrorException(
         'TossPayments - VirtualAccount processing failed',
       );
-    return 'Ok';
-  }
 
-  @Get('toss/virtual-account')
-  public async tossVirtualAccountCallbackHealthCheck(): Promise<string> {
-    return 'Ready';
+    return 'Ok';
   }
 }
