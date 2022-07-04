@@ -19,6 +19,7 @@ import {
   CreateReturnDto,
   exchangeReturnAbleSteps,
   findBankCode,
+  RefundAccountDto,
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { useRouter } from 'next/router';
@@ -60,7 +61,8 @@ async function uploadImages({
 type ExchangeReturnFormData = {
   previews: Preview[];
   solution: Solution;
-} & Record<string, any>;
+} & RefundAccountDto &
+  Record<string, any>;
 export interface ExchangeReturnWriteFormProps {
   orderId?: number;
 }
@@ -199,7 +201,7 @@ export function ExchangeReturnWriteSection({
         orderId,
         reason,
         items: selectedItems,
-        refundBank: findBankCode(refundBank),
+        refundBank, // Bank.bankName 형태로 저장
         refundAccount,
         refundAccountHolder,
         images:

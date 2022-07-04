@@ -24,14 +24,10 @@ import {
   convertPaymentMethodToKrString,
   CreateRefundDto,
   findBankCode,
+  RefundAccountDto,
 } from '@project-lc/shared-types';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { OrderItemOptionInfo } from './OrderItemOptionInfo';
-
-type RefundAccountDto = Pick<
-  CreateRefundDto,
-  'refundAccount' | 'refundAccountHolder' | 'refundBank'
->;
 
 export function OrderCancelDialog({
   isOpen,
@@ -165,7 +161,7 @@ export function RefundAccountForm(): JSX.Element {
   const {
     register,
     formState: { errors },
-  } = useFormContext();
+  } = useFormContext<RefundAccountDto>();
 
   return (
     <Stack p={2} borderWidth="thin" rounded="md">

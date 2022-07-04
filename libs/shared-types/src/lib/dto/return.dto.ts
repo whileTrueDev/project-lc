@@ -17,6 +17,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { RefundAccountDto } from './refund.dto';
 
 //* ------- 생성 dto -------
 
@@ -43,7 +44,7 @@ export class CreateReturnItemDto {
 }
 
 /** 반품 생성 dto */
-export class CreateReturnDto {
+export class CreateReturnDto extends RefundAccountDto {
   /** 반품요청할 상품의 주문 고유번호 */
   @IsNumber()
   orderId: Order['id'];
@@ -56,21 +57,6 @@ export class CreateReturnDto {
   @IsString()
   @IsOptional()
   returnAddress?: string;
-
-  /** 환불계좌번호 */
-  @IsString()
-  @IsOptional()
-  refundAccount?: string;
-
-  /** 환불계좌예금주명 */
-  @IsString()
-  @IsOptional()
-  refundAccountHolder?: string;
-
-  /** 환불은행 Bank.bankCode */
-  @IsString()
-  @IsOptional()
-  refundBank?: string;
 
   /** 반품 상품들 */
   @IsArray()
