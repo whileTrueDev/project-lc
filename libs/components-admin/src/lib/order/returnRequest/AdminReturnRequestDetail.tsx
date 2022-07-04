@@ -22,6 +22,7 @@ import {
 import { CardDetail } from '@project-lc/components-shared/payment/CardDetail';
 import { TransferDetail } from '@project-lc/components-shared/payment/TransferDetail';
 import { VirtualAccountDetail } from '@project-lc/components-shared/payment/VirtualAccountDetail';
+import { RefundAccountForm } from '@project-lc/components-shared/payment/RefundAccountForm';
 import { useCreateRefundMutation, usePaymentByOrderCode } from '@project-lc/hooks';
 import {
   AdminReturnData,
@@ -286,6 +287,8 @@ export function AdminReturnRequestDetail({
             </Tr>
           </Tfoot>
         </Table>
+
+        {paymentData && paymentData.method === '가상계좌' && <RefundAccountForm />}
 
         <Stack spacing={4} direction="row-reverse">
           <Button type="submit" colorScheme="red" isLoading={isLoading}>
