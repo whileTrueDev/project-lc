@@ -9,7 +9,7 @@ $(document).ready(function ready() {
 
     $.ajax({
       type: 'POST',
-      url: `http://localhost:3333/auth/login?type=admin`,
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/auth/login?type=admin`,
       data: { email, password, stayLogedIn: true, type: 'admin' },
       success(data) {
         window.location.href = '/';

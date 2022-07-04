@@ -512,7 +512,7 @@ $(document).ready(function ready() {
   $('.logout-button').click(function logout() {
     $.ajax({
       type: 'POST',
-      url: `http://localhost:3333/auth/logout`,
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/auth/logout`,
       success(data) {
         window.location.replace('/login');
       },
