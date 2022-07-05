@@ -78,7 +78,7 @@ export function NonMemberOrderFindForm(): JSX.Element {
         <FormControl isInvalid={!!errors.ordererPhone}>
           <FormLabel>주문자 휴대전화</FormLabel>
           <Input
-            placeholder="-를 제외한 숫자로만 입력해주세요."
+            placeholder="010-0000-0000와 같은 형태로 입력해주세요."
             {...register('ordererPhone', { required: '휴대전화를 입력해주세요.' })}
           />
           <FormErrorMessage>{errors.ordererPhone?.message}</FormErrorMessage>

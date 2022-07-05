@@ -335,7 +335,15 @@ export class OrderService {
     let where: Prisma.OrderWhereInput = {};
     // 특정 소비자의 주문목록 조회시
     if (customerId) {
-      where = { ...where, customerId, deleteFlag: false };
+      where = {
+        ...where,
+        customerId,
+        deleteFlag: false,
+        exchanges: { none: {} },
+        returns: { none: {} },
+        refunds: { none: {} },
+        orderCancellations: { none: {} },
+      };
     }
 
     // 특정 판매자가 판매하는 물건들의 주문목록 조회시
@@ -424,9 +432,9 @@ export class OrderService {
       if (_o.giftFlag) {
         _o = this.removeRecipientInfo(_o);
       }
-
       return _o;
     });
+
     return {
       orders: postProcessed,
       ...rest,
@@ -749,6 +757,7 @@ export class OrderService {
       ordererName,
       customerId: null,
       deleteFlag: false,
+      nonMemberOrderFlag: true,
     });
 
     return { order };

@@ -177,6 +177,7 @@ export function ReviewCreateOrUpdateForm({
               isOpen={isOpen}
               onClose={onClose}
               onConfirm={onImageUpload}
+              imageSizeLimit={10}
             />
           </Box>
 

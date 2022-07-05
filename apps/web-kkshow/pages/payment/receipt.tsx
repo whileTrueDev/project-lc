@@ -90,18 +90,13 @@ export function Receipt(): JSX.Element {
             </GridItem>
             <GridItem colSpan={7}>
               <Heading>주문코드</Heading>
-              {orderDetailData?.nonMemberOrderFlag && (
-                <Text fontSize="sm">
-                  * 비회원 주문조회시 주문코드와 주문자명이 필요합니다.
-                </Text>
-              )}
               <Flex
                 bg={virtualAccountBoxBgColor}
                 p={5}
                 borderRadius="10px"
                 alignItems="center"
               >
-                <Text fontSize={{ base: 'md', sm: 'xl' }}>{orderCode}</Text>
+                <Text>{orderCode}</Text>
                 <Button size="sm" ml={4} onClick={copyOrderCode}>
                   복사
                 </Button>

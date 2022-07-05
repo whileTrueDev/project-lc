@@ -15,7 +15,7 @@ import ReviewCreateDialog, {
   ReviewCreateDialogProps,
 } from '@project-lc/components-shared/goods-review/ReviewCreateDialog';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
-import { OrderItemWithRelations } from '@project-lc/shared-types';
+import { OrderItemWithRelations, reviewAbleSteps } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 
 interface OrderInfoItemsListProps {
@@ -38,6 +38,7 @@ export function OrderInfoItem({ orderItem }: OrderInfoItemProps): JSX.Element | 
   return (
     <Stack key={orderItem.id} borderWidth="thin" p={2} rounded="md" my={2}>
       <OrderInfoItemReview
+        isReviewable={orderItem.options.every((x) => reviewAbleSteps.includes(x.step))}
         review={orderItem.review || undefined}
         goodsId={orderItem.goodsId}
         orderItemId={orderItem.id}
@@ -56,9 +57,11 @@ export function OrderInfoItem({ orderItem }: OrderInfoItemProps): JSX.Element | 
 interface OrderInfoItemReviewProps
   extends Pick<ReviewCreateDialogProps, 'goodsId' | 'orderItemId'> {
   review?: GoodsReview;
+  isReviewable?: boolean;
 }
 export function OrderInfoItemReview({
   review,
+  isReviewable = false,
   goodsId,
   orderItemId,
 }: OrderInfoItemReviewProps): JSX.Element {
@@ -73,15 +76,19 @@ export function OrderInfoItemReview({
         </Box>
       ) : (
         <Box>
-          <Button size="sm" onClick={reviewCreateDialog.onOpen}>
-            리뷰작성하기
-          </Button>
-          <ReviewCreateDialog
-            goodsId={goodsId}
-            isOpen={reviewCreateDialog.isOpen}
-            onClose={reviewCreateDialog.onClose}
-            orderItemId={orderItemId}
-          />
+          {isReviewable ? (
+            <>
+              <Button size="sm" onClick={reviewCreateDialog.onOpen}>
+                리뷰작성하기
+              </Button>
+              <ReviewCreateDialog
+                goodsId={goodsId}
+                isOpen={reviewCreateDialog.isOpen}
+                onClose={reviewCreateDialog.onClose}
+                orderItemId={orderItemId}
+              />
+            </>
+          ) : null}
         </Box>
       )}
     </Box>

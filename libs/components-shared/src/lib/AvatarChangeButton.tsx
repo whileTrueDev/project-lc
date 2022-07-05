@@ -18,7 +18,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
-import { ImageInput } from '@project-lc/components-core/ImageInput';
+import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
 import {
   useAvatarMutation,
   useAvatarRemoveMutation,
@@ -138,6 +138,23 @@ export function AvatarChangeButton({ onClick }: AvatarChangeButtonProps): JSX.El
     if (onClick) onClick();
   };
 
+  const handleUploadError = (errortype: ImageInputErrorTypes): void => {
+    if (errortype === 'over-size')
+      toast({
+        status: 'error',
+        title: '이미지 업로드 실패',
+        description: '이미지 크기가 올바르지 않습니다.',
+      });
+
+    if (errortype === 'invalid-format') {
+      toast({
+        status: 'error',
+        title: '이미지 업로드 실패',
+        description: '이미지 형식이 올바르지 않습니다.',
+      });
+    }
+  };
+
   return (
     <>
       <Button
@@ -172,7 +189,7 @@ export function AvatarChangeButton({ onClick }: AvatarChangeButtonProps): JSX.El
               <ImageInput
                 variant="chakra"
                 handleSuccess={handleSuccess}
-                handleError={(errortype) => console.error(errortype)}
+                handleError={handleUploadError}
               />
               <Stack direction="row" flexWrap="wrap" alignItems="center" {...boxStyle}>
                 {!src && (
