@@ -23,11 +23,12 @@ export function ImageInput({
   required = true,
   variant = 'unstyle',
   multiple = false,
-  imageSizeLimit = 10 * MB, // 이미지 파일 크기 제한 기본 10mb
+  imageSizeLimit = 10, // 이미지 파일 크기 제한 기본 10mb
   size,
   title = '사진 업로드',
   isDisabled = false,
 }: ImageInputProps): JSX.Element {
+  const realSizeLimit = imageSizeLimit * MB;
   const inputRef = useRef<HTMLInputElement>(null);
 
   const fileRegx = /^image\/[a-z]*$/;
@@ -39,7 +40,7 @@ export function ImageInput({
       return;
     }
     // 사이즈 제한보다 큰 경우
-    if (myImage.size > imageSizeLimit) {
+    if (myImage.size > realSizeLimit) {
       handleError('over-size');
       return;
     }
