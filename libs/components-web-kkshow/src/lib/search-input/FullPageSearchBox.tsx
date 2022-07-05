@@ -28,6 +28,7 @@ export function FullPageSearchBox({
 
   const onKeywordClick = (item: string): void => {
     setValue('keyword', item);
+    onSubmit();
   };
 
   return (

@@ -106,6 +106,7 @@ export function SearchInputBox({
       <SearchHelpPopover
         onItemClick={(item) => {
           setValue('keyword', item);
+          onSubmit();
           closeSearchRecommendPopover();
         }}
       />
