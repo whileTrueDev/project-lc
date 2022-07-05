@@ -424,11 +424,18 @@ export class OrderService {
       if (_o.giftFlag) {
         _o = this.removeRecipientInfo(_o);
       }
-
       return _o;
     });
+
+    // 취소/재배송등이 포함된 주문 제거
+    const postProcessed2 = postProcessed
+      .filter((x) => x.exchanges.length > 0)
+      .filter((x) => x.orderCancellations.length > 0)
+      .filter((x) => x.refunds.length > 0)
+      .filter((x) => x.returns.length > 0);
+
     return {
-      orders: postProcessed,
+      orders: postProcessed2,
       ...rest,
     };
   }
