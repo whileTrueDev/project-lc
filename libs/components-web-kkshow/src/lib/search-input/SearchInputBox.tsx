@@ -23,11 +23,13 @@ export interface SearchForm {
 export interface SearchInputBoxProps {
   inputRef?: RefObject<HTMLInputElement>;
   autoFocus?: boolean;
+  onSubmit: () => void;
 }
 
 export function SearchInputBox({
   inputRef,
   autoFocus,
+  onSubmit,
 }: SearchInputBoxProps): JSX.Element {
   const { isMobileSize } = useDisplaySize();
 
@@ -61,9 +63,11 @@ export function SearchInputBox({
           autoComplete="off"
           bgColor={useColorModeValue('white', 'gray.600')}
           color={useColorModeValue('blackAlpha.900', 'whiteAlpha.900')}
-          form={SEARCH_FORM_ID}
           onKeyDown={(e) => {
             if (e.code === 'Escape') closeSearchRecommendPopover();
+            if (e.key === 'Enter') {
+              onSubmit();
+            }
           }}
           onInput={() => {
             if (!isSearchPopoverOpen) openSearchRecommendPopover();
@@ -94,8 +98,7 @@ export function SearchInputBox({
           variant="fill"
           aria-label="search-button-icon"
           icon={<SearchIcon />}
-          form={SEARCH_FORM_ID}
-          type="submit"
+          onClick={onSubmit}
         />
       </Tooltip>
 
@@ -103,6 +106,7 @@ export function SearchInputBox({
       <SearchHelpPopover
         onItemClick={(item) => {
           setValue('keyword', item);
+          onSubmit();
           closeSearchRecommendPopover();
         }}
       />
