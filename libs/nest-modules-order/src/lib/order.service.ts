@@ -335,7 +335,15 @@ export class OrderService {
     let where: Prisma.OrderWhereInput = {};
     // 특정 소비자의 주문목록 조회시
     if (customerId) {
-      where = { ...where, customerId, deleteFlag: false };
+      where = {
+        ...where,
+        customerId,
+        deleteFlag: false,
+        exchanges: { none: {} },
+        returns: { none: {} },
+        refunds: { none: {} },
+        orderCancellations: { none: {} },
+      };
     }
 
     // 특정 판매자가 판매하는 물건들의 주문목록 조회시
@@ -427,15 +435,8 @@ export class OrderService {
       return _o;
     });
 
-    // 취소/재배송등이 포함된 주문 제거
-    const postProcessed2 = postProcessed
-      .filter((x) => x.exchanges.length > 0)
-      .filter((x) => x.orderCancellations.length > 0)
-      .filter((x) => x.refunds.length > 0)
-      .filter((x) => x.returns.length > 0);
-
     return {
-      orders: postProcessed2,
+      orders: postProcessed,
       ...rest,
     };
   }
