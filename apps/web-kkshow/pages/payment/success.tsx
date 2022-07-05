@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Flex, Heading, Spinner } from '@chakra-ui/react';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { useOrderCreateMutation, usePaymentMutation } from '@project-lc/hooks';

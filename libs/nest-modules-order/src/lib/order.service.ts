@@ -749,6 +749,7 @@ export class OrderService {
       ordererName,
       customerId: null,
       deleteFlag: false,
+      nonMemberOrderFlag: true,
     });
 
     return { order };

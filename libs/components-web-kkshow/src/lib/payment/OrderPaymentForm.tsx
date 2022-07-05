@@ -1,16 +1,16 @@
-import { Grid, GridItem, Heading, Stack, useToast, Text } from '@chakra-ui/react';
+import { Grid, GridItem, Heading, Stack } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useCartStore, useKkshowOrderStore } from '@project-lc/stores';
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { setCookie } from '@project-lc/utils-frontend';
 import { useEffect } from 'react';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { BuyerInfo } from './BuyerInfo';
 import { DeliveryAddress } from './DeliveryAddress';
 import { Discount } from './Discount';
 import { GiftBox } from './Gift';
 import { OrderItemInfo } from './OrderItemInfo';
-import { PaymentBox, getOrderPrice, doPayment } from './Payment';
+import { doPayment, getOrderPrice, PaymentBox } from './Payment';
 import PaymentNotice from './PaymentNotice';
 import { PaymentSelection } from './PaymentSelection';
 
@@ -31,7 +31,6 @@ export function OrderPaymentForm(): JSX.Element | null {
   const CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_PAYMENTS_CLIENT_KEY!;
   const { paymentType, order, shipping, handleOrderPrepare } = useKkshowOrderStore();
   const { selectedItems } = useCartStore();
-  const toast = useToast();
   const PRODUCT_PRICE = order.orderPrice;
   // orderItem.shippingCost 가 아닌 kkshowOrderStore에 저장된 배송비 정보 참조하여 배송비 계산
   const SHIPPING_COST = Object.values(shipping).reduce((prev, curr) => {
@@ -76,6 +75,7 @@ export function OrderPaymentForm(): JSX.Element | null {
       cartItemIdList: selectedItems,
       customerId: profile?.id,
       recipientPhone: [recipientPhone1, recipientPhone2, recipientPhone3].join('-'),
+      ordererPhone: [ordererPhone1, ordererPhone2, ordererPhone3].join('-'),
     });
     const amount = getOrderPrice(
       PRODUCT_PRICE,
