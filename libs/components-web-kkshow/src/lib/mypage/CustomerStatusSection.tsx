@@ -56,7 +56,7 @@ export function CustomerStatusSection({
 
 function StatusBox({ label, value }: { label: string; value?: number }): JSX.Element {
   return (
-    <Stat textAlign="center" minW="60px">
+    <Stat textAlign="center" minW="70px">
       <StatLabel>{label}</StatLabel>
       <StatNumber>{value}</StatNumber>
     </Stat>
