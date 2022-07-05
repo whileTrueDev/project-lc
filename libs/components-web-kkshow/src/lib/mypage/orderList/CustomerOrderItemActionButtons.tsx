@@ -11,6 +11,7 @@ import {
   reviewAbleSteps,
 } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
+import { GoodsInquiryFormDialog } from '../../goods/GoodsInquiryFormDialog';
 import { OrderCancelDialog } from './OrderCancelDialog';
 import { OrderItemOptionInfoProps } from './OrderItemOptionInfo';
 
@@ -22,7 +23,7 @@ export function OrderItemActionButtons({
   const router = useRouter();
   const { step } = option;
   const hasReview = !!orderItem.reviewId;
-  const { orderId } = orderItem;
+  const { orderId, goods } = orderItem;
 
   // 주문 하나에 대해 여러개의 주문취소요청이 생성될 수 없다(주문취소시 전체 주문상품옵션을 선택하여 취소하게 되어있음)
   const orderCancel = order.orderCancellations?.[0];
@@ -184,6 +185,13 @@ export function OrderItemActionButtons({
           orderItemId={option.orderItemId}
         />
       )}
+
+      {/* 문의하기 다이얼로그 */}
+      <GoodsInquiryFormDialog
+        isOpen={goodsInquireDialog.isOpen}
+        onClose={goodsInquireDialog.onClose}
+        goodsId={goods.id}
+      />
     </SimpleGrid>
   );
 }
