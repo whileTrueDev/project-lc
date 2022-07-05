@@ -6,6 +6,7 @@ import { CustomerPhoneNumberChage } from './CustomerPhoneNumberChange';
 import { GenderSelection } from './GenderSelection';
 import { CustomerBirthday } from './CustomerBirthday';
 import { CustomerDelete } from './CustomerDelete';
+import { AgreementDialog } from '../../AgreementDialog';
 
 export function UserInfo({ userId }: { userId: number }): JSX.Element {
   const { data } = useCustomerInfo(userId);
@@ -14,6 +15,12 @@ export function UserInfo({ userId }: { userId: number }): JSX.Element {
     isOpen: nicknameIsOpen,
     onClose: nicknameOnClose,
     onOpen: nicknameOnOpen,
+  } = useDisclosure();
+
+  const {
+    isOpen: agreementIsOpen,
+    onOpen: agreementOnOpen,
+    onClose: agreementOnClose,
   } = useDisclosure();
 
   return (
@@ -75,7 +82,14 @@ export function UserInfo({ userId }: { userId: number }): JSX.Element {
             <Text fontWeight="bold">개인정보이용동의</Text>
           </GridItem>
           <GridItem colSpan={3}>
-            <Text>{data.agreementFlag ? '동의' : '미동의'}</Text>
+            <HStack>
+              <Text>{data.agreementFlag ? '동의' : '미동의'}</Text>
+              {!data.agreementFlag && (
+                <Button size="xs" onClick={agreementOnOpen}>
+                  약관보기
+                </Button>
+              )}
+            </HStack>
           </GridItem>
           <GridItem colSpan={4} />
           <GridItem colSpan={1}>
@@ -94,6 +108,7 @@ export function UserInfo({ userId }: { userId: number }): JSX.Element {
             onConfirm={nicknameOnClose}
             userId={userId}
           />
+          <AgreementDialog isOpen={agreementIsOpen} onClose={agreementOnClose} />
         </>
       )}
     </Grid>
