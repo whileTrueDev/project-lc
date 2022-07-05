@@ -128,9 +128,16 @@ export function GoodsViewPurchaseBox({
               justify="space-between"
             >
               <Box>
-                <Text mb={2}>
-                  {opt.option_title} : {opt.option1}
-                </Text>
+                {/* 옵션이 기본옵션 하나밖에 없는 경우 - 옵션명, 옵션값이 없으므로 상품명 출력 */}
+                {isOnlyDefaultOption ? (
+                  <Text>{goods.goods_name}</Text>
+                ) : (
+                  <Text mb={2}>
+                    {/* 여러 옵션이 존재하는 경우 옵션명, 옵션값이 각각 존재하므로 옵션명:옵션값 형태로 출력 */}
+                    {opt.option_title} : {opt.option1}
+                  </Text>
+                )}
+
                 <OptionQuantity
                   quantity={opt.quantity}
                   handleDecrease={() => store.handleDecreaseOptQuantity(opt.id)}

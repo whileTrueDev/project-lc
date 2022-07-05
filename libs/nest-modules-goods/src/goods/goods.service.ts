@@ -388,6 +388,7 @@ export class GoodsService {
     });
 
     if (!result) return null;
+
     return {
       ...result,
       informationNotice: result.informationNotice
@@ -453,7 +454,7 @@ export class GoodsService {
           confirmation: { create: { status: 'waiting' } },
           categories: { connect: { id: categoryId } },
           informationNotice: {
-            create: { contents: JSON.parse(informationNoticeContents) },
+            create: { contents: JSON.stringify(JSON.parse(informationNoticeContents)) },
           },
         },
       });
@@ -576,7 +577,6 @@ export class GoodsService {
 
   /** 상품 수정 */
   async updateOneGoods(id: number, dto: RegistGoodsDto): Promise<{ goodsId: number }> {
-    console.log('dto: ', dto);
     const {
       options: comingOptions,
       image,
@@ -627,7 +627,7 @@ export class GoodsService {
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
           informationNotice: {
             update: {
-              contents: JSON.parse(informationNoticeContents),
+              contents: JSON.stringify(JSON.parse(informationNoticeContents)),
             },
           },
           categories: { connect: { id: categoryId } },
