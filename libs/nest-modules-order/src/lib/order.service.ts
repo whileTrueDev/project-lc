@@ -783,7 +783,7 @@ export class OrderService {
     ordererPhone,
     ordererName,
   }: GetNonMemberOrderDetailDto): Promise<NonMemberOrderDetailRes> {
-    const order = await this.findOneOrderDetail({
+    let order = await this.findOneOrderDetail({
       ordererPhone,
       ordererName,
       customerId: null,
@@ -791,7 +791,14 @@ export class OrderService {
       nonMemberOrderFlag: true,
     });
 
-    return { order: this.removeDeliveryCompanyAndDeliveryNumber(order) };
+    if (order.giftFlag) {
+      // 선물주문인경우 받는사람 정보 삭제
+      order = this.removeRecipientInfo(order);
+      // 출고정보에서 운송장번호, 택배회사 정보 삭제
+      order = this.removeDeliveryCompanyAndDeliveryNumber(order);
+    }
+
+    return { order };
   }
 
   /** 주문수정 */
