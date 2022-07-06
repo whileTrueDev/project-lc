@@ -60,7 +60,7 @@ export function OrderItemActionButtons({
       onClick: () => {
         router.push(`/mypage/shipping-tracking/${order.orderCode}`);
       },
-      display: deliveryTrackingAbleSteps.includes(step), // 출고완료 이후 표시
+      display: !order.giftFlag && deliveryTrackingAbleSteps.includes(step), // 선물하기 주문이 아닌경우 && 출고완료 이후 표시
       disabled: false,
     },
     {
@@ -99,7 +99,7 @@ export function OrderItemActionButtons({
           );
         }
       },
-      display: exchangeReturnAbleSteps.includes(step), // 상품준비 이후 표시
+      display: !order.giftFlag && exchangeReturnAbleSteps.includes(step), // 선물하기 주문이 아닌경우 && 상품준비 이후 표시
       disabled: false,
     },
     {
