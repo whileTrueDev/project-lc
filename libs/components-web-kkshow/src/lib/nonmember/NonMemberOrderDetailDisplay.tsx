@@ -19,6 +19,7 @@ import { VirtualAccountDetail } from '@project-lc/components-shared/payment/Virt
 import dayjs from 'dayjs';
 import { OrderItemOptionInfo } from '../mypage/orderList/OrderItemOptionInfo';
 import { SuccessDeliveryAddress } from '../payment/DeliveryAddress';
+import { OrderInfoGiftExportsItem } from '../mypage/order/OrderInfoExportsList';
 
 export interface NonMemberOrderDetailDisplayProps {
   orderData: NonMemberOrderDetailRes;
@@ -155,7 +156,9 @@ export function NonmemberExportInfo({ order }: { order: OrderDetailRes }): JSX.E
   if (!order.exports || order.exports.length === 0) {
     return <Text>아직 상품이 출고되지 않았습니다</Text>;
   }
-
+  if (order.giftFlag) {
+    return <OrderInfoGiftExportsItem order={order} exports={order.exports} />;
+  }
   return (
     <>
       {order.exports.map((_export) => {
