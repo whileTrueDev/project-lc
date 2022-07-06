@@ -184,7 +184,7 @@ export function OrderFilterConsole(): JSX.Element {
                   <Checkbox
                     m={1}
                     aria-label={`order-status-${orderStatuses[orderStatus].name}`}
-                    key={orderStatus}
+                    key={orderStatuses[orderStatus].name}
                     colorScheme={orderStatuses[orderStatus].chakraColor}
                     isChecked={watch('searchStatuses')?.includes(orderProcessStep)}
                     onChange={(_) => {
