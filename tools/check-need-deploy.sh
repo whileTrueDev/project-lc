@@ -2,7 +2,7 @@
 APP=$1
 
 # Run the affected command, comparing latest commit to the one before that
-yarn nx affected:apps --plain --base HEAD~1 | grep $APP
+yarn nx affected:apps --plain --base HEAD~1 HEAD | grep $APP -q
 
 # Store result of the previous command (grep)
 IS_AFFECTED=$?

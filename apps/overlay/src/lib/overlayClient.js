@@ -914,7 +914,7 @@ socket.on('bgm volume from server', (volume) => {
 
 socket.on('get virtual character audio from server', async () => {
   $('body').append(`
-    <iframe src="https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-audio/${email}/${liveShoppingId}/voice"
+    <iframe src="https://${bucketName}.ap-northeast-2.amazonaws.com/overlay-audio/${email}/${liveShoppingId}/voice"
      id="virtual-voice" allow="autoplay" style="display:none"></iframe>
     `);
 });
@@ -938,5 +938,23 @@ socket.on('get news message from server', (data) => {
     $('.news-banner').hide();
   }, 5000);
 });
+
+socket.on('play virtual video from server', () => {
+  $('.left-banner-area').append(`
+  <video class='virtual-video' autoplay width='100%' height='100%'>
+    <source src='https://${bucketName}.s3.ap-northeast-2.amazonaws.com/overlay-virtual-video/${email}/${liveShoppingId}/virtual-video.mp4'
+     type='video/mp4' />
+  </video>
+  `);
+  $('.virtual-video').on('ended', function () {
+    $('.virtual-video').remove();
+  });
+});
+
+// socket.on('reset theme from server', () => {
+//   $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').removeClass(
+//     currentThemeType,
+//   );
+// });
 
 export {};

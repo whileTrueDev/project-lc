@@ -278,4 +278,9 @@ export class AppScreenGateway
   hideVerticalBanner(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('hide vertical-banner from server');
   }
+
+  @SubscribeMessage('play virtual video from admin')
+  playVirtualVideo(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('play virtual video from server');
+  }
 }

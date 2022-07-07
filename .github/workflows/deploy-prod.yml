@@ -20,7 +20,6 @@ on:
 
 name: Deploy to AWS ECS "Prod"
 env:
-  BEFORE_SHA: ${{ github.event.before }}
   DATABASE_URL: ${{ secrets.PROD_PRISMA_DATABASE_URL }}
 jobs:
   Build:

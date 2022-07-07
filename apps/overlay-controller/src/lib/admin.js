@@ -527,6 +527,10 @@ $(document).ready(function ready() {
     socket.emit('news message from admin', { roomName, message });
   });
 
+  $('#play-virtual-video-button').click(function playVirtualVideo() {
+    socket.emit('play virtual video from admin', roomName);
+  });
+
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
 
