@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Button,
   Center,
   Spinner,
@@ -124,9 +125,19 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
   const handleDetailClick = (): void => {
     router.push(`/mypage/orders/${order.orderCode}`);
   };
+
+  const giftBroadcaster = order.orderItems.find((oi) => !!oi.support)?.support
+    ?.broadcaster;
   return (
-    <Stack borderWidth="1px" borderRadius="md" p={1} boxShadow="md" bg={orderDataBgColor}>
-      <Stack direction="row" justifyContent="space-between">
+    <Stack
+      borderWidth="1px"
+      borderRadius="md"
+      p={1}
+      boxShadow="md"
+      bg={orderDataBgColor}
+      spacing={1}
+    >
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Stack direction={{ base: 'column', sm: 'row' }}>
           <Text>주문번호 : {order.orderCode}</Text>
           <TextDotConnector display={{ base: 'none', sm: 'block' }} />
@@ -137,8 +148,15 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
           상세보기
         </Button>
       </Stack>
+      {order.giftFlag && giftBroadcaster && (
+        <Stack direction="row" alignItems="center" px={1}>
+          <Avatar size="xs" src={giftBroadcaster.avatar || ''} />
+          <Text fontWeight="bold">{giftBroadcaster.userNickname}</Text>
+          <Text>님께 보낸 선물 🎁</Text>
+        </Stack>
+      )}
 
-      <Stack p={1}>
+      <Stack px={1}>
         {order.orderItems.map((item) => (
           <OrderItem key={item.id} orderItem={item} order={order} />
         ))}

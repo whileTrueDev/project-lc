@@ -1,12 +1,25 @@
-import { Box, Center, Text } from '@chakra-ui/react';
+import { Box, Center, Spinner, Text } from '@chakra-ui/react';
 import { DeliveryTrackingList } from '@project-lc/components-shared/delivery-tracking/DeliveryTracking';
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
+import { OrderInfoGiftExportsItem } from '@project-lc/components-web-kkshow/mypage/order/OrderInfoExportsList';
+import { useOrderDetail } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 
 export function ShippingTrackingIndex(): JSX.Element {
   const router = useRouter();
   const orderCode = router.query.orderCode as string;
-  if (!orderCode)
+  const orderDetail = useOrderDetail({ orderCode });
+
+  if (orderDetail.isLoading) {
+    return (
+      <CustomerMypageLayout title="배송 조회">
+        <Center>
+          <Spinner />
+        </Center>
+      </CustomerMypageLayout>
+    );
+  }
+  if (!orderCode || !orderDetail.data)
     return (
       <CustomerMypageLayout title="배송 조회">
         <Box p={[2, 2, 4]}>
@@ -16,6 +29,23 @@ export function ShippingTrackingIndex(): JSX.Element {
         </Box>
       </CustomerMypageLayout>
     );
+
+  if (orderDetail.data.giftFlag) {
+    return (
+      <CustomerMypageLayout title="배송 조회">
+        <Box p={[2, 2, 4]}>
+          <Text fontSize="xl" fontWeight="bold">
+            배송 조회
+          </Text>
+          <OrderInfoGiftExportsItem
+            order={orderDetail.data}
+            exports={orderDetail.data.exports}
+          />
+        </Box>
+      </CustomerMypageLayout>
+    );
+  }
+
   return (
     <CustomerMypageLayout title="배송 조회">
       <Box p={[2, 2, 4]}>

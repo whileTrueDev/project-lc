@@ -12,6 +12,8 @@ import {
 } from '@prisma/client';
 import { UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
+import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
+import { MileageService } from '@project-lc/nest-modules-mileage';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
@@ -22,6 +24,7 @@ import {
   GetOneOrderDetailDto,
   GetOrderListDto,
   getOrderProcessStepNameByStringNumber,
+  NonMemberOrderDetailRes,
   OrderDataWithRelations,
   OrderDetailRes,
   OrderListRes,
@@ -34,14 +37,11 @@ import {
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
   UpdateOrderDto,
-  NonMemberOrderDetailRes,
 } from '@project-lc/shared-types';
 import { calculateShippingCost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
-import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
-import { MileageService } from '@project-lc/nest-modules-mileage';
 
 dayjs.extend(isToday);
 
@@ -121,6 +121,32 @@ export class OrderService {
       recipientAddress: '',
       recipientDetailAddress: '',
       recipientPostalCode: '',
+    };
+  }
+
+  /** 주문 상세조회(OrderDetailRes) 데이터에서
+   * 출고정보 중 택배사(deliveryCompany), 운송장번호(deliveryNumber) 삭제
+   *
+   * 주문 목록 조회는 출고데이터를 포함하지 않으므로 주문상세조회 응답값에만 해당 함수 적용함
+   * */
+  private removeDeliveryCompanyAndDeliveryNumber(order: OrderDetailRes): OrderDetailRes {
+    const { exports } = order;
+    // 출고정보가 없는경우 그대로 리턴
+    if (!exports || exports.length === 0) {
+      return order;
+    }
+    // 출고정보가 있는경우, 출고정보에서 deliveryCompany, deliveryNumber 삭제하고 리턴
+    const exportsDeliveryCompanyAndDeliveryNumberRemoved = exports.map((ex) => {
+      return {
+        ...ex,
+        deliveryCompany: '',
+        deliveryNumber: '',
+      };
+    });
+
+    return {
+      ...order,
+      exports: exportsDeliveryCompanyAndDeliveryNumberRemoved,
     };
   }
 
@@ -428,8 +454,8 @@ export class OrderService {
     // 소비자 주문목록 후처리
     const postProcessed = orders.map((order) => {
       let _o = { ...order };
-      //  선물하기 주문일 시 받는사람 정보 삭제
-      if (_o.giftFlag) {
+      //  선물하기 주문 && 소비자센터에서 요청한 경우 받는사람 정보 삭제
+      if (_o.giftFlag && dto.appType === 'customer') {
         _o = this.removeRecipientInfo(_o);
       }
       return _o;
@@ -626,7 +652,7 @@ export class OrderService {
   }
 
   /** 주문 상세 조회 */
-  async findOneOrderDetail(where: Prisma.OrderWhereInput): Promise<any> {
+  async findOneOrderDetail(where: Prisma.OrderWhereInput): Promise<OrderDetailRes> {
     // 주문이 있는지 확인
     await this.findOneOrder(where);
 
@@ -739,9 +765,14 @@ export class OrderService {
       };
     }
 
-    // 소비자센터에서 주문 조회 요청 && 선물주문인경우 => 받는사람 정보 삭제하고 리턴
+    /** 소비자센터에서 주문상세 조회 요청 && 선물주문인경우
+     * => 받는사람 정보 삭제  & 출고데이터에서 택배사, 운송장번호 정보 삭제하고 보낸다
+     */
     if (appType === 'customer' && result.giftFlag) {
+      // 받는사람 정보 삭제
       result = this.removeRecipientInfo(result);
+      // 출고데이터에서 택배사, 운송장번호 정보 삭제
+      result = this.removeDeliveryCompanyAndDeliveryNumber(result);
     }
 
     return result;
@@ -752,13 +783,20 @@ export class OrderService {
     ordererPhone,
     ordererName,
   }: GetNonMemberOrderDetailDto): Promise<NonMemberOrderDetailRes> {
-    const order = await this.findOneOrderDetail({
+    let order = await this.findOneOrderDetail({
       ordererPhone,
       ordererName,
       customerId: null,
       deleteFlag: false,
       nonMemberOrderFlag: true,
     });
+
+    if (order.giftFlag) {
+      // 선물주문인경우 받는사람 정보 삭제
+      order = this.removeRecipientInfo(order);
+      // 출고정보에서 운송장번호, 택배회사 정보 삭제
+      order = this.removeDeliveryCompanyAndDeliveryNumber(order);
+    }
 
     return { order };
   }

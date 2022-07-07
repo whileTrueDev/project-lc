@@ -74,7 +74,7 @@ interface OrderInfoGiftExportsItemProps {
   order: OrderDetailRes;
   exports: ExportBaseData[];
 }
-function OrderInfoGiftExportsItem({
+export function OrderInfoGiftExportsItem({
   exports,
 }: OrderInfoGiftExportsItemProps): JSX.Element {
   const isNowShipping = useMemo(
