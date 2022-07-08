@@ -251,6 +251,17 @@
             "jestConfig": "apps/batch-inactive-handler/jest.config.js",
             "passWithNoTests": true
           }
+        },
+        "dockerize": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker build -f ./apps/batch-inactive-handler/Dockerfile -t {args.registry}/project-lc-inactive-batch:{args.tag} --platform=linux/amd64 .",
+              "docker tag {args.registry}/project-lc-inactive-batch:{args.tag} {args.registry}/project-lc-inactive-batch:latest",
+              "docker push --all-tags {args.registry}/project-lc-inactive-batch"
+            ],
+            "parallel": false
+          }
         }
       }
     },
@@ -302,6 +313,17 @@
           "options": {
             "jestConfig": "apps/batch-virtual-account/jest.config.js",
             "passWithNoTests": true
+          }
+        },
+        "dockerize": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker build -f ./apps/batch-virtual-account/Dockerfile -t {args.registry}/project-lc-virtual-account-batch:{args.tag} --platform=linux/amd64 .",
+              "docker tag {args.registry}/project-lc-virtual-account-batch:{args.tag} {args.registry}/project-lc-virtual-account-batch:latest",
+              "docker push --all-tags {args.registry}/project-lc-virtual-account-batch"
+            ],
+            "parallel": false
           }
         }
       },
