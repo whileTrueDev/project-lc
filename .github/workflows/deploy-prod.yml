@@ -39,7 +39,7 @@ jobs:
 
       #  Build API server
       - name: Build
-        run: yarn affected:build --prod --base=origin/master
+        run: yarn affected:build --prod
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -62,7 +62,6 @@ jobs:
         run: |
           yarn affected \
             --target=dockerize \
-            --base=origin/master \
             --args="--registry=$ECR_REGISTRY --tag=prod-$IMAGE_TAG"
 
   DeployAPI:
