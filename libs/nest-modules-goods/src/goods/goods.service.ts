@@ -1,8 +1,7 @@
 /* eslint-disable camelcase */
+import { ObjectIdentifier } from '@aws-sdk/client-s3';
 import {
   BadRequestException,
-  CACHE_MANAGER,
-  Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -11,6 +10,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminAllLcGoodsList,
+  AllGoodsIdsRes,
   ApprovedGoodsNameAndId,
   getLiveShoppingProgress,
   GoodsByIdRes,
@@ -20,25 +20,16 @@ import {
   GoodsOptionDto,
   GoodsOptionsWithSupplies,
   GoodsOptionWithStockInfo,
+  GoodsOutlineByIdRes,
   RegistGoodsDto,
   TotalStockInfo,
 } from '@project-lc/shared-types';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
-import { Cache } from 'cache-manager';
 import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
-import { ObjectIdentifier } from '@aws-sdk/client-s3';
 import { s3 } from '@project-lc/utils-s3';
 
 @Injectable()
-export class GoodsService extends ServiceBaseWithCache {
-  #GOODS_CACHE_KEY = 'goods';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class GoodsService {
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * 판매자의 승인된 상품 ID 목록을 가져옵니다.
@@ -49,81 +40,14 @@ export class GoodsService extends ServiceBaseWithCache {
     sellerId?: Seller['id'],
     ids?: number[],
   ): Promise<number[]> {
-    const goodsIds = await this.prisma.goods.findMany({
+    const allGoods = await this.prisma.goods.findMany({
       where: {
         seller: sellerId ? { id: sellerId } : undefined,
         id: ids ? { in: ids } : undefined,
-        AND: {
-          confirmation: {
-            status: 'confirmed',
-          },
-        },
-      },
-      select: {
-        confirmation: {
-          select: {
-            firstmallGoodsConnectionId: true,
-          },
-        },
-        LiveShopping: {
-          select: {
-            fmGoodsSeq: true,
-          },
-        },
-        productPromotion: {
-          select: { fmGoodsSeq: true },
-        },
+        AND: { confirmation: { status: 'confirmed' } },
       },
     });
-
-    const allMyGoodsIds = goodsIds.reduce((prev, goods) => {
-      const lsGoodsIds = goods.LiveShopping.map((l) => l.fmGoodsSeq);
-      const productPromotionGoodsIds = goods.productPromotion.map((p) => p.fmGoodsSeq);
-      return prev
-        .concat(goods.confirmation.firstmallGoodsConnectionId)
-        .concat(lsGoodsIds)
-        .concat(productPromotionGoodsIds);
-    }, []);
-
-    return [...new Set(allMyGoodsIds)];
-  }
-
-  /**
-   * 관리자가 승인된 상품 ID(firsmall db의 goods_seq) 목록을 가져옵니다.
-   * @param ids? 특정 상품의 firstMallGoodsId만 조회하고 싶을 때
-   */
-  public async findAdminGoodsIds(ids?: number[]): Promise<number[]> {
-    const goodsIds = await this.prisma.goods.findMany({
-      where: {
-        id: ids ? { in: ids } : undefined,
-        AND: {
-          confirmation: {
-            status: 'confirmed',
-          },
-        },
-      },
-      select: {
-        confirmation: {
-          select: {
-            firstmallGoodsConnectionId: true,
-          },
-        },
-        LiveShopping: {
-          select: {
-            fmGoodsSeq: true,
-          },
-        },
-      },
-    });
-
-    const allGoodsIds = goodsIds.reduce((prev, goods) => {
-      const lsGoodsIds = goods.LiveShopping.map((l) => l.fmGoodsSeq);
-      return prev
-        .concat(goods.confirmation.firstmallGoodsConnectionId)
-        .concat(lsGoodsIds);
-    }, []);
-
-    return [...new Set(allGoodsIds)];
+    return allGoods.map((goods) => goods.id);
   }
 
   /**
@@ -139,11 +63,24 @@ export class GoodsService extends ServiceBaseWithCache {
     sort,
     direction,
     groupId,
-  }: GoodsListDto & { sellerId?: number }): Promise<GoodsListRes> {
+    goodsName,
+    categoryId,
+  }: GoodsListDto & {
+    sellerId?: number;
+    goodsName?: string;
+    categoryId?: number;
+  }): Promise<GoodsListRes> {
     const items = await this.prisma.goods.findMany({
       skip: page * itemPerPage,
       take: itemPerPage,
-      where: { seller: { id: sellerId }, shippingGroupId: groupId },
+      where: {
+        seller: { id: sellerId },
+        shippingGroupId: groupId,
+        goods_name: {
+          search: goodsName ? goodsName.trim() : undefined,
+        },
+        categories: { some: { id: categoryId } },
+      },
       orderBy: [{ [sort]: direction }],
       include: {
         options: {
@@ -319,8 +256,6 @@ export class GoodsService extends ServiceBaseWithCache {
         },
       });
 
-      await this._clearCaches(this.#GOODS_CACHE_KEY);
-
       return true;
     } catch (error) {
       console.error(error);
@@ -396,7 +331,6 @@ export class GoodsService extends ServiceBaseWithCache {
         where: { id },
         data: { goods_view: view },
       });
-      await this._clearCaches(this.#GOODS_CACHE_KEY);
       return true;
     } catch (error) {
       console.error(error);
@@ -405,14 +339,9 @@ export class GoodsService extends ServiceBaseWithCache {
   }
 
   /** 상품 개별 정보 조회 */
-  public async getOneGoods(goodsId: number, sellerId: number): Promise<GoodsByIdRes> {
-    return this.prisma.goods.findFirst({
-      where: {
-        id: goodsId,
-        seller: {
-          id: sellerId,
-        },
-      },
+  public async getOneGoods(goodsId: number): Promise<GoodsByIdRes> {
+    const result = await this.prisma.goods.findFirst({
+      where: { id: goodsId },
       include: {
         options: { include: { supply: true } },
         ShippingGroup: {
@@ -429,7 +358,62 @@ export class GoodsService extends ServiceBaseWithCache {
         confirmation: true,
         image: { orderBy: { cut_number: 'asc' } },
         GoodsInfo: true,
-        LiveShopping: true,
+        LiveShopping: {
+          include: {
+            broadcaster: { select: { id: true, userNickname: true, avatar: true } },
+          },
+        },
+        productPromotion: {
+          include: {
+            broadcaster: { select: { id: true, userNickname: true, avatar: true } },
+          },
+        },
+        categories: true,
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            email: true,
+            agreementFlag: true,
+            sellerShop: {
+              select: {
+                shopName: true,
+              },
+            },
+          },
+        },
+        informationNotice: true,
+      },
+    });
+
+    if (!result) return null;
+
+    return {
+      ...result,
+      informationNotice: result.informationNotice
+        ? {
+            ...result.informationNotice,
+            contents: result.informationNotice?.contents
+              ? JSON.parse(result.informationNotice?.contents as string)
+              : null,
+          }
+        : null,
+    };
+  }
+
+  /** 상품 개별 간략 정보 조회 */
+  public async getOneGoodsOutline(goodsId: number): Promise<GoodsOutlineByIdRes> {
+    return this.prisma.goods.findFirst({
+      where: { id: goodsId },
+      select: {
+        id: true,
+        goods_name: true,
+        summary: true,
+        goods_status: true,
+        options: { include: { supply: true } },
+        confirmation: true,
+        image: { orderBy: { cut_number: 'asc' } },
       },
     });
   }
@@ -442,34 +426,38 @@ export class GoodsService extends ServiceBaseWithCache {
     goodsId: number;
   }> {
     try {
-      const { options, image, shippingGroupId, goodsInfoId, ...goodsData } = dto;
+      const {
+        options,
+        image,
+        shippingGroupId,
+        goodsInfoId,
+        categoryId,
+        informationNoticeContents,
+        searchKeywords,
+        ...goodsData
+      } = dto;
       const optionsData = options.map((opt) => {
         const { supply, ...optData } = opt;
-        return {
-          ...optData,
-          supply: {
-            create: supply,
-          },
-        };
+        return { ...optData, supply: { create: supply } };
       });
       const goods = await this.prisma.goods.create({
         data: {
           seller: { connect: { id: sellerId } },
           ...goodsData,
-          options: {
-            create: optionsData,
-          },
-          image: {
-            connect: image.map((img) => ({ id: img.id })),
-          },
+          searchKeyword: searchKeywords.map((k) => k.keyword).join(',') || undefined,
+          options: { create: optionsData },
+          image: { connect: image.map((img) => ({ id: img.id })) },
           ShippingGroup: shippingGroupId
             ? { connect: { id: shippingGroupId } }
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
           confirmation: { create: { status: 'waiting' } },
+          categories: { connect: { id: categoryId } },
+          informationNotice: {
+            create: { contents: JSON.stringify(JSON.parse(informationNoticeContents)) },
+          },
         },
       });
-      await this._clearCaches(this.#GOODS_CACHE_KEY);
 
       return { goodsId: goods.id };
     } catch (error) {
@@ -515,8 +503,8 @@ export class GoodsService extends ServiceBaseWithCache {
 
     try {
       const url = imageToDeleted.image;
-      if (url.includes(s3.fullDomain)) {
-        const Key = url.replace(s3.fullDomain, '');
+      if (url.includes(s3.bucketDomain)) {
+        const Key = url.replace(s3.bucketDomain, '');
 
         s3.sendDeleteObjectsCommand({ deleteObjects: [{ Key }] });
       }
@@ -524,8 +512,6 @@ export class GoodsService extends ServiceBaseWithCache {
       await this.prisma.goodsImages.delete({
         where: { id: imageId },
       });
-
-      await this._clearCaches(this.#GOODS_CACHE_KEY);
 
       return true;
     } catch (e) {
@@ -596,6 +582,10 @@ export class GoodsService extends ServiceBaseWithCache {
       image,
       shippingGroupId,
       goodsInfoId,
+      informationNoticeId,
+      informationNoticeContents,
+      categoryId,
+      searchKeywords,
       ...goodsData
     } = dto;
 
@@ -612,6 +602,7 @@ export class GoodsService extends ServiceBaseWithCache {
         where: { id },
         data: {
           ...goodsData,
+          searchKeyword: searchKeywords.map((k) => k.keyword).join(',') || undefined,
           options: {
             deleteMany: willBeDeletedOptIds.map((_id) => ({ id: _id })),
             create: willBeCreatedOptions.map((opt) => {
@@ -629,13 +620,17 @@ export class GoodsService extends ServiceBaseWithCache {
               };
             }),
           },
-          image: {
-            connect: image.map((img) => ({ id: img.id })),
-          },
+          image: { connect: image.map((img) => ({ id: img.id })) },
           ShippingGroup: shippingGroupId
             ? { connect: { id: shippingGroupId } }
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
+          informationNotice: {
+            update: {
+              contents: JSON.stringify(JSON.parse(informationNoticeContents)),
+            },
+          },
+          categories: { connect: { id: categoryId } },
           confirmation: {
             update: {
               status: prevStatus === 'waiting' ? 'waiting' : 'needReconfirmation',
@@ -643,8 +638,6 @@ export class GoodsService extends ServiceBaseWithCache {
           }, // 상품 수정 후  (승인, 거절, 재검수 대기) 상태에서는 '재검수 대기' 상태로 변경, (대기) 상태에서는 그대로 '대기' 상태
         },
       });
-
-      await this._clearCaches(this.#GOODS_CACHE_KEY);
       return { goodsId: id };
     } catch (error) {
       console.error(error);
@@ -704,6 +697,40 @@ export class GoodsService extends ServiceBaseWithCache {
         goods_name: true,
         seller: { select: { id: true, email: true } },
       },
+    });
+  }
+
+  /** 전체 상품목록 조회(카테고리 포함) -
+   * 관리자에서 쿠폰에 연결하기 위한 상품(project-lc goods) 전체목록. 검수완료 & 정상판매중 일 것
+   * goodsConfirmation.status === confirmed && goods.status === normal
+   * goodsId, goodsName, sellerId, sellerEmail
+   * */
+  public async findAllConfirmedLcGoodsListWithCategory(): Promise<AdminAllLcGoodsList> {
+    return this.prisma.goods.findMany({
+      where: {
+        goods_status: 'normal',
+        AND: {
+          confirmation: {
+            status: 'confirmed',
+          },
+        },
+      },
+      select: {
+        id: true,
+        goods_name: true,
+        seller: { select: { id: true, email: true } },
+        categories: true,
+      },
+    });
+  }
+
+  /**
+   * 상품 노출 여부를 조절하여 보이지 않도록 설정하지 않은 모든 상품의 상품번호를 반환합니다.
+   */
+  public async findAllGoodsIds(): Promise<AllGoodsIdsRes> {
+    return this.prisma.goods.findMany({
+      select: { id: true, goods_name: true },
+      where: { goods_view: { not: 'notLook' } },
     });
   }
 }

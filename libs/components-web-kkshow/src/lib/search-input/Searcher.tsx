@@ -48,17 +48,18 @@ export function Searcher(): JSX.Element {
 
   return (
     <FormProvider {...methods}>
-      <form id={SEARCH_FORM_ID} onSubmit={methods.handleSubmit(onSubmit)}>
-        {/* 데스크탑 검색 input */}
-        <Flex display={{ base: 'none', md: 'flex' }} w={360}>
-          <SearchInputBox inputRef={inputRef} />
-        </Flex>
+      {/* 데스크탑 검색 input */}
+      <Flex display={{ base: 'none', md: 'flex' }} w={360}>
+        <SearchInputBox inputRef={inputRef} onSubmit={methods.handleSubmit(onSubmit)} />
+      </Flex>
 
-        {/* 모바일 검색 full-page drawer */}
-        <Flex display={{ base: 'flex', md: 'none' }}>
-          <FullPageSearchDrawer searchBoxInputRef={inputRef} />
-        </Flex>
-      </form>
+      {/* 모바일 검색 full-page drawer */}
+      <Flex display={{ base: 'flex', md: 'none' }}>
+        <FullPageSearchDrawer
+          searchBoxInputRef={inputRef}
+          onSubmit={methods.handleSubmit(onSubmit)}
+        />
+      </Flex>
     </FormProvider>
   );
 }

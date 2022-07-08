@@ -22,7 +22,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         const res = context.switchToHttp().getResponse<Response>();
         this.jwtHelper.refreshAndSetAuthorizationHeader(res, userPayload);
       } else {
-        throw err || new UnauthorizedException();
+        throw err || new UnauthorizedException('no payload after validate refresh token');
       }
     }
     return userPayload;

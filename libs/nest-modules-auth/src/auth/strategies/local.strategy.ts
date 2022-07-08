@@ -17,7 +17,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(req: Request, email: string, password: string): Promise<UserPayload> {
-    if (!['seller', 'broadcaster', 'admin'].includes(req.query.type as string)) {
+    const userTypes: UserType[] = ['seller', 'broadcaster', 'admin', 'customer'];
+    if (!(userTypes as string[]).includes(req.query.type as string)) {
       throw new ForbiddenException();
     }
     const userPayload = await this.authService.validateUser(
@@ -26,7 +27,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       password,
     );
     if (!userPayload) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('no payload after validate user in local strategy');
     }
     return userPayload;
   }

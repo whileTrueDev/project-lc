@@ -17,15 +17,18 @@ import { SearchForm, SearchInputBox, SearchInputBoxProps } from './SearchInputBo
 
 interface FullPageSearchBoxProps {
   searchBoxInputRef?: SearchInputBoxProps['inputRef'];
+  onSubmit: () => void;
 }
 export function FullPageSearchBox({
   searchBoxInputRef,
+  onSubmit,
 }: FullPageSearchBoxProps): JSX.Element {
   const closeSearchDrawer = useKkshowSearchStore((s) => s.closeSearchDrawer);
   const { setValue } = useFormContext<SearchForm>();
 
   const onKeywordClick = (item: string): void => {
     setValue('keyword', item);
+    onSubmit();
   };
 
   return (
@@ -39,7 +42,7 @@ export function FullPageSearchBox({
           variant="unstyle"
           icon={<ChevronLeftIcon w="30px" h="35px" />}
         />
-        <SearchInputBox inputRef={searchBoxInputRef} autoFocus />
+        <SearchInputBox inputRef={searchBoxInputRef} onSubmit={onSubmit} autoFocus />
       </Flex>
 
       {/* 최근검색어 */}
@@ -52,10 +55,12 @@ export function FullPageSearchBox({
 
 interface FullPageSearchDrawerProps extends FullPageSearchBoxProps {
   containerRef?: RefObject<HTMLElement | null>;
+  onSubmit: () => void;
 }
 export function FullPageSearchDrawer({
   containerRef,
   searchBoxInputRef,
+  onSubmit,
 }: FullPageSearchDrawerProps): JSX.Element {
   const { isSearchDrawerOpen, openSearchDrawer, closeSearchDrawer } =
     useKkshowSearchStore();
@@ -85,7 +90,10 @@ export function FullPageSearchDrawer({
         <DrawerOverlay display={{ base: 'flex', md: 'none' }} />
         <DrawerContent display={{ base: 'flex', md: 'none' }}>
           <DrawerBody p={0}>
-            <FullPageSearchBox searchBoxInputRef={searchBoxInputRef} />
+            <FullPageSearchBox
+              searchBoxInputRef={searchBoxInputRef}
+              onSubmit={onSubmit}
+            />
           </DrawerBody>
         </DrawerContent>
       </Drawer>

@@ -91,6 +91,7 @@ export const constants = {
     REDIS_URL: 'PROJECT_LC_DEV_REDIS_URL',
     CACHE_REDIS_URL: 'PROJECT_LC_DEV_CACHE_REDIS_URL',
     MQ_REDIS_URL: 'PROJECT_LC_DEV_MQ_REDIS_URL',
+    TOSS_PAYMENTS_SECRET_KEY: 'PROJECT_LC_DEV_TOSS_PAYMENTS_SECRET_KEY',
   },
   PROD: {
     /** Production 환경용 프라이빗 도메인 */
@@ -127,6 +128,9 @@ export const constants = {
     // * ECS Inactive Batch
     ECS_INACTIVE_BATCH_FAMILY_NAME: 'project-lc-inactive-batch',
     ECS_INACTIVE_BATCH_LOG_GROUP_NAME: '/ecs/project-lc-inactive-batch',
+    // * ECS VirtualAccount Batch
+    ECS_VIRTUAL_ACCOUNT_BATCH_FAMILY_NAME: 'project-lc-virtual-account-batch',
+    ECS_VIRTUAL_ACCOUNT_BATCH_LOG_GROUP_NAME: '/ecs/project-lc-virtual-account-batch',
     // * ************************
     // * SSM Parameter Store Keys
     // * ************************
@@ -154,5 +158,7 @@ export const constants = {
     REDIS_URL_KEY: 'PROJECT_LC_REDIS_URL',
     CACHE_REDIS_URL_KEY: 'PROJECT_LC_CACHE_REDIS_URL',
     MQ_REDIS_URL_KEY: 'PROJECT_LC_MQ_REDIS_URL',
+    REDIS_BULL_QUEUE_URL: 'PROJECT_LC_REDIS_BULL_QUEUE_URL',
+    TOSS_PAYMENTS_SECRET_KEY: 'PROJECT_LC_TOSS_PAYMENTS_SECRET_KEY',
   },
 } as const;

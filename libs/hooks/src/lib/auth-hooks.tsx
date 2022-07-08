@@ -1,5 +1,6 @@
 import { UserType } from '@project-lc/shared-types';
 import { liveShoppingStateBoardWindowStore } from '@project-lc/stores';
+import { removeCartKey } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import { useQueryClient } from 'react-query';
@@ -24,6 +25,7 @@ export function useLogout(): { logout: () => void } {
           closeWindow();
           queryClient.clear();
           queryClient.removeQueries('Profile', { exact: true });
+          removeCartKey();
         }
       })
       .catch((error) => {

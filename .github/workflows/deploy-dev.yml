@@ -19,7 +19,7 @@ on:
 
 name: Deploy to AWS ECS "Dev"
 env:
-  BEFORE_SHA: ${{ github.event.before }}
+  DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
 jobs:
   Build:
     name: Build Job
@@ -38,7 +38,7 @@ jobs:
 
       #  Build API server
       - name: Build
-        run: yarn affected:build --prod --base=$BEFORE_SHA
+        run: yarn affected:build --prod --base=origin/dev
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -60,7 +60,7 @@ jobs:
         run: |
           yarn affected \
             --target=dockerize-dev \
-            --base=$BEFORE_SHA \
+            --base=origin/dev \
             --args="--registry=$ECR_REGISTRY"
 
   DeployAPI:
@@ -74,7 +74,7 @@ jobs:
         run: yarn install
 
       - name: Check api affected
-        run: tools/check-need-deploy.sh api $BEFORE_SHA
+        run: tools/check-need-deploy.sh api
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -124,7 +124,7 @@ jobs:
         run: yarn install
 
       - name: Check Overlay affected
-        run: tools/check-need-deploy.sh overlay $BEFORE_SHA
+        run: tools/check-need-deploy.sh overlay
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -174,7 +174,7 @@ jobs:
         run: yarn install
 
       - name: Check Overlay affected
-        run: tools/check-need-deploy.sh overlay-controller $BEFORE_SHA
+        run: tools/check-need-deploy.sh overlay-controller
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -224,7 +224,7 @@ jobs:
         run: yarn install
 
       - name: Check RealtimeAPI affected
-        run: tools/check-need-deploy.sh realtimeapi $BEFORE_SHA
+        run: tools/check-need-deploy.sh api-realtime
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -268,7 +268,7 @@ jobs:
         run: yarn install
 
       - name: Check Mailer affected
-        run: tools/check-need-deploy.sh mailer $BEFORE_SHA
+        run: tools/check-need-deploy.sh mailer
 
       - name: Configure AWS credentials
         if: ${{ success() }}

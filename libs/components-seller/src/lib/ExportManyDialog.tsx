@@ -15,19 +15,19 @@ import {
 } from '@chakra-ui/react';
 import { useExportOrderMutation, useExportOrdersMutation } from '@project-lc/hooks';
 import {
-  ExportOrderDto,
-  ExportOrdersDto,
-  FindFmOrderRes,
-  isOrderExportable,
+  CreateKkshowExportDto,
+  exportableSteps,
+  ExportManyDto,
+  OrderDataWithRelations,
 } from '@project-lc/shared-types';
-import { fmExportStore, useFmOrderStore } from '@project-lc/stores';
+import { sellerExportStore, useSellerOrderStore } from '@project-lc/stores';
 import { useCallback } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ExportBundleDialog } from './ExportBundleDialog';
 import { ExportOrderOptionList } from './ExportOrderOptionList';
 
 export type ExportManyDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
-  orders: FindFmOrderRes[];
+  orders: OrderDataWithRelations[];
 };
 
 export function ExportManyDialog({
@@ -37,11 +37,12 @@ export function ExportManyDialog({
 }: ExportManyDialogProps): JSX.Element {
   const bundleDialog = useDisclosure();
   const toast = useToast();
-  const formMethods = useForm<ExportOrderDto[]>();
-
-  const selectedOrders = useFmOrderStore((state) => state.selectedOrders);
-  const selectedOrderShippings = fmExportStore((s) => s.selectedOrderShippings);
-  const resetSelectedOrderShippings = fmExportStore((s) => s.resetSelectedOrderShippings);
+  const formMethods = useForm<CreateKkshowExportDto[]>();
+  const selectedOrders = useSellerOrderStore((state) => state.selectedOrders);
+  const selectedOrderShippings = sellerExportStore((s) => s.selectedOrderShippings);
+  const resetSelectedOrderShippings = sellerExportStore(
+    (s) => s.resetSelectedOrderShippings,
+  );
 
   // 모달창 닫기 && orderShipping 배열 초기화
   const closeAndResetShippings = useCallback(() => {
@@ -54,10 +55,7 @@ export function ExportManyDialog({
   const exportOrders = useExportOrdersMutation();
 
   const onExportSuccess = useCallback(() => {
-    toast({
-      status: 'success',
-      description: '출고 처리가 성공적으로 완료되었습니다.',
-    });
+    toast({ status: 'success', description: '출고 처리가 성공적으로 완료되었습니다.' });
     closeAndResetShippings();
   }, [toast, closeAndResetShippings]);
 
@@ -70,7 +68,7 @@ export function ExportManyDialog({
 
   /** 목록 일괄 출고 처리 */
   const exportAll = useCallback(
-    async (dto: ExportOrdersDto) => {
+    async (dto: ExportManyDto) => {
       return exportOrders.mutateAsync(dto).then(onExportSuccess).catch(onExportFail);
     },
     [exportOrders, onExportFail, onExportSuccess],
@@ -78,18 +76,15 @@ export function ExportManyDialog({
 
   /** 개별 출고 처리 */
   const onExportOneOrder = useCallback(
-    async (orderId: string, orderIdx: number) => {
+    async (orderId: number, orderIdx: number) => {
       const fieldID = `${orderIdx}` as const;
       const isValid = await formMethods.trigger(fieldID);
       if (isValid) {
         formMethods.setValue(`${orderIdx}.orderId`, orderId);
         const dto = formMethods.getValues(fieldID);
         // options배열의 빈 값 정리
-        const realDto = {
-          ...dto,
-          exportOptions: dto.exportOptions.filter((x) => !!x.exportEa),
-        };
-        if (dto.exportOptions.every((o) => Number(o.exportEa) === 0)) {
+        const realDto = { ...dto, exportOptions: dto.items.filter((x) => !!x.amount) };
+        if (dto.items.every((o) => Number(o.amount) === 0)) {
           toast({
             status: 'warning',
             description:
@@ -105,21 +100,13 @@ export function ExportManyDialog({
   );
 
   /** 폼제출 핸들러 -> 일괄 출고 처리 API 요청 */
-  async function onSubmit(formData: ExportOrderDto[]): Promise<void> {
+  async function onSubmit(formData: CreateKkshowExportDto[]): Promise<void> {
     const selectedKeys = Object.keys(formData);
-    const dto: ExportOrderDto[] = [];
+    const dto: CreateKkshowExportDto[] = [];
     selectedKeys.forEach((k) => {
       const data = formData[Number(k)];
-      // options배열의 빈 값 정리
-      const realData = {
-        ...data,
-        exportOptions: data.exportOptions.filter((x) => !!x.exportEa),
-      };
-      if (selectedOrderShippings.includes(realData.shippingSeq)) {
-        if (!realData.exportOptions.every((o) => Number(o.exportEa) === 0)) {
-          dto.push(realData);
-        }
-      }
+      const realData = { ...data, items: data.items.filter((x) => !!x.amount) };
+      dto.push(realData);
     });
 
     if (dto.length === 0) {
@@ -152,14 +139,13 @@ export function ExportManyDialog({
             {selectedOrders.map((orderId, orderIndex) => {
               const _order = orders.find((_o) => _o.id === orderId);
               if (!_order) return null;
-              const isExportable = isOrderExportable(_order.step);
+              const isExportable = exportableSteps.includes(_order.step);
               if (!isExportable) return null;
-
               return (
                 <Box key={orderId} mt={2}>
                   <ExportOrderOptionList
                     onSubmitClick={onExportOneOrder}
-                    orderId={orderId as string}
+                    orderCode={_order.orderCode || undefined}
                     orderIndex={orderIndex}
                   />
                 </Box>
@@ -182,6 +168,7 @@ export function ExportManyDialog({
               ml={2}
               colorScheme="pink"
               type="submit"
+              isLoading={formMethods.formState.isSubmitting || exportOrders.isLoading}
               isDisabled={selectedOrderShippings.length === 0}
             >
               일괄출고처리

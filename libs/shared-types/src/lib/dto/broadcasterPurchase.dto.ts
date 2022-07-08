@@ -1,5 +1,5 @@
-import { IsInt, IsString } from 'class-validator';
 import { SellType } from '@prisma/client';
+import { IsInt, IsString } from 'class-validator';
 
 export class BroadcasterPurchaseDto {
   @IsInt() id: number;

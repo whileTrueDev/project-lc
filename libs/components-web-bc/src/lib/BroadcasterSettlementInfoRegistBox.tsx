@@ -97,7 +97,7 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
     <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
       <Flex direction={['column', 'row']} justifyContent="space-between" mb={3} gap={3}>
         <Text fontSize="lg" fontWeight="medium">
-          정산 등록 정보
+          정산 정보
         </Text>
 
         <Button size="sm" onClick={onOpen} colorScheme="blue">

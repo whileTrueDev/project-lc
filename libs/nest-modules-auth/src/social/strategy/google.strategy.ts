@@ -6,7 +6,7 @@ import { getApiHost } from '@project-lc/utils';
 import { getUserTypeFromRequest } from '@project-lc/utils-backend';
 import { Request } from 'express';
 import { Profile, Strategy } from 'passport-google-oauth20';
-import { Broadcaster, Seller } from '.prisma/client';
+import { Broadcaster, Customer, Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
 const GOOGLE_PROVIDER = 'google';
@@ -38,7 +38,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_PROVIDER) 
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-  ): Promise<Seller | Broadcaster> {
+  ): Promise<Seller | Broadcaster | Customer> {
     const { id, displayName, emails, photos } = profile;
 
     if (!emails[0].value) {

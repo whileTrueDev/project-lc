@@ -55,6 +55,21 @@ export const getBroadcasterWebHost = (): string => {
   }
 };
 
+export const getCustomerWebHost = (): string => {
+  switch (process.env.NODE_ENV) {
+    case 'production':
+    case 'test':
+      return process.env.NEXT_PUBLIC_KKSHOW_WEB_HOST || process.env.KKSHOW_WEB_HOST;
+    case 'development':
+    default:
+      return 'http://localhost:4000';
+  }
+};
+
+export const getKkshowWebHost = (): string => {
+  return getCustomerWebHost();
+};
+
 export const getOverlayHost = (): string => {
   switch (process.env.NODE_ENV) {
     case 'production':

@@ -10,7 +10,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { UserNotification } from '@prisma/client';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CreateMultipleNotificationDto,
@@ -23,6 +23,7 @@ import { NotificationService } from './notification.service';
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('notification')
 @Controller('notification')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}

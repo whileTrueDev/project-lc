@@ -10,9 +10,6 @@ export class GoodsConfirmationDto {
   @IsNumber()
   goodsId: number;
 
-  @IsNumber()
-  firstmallGoodsConnectionId: number;
-
   @IsEnum(GoodsConfirmationStatus)
   status = GoodsConfirmationStatus.CONFIRMED;
 }

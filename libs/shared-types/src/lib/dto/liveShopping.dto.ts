@@ -1,14 +1,16 @@
 import {
+  Broadcaster,
   LiveShopping,
   LiveShoppingImage,
   LiveShoppingImageType,
   LiveShopppingProgressType,
+  Seller,
 } from '@prisma/client';
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsDate,
   IsEnum,
-  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -18,56 +20,58 @@ import {
 import { LiveShoppingInput } from '../..';
 import { LIVE_SHOPPING_PROGRESS } from '../constants/liveShoppingProgress';
 
-export class LiveShoppingDTO {
+/** 라이브쇼핑 업데이트 dto */
+export class LiveShoppingUpdateDTO {
   @IsNumber()
   id: number;
 
   @IsOptional()
   @IsNumber()
-  broadcasterId: number;
-
-  @IsString()
-  sellerId: string;
+  broadcasterId?: number;
 
   @IsNumber()
-  goods_id: number;
+  @IsOptional()
+  sellerId?: string;
 
   @IsNumber()
-  contactId: number;
+  @IsOptional()
+  goodsId?: number;
+
+  @IsNumber()
+  @IsOptional()
+  contactId?: number;
 
   @IsOptional()
   @IsString()
-  requests: string;
+  requests?: string;
 
   @IsString()
-  progress: LiveShopppingProgressType;
+  @IsOptional()
+  progress?: LiveShopppingProgressType;
 
   @IsOptional()
   @IsDate()
-  broadcastStartDate: Date;
+  broadcastStartDate?: string;
 
   @IsOptional()
   @IsDate()
-  broadcastEndDate: Date;
+  broadcastEndDate?: string;
 
   @IsOptional()
   @IsDate()
-  sellStartDate: string;
+  sellStartDate?: string;
 
   @IsOptional()
   @IsDate()
-  sellEndDate: string;
+  sellEndDate?: string;
 
   @IsOptional()
   @IsString()
-  rejectionReason: string;
+  rejectionReason?: string;
 
   @IsOptional()
   @IsNumber()
   videoUrl: string;
-
-  @IsDate()
-  createDate: string;
 
   @ValidateIf((o) => o.progress === LIVE_SHOPPING_PROGRESS.확정됨)
   @IsNumber()
@@ -79,8 +83,6 @@ export class LiveShoppingDTO {
   @IsNotEmpty()
   broadcasterCommissionRate?: string;
 
-  @IsOptional() @IsInt() fmGoodsSeq?: LiveShopping['fmGoodsSeq'];
-
   @IsOptional() @IsString() liveShoppingName?: LiveShopping['liveShoppingName'];
 
   @IsOptional()
@@ -88,22 +90,33 @@ export class LiveShoppingDTO {
   liveShoppingImage?: Pick<LiveShoppingImage, 'imageUrl' | 'type'>;
 }
 
-export type LiveShoppingRegistDTO = Pick<
-  LiveShoppingDTO,
-  'requests' | 'goods_id' | 'contactId' | 'progress'
-> &
-  Pick<LiveShoppingInput, 'desiredPeriod' | 'desiredCommission'>;
+/** 라이브쇼핑 등록 dto */
+export class LiveShoppingRegistDTO {
+  @IsString()
+  requests: LiveShopping['requests'];
 
-export type LiveShoppingWithSales = Pick<
-  LiveShoppingDTO,
-  'id' | 'sellStartDate' | 'sellEndDate' | 'fmGoodsSeq'
->;
-export class LiveShoppingParamsDto {
-  @IsOptional() @IsString() id?: string;
+  @IsNumber()
+  goodsId: LiveShopping['goodsId'];
+
+  @IsNumber()
+  contactId: LiveShopping['contactId'];
+
+  @IsString()
+  desiredPeriod: LiveShoppingInput['desiredPeriod'];
+
+  @IsString()
+  @IsOptional()
+  desiredCommission?: LiveShoppingInput['desiredCommission'];
+}
+
+export class FindLiveShoppingDto {
+  @Type(() => Number) @IsOptional() @IsNumber() id?: LiveShopping['id'];
+  @Type(() => Number) @IsOptional() @IsNumber() broadcasterId?: Broadcaster['id'];
+  @Type(() => Number) @IsOptional() @IsNumber() sellerId?: Seller['id'];
   @IsOptional() @IsArray() goodsIds?: number[];
 }
 export type LiveShoppingBroadcastDate = Pick<
-  LiveShoppingDTO,
+  LiveShopping,
   'broadcastStartDate' | 'broadcastEndDate'
 >;
 
@@ -120,8 +133,6 @@ export type LiveShoppingsWithBroadcasterAndGoodsName = Pick<
     goods_name: string;
   };
 };
-
-export type LiveShoppingFmGoodsSeq = Pick<LiveShopping, 'fmGoodsSeq'>;
 
 export type LiveShoppingId = Pick<LiveShopping, 'id'>;
 

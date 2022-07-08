@@ -27,11 +27,13 @@ import { LiveShoppingDetailDialog } from '@project-lc/components-shared/LiveShop
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
 import {
   useDeleteLiveShopping,
-  useFmOrdersDuringLiveShoppingSales,
+  useDisplaySize,
   useLiveShoppingList,
   useProfile,
-  useDisplaySize,
 } from '@project-lc/hooks';
+import { LiveShoppingWithGoods } from '@project-lc/shared-types';
+import { getCustomerWebHost } from '@project-lc/utils';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
@@ -58,60 +60,37 @@ export interface LiveShoppingWithSalesFrontType extends LiveShoppingWithoutDate 
 
 export function LiveShoppingList(): JSX.Element {
   const toast = useToast();
-  const { data: profileData } = useProfile();
-  const [pageSize, setPageSize] = useState<number>(5);
-  const { data } = useLiveShoppingList({});
-  const { data: sales, isLoading: isSalesLoading } = useFmOrdersDuringLiveShoppingSales({
-    enabled: !!profileData?.id,
-  });
   const { isMobileSize } = useDisplaySize();
+  const { data: profile } = useProfile();
+  const { data, isLoading } = useLiveShoppingList({ sellerId: profile?.id });
 
-  const liveShoppingWithSales: LiveShoppingWithSalesFrontType[] = [];
+  const [pageSize, setPageSize] = useState<number>(5);
 
-  if (data && sales) {
-    for (let i = 0; i < data.length; i++) {
-      liveShoppingWithSales.push({
-        ...data[i],
-        ...sales.find((itmInner) => itmInner.id === data[i].id),
-      });
-    }
-  }
-
-  const [isOpen, setIsOpen] = useState(false);
-
+  const deleteDialog = useDisclosure();
   const [toDeleteLiveShoppingId, setToDeleteLiveShoppingId] = useState(0);
-  const [liveShoppingId, setLiveShoppingId] = useState(0);
+  const [selectedLiveShopping, setSelectedLiveShopping] =
+    useState<LiveShoppingWithGoods>();
   const {
     isOpen: detailIsOpen,
     onOpen: detailOnOpen,
     onClose: detailOnClose,
   } = useDisclosure();
 
-  const handleDetailOnOpen = (id: number): void => {
-    const index = liveShoppingWithSales?.findIndex((x) => x.id === id) || 0;
-    setLiveShoppingId(index);
+  const handleDetailOnOpen = (row: LiveShoppingWithGoods): void => {
+    setSelectedLiveShopping(row);
     detailOnOpen();
   };
 
-  const handleModalOpen = (id: number): void => {
-    setIsOpen(true);
+  const handleDeleteClick = (id: number): void => {
+    deleteDialog.onOpen();
     setToDeleteLiveShoppingId(id);
-  };
-
-  const onClose = (): void => {
-    setIsOpen(false);
   };
 
   const { mutateAsync } = useDeleteLiveShopping();
   const deleteLiveShopping = async (): Promise<void> => {
     mutateAsync(toDeleteLiveShoppingId)
       .then((isDeleted) => {
-        if (isDeleted) {
-          toast({
-            title: '삭제 완료하였습니다',
-            status: 'success',
-          });
-        }
+        if (isDeleted) toast({ description: '삭제 완료하였습니다', status: 'success' });
       })
       .catch((error) => {
         if (error.response.status === 400 || error.response.status === 401) {
@@ -121,10 +100,7 @@ export function LiveShoppingList(): JSX.Element {
             status: 'error',
           });
         } else {
-          toast({
-            title: '삭제 오류',
-            status: 'error',
-          });
+          toast({ title: '삭제 오류', status: 'error' });
         }
       });
   };
@@ -132,30 +108,24 @@ export function LiveShoppingList(): JSX.Element {
     {
       field: 'liveShoppingName',
       headerName: '라이브 쇼핑명',
-      minWidth: 350,
+      minWidth: 250,
       flex: 1,
       valueFormatter: ({ row }) =>
-        row.liveShoppingName || '라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록됩니다.',
+        row.liveShoppingName || '(라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록됩니다.)',
     },
     {
-      field: 'fmGoodsSeq',
+      field: 'goods_name',
       headerName: '상품명',
       minWidth: 350,
       flex: 1,
       renderCell: ({ row }) => {
-        if (row.fmGoodsSeq) {
-          return (
-            <Tooltip label="상품페이지로 이동">
-              <Link
-                href={`http://whiletrue.firstmall.kr/goods/view?no=${row.fmGoodsSeq}`}
-                isExternal
-              >
-                {row.goods.goods_name} <ExternalLinkIcon mx="2px" />
-              </Link>
-            </Tooltip>
-          );
-        }
-        return <Text>{row.goods.goods_name}</Text>;
+        return (
+          <Tooltip label="상품페이지로 이동">
+            <Link href={`${getCustomerWebHost()}/goods/${row.goodsId}`} isExternal>
+              {row.goods.goods_name} <ExternalLinkIcon mx="2px" />
+            </Link>
+          </Tooltip>
+        );
       },
     },
     {
@@ -214,8 +184,19 @@ export function LiveShoppingList(): JSX.Element {
     {
       headerName: '매출',
       field: 'sales',
-      valueFormatter: ({ row }) =>
-        `${row.sales ? row.sales.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0'}원`,
+      valueFormatter: ({ row }) => {
+        const totalPrice = (row as LiveShoppingWithGoods).orderItemSupport.reduce(
+          (prev, o) => {
+            const optTotalPrice = o.orderItem.options.reduce(
+              (_p, opt) => _p + Number(opt.discountPrice) * opt.quantity,
+              0,
+            );
+            return prev + optTotalPrice;
+          },
+          0,
+        );
+        return `${getLocaleNumber(totalPrice)}원`;
+      },
     },
     {
       headerName: '유튜브영상',
@@ -246,22 +227,14 @@ export function LiveShoppingList(): JSX.Element {
       disableColumnMenu: true,
       renderCell: ({ row }: GridRowData) => (
         <Stack direction="row">
-          <Button
-            size="xs"
-            colorScheme="blue"
-            onClick={() => {
-              handleDetailOnOpen(row.id);
-            }}
-          >
+          <Button size="xs" colorScheme="blue" onClick={() => handleDetailOnOpen(row)}>
             상세보기
           </Button>
           {row.progress === 'registered' ? (
             <Button
               size="xs"
               colorScheme="orange"
-              onClick={() => {
-                handleModalOpen(row.id);
-              }}
+              onClick={() => handleDeleteClick(row.id)}
             >
               삭제
             </Button>
@@ -303,47 +276,39 @@ export function LiveShoppingList(): JSX.Element {
   ];
 
   return (
-    <Box minHeight={{ base: 300, md: 600 }} mb={24}>
-      {data && liveShoppingWithSales && (
-        <ChakraDataGrid
-          disableExtendRowFullWidth
-          autoHeight
-          pagination
-          autoPageSize
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[5, 10, 15]}
-          disableSelectionOnClick
-          disableColumnMenu
-          disableColumnSelector
-          loading={isSalesLoading}
-          columns={isMobileSize ? mobileColumns : columns}
-          rows={liveShoppingWithSales}
-        />
-      )}
+    <Box mb={24}>
+      <ChakraDataGrid
+        minHeight={300}
+        disableExtendRowFullWidth
+        autoHeight
+        pagination
+        autoPageSize
+        pageSize={pageSize}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        rowsPerPageOptions={[5, 10, 15]}
+        disableSelectionOnClick
+        disableColumnMenu
+        disableColumnSelector
+        loading={isLoading}
+        columns={isMobileSize ? mobileColumns : columns}
+        rows={data || []}
+      />
 
-      {liveShoppingWithSales && liveShoppingWithSales.length !== 0 && (
-        <>
-          <LiveShoppingDetailDialog
-            isOpen={detailIsOpen}
-            onClose={detailOnClose}
-            data={data}
-            id={liveShoppingId}
-            type="seller"
-          />
+      <LiveShoppingDetailDialog
+        isOpen={detailIsOpen}
+        onClose={detailOnClose}
+        liveShopping={selectedLiveShopping}
+        type="seller"
+      />
 
-          <ConfirmDialog
-            title="라이브 쇼핑 삭제"
-            isOpen={isOpen}
-            onClose={onClose}
-            onConfirm={deleteLiveShopping}
-          >
-            <Text>삭제하시겠습니까?</Text>
-          </ConfirmDialog>
-        </>
-      )}
+      <ConfirmDialog
+        title="라이브 쇼핑 삭제"
+        isOpen={deleteDialog.isOpen}
+        onClose={deleteDialog.onClose}
+        onConfirm={deleteLiveShopping}
+      >
+        <Text>삭제하시겠습니까?</Text>
+      </ConfirmDialog>
     </Box>
   );
 }
-
-export default LiveShoppingList;

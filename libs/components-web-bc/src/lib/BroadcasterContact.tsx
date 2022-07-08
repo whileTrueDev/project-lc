@@ -42,6 +42,7 @@ import { AxiosError } from 'axios';
 import { useEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { UseMutateAsyncFunction } from 'react-query';
+import { parseErrorObject } from '@project-lc/utils-frontend';
 import { BroadcasterContacts } from '.prisma/client';
 
 export function BroadcasterContactSection(): JSX.Element {
@@ -120,9 +121,11 @@ export function BroadcasterContactItem({
             });
           }
         })
-        .catch(() => {
+        .catch((err?: any) => {
+          const { status, message } = parseErrorObject(err);
           toast({
             title: '연락처가 삭제중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+            description: status ? `code: ${status} - message: ${message}` : undefined,
             status: 'error',
           });
         });
@@ -320,9 +323,11 @@ export function BroadcasterContactForm(props: BroadcasterContactFormProps): JSX.
     const onSuccess = (): void => {
       toast({ title: '연락처가 등록되었습니다.', status: 'success' });
     };
-    const onFail = (): void => {
+    const onFail = (err?: any): void => {
+      const { status, message } = parseErrorObject(err);
       toast({
         title: '연락처 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        description: status ? `code: ${status} - message: ${message}` : undefined,
         status: 'error',
       });
     };
@@ -336,7 +341,7 @@ export function BroadcasterContactForm(props: BroadcasterContactFormProps): JSX.
         })
         .catch((err) => {
           console.log(err);
-          onFail();
+          onFail(err);
         });
     } else {
       mutateAsync(dto)
@@ -347,7 +352,7 @@ export function BroadcasterContactForm(props: BroadcasterContactFormProps): JSX.
         })
         .catch((err) => {
           console.log(err);
-          onFail();
+          onFail(err);
         });
     }
   }

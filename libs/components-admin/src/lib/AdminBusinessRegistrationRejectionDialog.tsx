@@ -19,7 +19,10 @@ import {
 } from '@chakra-ui/react';
 import { GridRowData } from '@material-ui/data-grid';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
-import { useBusinessRegistrationRejectionMutation } from '@project-lc/hooks';
+import {
+  useBusinessRegistrationRejectionMutation,
+  useAdminSellerSettlementHistoryMutation,
+} from '@project-lc/hooks';
 import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -55,6 +58,7 @@ export function AdminBusinessRegistrationRejectionDialog({
   }, [reset, row]);
 
   const rejectMutation = useBusinessRegistrationRejectionMutation();
+  const { mutateAsync: historyMutation } = useAdminSellerSettlementHistoryMutation();
 
   async function handleRejectionGood({
     id,
@@ -67,6 +71,11 @@ export function AdminBusinessRegistrationRejectionDialog({
       await rejectMutation.mutateAsync({
         id,
         rejectionReason,
+      });
+      await historyMutation({
+        type: 'businessRegistration',
+        status: 'rejected',
+        sellerBusinessRegistrationId: id,
       });
       toast({
         title: '사업자등록정보가 반려되었습니다.',

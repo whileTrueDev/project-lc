@@ -1,25 +1,35 @@
 import {
-  FcMoneyTransfer,
-  FcInspection,
-  FcList,
-  FcDislike,
-  FcVideoCall,
-  FcFaq,
-  FcSms,
-  FcAdvertising,
-  FcCloseUpMode,
-  FcBiohazard,
-} from 'react-icons/fc';
-
-import {
-  AiOutlineShop,
+  AiOutlineContainer,
   AiOutlineHome,
   AiOutlineSetting,
-  AiOutlineContainer,
+  AiOutlineShop,
 } from 'react-icons/ai';
 import { BsBox } from 'react-icons/bs';
-import { MdLiveTv, MdOutlineShoppingCart, MdPayment } from 'react-icons/md';
+import {
+  FcAdvertising,
+  FcBiohazard,
+  FcBusinessman,
+  FcCloseUpMode,
+  FcDislike,
+  FcFaq,
+  FcFinePrint,
+  FcInspection,
+  FcList,
+  FcMoneyTransfer,
+  FcQuestions,
+  FcRating,
+  FcSms,
+  FcVideoCall,
+} from 'react-icons/fc';
 import { IconType } from 'react-icons/lib';
+import {
+  MdAccountCircle,
+  MdLiveTv,
+  MdOutlineShoppingCart,
+  MdPayment,
+  MdShoppingBasket,
+} from 'react-icons/md';
+import { RiFootprintFill } from 'react-icons/ri';
 
 export interface NavItem {
   label: string;
@@ -95,6 +105,23 @@ export const mypageNavLinks: MypageLink[] = [
     name: '상품',
     href: '/mypage/goods',
     checkIsActive: defaultIsActiveChecker,
+    children: [
+      {
+        name: '상품 목록',
+        href: '/mypage/goods',
+        checkIsActive: (pathname, linkHref) => pathname === linkHref,
+      },
+      {
+        name: '문의 관리',
+        href: '/mypage/goods-inquiries',
+        checkIsActive: (pathname, linkHref) => pathname === linkHref,
+      },
+      {
+        name: '상품 후기 관리',
+        href: '/mypage/goods-reviews',
+        checkIsActive: (pathname, linkHref) => pathname === linkHref,
+      },
+    ],
   },
   {
     icon: MdLiveTv,
@@ -230,6 +257,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '방송인',
     href: '/broadcaster',
     children: [
+      { name: '가입자 목록', href: '/broadcaster/signup-list', icon: FcBusinessman },
       { name: '정산정보 검수', href: '/broadcaster/settlement-info', icon: FcInspection },
       { name: '정산', href: '/broadcaster/settlement', icon: FcMoneyTransfer },
       {
@@ -243,6 +271,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '판매자',
     href: '/seller',
     children: [
+      { name: '가입자 목록', href: '/seller/signup-list', icon: FcBusinessman },
       { name: '계좌정보 목록', href: '/seller/account', icon: FcList },
       {
         name: '사업자 등록정보 검수',
@@ -253,9 +282,23 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     ],
   },
   {
+    name: '구매자',
+    href: '/customer',
+    children: [
+      { name: '쿠폰관리', href: '/customer/coupon', icon: FcFinePrint },
+      { name: '마일리지 관리', href: '/customer/mileage', icon: FcMoneyTransfer },
+      { name: '가입자 목록', href: '/customer/signup-list', icon: FcBusinessman },
+    ],
+  },
+  {
     name: '상품',
     href: '/goods',
-    children: [{ name: '상품검수', href: '/goods/confirmation', icon: FcInspection }],
+    children: [
+      { name: '상품목록/검수', href: '/goods/confirmation', icon: FcInspection },
+      { name: '상품카테고리', href: '/goods/category', icon: FcList },
+      { name: '상품문의관리', href: '/goods/inquiry', icon: FcQuestions },
+      { name: '상품리뷰관리', href: '/goods/review', icon: FcRating },
+    ],
   },
   {
     name: '라이브쇼핑',
@@ -265,7 +308,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '주문',
     href: 'order',
-    children: [{ name: '결제취소 요청', href: '/order/order-cancel', icon: FcDislike }],
+    children: [
+      { name: '결제취소 요청', href: '/order/order-cancel', icon: FcDislike },
+      { name: '주문 목록', href: '/order/list', icon: FcList },
+      { name: '환불요청 처리', href: '/order/refund', icon: FcMoneyTransfer },
+    ],
   },
   {
     name: '일반관리',
@@ -302,5 +349,88 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
         icon: FcBiohazard,
       },
     ],
+  },
+];
+
+/** 크크쇼 소비자 마이페이지 사이드바 - "쇼핑" 하위 탭 */
+const customerMypageShoppingChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
+  {
+    name: '장바구니',
+    href: '/cart',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '주문/배송 내역',
+    href: '/mypage/orders',
+    checkIsActive: (pathname: string, linkHref: string) => {
+      return pathname.includes(linkHref) || pathname === '/mypage'; // 소비자 데스크탑 마이페이지 홈에서 주문/배송내역이 표시됨
+    },
+  },
+  {
+    name: '재배송/환불 신청 내역',
+    href: '/mypage/exchange-return-cancel',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  { name: '혜택관리', href: '/mypage/benefits', checkIsActive: defaultIsActiveChecker },
+];
+/** 크크쇼 소비자 마이페이지 사이드바 - "활동" 하위 탭 */
+const customerMypageActivityChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
+  // { name: '후원내역', href: '/mypage/후원내역', checkIsActive: defaultIsActiveChecker },
+  // {
+  //   name: '라이브 알림 내역',
+  //   href: '/mypage/내역',
+  //   checkIsActive: defaultIsActiveChecker,
+  // },
+  { name: '후기 관리', href: '/mypage/review', checkIsActive: defaultIsActiveChecker },
+];
+/** 크크쇼 소비자 마이페이지 사이드바 - "정보" 하위 탭 */
+const customerMypageInfoChildrenNavLinks: MypageLink[] = [
+  {
+    name: '회원 정보 수정',
+    href: '/mypage/info',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '배송지 관리',
+    href: '/mypage/address',
+    checkIsActive: defaultIsActiveChecker,
+  },
+];
+
+/** 크크쇼 소비자 마이페이지 사이드바 메뉴 */
+export const customerMypageNavLinks: MypageLink[] = [
+  {
+    name: '쇼핑',
+    href: '',
+    icon: MdShoppingBasket,
+    checkIsActive: (pathname: string, _: string) => {
+      // 하위탭 링크 중 하나라도 active해당되면 active처리
+      return customerMypageShoppingChildrenNavLinks.some((link) =>
+        link.checkIsActive(pathname, link.href),
+      );
+    },
+    children: customerMypageShoppingChildrenNavLinks,
+  },
+  {
+    name: '활동',
+    href: '',
+    icon: RiFootprintFill,
+    checkIsActive: (pathname: string, _: string) => {
+      return customerMypageActivityChildrenNavLinks.some((link) =>
+        link.checkIsActive(pathname, link.href),
+      );
+    },
+    children: customerMypageActivityChildrenNavLinks,
+  },
+  {
+    name: '정보',
+    href: '',
+    icon: MdAccountCircle,
+    checkIsActive: (pathname: string, _: string) => {
+      return customerMypageInfoChildrenNavLinks.some((link) =>
+        link.checkIsActive(pathname, link.href),
+      );
+    },
+    children: customerMypageInfoChildrenNavLinks,
   },
 ];

@@ -2,33 +2,53 @@ import {
   Administrator,
   Broadcaster,
   BroadcasterPromotionPage,
+  Customer,
   Goods,
   GoodsInfo,
+  Prisma,
   PrismaClient,
   Seller,
   SellerContacts,
   ShippingGroup,
-  Prisma,
 } from '@prisma/client';
+import { cartSample, tempUserCartItemSample } from './seedData/cart';
+import { dummyCustomer } from './seedData/customer';
+import {
+  dummyCoupon,
+  dummyCustomerCoupon,
+  dummyCustomerCouponLog,
+} from './seedData/dummyCoupon';
 import {
   defaultOption,
   defaultSellCommissionData,
+  dummyBroadcasterAddress,
+  dummyBroadcasterChannel,
+  dummyBroadcasterContacts,
   DummyGoodsDataType,
   dummyGoodsList,
   dummyImageUrlList,
   dummyLiveShoppingData,
+  dummyLoginHistory,
+  secondOption,
   testadminData,
   testBroadcasterData,
   testsellerData,
   testsellerExtraData,
-  dummyBroadcasterAddress,
-  dummyBroadcasterChannel,
-  dummyBroadcasterContacts,
-  dummyLoginHistory,
 } from './seedData/dummyData';
-import { termsData } from './seedData/terms';
+import {
+  createDummyOrderData,
+  createDummyOrderWithCancellation,
+  createDummyOrderWithExchange,
+  createDummyOrderWithReturn,
+  createDummyOrderWithSupport,
+} from './seedData/dummyOrder';
+import { dummyPayments } from './seedData/dummyPayment';
+import { createGoodsInquiry, createGoodsInquiry2 } from './seedData/goods-inquiry';
+import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
+import { dummyMileage, dummyMileageLog } from './seedData/mileage';
+import { termsData } from './seedData/terms';
 
 const prisma = new PrismaClient();
 
@@ -84,6 +104,23 @@ async function createBroadcaster(): Promise<Broadcaster> {
   });
 }
 
+/** 테스트소비자 생성 */
+async function createCustomer(): Promise<Customer> {
+  const customer = await prisma.customer.create({ data: dummyCustomer });
+  await prisma.customerAddress.create({
+    data: {
+      title: '회사',
+      recipient: '크크쇼',
+      address: '부산 금정구 장전온천천로 51 ',
+      detailAddress: '313 호',
+      postalCode: '12345',
+      isDefault: true,
+      customer: { connect: { id: customer.id } },
+    },
+  });
+  return customer;
+}
+
 /** 방송인홍보페이지 생성 */
 let kkmarketCatalogCode = 11;
 async function createBroadcasterPromotionPage(
@@ -95,6 +132,11 @@ async function createBroadcasterPromotionPage(
     data: {
       broadcasterId,
       url: tempCatalogUrl, // 임시로 크크마켓 카테고리 링크
+      comment: `✍️Senior 2D Artist 
+@SecondDinnerGames
+🎨Illustrator for Hearthstone and MtG
+Past: Blur, Blizzard, Gearbox, Disney, Valve, Bethesda, etc.
+`,
     },
   });
 }
@@ -103,11 +145,13 @@ async function createBroadcasterPromotionPage(
 async function createProductPromotion(
   broadcasterPromotionPageId: number,
   goodsId: number,
+  broadcasterId: number,
 ): Promise<any> {
   return prisma.productPromotion.create({
     data: {
       broadcasterPromotionPageId,
       goodsId,
+      broadcasterId,
     },
   });
 }
@@ -125,7 +169,7 @@ async function createDummyGoods(
   seller: SellerAccountType,
   goods: DummyGoodsDataType,
 ): Promise<Goods> {
-  const { goods_name, summary, confirmation } = goods;
+  const { goods_name, summary, confirmation, contents } = goods;
   const sellerDefaultShippingGroup = seller.shippingGroups[0];
   const sellerDefaultCommonInfo = seller.goodsCommonInfo[0];
   const createdGoods = await prisma.goods.create({
@@ -145,8 +189,27 @@ async function createDummyGoods(
           image: url,
         })),
       },
-      options: { create: [defaultOption] },
+      options: { create: [defaultOption, secondOption] },
       confirmation: { create: confirmation },
+      contents,
+      categories: { connect: { id: 1 } },
+      informationNotice: {
+        create: {
+          contents: `{
+            "제품명": "상세설명참고",
+            "식품의 유형": "상세설명참고",
+            "원재료명 및 함량": "상세설명참고",
+            "소비자상담 관련 전화번호": "크크쇼 고객센터(051-515-6309)",
+            "소비자안전을 위한 주의사항": "상세설명참고",
+            "포장단위별 내용물의 용량(중량), 수량": "상세설명참고",
+            "유전자변형식품에 해당하는 경우의 표시": "상세설명참고",
+            "제조연월일, 유통기한 또는 품질유지기한": "상세설명참고",
+            "생산자 및 소재지, 수입품의 경우 생산자, 수입자 및 제조국 함께 표기": "상세설명참고",
+            "영양성분(식품 등의 표시·광고에 관한 법률에 따른 영양성분 표시대상 식품에 한함)": "상세설명참고",
+            "수입식품에 해당하는 경우 “수입식품안전관리특별법에 따른 수입신고를 필함”의 문구": "상세설명참고"
+          }`,
+        },
+      },
     },
   });
   return createdGoods;
@@ -187,7 +250,19 @@ async function createDummyBroadcasterAddress(broadcaster: Broadcaster): Promise<
 async function createDummyBroadcasterChannel(broadcaster: Broadcaster): Promise<void> {
   await prisma.broadcasterChannel.create({
     data: {
-      url: dummyBroadcasterChannel.url,
+      url: `${dummyBroadcasterChannel.url}/asdfasdfasdfasdfasdfasdf`,
+      broadcaster: { connect: { id: broadcaster.id } },
+    },
+  });
+  await prisma.broadcasterChannel.create({
+    data: {
+      url: 'https://afreecatv.comasdfasdfasdfasdfasdfasdf',
+      broadcaster: { connect: { id: broadcaster.id } },
+    },
+  });
+  await prisma.broadcasterChannel.create({
+    data: {
+      url: 'https://www.youtube.com/channel/UCN3w7jS8f6t2fPROcRY7e0g',
       broadcaster: { connect: { id: broadcaster.id } },
     },
   });
@@ -273,6 +348,41 @@ async function genereateInitialKkshowShoppingTabData(): Promise<void> {
   }
 }
 
+async function createCartItems(): Promise<void> {
+  await prisma.cartItem.create({ data: cartSample });
+  await prisma.cartItem.create({ data: tempUserCartItemSample });
+}
+
+async function createDummyOrderCancelReturnExchange(): Promise<void> {
+  await createDummyOrderWithCancellation();
+  await createDummyOrderWithExchange();
+  await createDummyOrderWithReturn();
+}
+// 더미페이먼트 연결
+async function createDummyPayments(): Promise<void> {
+  await prisma.orderPayment.createMany({ data: dummyPayments });
+}
+
+async function createDummyCoupon(): Promise<void> {
+  await prisma.coupon.create({ data: dummyCoupon });
+}
+
+async function createDummyCustomerCoupon(): Promise<void> {
+  await prisma.customerCoupon.create({ data: dummyCustomerCoupon });
+}
+
+async function createDummyCustomerCouponLog(): Promise<void> {
+  await prisma.customerCouponLog.create({ data: dummyCustomerCouponLog });
+}
+
+async function createDummyCustomerMileage(): Promise<void> {
+  await prisma.customerMileage.create({ data: dummyMileage });
+}
+
+async function createDummyCustomerMileageLog(): Promise<void> {
+  await prisma.customerMileageLog.create({ data: dummyMileageLog });
+}
+
 /** 시드 메인 함수 */
 async function main(): Promise<void> {
   // 약관 데이터 저장
@@ -290,6 +400,9 @@ async function main(): Promise<void> {
 
   // 판매자 계정 생성
   const seller = await createSellerAccount();
+
+  // 소비자 계정 생성
+  await createCustomer();
 
   // 테스트방송인 데이터 생성
   const testbroadcaster = await createBroadcaster();
@@ -319,7 +432,38 @@ async function main(): Promise<void> {
   // 더미 상품홍보페이지 생성
   const promotionPage = await createBroadcasterPromotionPage(testbroadcaster.id);
   // 더미 상품홍보 아이템 생성
-  await createProductPromotion(promotionPage.id, goods4.id);
+  await createProductPromotion(promotionPage.id, goods4.id, testbroadcaster.id);
+
+  // 더미 카트 상품 생성
+  await createCartItems();
+
+  // 더미 주문데이터 생성
+  await createDummyOrderData();
+  await createDummyOrderCancelReturnExchange();
+  await createDummyOrderWithSupport(); // 방송인 후원 정보 포함된 주문 생성
+
+  // 더미 상품리뷰 생성
+  await createGoodsReview(prisma);
+  await createGoodsReview2(prisma);
+
+  // 더미 상품문의 생성
+  await createGoodsInquiry(prisma);
+  await createGoodsInquiry2(prisma);
+
+  // 더미페이먼트 생성
+  await createDummyPayments();
+
+  // 더미 쿠폰 생성
+  await createDummyCoupon();
+  // 더미 커스터머 쿠폰 생성
+  await createDummyCustomerCoupon();
+  // 더미 쿠폰 로그 생성
+  await createDummyCustomerCouponLog();
+
+  // 더미 마일리지 생성
+  await createDummyCustomerMileage();
+  // 더미 마일리지 로그 생성
+  await createDummyCustomerMileageLog();
 }
 
 main()

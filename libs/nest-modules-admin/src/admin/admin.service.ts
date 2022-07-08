@@ -1,30 +1,30 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import {
   AdminClassChangeHistory,
   Administrator,
   GoodsConfirmation,
 } from '@prisma/client';
+import { CipherService } from '@project-lc/nest-modules-cipher';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminClassDto,
-  AdminGoodsByIdRes,
   AdminGoodsListRes,
+  AdminLiveShoppingGiftOrder,
   AdminSettlementInfoType,
-  BusinessRegistrationStatus,
   GoodsConfirmationDto,
   GoodsRejectionDto,
-  LiveShoppingDTO,
+  LiveShoppingUpdateDTO,
   LiveShoppingImageDto,
-  LiveShoppingWithGoods,
 } from '@project-lc/shared-types';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly productPromotionService: ProductPromotionService,
+    private readonly cipherService: CipherService,
+  ) {}
 
   // 관리자 페이지 정산 데이터
   public async getSettlementInfo(): Promise<AdminSettlementInfoType> {
@@ -34,28 +34,14 @@ export class AdminService {
         sellerBusinessRegistration: {
           include: {
             BusinessRegistrationConfirmation: true,
-            seller: {
-              select: {
-                email: true,
-                agreementFlag: true,
-                inactiveFlag: false,
-              },
-            },
+            seller: { select: { email: true, agreementFlag: true, inactiveFlag: false } },
           },
-          orderBy: {
-            id: 'desc',
-          },
+          orderBy: { id: 'desc' },
           take: 1,
         },
         sellerSettlementAccount: {
-          orderBy: {
-            id: 'desc',
-          },
-          include: {
-            seller: {
-              select: { email: true },
-            },
-          },
+          orderBy: { id: 'desc' },
+          include: { seller: { select: { email: true } } },
           take: 1,
         },
       },
@@ -75,7 +61,13 @@ export class AdminService {
     // 단순 데이터를 전달하지 않고 필요한 데이터의형태로 정제해야함.
     users.forEach(({ sellerSettlementAccount, sellerBusinessRegistration }) => {
       if (sellerSettlementAccount.length > 0) {
-        result.sellerSettlementAccount.push(sellerSettlementAccount[0]);
+        // 암호화된 계좌번호 복호화처리
+        const { number } = sellerSettlementAccount[0];
+        const decryptedSettlementAccount = this.cipherService.getDecryptedText(number);
+        result.sellerSettlementAccount.push({
+          ...sellerSettlementAccount[0],
+          number: decryptedSettlementAccount,
+        });
       }
       if (sellerBusinessRegistration.length > 0) {
         result.sellerBusinessRegistration.push(sellerBusinessRegistration[0]);
@@ -122,11 +114,6 @@ export class AdminService {
   public async getGoodsInfo({ sort, direction }): Promise<AdminGoodsListRes> {
     const items = await this.prisma.goods.findMany({
       orderBy: [{ [sort]: direction }],
-      where: {
-        confirmation: {
-          OR: [{ status: 'waiting' }, { status: 'needReconfirmation' }],
-        },
-      },
       include: {
         options: {
           include: {
@@ -180,41 +167,14 @@ export class AdminService {
     };
   }
 
-  /** 동일한 퍼스트몰 상품 고유번호로 검수된 상품이 있는지 확인(중복 상품 연결 방지 위함) */
-  private async checkDupFMGoodsConnectionId(fmGoodsId: number): Promise<boolean> {
-    const confirmData = await this.prisma.goodsConfirmation.findFirst({
-      where: { firstmallGoodsConnectionId: fmGoodsId },
-    });
-    const lv = await this.prisma.liveShopping.findFirst({
-      where: { fmGoodsSeq: fmGoodsId },
-    });
-    const pp = await this.prisma.productPromotion.findFirst({
-      where: { fmGoodsSeq: fmGoodsId },
-    });
-    if (confirmData || lv || pp) return true;
-    return false;
-  }
-
+  /** 상품 검수 여부 변경 */
   public async setGoodsConfirmation(
     dto: GoodsConfirmationDto,
   ): Promise<GoodsConfirmation> {
-    // 상품 검수 확인시 동일한 퍼스트몰 상품번호로 검수된 상품이 있는지(중복 여부) 확인 - 이미 존재하면 400 에러
-    const { firstmallGoodsConnectionId } = dto;
-    const hasDuplicatedFmGoodsConnectionId = await this.checkDupFMGoodsConnectionId(
-      firstmallGoodsConnectionId,
-    );
-
-    if (hasDuplicatedFmGoodsConnectionId) {
-      throw new BadRequestException(
-        `이미 ( 퍼스트몰 상품 고유번호 : ${firstmallGoodsConnectionId} ) 로 검수된
-        상품or라이브쇼핑or상품홍보가 존재합니다. 퍼스트몰 상품 고유번호를 다시 확인해주세요.`,
-      );
-    }
-    // 동일한 퍼스트몰 상품번호로 검수된 상품이 없다면(중복이 아닌 경우) 그대로 검수 확인 진행
     const goodsConfirmation = await this.prisma.goodsConfirmation.update({
       where: { goodsId: dto.goodsId },
       data: {
-        firstmallGoodsConnectionId,
+        firstmallGoodsConnectionId: null,
         status: dto.status,
         rejectionReason: null,
       },
@@ -239,71 +199,10 @@ export class AdminService {
     return goodsConfirmation;
   }
 
-  public async getOneGoods(goodsId: string | number): Promise<AdminGoodsByIdRes> {
-    return this.prisma.goods.findFirst({
-      where: {
-        id: Number(goodsId),
-      },
-      include: {
-        options: { include: { supply: true } },
-        ShippingGroup: {
-          include: {
-            shippingSets: {
-              include: {
-                shippingOptions: {
-                  include: { shippingCost: true },
-                },
-              },
-            },
-          },
-        },
-        confirmation: true,
-        image: true,
-        GoodsInfo: true,
-        seller: true,
-      },
-    });
-  }
-
-  public async getRegisteredLiveShoppings(id?: string): Promise<LiveShoppingWithGoods[]> {
-    return this.prisma.liveShopping.findMany({
-      where: { id: id ? Number(id) : undefined },
-      include: {
-        goods: {
-          select: { goods_name: true, summary: true, image: true, options: true },
-        },
-        seller: { select: { sellerShop: true } },
-        broadcaster: {
-          select: {
-            id: true,
-            userName: true,
-            userNickname: true,
-            email: true,
-            avatar: true,
-            BroadcasterPromotionPage: true,
-          },
-        },
-        liveShoppingVideo: {
-          select: { youtubeUrl: true },
-        },
-        images: true,
-      },
-      orderBy: { createDate: 'desc' },
-    });
-  }
-
   public async updateLiveShoppings(
-    dto: LiveShoppingDTO,
+    dto: LiveShoppingUpdateDTO,
     videoId?: number | null,
   ): Promise<boolean> {
-    if (dto.fmGoodsSeq) {
-      const isDuplicated = await this.checkDupFMGoodsConnectionId(Number(dto.fmGoodsSeq));
-      if (isDuplicated)
-        throw new BadRequestException(
-          `이미 다른 상품or라이브쇼핑or상품홍보에 연결된 퍼스트몰 상품번호입니다.
-          퍼스트몰 상품 고유번호를 다시 확인해주세요.`,
-        );
-    }
     const liveShoppingUpdate = await this.prisma.liveShopping.update({
       where: { id: Number(dto.id) },
       data: {
@@ -321,12 +220,29 @@ export class AdminService {
         videoId: videoId || undefined,
         whiletrueCommissionRate: dto.whiletrueCommissionRate || 0,
         broadcasterCommissionRate: dto.broadcasterCommissionRate || 0,
-        fmGoodsSeq: dto.fmGoodsSeq ? Number(dto.fmGoodsSeq) : undefined,
         liveShoppingName: dto.liveShoppingName || undefined,
       },
     });
 
     if (!liveShoppingUpdate) throw new InternalServerErrorException(`업데이트 실패`);
+
+    // 방송인을 등록하는 경우 => 해당방송인의 상품홍보페이지에 라이브쇼핑 진행상품 등록
+    if (dto.broadcasterId) {
+      try {
+        const liveshoppingGoodsId = liveShoppingUpdate.goodsId;
+        const { broadcasterId } = dto;
+        await this.productPromotionService.createProductPromotion({
+          goodsId: liveshoppingGoodsId,
+          broadcasterId,
+        });
+      } catch (e) {
+        throw new InternalServerErrorException(
+          e,
+          `방송인의 상품홍보페이지에 라이브쇼핑 진행상품 등록 오류, 방송인 고유번호 : ${dto.broadcasterId}`,
+        );
+      }
+    }
+
     return true;
   }
 
@@ -398,35 +314,6 @@ export class AdminService {
     return false;
   }
 
-  /** 상품홍보 fmGoodsSeq 등록전 다른 곳에 등록된 fmGoodsSeq(goodsConfirmation, liveShopping) 과 중복되는지 확인
-   * @return 중복되는 경우 true, 아니면 false
-   */
-  public async checkHasDuplicateFmGoodsSeq(goodsSeq: number): Promise<boolean> {
-    // 상품검수 테이블 fmGoodsConnectionId와 중복되는 값이 있는지 확인
-    const hasDuplicatedFmGoodsConnectionId = await this.checkDupFMGoodsConnectionId(
-      goodsSeq,
-    );
-
-    if (hasDuplicatedFmGoodsConnectionId) return true;
-
-    // 라이브쇼핑 테이블 fmGoodsSeq 와 중복값이 있는지 확인
-    const duplicatedFmGoodsSeqLiveShopping = await this.prisma.liveShopping.findFirst({
-      where: { fmGoodsSeq: goodsSeq },
-    });
-
-    if (duplicatedFmGoodsSeqLiveShopping) return true;
-
-    // 상품홍보 테이블 fmGoodsSeq와 중복값 있는지 확인
-    const duplicateFmGoodsSeqProductPromotion =
-      await this.prisma.productPromotion.findFirst({
-        where: { fmGoodsSeq: goodsSeq },
-      });
-
-    if (duplicateFmGoodsSeqProductPromotion) return true;
-
-    return false;
-  }
-
   public async getAdminUserList(): Promise<AdminClassDto[]> {
     return this.prisma.administrator.findMany({
       select: {
@@ -467,5 +354,76 @@ export class AdminService {
         newAdminClass: dto.newAdminClass,
       },
     });
+  }
+
+  /** 라이브쇼핑 선물주문 목록 조회
+   * 라이브쇼핑 판매시작일시~판매종료일시 생성된 선물 주문 중 주문상태가 주문무효 주문취소 등의 상태가 아닌 주문 중
+   * 라이브쇼핑 진행한 상품이 주문상품으로 포함 && 주문상품에 라이브쇼핑 진행한 방송인이 후원으로 연결된 주문
+   */
+  public async getLiveShoppingGiftOrders(
+    liveShoppingId: number,
+  ): Promise<AdminLiveShoppingGiftOrder[]> {
+    const liveShopping = await this.prisma.liveShopping.findUnique({
+      where: { id: liveShoppingId },
+    });
+
+    const { goodsId, broadcasterId, sellStartDate, sellEndDate } = liveShopping;
+
+    const giftOrders = await this.prisma.order.findMany({
+      where: {
+        createDate: {
+          gte: sellStartDate ? new Date(sellStartDate) : undefined,
+          lte: sellEndDate ? new Date(sellEndDate) : undefined,
+        },
+        orderItems: { some: { goodsId, support: { broadcasterId } } },
+        step: {
+          in: [
+            'orderReceived',
+            'paymentConfirmed',
+            'goodsReady',
+            'partialExportReady',
+            'exportReady',
+            'partialExportDone',
+            'exportDone',
+            'partialShipping',
+            'shipping',
+            'partialShippingDone',
+            'shippingDone',
+            'purchaseConfirmed',
+          ],
+        },
+        giftFlag: true,
+      },
+      orderBy: { createDate: 'desc' },
+      include: {
+        orderItems: {
+          include: {
+            options: true,
+            support: {
+              include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+            },
+            goods: {
+              select: {
+                id: true,
+                goods_name: true,
+                seller: { select: { sellerShop: { select: { shopName: true } } } },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // 라이브쇼핑 진행한 주문상품만 필터링
+    const giftOrdersFilterByGoodsId = giftOrders.map((order) => {
+      const { orderItems, ...rest } = order;
+      const filtered = orderItems.filter((item) => item.goodsId === goodsId);
+      return {
+        ...rest,
+        orderItems: filtered,
+      };
+    });
+
+    return giftOrdersFilterByGoodsId;
   }
 }

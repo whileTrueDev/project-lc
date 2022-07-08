@@ -2,10 +2,9 @@ import {
   PrepayInfo,
   ShippingCalculType,
   ShippingCost,
+  ShippingOptType,
   ShippingSet,
   ShippingSetCode,
-  ShippingOptType,
-  ShippingSetType,
 } from '@prisma/client';
 
 import { ShippingOptionDto } from '../dto/shippingOption.dto';
@@ -69,7 +68,7 @@ export const ShippingSetCodes: Array<ShippingSetCode> = [
   'custom',
 ];
 
-// 선불/착불정보 fm_shipping_set.prepay_info -----------------------------------------------
+// 선불/착불정보 prepay_info -----------------------------------------------
 export const PrepayInfoOptions = {
   all: { label: '착불/선불' },
   delivery: { label: '선불' },
@@ -118,6 +117,7 @@ export const shippingSelectOptions: ShippingSelectOption[] = [
   { key: 'amount_rep', label: '금액(구간반복)', suffix: '₩' },
   { key: 'cnt', label: '수량(구간입력)', suffix: '개' },
   { key: 'cnt_rep', label: '수량(구간반복)', suffix: '개' },
-  { key: 'weight', label: '무게(구간입력)', suffix: 'kg' },
-  { key: 'weight_rep', label: '무게(구간반복)', suffix: 'kg' },
+  // 무게 사용하지 않아서 배송비 계산기능 단순화 위해 주석처리함
+  // { key: 'weight', label: '무게(구간입력)', suffix: 'kg' },
+  // { key: 'weight_rep', label: '무게(구간반복)', suffix: 'kg' },
 ];

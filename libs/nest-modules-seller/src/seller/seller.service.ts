@@ -1,39 +1,26 @@
-import {
-  BadRequestException,
-  CACHE_MANAGER,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { Prisma, Seller, InactiveSeller, SellerSocialAccount } from '@prisma/client';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { InactiveSeller, Prisma, Seller, SellerSocialAccount } from '@prisma/client';
+import { UserPwManager } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminSellerListRes,
   FindSellerRes,
   SellerContractionAgreementDto,
 } from '@project-lc/shared-types';
-import { hash, verify } from 'argon2';
-import { Cache } from 'cache-manager';
-import __multer from 'multer';
 import { s3 } from '@project-lc/utils-s3';
 
 @Injectable()
-export class SellerService extends ServiceBaseWithCache {
-  #SELLER_CACHE_KEY = 'seller';
-
+export class SellerService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+    private readonly userPwManager: UserPwManager,
+  ) {}
 
   /**
    * 회원 가입
    */
   async signUp(signUpInput: Prisma.SellerCreateInput): Promise<Seller> {
-    const hashedPw = await this.hashPassword(signUpInput.password);
+    const hashedPw = await this.userPwManager.hashPassword(signUpInput.password);
     const seller = await this.prisma.seller.create({
       data: {
         email: signUpInput.email,
@@ -41,7 +28,6 @@ export class SellerService extends ServiceBaseWithCache {
         password: hashedPw,
       },
     });
-    await this._clearCaches(this.#SELLER_CACHE_KEY);
     return seller;
   }
 
@@ -61,7 +47,7 @@ export class SellerService extends ServiceBaseWithCache {
       // 소셜로그인으로 가입된 회원
       throw new BadRequestException();
     }
-    const isCorrect = await this.validatePassword(
+    const isCorrect = await this.userPwManager.validatePassword(
       pwdInput,
       user?.password || inactiveUser?.password,
     );
@@ -147,27 +133,6 @@ export class SellerService extends ServiceBaseWithCache {
   }
 
   /**
-   * 비밀번호를 단방향 암호화 합니다.
-   * @param purePw 비밀번호 문자열
-   * @returns {string} 비밀번호 해시값
-   */
-  private async hashPassword(purePw: string): Promise<string> {
-    const hashed = await hash(purePw);
-    return hashed;
-  }
-
-  /**
-   * 입력한 비밀번호를 해시된 비밀번호와 비교합니다.
-   * @param pwInput 입력한 비밀번호 문자열
-   * @param hashedPw 해시된 비밀번호 값
-   * @returns {boolean} 올바른 비밀번호인지 여부
-   */
-  async validatePassword(pwInput: string, hashedPw: string): Promise<boolean> {
-    const isCorrect = await verify(hashedPw, pwInput);
-    return isCorrect;
-  }
-
-  /**
    * 해당 이메일로 가입된 계정이 삭제될 수 있는지 확인함
    * @throws {Error}
    */
@@ -201,12 +166,7 @@ export class SellerService extends ServiceBaseWithCache {
    */
   async deleteOne(email: string): Promise<boolean> {
     await this.checkCanBeDeletedSeller(email);
-
-    await this.prisma.seller.delete({
-      where: { email },
-    });
-
-    await this._clearCaches(this.#SELLER_CACHE_KEY);
+    await this.prisma.seller.delete({ where: { email } });
     return true;
   }
 
@@ -218,12 +178,7 @@ export class SellerService extends ServiceBaseWithCache {
    */
   async checkPassword(email: string, password: string): Promise<boolean> {
     const seller = await this.findOne({ email });
-    if (!seller.password) {
-      throw new BadRequestException(
-        '소셜계정으로 가입된 회원입니다. 비밀번호를 등록해주세요.',
-      );
-    }
-    return this.validatePassword(password, seller.password);
+    return this.userPwManager.checkPassword(seller, password);
   }
 
   /**
@@ -233,12 +188,10 @@ export class SellerService extends ServiceBaseWithCache {
    * @returns
    */
   async changePassword(email: string, newPassword: string): Promise<Seller> {
-    const hashedPw = await this.hashPassword(newPassword);
+    const hashedPw = await this.userPwManager.hashPassword(newPassword);
     const seller = await this.prisma.seller.update({
       where: { email },
-      data: {
-        password: hashedPw,
-      },
+      data: { password: hashedPw },
     });
     return seller;
   }
@@ -258,7 +211,6 @@ export class SellerService extends ServiceBaseWithCache {
       where: { email },
       data: { avatar: avatarUrl },
     });
-    await this._clearCaches(this.#SELLER_CACHE_KEY);
     return true;
   }
 
@@ -268,7 +220,6 @@ export class SellerService extends ServiceBaseWithCache {
       where: { email },
       data: { avatar: null },
     });
-    await this._clearCaches(this.#SELLER_CACHE_KEY);
     return true;
   }
 
@@ -282,6 +233,13 @@ export class SellerService extends ServiceBaseWithCache {
         name: true,
         avatar: true,
         inactiveFlag: true,
+        sellerBusinessRegistration: {
+          include: {
+            BusinessRegistrationConfirmation: true,
+          },
+        },
+        sellerSettlementAccount: true,
+        SellerContacts: true,
       },
     });
   }
@@ -293,7 +251,6 @@ export class SellerService extends ServiceBaseWithCache {
         agreementFlag: dto.agreementFlag,
       },
     });
-    await this._clearCaches(this.#SELLER_CACHE_KEY);
     return seller;
   }
 

@@ -1,12 +1,12 @@
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import { LiveShopping } from '@prisma/client';
-import { LiveShoppingDTO } from '@project-lc/shared-types';
+import { LiveShoppingUpdateDTO } from '@project-lc/shared-types';
 import axios from '../../axios';
 
-type LiveShoppingManage = Omit<
-  LiveShoppingDTO,
-  'sellerId' | 'goods_id' | 'contactId' | 'requests'
+export type LiveShoppingManage = Omit<
+  LiveShoppingUpdateDTO,
+  'sellerId' | 'goodsId' | 'contactId' | 'requests'
 >;
 
 export const useUpdateLiveShoppingManageMutation = (): UseMutationResult<

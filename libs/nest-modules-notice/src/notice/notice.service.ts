@@ -1,21 +1,12 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Notice } from '@prisma/client';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { NoticePatchDto, NoticePostDto } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
 
 @Injectable()
-export class NoticeService extends ServiceBaseWithCache {
-  #NOTICE_CACHE_KEY = 'notice';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class NoticeService {
+  constructor(private readonly prisma: PrismaService) {}
 
   public async getNotices(): Promise<Notice[]> {
     const notice = await this.prisma.notice.findMany({
@@ -43,7 +34,6 @@ export class NoticeService extends ServiceBaseWithCache {
         postingDate: dayjs().toISOString(),
       },
     });
-    await this._clearCaches(this.#NOTICE_CACHE_KEY);
 
     return notice;
   }
@@ -58,14 +48,12 @@ export class NoticeService extends ServiceBaseWithCache {
       where: { id: dto.id },
     });
 
-    await this._clearCaches(this.#NOTICE_CACHE_KEY);
     return notice;
   }
 
   // 공지사항 삭제
   public async deleteNotice(id: Notice['id']): Promise<Notice> {
     const notice = await this.prisma.notice.delete({ where: { id } });
-    await this._clearCaches(this.#NOTICE_CACHE_KEY);
     return notice;
   }
 }

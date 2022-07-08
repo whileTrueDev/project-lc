@@ -17,6 +17,7 @@ export interface ConfirmDialogProps
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => Promise<any>;
+  onFail?: () => Promise<any>;
   isLoading?: boolean;
   cancelString?: string;
   confirmString?: string;
@@ -27,6 +28,7 @@ export function ConfirmDialog({
   isOpen,
   onClose,
   onConfirm,
+  onFail,
   isLoading,
   cancelString = '취소',
   confirmString = '확인',
@@ -34,6 +36,14 @@ export function ConfirmDialog({
   children,
 }: ConfirmDialogProps): JSX.Element {
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const handleConfirmClick = async (): Promise<void> => {
+    return onConfirm()
+      .then(() => onClose())
+      .catch((err) => {
+        if (onFail) return onFail();
+        return console.log(err);
+      });
+  };
   return (
     <AlertDialog
       isCentered
@@ -47,13 +57,13 @@ export function ConfirmDialog({
           <AlertDialogHeader>{title}</AlertDialogHeader>
           <AlertDialogBody>{children}</AlertDialogBody>
           <AlertDialogFooter>
-            <Button isLoading={isLoading} ref={cancelRef} onClick={onClose}>
+            <Button ref={cancelRef} onClick={onClose}>
               {cancelString}
             </Button>
             <Button
               ml={3}
               colorScheme="green"
-              onClick={() => onConfirm().then(() => onClose())}
+              onClick={handleConfirmClick}
               isLoading={isLoading}
               isDisabled={isDisabled}
             >

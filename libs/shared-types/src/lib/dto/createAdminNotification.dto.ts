@@ -1,5 +1,5 @@
 import { IsIn, IsString } from 'class-validator';
-import { UserType } from '../res-types/userProfile.res';
+import type { UserType } from '../res-types/userProfile.res';
 
 export class CreateNotificationDto {
   @IsString()

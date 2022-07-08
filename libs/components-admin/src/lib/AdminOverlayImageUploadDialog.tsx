@@ -21,7 +21,7 @@ import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { ImageInput } from '@project-lc/components-core/ImageInput';
 import { Preview, readAsDataURL } from '@project-lc/components-core/ImageInputDialog';
-import { GoodsPreviewItem } from '@project-lc/components-seller/GoodsRegistPictures';
+import { GoodsPreviewItem } from '@project-lc/components-seller/goods-regist/GoodsRegistPictures';
 import { OverlayImageTypes } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { useEffect, useState } from 'react';
@@ -490,7 +490,7 @@ export function AdminOverlayImageUploadDialog(
                       <VStack key={`saved-${result}`}>
                         <Link
                           isTruncated
-                          href={`${s3.fullDomain}${result}`}
+                          href={`${s3.bucketDomain}${result}`}
                           fontWeight="bold"
                           colorScheme="blue"
                           textDecoration="underline"
@@ -498,7 +498,7 @@ export function AdminOverlayImageUploadDialog(
                         >
                           <ChakraNextImage
                             layout="intrinsic"
-                            src={`${s3.fullDomain}${result}`}
+                            src={`${s3.bucketDomain}${result}`}
                             width={80}
                             height={160}
                           />
@@ -533,7 +533,7 @@ export function AdminOverlayImageUploadDialog(
                           <VStack>
                             <Link
                               isTruncated
-                              href={`${s3.fullDomain}${donationImage}`}
+                              href={`${s3.bucketDomain}${donationImage}`}
                               fontWeight="bold"
                               colorScheme="blue"
                               textDecoration="underline"
@@ -541,7 +541,7 @@ export function AdminOverlayImageUploadDialog(
                             >
                               <ChakraNextImage
                                 layout="intrinsic"
-                                src={`${s3.fullDomain}${donationImage}`}
+                                src={`${s3.bucketDomain}${donationImage}`}
                                 width={120}
                                 height={70}
                               />
@@ -575,7 +575,7 @@ export function AdminOverlayImageUploadDialog(
                   <VStack>
                     <Link
                       isTruncated
-                      href={`${s3.fullDomain}${savedLogoImages}`}
+                      href={`${s3.bucketDomain}${savedLogoImages}`}
                       fontWeight="bold"
                       colorScheme="blue"
                       textDecoration="underline"
@@ -583,7 +583,7 @@ export function AdminOverlayImageUploadDialog(
                     >
                       <ChakraNextImage
                         layout="intrinsic"
-                        src={`${s3.fullDomain}${savedLogoImages}`}
+                        src={`${s3.bucketDomain}${savedLogoImages}`}
                         width={130}
                         height={54}
                       />
@@ -615,7 +615,7 @@ export function AdminOverlayImageUploadDialog(
                       <VStack key={`saved-${result}`}>
                         <Link
                           isTruncated
-                          href={`${s3.fullDomain}${result}`}
+                          href={`${s3.bucketDomain}${result}`}
                           fontWeight="bold"
                           colorScheme="blue"
                           textDecoration="underline"
@@ -623,7 +623,7 @@ export function AdminOverlayImageUploadDialog(
                         >
                           <ChakraNextImage
                             layout="intrinsic"
-                            src={`${s3.fullDomain}${result}`}
+                            src={`${s3.bucketDomain}${result}`}
                             width={156}
                             height={56}
                           />

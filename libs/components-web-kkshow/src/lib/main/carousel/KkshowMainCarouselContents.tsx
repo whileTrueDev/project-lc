@@ -41,7 +41,7 @@ export function KkshowMainCarouselContents({
   const handleTwitchStateChange = useCallback(
     (status: 'play' | 'pause' | 'ready' | 'ended'): void => {
       if (status === 'play') swiper.autoplay.stop();
-      else swiper.autoplay.start();
+      else swiper?.autoplay?.start();
     },
     [swiper.autoplay],
   );

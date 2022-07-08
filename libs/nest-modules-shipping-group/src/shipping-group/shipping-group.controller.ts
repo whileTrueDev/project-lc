@@ -6,11 +6,17 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
+import {
+  CacheClearKeys,
+  HttpCacheInterceptor,
+  SellerInfo,
+  UserPayload,
+} from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { ShippingGroupDto } from '@project-lc/shared-types';
 import { Seller, ShippingGroup } from '.prisma/client';
@@ -22,6 +28,7 @@ import {
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('shipping-group')
 @Controller('shipping-group')
 export class ShippingGroupController {
   constructor(private readonly shippingGroupService: ShippingGroupService) {}
@@ -37,9 +44,9 @@ export class ShippingGroupController {
   // 배송그룹 조회
   @Get()
   getShippingGroupList(
-    @SellerInfo() sellerInfo: UserPayload,
+    @Query('sellerId', ParseIntPipe) sellerId: number,
   ): Promise<ShippingGroupListResult> {
-    return this.shippingGroupService.getShippingGroupList(sellerInfo.id);
+    return this.shippingGroupService.getShippingGroupList(sellerId);
   }
 
   // 배송그룹 생성
@@ -47,11 +54,7 @@ export class ShippingGroupController {
   createShippingGroup(
     @SellerInfo() sellerInfo: UserPayload,
     @Body(ValidationPipe) dto: ShippingGroupDto,
-  ): Promise<
-    ShippingGroup & {
-      seller: Seller;
-    }
-  > {
+  ): Promise<ShippingGroup & { seller: Seller }> {
     return this.shippingGroupService.createShippingGroup(sellerInfo.id, dto);
   }
 

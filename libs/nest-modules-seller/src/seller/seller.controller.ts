@@ -15,13 +15,24 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { SellCommission, Seller, SellerSettlementAccount } from '@prisma/client';
-import { PrismaService } from '@project-lc/prisma-orm';
-import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
-import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
+import {
+  ConfirmHistory,
+  SellCommission,
+  Seller,
+  SellerSettlementAccount,
+} from '@prisma/client';
+import {
+  CacheClearKeys,
+  HttpCacheInterceptor,
+  SellerInfo,
+  UserPayload,
+} from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
+import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
+import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BusinessRegistrationDto,
+  ConfirmHistoryDto,
   EmailDupCheckDto,
   FindSellerDto,
   FindSellerRes,
@@ -36,15 +47,18 @@ import { s3 } from '@project-lc/utils-s3';
 import { SellerContactsService } from './seller-contacts.service';
 import {
   SellerSettlementInfo,
-  SellerSettlementService,
-} from './seller-settlement.service';
+  SellerSettlementInfoService,
+} from './seller-settlement-info.service';
 import { SellerShopService } from './seller-shop.service';
 import { SellerService } from './seller.service';
+import SellerSettlementService from './settlement/seller-settlement.service';
 
 @Controller('seller')
+@CacheClearKeys('seller')
 export class SellerController {
   constructor(
     private readonly sellerService: SellerService,
+    private readonly sellerSettlementInfoService: SellerSettlementInfoService,
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly sellerShopService: SellerShopService,
     private readonly mailVerificationService: MailVerificationService,
@@ -61,6 +75,8 @@ export class SellerController {
 
   // * 판매자 회원가입
   @Post()
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   public async signUp(@Body(ValidationPipe) dto: SignUpDto): Promise<Seller> {
     const checkResult = await this.mailVerificationService.checkMailVerification(
       dto.email,
@@ -87,6 +103,8 @@ export class SellerController {
   // 판매자 계정 삭제
   @UseGuards(JwtAuthGuard)
   @Delete()
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   public async deleteSeller(
     @Body('email') email: string,
     @SellerInfo() sellerInfo: UserPayload,
@@ -108,6 +126,8 @@ export class SellerController {
 
   // 비밀번호 변경
   @Patch('password')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   public async changePassword(
     @Body(ValidationPipe) dto: PasswordValidateDto,
   ): Promise<Seller> {
@@ -121,23 +141,25 @@ export class SellerController {
   public async selectSellerSettlementInfo(
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<SellerSettlementInfo> {
-    return this.sellerSettlementService.selectSellerSettlementInfo(sellerInfo);
+    return this.sellerSettlementInfoService.selectSellerSettlementInfo(sellerInfo);
   }
 
   // 본인의 사업자 등록정보 등록
   @UseGuards(JwtAuthGuard)
   @Post('business-registration')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller/settlement')
   public async InsertBusinessRegistration(
     @Body(ValidationPipe) dto: BusinessRegistrationDto,
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<SellerBusinessRegistrationType> {
     // 사업자 등록정보 등록
     const sellerBusinessRegistration =
-      await this.sellerSettlementService.insertBusinessRegistration(dto, sellerInfo);
+      await this.sellerSettlementInfoService.insertBusinessRegistration(dto, sellerInfo);
 
     // 사업자 등록정보 검수정보 등록
     const businessRegistrationConfirmation =
-      await this.sellerSettlementService.insertBusinessRegistrationConfirmation(
+      await this.sellerSettlementInfoService.insertBusinessRegistrationConfirmation(
         sellerBusinessRegistration,
       );
 
@@ -153,22 +175,39 @@ export class SellerController {
   // 본인의 계좌정보 등록
   @UseGuards(JwtAuthGuard)
   @Post('settlement-account')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller/settlement')
   public async InsertSettlementAccount(
     @Body(ValidationPipe) dto: SettlementAccountDto,
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<SellerSettlementAccount> {
-    return this.sellerSettlementService.insertSettlementAccount(dto, sellerInfo);
+    return this.sellerSettlementInfoService.insertSettlementAccount(dto, sellerInfo);
+  }
+
+  // 본인의 정산정보 및 정산 검수 히스토리 조회
+  @UseGuards(JwtAuthGuard)
+  @Get('settlement/confirmation-history')
+  @UseInterceptors(HttpCacheInterceptor)
+  public async selectSellerSettlementHistory(
+    @SellerInfo() sellerInfo: UserPayload,
+  ): Promise<ConfirmHistory[]> {
+    return this.sellerSettlementInfoService.getSettlementConfirmHistory(sellerInfo);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('settlement/confirmation-history')
+  public async InsertSettlementHistory(
+    @Body(ValidationPipe) dto: ConfirmHistoryDto,
+  ): Promise<ConfirmHistory> {
+    return this.sellerSettlementInfoService.createSettlementConfirmHistory(dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('shop-info')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   public async changeShopInfo(
-    @Body(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    )
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
     dto: SellerShopInfoDto,
     @SellerInfo() sellerInfo: UserPayload,
     @Res() res,
@@ -190,9 +229,11 @@ export class SellerController {
   }
 
   /** 셀러 아바타 이미지 s3업로드 후 url 저장 */
-  @UseGuards(JwtAuthGuard)
   @Post('/avatar')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   async addAvatar(
     @SellerInfo() seller: UserPayload,
     @UploadedFile() file: Express.Multer.File,
@@ -201,14 +242,18 @@ export class SellerController {
   }
 
   /** 셀러 아바타 이미지 null로 저장 */
-  @UseGuards(JwtAuthGuard)
   @Delete('/avatar')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   async deleteAvatar(@SellerInfo() seller: UserPayload): Promise<boolean> {
     return this.sellerService.removeSellerAvatar(seller.sub);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch('agreement')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   async updateAgreement(
     @Body(ValidationPipe) dto: SellerContractionAgreementDto,
   ): Promise<Seller> {
@@ -216,26 +261,28 @@ export class SellerController {
   }
 
   @Patch('restore')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller/settlement')
   public async restoreInactiveSeller(@Body(ValidationPipe) dto): Promise<void> {
     try {
       await this.prismaService.$transaction(async (): Promise<void> => {
         const seller = await this.sellerService.restoreInactiveSeller(dto.email);
         Promise.all([
-          await this.sellerSettlementService.restoreInactiveBusinessRegistration(
+          await this.sellerSettlementInfoService.restoreInactiveBusinessRegistration(
             seller.id,
           ),
 
-          await this.sellerSettlementService
+          await this.sellerSettlementInfoService
             .restoreInactiveBusinessRegistrationConfirmation(seller.id)
             .then((data) => {
               if (data) {
-                this.sellerSettlementService.deleteInactiveBusinessRegistrationConfirmation(
+                this.sellerSettlementInfoService.deleteInactiveBusinessRegistrationConfirmation(
                   data.SellerBusinessRegistrationId,
                 );
               }
             }),
           this.sellerContactsService.restoreSellerContacts(seller.id),
-          this.sellerSettlementService.restoreSettlementAccount(seller.id),
+          this.sellerSettlementInfoService.restoreSettlementAccount(seller.id),
 
           s3.moveObjects(
             'inactive-business-registration',

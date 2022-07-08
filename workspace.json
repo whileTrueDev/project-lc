@@ -254,6 +254,59 @@
         }
       }
     },
+    "batch-virtual-account": {
+      "root": "apps/batch-virtual-account",
+      "sourceRoot": "apps/batch-virtual-account/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:webpack",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/batch-virtual-account",
+            "main": "apps/batch-virtual-account/src/main.ts",
+            "tsConfig": "apps/batch-virtual-account/tsconfig.app.json",
+            "assets": ["apps/batch-virtual-account/src/assets"],
+            "generatePackageJson": true
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/batch-virtual-account/src/environments/environment.ts",
+                  "with": "apps/batch-virtual-account/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:node",
+          "options": {
+            "buildTarget": "batch-virtual-account:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["apps/batch-virtual-account/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/batch-virtual-account"],
+          "options": {
+            "jestConfig": "apps/batch-virtual-account/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "components-admin": {
       "root": "libs/components-admin",
       "sourceRoot": "libs/components-admin/src",
@@ -432,29 +485,6 @@
           "outputs": ["coverage/libs/components-web-kkshow"],
           "options": {
             "jestConfig": "libs/components-web-kkshow/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      },
-      "tags": []
-    },
-    "firstmall-db": {
-      "root": "libs/firstmall-db",
-      "sourceRoot": "libs/firstmall-db/src",
-      "projectType": "library",
-      "targets": {
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/firstmall-db/**/*.ts"]
-          },
-          "outputs": ["{options.outputFile}"]
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/firstmall-db"],
-          "options": {
-            "jestConfig": "libs/firstmall-db/jest.config.js",
             "passWithNoTests": true
           }
         }
@@ -650,6 +680,7 @@
       },
       "tags": []
     },
+    "nest-modules-cart": "libs/nest-modules-cart",
     "nest-modules-cipher": {
       "root": "libs/nest-modules-cipher",
       "sourceRoot": "libs/nest-modules-cipher/src",
@@ -673,6 +704,10 @@
       },
       "tags": []
     },
+    "nest-modules-coupon": "libs/nest-modules-coupon",
+    "nest-modules-customer": "libs/nest-modules-customer",
+    "nest-modules-exchange": "libs/nest-modules-exchange",
+    "nest-modules-export": "libs/nest-modules-export",
     "nest-modules-goods": {
       "root": "libs/nest-modules-goods",
       "sourceRoot": "libs/nest-modules-goods/src",
@@ -696,6 +731,10 @@
       },
       "tags": []
     },
+    "nest-modules-goods-category": "libs/nest-modules-goods-category",
+    "nest-modules-goods-information-subject": "libs/nest-modules-goods-information-subject",
+    "nest-modules-goods-inquiry": "libs/nest-modules-goods-inquiry",
+    "nest-modules-goods-review": "libs/nest-modules-goods-review",
     "nest-modules-inquiry": {
       "root": "libs/nest-modules-inquiry",
       "sourceRoot": "libs/nest-modules-inquiry/src",
@@ -763,7 +802,7 @@
         }
       }
     },
-    "nest-modules-kkshow-search" : {
+    "nest-modules-kkshow-search": {
       "root": "libs/nest-modules-kkshow-search",
       "sourceRoot": "libs/nest-modules-kkshow-search/src",
       "targets": {
@@ -855,6 +894,7 @@
       "tags": []
     },
     "nest-modules-manual": "libs/nest-modules-manual",
+    "nest-modules-mileage": "libs/nest-modules-mileage",
     "nest-modules-notice": {
       "root": "libs/nest-modules-notice",
       "sourceRoot": "libs/nest-modules-notice/src",
@@ -901,6 +941,7 @@
       },
       "tags": []
     },
+    "nest-modules-order": "libs/nest-modules-order",
     "nest-modules-order-cancel": {
       "root": "libs/nest-modules-order-cancel",
       "sourceRoot": "libs/nest-modules-order-cancel/src",
@@ -970,6 +1011,29 @@
       },
       "tags": []
     },
+    "nest-modules-payment": {
+      "root": "libs/nest-modules-payment",
+      "sourceRoot": "libs/nest-modules-payment/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/nest-modules-payment/**/*.ts"]
+          },
+          "outputs": ["{options.outputFile}"]
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/nest-modules-payment"],
+          "options": {
+            "jestConfig": "libs/nest-modules-payment/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "nest-modules-policy": {
       "root": "libs/nest-modules-policy",
       "sourceRoot": "libs/nest-modules-policy/src",
@@ -1016,6 +1080,8 @@
       },
       "tags": []
     },
+    "nest-modules-refund": "libs/nest-modules-refund",
+    "nest-modules-return": "libs/nest-modules-return",
     "nest-modules-seller": {
       "root": "libs/nest-modules-seller",
       "sourceRoot": "libs/nest-modules-seller/src",

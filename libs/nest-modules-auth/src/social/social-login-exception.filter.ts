@@ -1,6 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import { UserType } from '@project-lc/shared-types';
-import { getBroadcasterWebHost, getWebHost } from '@project-lc/utils';
+import { getBroadcasterWebHost, getCustomerWebHost, getWebHost } from '@project-lc/utils';
 import { getUserTypeFromRequest } from '@project-lc/utils-backend';
 import { Request, Response } from 'express';
 import { SocialService } from './social.service';
@@ -9,17 +9,18 @@ import { SocialService } from './social.service';
 export class SocialLoginExceptionFilter implements ExceptionFilter {
   constructor(private readonly socialService: SocialService) {}
 
-  private getHostUrl = (userType: UserType): string => {
+  /** 소셜로그인 userType에 따른 마이페이지 주소 리턴 */
+  private getHostUrl(userType: UserType): string {
     let hostUrl: string;
-    if (userType === 'seller') {
-      // 판매자의 경우
-      hostUrl = getWebHost();
-    } else {
-      // 방송인의 경우
+    if (userType === 'broadcaster') {
       hostUrl = getBroadcasterWebHost();
+    } else if (userType === 'customer') {
+      hostUrl = getCustomerWebHost();
+    } else {
+      hostUrl = getWebHost();
     }
     return hostUrl;
-  };
+  }
 
   /** 소셜로그인 userType에 따른 로그인 페이지 주소 리턴 */
   private getWebLoginPageUrl = (userType: UserType): string => {

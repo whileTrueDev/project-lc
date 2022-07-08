@@ -1,13 +1,12 @@
 import { Box } from '@chakra-ui/layout';
 import { Spinner } from '@chakra-ui/spinner';
-import { Stat, StatGroup, StatHelpText, StatLabel, StatNumber } from '@chakra-ui/stat';
+import { Stat, StatGroup, StatLabel, StatNumber } from '@chakra-ui/stat';
 import {
   useBroadcasterAccumulatedSettlementAmount,
   useBroadcasterReceivableSettlementAmount,
   useProfile,
 } from '@project-lc/hooks';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
-import dayjs from 'dayjs';
 
 /** 방송인 수익금 */
 export function BroadcasterIncome(): JSX.Element {
@@ -33,19 +32,9 @@ function BroadcasterReceivableAmountStat(): JSX.Element {
     <Stat>
       <StatLabel>정산 예정 금액</StatLabel>
       {!receivable.isLoading ? (
-        <Box>
-          <StatNumber>
-            {!receivable.data?.amount
-              ? '0 원'
-              : `${getLocaleNumber(receivable.data?.amount)} 원`}
-          </StatNumber>
-          {receivable.data?.startedAt && receivable.data?.endedAt && (
-            <StatHelpText>
-              {dayjs(receivable.data.startedAt).format('YYYY/MM/DD')} -{' '}
-              {dayjs(receivable.data.endedAt).format('YYYY/MM/DD')}
-            </StatHelpText>
-          )}
-        </Box>
+        <StatNumber>
+          {!receivable.data ? '0 원' : `${getLocaleNumber(receivable.data)} 원`}
+        </StatNumber>
       ) : (
         <Spinner mt={4} />
       )}

@@ -1,6 +1,6 @@
 import { BroadcasterPromotionPage, AdminType } from '@prisma/client';
 
-export type UserType = 'seller' | 'broadcaster' | 'admin';
+export type UserType = 'seller' | 'broadcaster' | 'admin' | 'customer';
 
 export interface UserProfileRes {
   type: UserType;

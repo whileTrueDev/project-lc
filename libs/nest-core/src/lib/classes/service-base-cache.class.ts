@@ -1,6 +1,5 @@
 import { Cache } from 'cache-manager';
 import { Cluster } from 'ioredis';
-import _ from 'lodash';
 
 export class ServiceBaseWithCache {
   constructor(protected readonly cacheManager: Cache) {}
@@ -17,7 +16,7 @@ export class ServiceBaseWithCache {
     const _keys: string[][] = await Promise.all(
       redisNodes.map((redis) => redis.keys(`*${cacheKey}*`)),
     );
-    const keys = _.flatten(_keys);
+    const keys = _keys.flat();
 
     const result = await Promise.all(keys.map((key) => this.cacheManager.del(key))).catch(
       (err) => {

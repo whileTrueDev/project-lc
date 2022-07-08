@@ -45,6 +45,7 @@ export class LCDevAppStack extends cdk.Stack {
   private REDIS_URL: ssm.IStringParameter;
   private CACHE_REDIS_URL: ssm.IStringParameter;
   private MQ_REDIS_URL: ssm.IStringParameter;
+  private TOSS_PAYMENTS_SECRET_KEY: ssm.IStringParameter;
 
   public readonly alb: elbv2.ApplicationLoadBalancer;
   public readonly cluster: ecs.Cluster;
@@ -136,6 +137,9 @@ export class LCDevAppStack extends cdk.Stack {
         WHILETRUE_IP_ADDRESS: ecs.Secret.fromSsmParameter(this.WHILETRUE_IP_ADDRESS),
         CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
         MQ_REDIS_URL: ecs.Secret.fromSsmParameter(this.MQ_REDIS_URL),
+        TOSS_PAYMENTS_SECRET_KEY: ecs.Secret.fromSsmParameter(
+          this.TOSS_PAYMENTS_SECRET_KEY,
+        ),
       },
       environment: {
         S3_BUCKET_NAME: 'project-lc-dev-test',
@@ -452,7 +456,7 @@ export class LCDevAppStack extends cdk.Stack {
         protocol: elbv2.ApplicationProtocol.HTTP,
         healthCheck: {
           enabled: true,
-          path: '/',
+          path: '/health-check',
           interval: cdk.Duration.minutes(1),
         },
         targets: [overlayControllerService],
@@ -679,6 +683,13 @@ export class LCDevAppStack extends cdk.Stack {
       { parameterName: constants.DEV.MQ_REDIS_URL },
     );
 
+    this.TOSS_PAYMENTS_SECRET_KEY =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}TOSS_PAYMENTS_SECRET_KEY`,
+        { parameterName: constants.DEV.TOSS_PAYMENTS_SECRET_KEY },
+      );
+
     return {
       DATABASE_URL: this.DBURL_PARAMETER,
       FIRSTMALL_DATABASE_URL: this.FIRSTMALL_DATABASE_URL,
@@ -700,6 +711,7 @@ export class LCDevAppStack extends cdk.Stack {
       REDIS_URL: this.REDIS_URL,
       CACHE_REDIS_URL: this.CACHE_REDIS_URL,
       MQ_REDIS_URL: this.MQ_REDIS_URL,
+      TOSS_PAYMENTS_SECRET_KEY: this.TOSS_PAYMENTS_SECRET_KEY,
     };
   }
 }

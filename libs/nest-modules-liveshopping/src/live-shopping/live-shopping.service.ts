@@ -1,27 +1,20 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
-  LiveShoppingParamsDto,
+  FindLiveShoppingDto,
+  LiveShoppingId,
   LiveShoppingRegistDTO,
   LiveShoppingsWithBroadcasterAndGoodsName,
-  LiveShoppingFmGoodsSeq,
-  LiveShoppingId,
+  LiveShoppingWithGoods,
+  getLiveShoppingIsNowLive,
+  LiveShoppingOutline,
+  FindNowPlayingLiveShoppingDto,
 } from '@project-lc/shared-types';
-import { throwError } from 'rxjs';
-import { LiveShopping } from '@prisma/client';
-import { Cache } from 'cache-manager';
 
 @Injectable()
-export class LiveShoppingService extends ServiceBaseWithCache {
-  #LIVESHOPPING_CACHE_KEY = 'live-shoppings';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class LiveShoppingService {
+  constructor(private readonly prisma: PrismaService) {}
 
   /** 라이브쇼핑 생성 */
   async createLiveShopping(
@@ -38,11 +31,10 @@ export class LiveShoppingService extends ServiceBaseWithCache {
         requests: dto.requests,
         desiredPeriod: dto.desiredPeriod,
         desiredCommission: dto.desiredCommission || '0.00',
-        goods: { connect: { id: dto.goods_id } },
+        goods: { connect: { id: dto.goodsId } },
         sellerContacts: { connect: { id: dto.contactId } },
       },
     });
-    await this._clearCaches(this.#LIVESHOPPING_CACHE_KEY);
     return { liveShoppingId: liveShopping.id };
   }
 
@@ -55,114 +47,96 @@ export class LiveShoppingService extends ServiceBaseWithCache {
     });
 
     if (!doDelete) {
-      throwError('라이브 쇼핑 삭제 실패');
+      throw new InternalServerErrorException('라이브 쇼핑 삭제 실패');
     }
-    await this._clearCaches(this.#LIVESHOPPING_CACHE_KEY);
     return true;
   }
 
-  async getRegisteredLiveShoppings(
-    sellerId: UserPayload['id'],
-    dto: LiveShoppingParamsDto,
-  ): Promise<LiveShopping[]> {
+  /** 라이브 쇼핑 목록 조회 */
+  async findLiveShoppings(dto?: FindLiveShoppingDto): Promise<LiveShoppingWithGoods[]> {
     // 자신의 id를 반환하는 쿼리 수행하기
-    const { id, goodsIds } = dto;
+    const id = dto?.id;
+    const goodsIds = dto?.goodsIds;
+    const broadcasterId = dto?.broadcasterId;
+    const sellerId = dto?.sellerId;
     return this.prisma.liveShopping.findMany({
       where: {
-        id: id ? Number(id) : undefined,
+        id: id || undefined,
+        broadcasterId: broadcasterId || undefined,
         goodsId:
           goodsIds?.length >= 1
             ? { in: goodsIds.map((goodsid) => Number(goodsid)) }
             : undefined,
-        seller: {
-          id: sellerId,
-        },
+        sellerId: sellerId || undefined,
       },
       include: {
         goods: {
-          select: {
-            goods_name: true,
-            summary: true,
-          },
+          select: { goods_name: true, summary: true, image: true, options: true },
         },
-        seller: {
-          select: {
-            sellerShop: true,
-          },
-        },
+        seller: { select: { sellerShop: true } },
         broadcaster: {
           select: {
+            id: true,
+            userName: true,
             userNickname: true,
+            email: true,
+            avatar: true,
+            BroadcasterPromotionPage: true,
             channels: true,
           },
         },
-        liveShoppingVideo: {
-          select: { youtubeUrl: true },
+        liveShoppingVideo: { select: { youtubeUrl: true } },
+        images: true,
+        orderItemSupport: {
+          select: {
+            orderItem: {
+              select: {
+                options: { select: { discountPrice: true, quantity: true } },
+              },
+            },
+          },
         },
       },
     });
   }
 
-  /**
-   *
-   * @author m'baku
-   * @description 해당 방송인에게 매칭된 모든 라이브 쇼핑에 연결된 상품들의 fmGoodsSeq 반환받는다
-   * @param broadcasterId
-   * @returns fmGoodsSeq
-   */
-  async getFmGoodsSeqsLinkedToLiveShoppings(
-    broadcasterId: number,
-  ): Promise<LiveShoppingFmGoodsSeq[]> {
-    const fmGoodsSeqs = await this.prisma.liveShopping.findMany({
+  /** 현재 판매중(라이브 진행중 포함)인 라이브쇼핑 목록 조회 */
+  public async getNowPlayingLiveShopping(
+    dto: FindNowPlayingLiveShoppingDto,
+  ): Promise<LiveShoppingOutline[]> {
+    const liveShoppings = await this.prisma.liveShopping.findMany({
       where: {
-        broadcasterId: broadcasterId ? Number(broadcasterId) : undefined,
+        goodsId: dto.goodsIds
+          ? { in: dto.goodsIds.map((x) => Number(x)) }
+          : dto.goodsId || undefined,
+        broadcasterId: dto.broadcasterId || undefined,
+        progress: 'confirmed',
       },
       select: {
-        fmGoodsSeq: true,
+        id: true,
+        goodsId: true,
+        goods: {
+          select: {
+            id: true,
+            goods_name: true,
+            summary: true,
+            image: { take: 1, orderBy: { cut_number: 'asc' } },
+            options: true,
+          },
+        },
+        sellStartDate: true,
+        sellEndDate: true,
+        broadcastStartDate: true,
+        broadcastEndDate: true,
+        broadcasterId: true,
+        progress: true,
+        images: true,
+        liveShoppingName: true,
       },
     });
 
-    return fmGoodsSeqs;
-  }
-
-  async getBroadcasterRegisteredLiveShoppings(
-    broadcasterId: number,
-  ): Promise<LiveShopping[]> {
-    // 자신의 id를 반환하는 쿼리 수행하기
-    return this.prisma.liveShopping.findMany({
-      where: {
-        broadcasterId: Number(broadcasterId),
-      },
-      include: {
-        goods: {
-          select: {
-            goods_name: true,
-            summary: true,
-          },
-        },
-        seller: {
-          select: {
-            sellerShop: true,
-          },
-        },
-        broadcaster: {
-          select: {
-            userNickname: true,
-            channels: true,
-          },
-        },
-        liveShoppingVideo: {
-          select: { youtubeUrl: true },
-        },
-      },
-      orderBy: [
-        {
-          sellStartDate: 'desc',
-        },
-        {
-          id: 'desc',
-        },
-      ],
+    return liveShoppings.filter((liveShopping) => {
+      return getLiveShoppingIsNowLive(liveShopping);
     });
   }
 
@@ -181,17 +155,9 @@ export class LiveShoppingService extends ServiceBaseWithCache {
       select: {
         id: true,
         broadcaster: {
-          select: {
-            email: true,
-            userNickname: true,
-            overlayUrl: true,
-          },
+          select: { email: true, userNickname: true, overlayUrl: true },
         },
-        goods: {
-          select: {
-            goods_name: true,
-          },
-        },
+        goods: { select: { goods_name: true } },
         broadcastStartDate: true,
         broadcastEndDate: true,
       },
@@ -207,37 +173,8 @@ export class LiveShoppingService extends ServiceBaseWithCache {
         progress: 'confirmed',
         broadcastEndDate: { gte: now },
       },
-      select: {
-        id: true,
-      },
-      orderBy: {
-        broadcastEndDate: 'asc',
-      },
-    });
-  }
-
-  /** 특정 라이브 쇼핑의 현황(응원메시지 데이터) 조회 - 생성일 내림차순 조회(최신순)
-   * @param liveShoppingId 라이브쇼핑 고유id
-   */
-  /** 해당 fmGoodsSeq가 라이브쇼핑에 등록되어 있으면 true를 반환 */
-  async checkIsLiveShoppingFmGoodsSeq(fmGoodsSeq: number): Promise<boolean> {
-    const liveShoppingFmGoodsSeq = await this.prisma.liveShopping.findFirst({
-      where: {
-        fmGoodsSeq: Number(fmGoodsSeq),
-      },
-    });
-    if (liveShoppingFmGoodsSeq) return true;
-    return false;
-  }
-
-  /**
-   * 전달된 fmGoodsSeq 배열에 해당하는 라이브쇼핑 목록 정보 조회
-   * @param fmGoodsSeqs 퍼스트몰 상품 고유번호 fmGoodsSeq 배열 (liveShopping.fmGoodsSeq)
-   */
-  async findLiveShoppingsByGoodsIds(fmGoodsSeqs: number[]): Promise<LiveShopping[]> {
-    const _fmGoodsSeqs = fmGoodsSeqs.map((s) => Number(s)).filter((x) => !!x);
-    return this.prisma.liveShopping.findMany({
-      where: { fmGoodsSeq: { in: _fmGoodsSeqs } },
+      select: { id: true },
+      orderBy: { broadcastEndDate: 'asc' },
     });
   }
 }

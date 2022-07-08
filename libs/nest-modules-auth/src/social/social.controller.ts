@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,34 +8,30 @@ import {
   Query,
   Req,
   Res,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SocialAccounts, UserType, USER_TYPE_KEY } from '@project-lc/shared-types';
-import { getBroadcasterWebHost, getWebHost } from '@project-lc/utils';
+import { getBroadcasterWebHost, getWebHost, getCustomerWebHost } from '@project-lc/utils';
 import { getUserTypeFromRequest } from '@project-lc/utils-backend';
 import { Request, Response } from 'express';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
-import { LoginHistoryService } from '../auth/login-history/login-history.service';
+import { join } from 'path';
+import {
+  LoginHistoryService,
+  LoginMethods,
+} from '../auth/login-history/login-history.service';
 import { SocialService } from './social.service';
+import { SocialLoginExceptionFilter } from './social-login-exception.filter';
 
 @Controller('social')
+@UseFilters(SocialLoginExceptionFilter)
 export class SocialController {
   constructor(
     private readonly loginHistoryService: LoginHistoryService,
     private readonly socialService: SocialService,
   ) {}
-
-  /** 소셜로그인 userType에 따른 마이페이지 주소 리턴 */
-  private getFrontMypageUrl(userType: UserType): string {
-    let hostUrl: string;
-    if (userType === 'broadcaster') {
-      hostUrl = getBroadcasterWebHost();
-    } else {
-      hostUrl = getWebHost();
-    }
-    return `${hostUrl}/mypage`;
-  }
 
   /** email 로 가입된 셀러에 연동된 소셜계정목록 반환 */
   @UseGuards(JwtAuthGuard)
@@ -55,26 +52,7 @@ export class SocialController {
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
-    const userType: UserType = getUserTypeFromRequest(req);
-    const userPayload = this.socialService.login(userType, req, res);
-
-    if (userPayload.inactiveFlag) {
-      // 휴면계정 처리
-      let hostUrl: string;
-
-      if (userType === 'broadcaster') {
-        hostUrl = getBroadcasterWebHost();
-      } else {
-        hostUrl = getWebHost();
-      }
-      return res.redirect(`${hostUrl}/activate?type=social&email=${userPayload.sub}`);
-    }
-
-    // 로그인 기록 추가 by @hwasurr
-    this.loginHistoryService.createLoginStamp(req, '소셜/구글');
-
-    res.clearCookie(USER_TYPE_KEY);
-    return res.redirect(this.getFrontMypageUrl(userType));
+    return this.handleSocialCallback({ req, res, loginMethod: '소셜/구글' });
   }
 
   @Delete('/google/unlink/:serviceId')
@@ -95,26 +73,7 @@ export class SocialController {
   @Get('/naver/callback')
   @UseGuards(AuthGuard('naver'))
   async naverAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
-    const userType: UserType = getUserTypeFromRequest(req);
-    const userPayload = this.socialService.login(userType, req, res);
-
-    if (userPayload.inactiveFlag) {
-      // 휴면계정 처리
-      let hostUrl: string;
-
-      if (userType === 'broadcaster') {
-        hostUrl = getBroadcasterWebHost();
-      } else {
-        hostUrl = getWebHost();
-      }
-      return res.redirect(`${hostUrl}/activate?type=social&email=${userPayload.sub}`);
-    }
-
-    // 로그인 기록 추가 by @hwasurr
-    this.loginHistoryService.createLoginStamp(req, '소셜/네이버');
-
-    res.clearCookie(USER_TYPE_KEY);
-    return res.redirect(this.getFrontMypageUrl(userType));
+    return this.handleSocialCallback({ req, res, loginMethod: '소셜/네이버' });
   }
 
   @Delete('/naver/unlink/:serviceId')
@@ -135,25 +94,7 @@ export class SocialController {
   @Get('/kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   async kakaoAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
-    const userType: UserType = getUserTypeFromRequest(req);
-    const userPayload = this.socialService.login(userType, req, res);
-
-    if (userPayload.inactiveFlag) {
-      // 휴면계정 처리
-      let hostUrl: string;
-
-      if (userType === 'broadcaster') {
-        hostUrl = getBroadcasterWebHost();
-      } else {
-        hostUrl = getWebHost();
-      }
-      return res.redirect(`${hostUrl}/activate?type=social&email=${userPayload.sub}`);
-    }
-    // 로그인 기록 추가 by @hwasurr
-    this.loginHistoryService.createLoginStamp(req, '소셜/카카오');
-
-    res.clearCookie(USER_TYPE_KEY);
-    return res.redirect(this.getFrontMypageUrl(userType));
+    return this.handleSocialCallback({ req, res, loginMethod: '소셜/카카오' });
   }
 
   @Delete('/kakao/unlink/:serviceId')
@@ -163,5 +104,42 @@ export class SocialController {
   ): Promise<boolean> {
     await this.socialService.kakaoUnlink(userType, serviceId);
     return this.socialService.deleteSocialAccountRecord(userType, serviceId);
+  }
+
+  /** 소셜로그인 콜백 핸들링 */
+  private async handleSocialCallback(opts: {
+    req: Request;
+    res: Response;
+    loginMethod: LoginMethods;
+  }): Promise<void> {
+    const { req, res, loginMethod } = opts;
+    const userType: UserType = getUserTypeFromRequest(req);
+    if (!userType) throw new BadRequestException('userType cookie must be defined');
+    const userPayload = this.socialService.login(userType, req, res);
+    const hostUrl = this.getFrontUrl(userType);
+
+    if (userPayload.inactiveFlag) {
+      // 휴면계정 처리
+      return res.redirect(`${hostUrl}/activate?type=social&email=${userPayload.sub}`);
+    }
+    // 로그인 기록 생성
+    this.loginHistoryService.createLoginStamp(req, loginMethod);
+
+    res.clearCookie(USER_TYPE_KEY);
+    if (userType === 'customer') return res.redirect(hostUrl);
+    return res.redirect(join(hostUrl, 'mypage'));
+  }
+
+  /** 소셜로그인 userType에 따른 마이페이지 주소 리턴 */
+  private getFrontUrl(userType: UserType): string {
+    let hostUrl: string;
+    if (userType === 'broadcaster') {
+      hostUrl = getBroadcasterWebHost();
+    } else if (userType === 'customer') {
+      hostUrl = getCustomerWebHost();
+    } else {
+      hostUrl = getWebHost();
+    }
+    return hostUrl;
   }
 }

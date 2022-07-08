@@ -16,6 +16,7 @@ import {
   SocketIdandDevice,
   StartSetting,
   ObjectiveMessage,
+  NewsMessage,
 } from '@project-lc/shared-types';
 import { OverlayService } from '@project-lc/nest-modules-overlay';
 
@@ -165,6 +166,14 @@ export class AppScreenGateway
       : `판매금액 ${data.objective.price}원 돌파!`;
     const audioBuffer = await this.overlayService.streamObjectiveNotification(text);
     this.server.to(data.roomName).emit('get objective notification tts', audioBuffer);
+  }
+
+  @SubscribeMessage('news message from admin')
+  async getNewsMessage(
+    @MessageBody()
+    data: NewsMessage,
+  ): Promise<void> {
+    this.server.to(data.roomName).emit('get news message from server', data.message);
   }
 
   @SubscribeMessage('send notification signal')

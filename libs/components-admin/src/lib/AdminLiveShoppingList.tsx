@@ -6,30 +6,21 @@ import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveSho
 import { useAdminLiveShoppingList, useProfile } from '@project-lc/hooks';
 import { getLiveShoppingProgress, LiveShoppingWithGoods } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { SeletctedLiveShoppingType } from './AdminGiftList';
+import { getCustomerWebHost } from '@project-lc/utils';
 
 export function AdminLiveShoppingList({
-  setSelectedGoods,
+  onRowClick,
 }: {
-  setSelectedGoods: (selectedGoods: SeletctedLiveShoppingType) => void;
+  onRowClick: (liveShoppingId: number) => void;
 }): JSX.Element {
   const { data: profileData } = useProfile();
-
   const { data, isLoading } = useAdminLiveShoppingList(
     {},
-    {
-      enabled: !!profileData?.id,
-    },
+    { enabled: !!profileData?.id },
   );
 
   function handleClick(row: LiveShoppingWithGoods): void {
-    setSelectedGoods({
-      goodsId: row.goodsId,
-      broadcastStartDate: row.broadcastStartDate,
-      broadcastEndDate: row.broadcastEndDate,
-      sellEndDate: row.sellEndDate,
-      sellStartDate: row.sellStartDate,
-    });
+    onRowClick(row.id);
   }
   const columns: GridColumns = [
     { field: 'id', width: 50 },
@@ -54,27 +45,19 @@ export function AdminLiveShoppingList({
       valueFormatter: ({ row }) => dayjs(row.createDate).format('YYYY/MM/DD HH:mm'),
     },
     {
-      field: 'fmGoodsSeq',
+      field: 'goodsName',
       headerName: '상품명',
       minWidth: 350,
       renderCell: ({ row }) =>
-        new Date(row.sellEndDate) > new Date() && row.fmGoodsSeq ? (
+        new Date(row.sellEndDate) > new Date() ? (
           <Tooltip label="상품페이지로 이동">
-            <Link
-              href={`http://whiletrue.firstmall.kr/goods/view?no=${row.fmGoodsSeq}`}
-              isExternal
-            >
+            <Link href={`${getCustomerWebHost()}/goods/${row.goodsId}`} isExternal>
               {row.goods.goods_name} <ExternalLinkIcon mx="2px" />
             </Link>
           </Tooltip>
         ) : (
           <Text>{row.goods.goods_name}</Text>
         ),
-    },
-    {
-      field: 'fmGoodSeq',
-      headerName: '퍼스트몰 상품ID',
-      valueFormatter: ({ row }) => (row.fmGoodsSeq ? row.fmGoodsSeq || '미입력' : '미정'),
     },
     {
       field: 'progress',

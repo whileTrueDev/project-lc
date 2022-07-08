@@ -41,12 +41,18 @@ jobs:
   Build:
     name: Build Job
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: mysql://root:qwer1234@localhost/public
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Setup Dependency Containers
+        run: docker-compose up -d
       - name: Install Dependencies
         uses: bahmutov/npm-install@v1
-      - name: Primsa generate # Generate Prisma Client
+      - name: Generate Primsa client
         run: yarn nx run prisma-orm:prisma-generate
+      - name: Execute migration 
+        run: yarn nx run prisma-orm:migrate-dev
       - name: Run Build all affected apps and libs
         run: yarn affected:build --base="origin/${GITHUB_BASE_REF}"

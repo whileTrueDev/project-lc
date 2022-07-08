@@ -17,21 +17,16 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { GridSelectionModel } from '@material-ui/data-grid';
+import { OrderProcessStep } from '@prisma/client';
 import PasswordCheckForm from '@project-lc/components-shared/PasswordCheckForm';
 import {
-  useDeleteFmGoods,
   useDeleteLcGoods,
-  useFmOrdersByGoods,
   useLiveShoppingList,
   useProfile,
+  useSellerOrderList,
 } from '@project-lc/hooks';
-import {
-  getFmOrderStatusByNames,
-  getLiveShoppingProgress,
-  SellerGoodsListItem,
-} from '@project-lc/shared-types';
+import { getLiveShoppingProgress, SellerGoodsListItem } from '@project-lc/shared-types';
 import { useMemo, useRef, useState } from 'react';
-import { useQueryClient } from 'react-query';
 
 export function DeleteGoodsAlertDialog({
   onClose,
@@ -50,41 +45,33 @@ export function DeleteGoodsAlertDialog({
     setStep('alert');
     onClose();
   };
-  const queryClient = useQueryClient();
   const toast = useToast();
   const cancelRef = useRef<HTMLButtonElement>(null);
   // Goods테이블에서 삭제요청
   const deleteLcGoods = useDeleteLcGoods();
-  // fm-goods 테이블에서 삭제요청
-  const deleteFmGoods = useDeleteFmGoods();
 
   // 해당 상품 주문 조회
   // [결제취소, 결제실패, 배송완료, 주문무효]를 제외한 상태의 주문이 있는지 체크하여
   // 상품 삭제 불가 처리를 진행할 것이므로 해당 상태를 제외한 상태만 조회
-  const orders = useFmOrdersByGoods(
-    {
-      searchStatuses: getFmOrderStatusByNames([
-        '결제확인',
-        '배송완료',
-        '배송중',
-        '부분배송완료',
-        '부분배송중',
-        '부분출고완료',
-        '부분출고준비',
-        '상품준비',
-        '주문접수',
-        '출고완료',
-        '출고준비',
-      ]),
-      goodsIds: selectedGoodsIds as number[],
-    },
-    { enabled: isOpen },
-  );
+  const orders = useSellerOrderList({
+    searchStatuses: [
+      OrderProcessStep.orderReceived, // 주문접수
+      OrderProcessStep.paymentConfirmed, // 결제확인
+      OrderProcessStep.goodsReady, // 상품준비
+      OrderProcessStep.partialExportReady, // 부분출고준비
+      OrderProcessStep.exportReady, // 출고준비
+      OrderProcessStep.partialExportDone, // 부분출고완료
+      OrderProcessStep.exportDone, // 출고완료
+      OrderProcessStep.partialShipping, // 부분배송중
+      OrderProcessStep.shipping, // 배송중
+      OrderProcessStep.partialShippingDone, // 부분배송완료
+      OrderProcessStep.shippingDone, // 배송완료
+    ],
+    goodsIds: selectedGoodsIds as number[],
+  });
 
   const liveShoppings = useLiveShoppingList(
-    {
-      goodsIds: selectedGoodsIds as number[],
-    },
+    { goodsIds: selectedGoodsIds as number[] },
     { enabled: isOpen },
   );
 
@@ -104,7 +91,7 @@ export function DeleteGoodsAlertDialog({
   // 선택된 상품목록이 삭제가능한 지 여부
   const isDeletable = useMemo(() => {
     if (!orders.data) return false;
-    return orders.data.length === 0;
+    return orders.data.count === 0;
   }, [orders.data]);
 
   // 삭제 다이얼로그에서 확인 눌렀을 때 상품삭제 핸들러
@@ -127,48 +114,22 @@ export function DeleteGoodsAlertDialog({
       });
       return;
     }
-
-    // 검수된 상품
-    const confirmedGoods = items.filter(
-      (item) =>
-        selectedGoodsIds.includes(item.id) &&
-        item.confirmation &&
-        item.confirmation.status === 'confirmed' &&
-        item.confirmation.firstmallGoodsConnectionId !== null,
-    );
-    try {
-      // 전체 선택된 상품 Goods테이블에서 삭제요청
-      const deleteGoodsFromLcDb = deleteLcGoods.mutateAsync({
+    // 전체 선택된 상품 Goods테이블에서 삭제요청
+    await deleteLcGoods
+      .mutateAsync({
         ids: selectedGoodsIds.map((id) => Number(id)),
-      });
-
-      const promises = [deleteGoodsFromLcDb];
-
-      if (confirmedGoods.length > 0) {
-        // 선택된 상품 중 검수된 상품이 있다면 fm-goods 테이블에서도 삭제요청
-        const deleteGoodsFromFmDb = deleteFmGoods.mutateAsync({
-          ids: confirmedGoods.map((item) => Number(item.id)),
+      })
+      .then(() => {
+        toast({ title: '상품이 삭제되었습니다', status: 'success', isClosable: true });
+        handleClose();
+      })
+      .catch(() => {
+        toast({
+          title: '상품 삭제 중 오류가 발생하였습니다',
+          status: 'error',
+          isClosable: true,
         });
-        promises.push(deleteGoodsFromFmDb);
-      }
-
-      await Promise.all(promises);
-      queryClient.invalidateQueries('SellerGoodsList');
-      toast({
-        title: '상품이 삭제되었습니다',
-        status: 'success',
-        isClosable: true,
       });
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: '상품 삭제 중 오류가 발생하였습니다',
-        status: 'error',
-        isClosable: true,
-      });
-    } finally {
-      handleClose();
-    }
   };
 
   return (
@@ -237,9 +198,7 @@ export function DeleteGoodsAlertDialog({
                   ml={3}
                   colorScheme="red"
                   isDisabled={!isDeletable || !(hasliveShoppingList.length === 0)}
-                  isLoading={
-                    deleteLcGoods.isLoading || deleteFmGoods.isLoading || orders.isLoading
-                  }
+                  isLoading={deleteLcGoods.isLoading || orders.isLoading}
                 >
                   확인
                 </Button>

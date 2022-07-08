@@ -128,6 +128,10 @@
                 {
                     "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_DEV_MQ_REDIS_URL",
                     "name": "MQ_REDIS_URL"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_DEV_TOSS_PAYMENTS_SECRET_KEY",
+                    "name": "TOSS_PAYMENTS_SECRET_KEY"
                 }
             ],
             "dockerSecurityOptions": null,

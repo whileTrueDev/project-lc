@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ProductPromotion } from '@prisma/client';
+import { Goods, ProductPromotion } from '@prisma/client';
+import { BroadcasterPromotionPageService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateProductPromotionDto,
@@ -9,18 +10,29 @@ import {
 
 @Injectable()
 export class ProductPromotionService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly promotionPageService: BroadcasterPromotionPageService,
+  ) {}
 
   /** 상품홍보 생성 */
   public async createProductPromotion(
     dto: CreateProductPromotionDto,
   ): Promise<ProductPromotion> {
-    const { goodsId, broadcasterPromotionPageId, ...rest } = dto;
+    const { goodsId, broadcasterPromotionPageId, broadcasterId, ...rest } = dto;
+
+    let promotionPageId = broadcasterPromotionPageId;
+    if (!promotionPageId) {
+      promotionPageId = await this.promotionPageService.findOrCreatePromotionPageId({
+        broadcasterId,
+      });
+    }
     const data = await this.prisma.productPromotion.create({
       data: {
         ...rest,
         goods: { connect: { id: goodsId } },
-        broadcasterPromotionPage: { connect: { id: broadcasterPromotionPageId } },
+        broadcasterPromotionPage: { connect: { id: promotionPageId } },
+        broadcaster: { connect: { id: broadcasterId } },
       },
     });
     return data;
@@ -76,26 +88,17 @@ export class ProductPromotionService {
     return data;
   }
 
-  public async checkIsPromotionProductFmGoodsSeq(fmGoodsSeq: number): Promise<boolean> {
-    const productPromotionFmGoodsSeq = await this.prisma.productPromotion.findFirst({
-      where: {
-        fmGoodsSeq: Number(fmGoodsSeq),
-      },
-    });
-    if (productPromotionFmGoodsSeq) return true;
-    return false;
-  }
-
   /**
-   * 전달받은 fmGoodsSeq 배열에 해당하는 '상품홍보' 목록 조회
-   * @param fmGoodsSeqs 퍼스트몰 상품 고유번호 fmGoodsSeq 배열 (productPromotion.fmGoodsSeq)
+   * 전달받은 goodsIds 배열에 해당하는 '상품홍보' 목록 조회
+   * @param goodsIds 상품 고유번호 GoodsId 배열 (productPromotion.goodsId)
    */
   public async findProductPromotionsByGoodsIds(
-    fmGoodsSeqs: number[],
+    goodsIds?: Goods['id'][],
   ): Promise<ProductPromotion[]> {
-    const _fmGoodsSeqs = fmGoodsSeqs.map((s) => Number(s)).filter((x) => !!x);
+    if (!goodsIds) return [];
+    const _goodsIds = goodsIds.map((s) => Number(s)).filter((x) => !!x);
     return this.prisma.productPromotion.findMany({
-      where: { fmGoodsSeq: { in: _fmGoodsSeqs } },
+      where: { goodsId: { in: _goodsIds } },
     });
   }
 }

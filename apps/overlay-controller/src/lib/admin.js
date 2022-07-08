@@ -509,6 +509,24 @@ $(document).ready(function ready() {
     socket.emit('combo reset from admin', roomName);
   });
 
+  $('.logout-button').click(function logout() {
+    $.ajax({
+      type: 'POST',
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/auth/logout`,
+      success(data) {
+        window.location.replace('/login');
+      },
+    });
+  });
+
+  $('#news-message-button').click(function resetCombo() {
+    let message = $('#news-message').val();
+    if (message.length > 23) {
+      message = `${message.slice(0, 21)}`;
+    }
+    socket.emit('news message from admin', { roomName, message });
+  });
+
   $('#play-virtual-video-button').click(function playVirtualVideo() {
     socket.emit('play virtual video from admin', roomName);
   });

@@ -5,17 +5,10 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
   Box,
   Button,
   Divider,
   Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
   Grid,
   Input,
   Link,
@@ -33,27 +26,28 @@ import { LiveShoppingDatePicker } from '@project-lc/components-admin/LiveShoppin
 import { LiveShoppingDetailTitle } from '@project-lc/components-admin/LiveShoppingDetailTitle';
 import { LiveShoppingProgressSelector } from '@project-lc/components-admin/LiveShoppingProgressSelector';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
-import { BroadcasterName } from '@project-lc/components-shared/BroadcasterName';
-import { GoodsDetailCommonInfo } from '@project-lc/components-seller/GoodsDetailCommonInfo';
-import { GoodsDetailImagesInfo } from '@project-lc/components-seller/GoodsDetailImagesInfo';
-import { GoodsDetailInfo } from '@project-lc/components-seller/GoodsDetailInfo';
-import { GoodsDetailOptionsInfo } from '@project-lc/components-seller/GoodsDetailOptionsInfo';
-import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components-seller/GoodsDetailPurchaseLimitInfo';
-import { GoodsDetailShippingInfo } from '@project-lc/components-seller/GoodsDetailShippingInfo';
-import { GoodsDetailSummary } from '@project-lc/components-seller/GoodsDetailSummary';
+import { GoodsDetailCommonInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailCommonInfo';
+import { GoodsDetailImagesInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailImagesInfo';
+import { GoodsDetailInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailInfo';
+import { GoodsDetailOptionsInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailOptionsInfo';
+import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailPurchaseLimitInfo';
+import { GoodsDetailShippingInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailShippingInfo';
+import { GoodsDetailSummary } from '@project-lc/components-seller/goods-detail/GoodsDetailSummary';
+import { AdminLiveShoppingBroadcasterName } from '@project-lc/components-admin/AdminLiveShoppingBroadcasterName';
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
 import {
+  LiveShoppingManage,
   useAdminGoodsById,
   useAdminLiveShoppingList,
   useProfile,
   useUpdateLiveShoppingManageMutation,
 } from '@project-lc/hooks';
-import { LiveShoppingDTO, LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
+import { LiveShoppingUpdateDTO, LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
+import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { AxiosError } from 'axios';
 
 function getDuration(startDate: Date, endDate: Date): string {
   if (startDate && startDate) {
@@ -67,34 +61,37 @@ function getDuration(startDate: Date, endDate: Date): string {
   return '미정';
 }
 
+export type LiveShoppingFormData = Omit<LiveShoppingUpdateDTO, 'id'>;
 export function LiveShoppingDetail(): JSX.Element {
   const router = useRouter();
   const liveShoppingId = router.query.liveShoppingId as string;
   const { data: profileData } = useProfile();
-  const { data: liveShopping, isLoading: liveShoppingIsLoading } =
-    useAdminLiveShoppingList(
-      {
-        id: liveShoppingId,
-      },
-      { enabled: !!profileData?.id },
-    );
+  const {
+    data: liveShopping,
+    isLoading: liveShoppingIsLoading,
+    refetch,
+  } = useAdminLiveShoppingList(
+    { id: Number(liveShoppingId) },
+    { enabled: !!profileData?.id },
+  );
 
   const goodsId = liveShopping ? liveShopping[0].goodsId : '';
   const goods = useAdminGoodsById(goodsId);
 
   const { mutateAsync } = useUpdateLiveShoppingManageMutation();
-  const methods = useForm({
+  const methods = useForm<LiveShoppingFormData>({
     defaultValues: {
-      progress: '',
+      progress: undefined,
       liveShoppingName: '',
-      broadcasterId: '',
+      broadcasterId: undefined,
       broadcastStartDate: '',
       broadcastEndDate: '',
       sellStartDate: '',
       sellEndDate: '',
       rejectionReason: '',
       videoUrl: '',
-      fmGoodsSeq: null,
+      whiletrueCommissionRate: undefined,
+      broadcasterCommissionRate: undefined,
     },
   });
   const toast = useToast();
@@ -114,18 +111,20 @@ export function LiveShoppingDetail(): JSX.Element {
 
   const onSuccess = (): void => {
     reset({
-      progress: '',
+      progress: undefined,
       liveShoppingName: '',
-      broadcasterId: '',
+      broadcasterId: undefined,
       broadcastStartDate: '',
       broadcastEndDate: '',
       sellStartDate: '',
       sellEndDate: '',
       rejectionReason: '',
       videoUrl: '',
-      fmGoodsSeq: null,
+      whiletrueCommissionRate: undefined,
+      broadcasterCommissionRate: undefined,
     });
     toast({ title: '변경 완료', status: 'success' });
+    refetch();
   };
 
   const onFail = (err?: AxiosError): void => {
@@ -137,13 +136,12 @@ export function LiveShoppingDetail(): JSX.Element {
   };
 
   const { handleSubmit, register, watch, reset } = methods;
-  const onSubmit = async (
-    // TODO: 타입 관련 정리 필요. build 실패로 any로 임시 처리 220411 hwasurr
-    data: any,
-    // data: Omit<LiveShoppingDTO, 'sellerId' | 'goods_id' | 'contactId' | 'requests'>,
-  ): Promise<void> => {
+  const onSubmit = async (data: LiveShoppingFormData): Promise<void> => {
     const videoUrlExist = Boolean(liveShopping[0]?.liveShoppingVideo?.youtubeUrl);
-    const dto = Object.assign(data, { id: liveShoppingId });
+    const { sellerId, goodsId: _, contactId, requests, ...restData } = data; // formData타입에서 LiveShoppingManage 타입으로 바꾸기 위해
+    const dto: LiveShoppingManage = Object.assign(restData, {
+      id: Number(liveShoppingId),
+    });
     mutateAsync({ dto, videoUrlExist }).then(onSuccess).catch(onFail);
   };
   if (liveShoppingIsLoading || goods.isLoading)
@@ -203,45 +201,14 @@ export function LiveShoppingDetail(): JSX.Element {
               ) : null}
             </Stack>
 
-            <Stack>
-              <Stack direction="row" alignItems="center">
-                <Text>퍼스트몰 상품 번호: </Text>
-                <Text
-                  as="span"
-                  fontWeight="bold"
-                  textDecoration={liveShopping[0].fmGoodsSeq ? 'underline' : 'unset'}
-                  color={liveShopping[0].fmGoodsSeq ? 'blue' : 'unset'}
-                  cursor={liveShopping[0].fmGoodsSeq ? 'pointer' : 'default'}
-                  onClick={() => {
-                    window.open(
-                      `http://whiletrue.firstmall.kr/goods/view?no=${liveShopping[0].fmGoodsSeq}`,
-                    );
-                  }}
-                >
-                  {liveShopping[0].fmGoodsSeq || '미입력'}
-                </Text>
-              </Stack>
-              {liveShopping[0].progress === 'confirmed' && !liveShopping[0].fmGoodsSeq && (
-                <Alert status="error">
-                  <Stack>
-                    <AlertIcon />
-                    <AlertTitle>퍼스트몰 상품 번호가 입력되지 않았습니다.</AlertTitle>
-                    <AlertDescription>
-                      진행상태가 확정됨이지만 퍼스트몰 상품 번호가 입력되지 않았습니다.
-                      <br />
-                      라이브 쇼핑 진행시 사용하는 퍼스트몰 상품 번호가 입력되지 않으면
-                      방송인 수익금이 올바르게 처리되지 않습니다.
-                    </AlertDescription>
-                  </Stack>
-                </Alert>
-              )}
-            </Stack>
-
             <Divider />
             <Stack direction="row" alignItems="center">
               <Text as="span">방송인: </Text>
               {liveShopping[0].broadcaster ? (
-                <BroadcasterName data={liveShopping[0].broadcaster} color="blue" />
+                <AdminLiveShoppingBroadcasterName
+                  data={liveShopping[0].broadcaster}
+                  color="blue"
+                />
               ) : (
                 <Text fontWeight="bold">미정</Text>
               )}
@@ -382,7 +349,6 @@ export function LiveShoppingDetail(): JSX.Element {
               <LiveShoppingDatePicker
                 title="방송 종료시간"
                 registerName="broadcastEndDate"
-                min={watch('broadcastStartDate')}
               />
               {dayjs(watch('broadcastStartDate')) > dayjs(watch('broadcastEndDate')) && (
                 <Text as="em" color="tomato">
@@ -417,24 +383,6 @@ export function LiveShoppingDetail(): JSX.Element {
                 />
               </Stack>
               <Divider />
-
-              <Stack maxW="300px">
-                <FormControl>
-                  <FormLabel>퍼스트몰 상품 번호</FormLabel>
-                  <FormLabel color="gray.500" fontSize="xs">
-                    해당 라이브를 위해 퍼스트몰에서 생성한 새 상품의 상품 번호를
-                    입력하세요.
-                  </FormLabel>
-                  <FormHelperText fontSize="xs">
-                    <Text fontSize="xs" color="red.500" as="span">
-                      (주의){' '}
-                    </Text>
-                    방송인,방송시각등이 확정되었음에도 입력하지 않는 경우, 방송인에게
-                    수익금으로 반영되지 않습니다.
-                  </FormHelperText>
-                  <Input mt={2} type="number" {...register('fmGoodsSeq')} />
-                </FormControl>
-              </Stack>
 
               <Button onClick={openConfirmModal} colorScheme="blue">
                 변경

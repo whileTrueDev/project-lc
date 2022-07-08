@@ -30,6 +30,7 @@ import {
   useTerms,
 } from '@project-lc/hooks';
 import { guideConditionStore } from '@project-lc/stores';
+import { parseErrorObject } from '@project-lc/utils-frontend';
 import { useEffect, useMemo, useState } from 'react';
 
 export function GuideContractionAgreementSection({
@@ -75,9 +76,11 @@ export function GuideContractionAgreementSection({
       // 성공시
       toast({ title: '약관동의가 완료되었습니다.', status: 'success' });
     };
-    const onError = (): void => {
+    const onError = (err?: any): void => {
+      const { status, message } = parseErrorObject(err);
       toast({
         title: '약관동의중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        description: status ? `code: ${status} - message: ${message}` : undefined,
         status: 'error',
       });
     };
@@ -93,7 +96,7 @@ export function GuideContractionAgreementSection({
           else onError();
         })
         .catch((err) => {
-          onError();
+          onError(err);
         });
     }
     if (userType === 'seller') {
@@ -104,7 +107,7 @@ export function GuideContractionAgreementSection({
           else onError();
         })
         .catch((err) => {
-          onError();
+          onError(err);
         });
     }
   };

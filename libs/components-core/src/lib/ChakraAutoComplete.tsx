@@ -13,7 +13,6 @@ import {
   List,
   ListItem,
   Spinner,
-  theme,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useAutocomplete } from '@material-ui/lab';
@@ -106,14 +105,16 @@ export function ChakraAutoComplete<T = any>({
       <Box position="relative" w="inherit">
         <List
           {...getListboxProps()}
-          w="inherit"
+          w="99%"
+          maxH={400}
+          overflowY="auto"
           inset="0px auto auto 0px"
           position="absolute"
           boxShadow="lg"
           borderWidth={popupOpen ? '0.025rem' : undefined}
           borderRadius="lg"
           backgroundColor={backgroundColor}
-          zIndex={theme.zIndices.dropdown}
+          zIndex="dropdown"
         >
           {groupedOptions.length > 0 ? (
             <>

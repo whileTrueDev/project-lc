@@ -5,6 +5,7 @@ import {
   Seller,
   InactiveBroadcaster,
   InactiveSeller,
+  Customer,
 } from '@prisma/client';
 import { JwtHelperService } from '@project-lc/nest-modules-jwt-helper';
 import { UserPayload, authConstants } from '@project-lc/nest-core';
@@ -13,13 +14,14 @@ import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { SellerService } from '@project-lc/nest-modules-seller';
 import { loginUserRes, UserProfileRes, UserType } from '@project-lc/shared-types';
 import { Response } from 'express';
+import { CustomerService } from '@project-lc/nest-modules-customer';
 
 @Injectable()
 export class AuthService {
-  // private를 사용하는 이유는 해당 Service를 내부에서만 사용할 것이기 떄문이다.
   constructor(
     private readonly sellerService: SellerService,
     private readonly broadcasterService: BroadcasterService,
+    private readonly customerService: CustomerService,
     private readonly adminAccountService: AdminAccountService,
     private jwtHelper: JwtHelperService,
   ) {}
@@ -68,7 +70,13 @@ export class AuthService {
     email: string,
     pwdInput: string,
   ): Promise<UserPayload | null> {
-    let user: Seller | Broadcaster | Administrator | InactiveBroadcaster | InactiveSeller;
+    let user:
+      | Seller
+      | Broadcaster
+      | Customer
+      | Administrator
+      | InactiveBroadcaster
+      | InactiveSeller;
     if (['seller'].includes(type)) {
       user = await this.sellerService.login(email, pwdInput);
     }
@@ -78,7 +86,9 @@ export class AuthService {
     if (['broadcaster'].includes(type)) {
       user = await this.broadcasterService.login(email, pwdInput);
     }
-
+    if (['customer'].includes(type)) {
+      user = await this.customerService.login(email, pwdInput);
+    }
     return this.createUserPayload(user, type);
   }
 
@@ -108,7 +118,7 @@ export class AuthService {
 
   /** 유저 JWT 토큰 내 생성 정보 */
   createUserPayload(
-    user: Seller | Broadcaster | Administrator,
+    user: Seller | Broadcaster | Administrator | Customer,
     type: UserType,
   ): UserPayload {
     return {
@@ -121,30 +131,39 @@ export class AuthService {
 
   async getProfile(userPayload: UserPayload, appType: UserType): Promise<UserProfileRes> {
     const { sub, type } = userPayload;
-    let user: Seller | Broadcaster | Administrator;
+    let user: Seller | Broadcaster | Customer | Administrator;
+    const errorMessage = `appType and payloadType doesn't match, appType:${appType}, payloadType:${type}`;
     // 판매자 정보 조회
     if (['seller'].includes(type)) {
       if (appType !== 'seller') {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException(errorMessage);
       }
       user = await this.sellerService.findOne({ email: sub });
     }
     // 방송인 정보 조회
     if (['broadcaster'].includes(type)) {
       if (appType !== 'broadcaster') {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException(errorMessage);
       }
       user = await this.broadcasterService.findOne({ email: sub });
+    }
+    // 소비자 정보 조회
+    if (['customer'].includes(type)) {
+      if (appType !== 'customer') {
+        throw new UnauthorizedException(errorMessage);
+      }
+      user = await this.customerService.findOne({ email: sub });
     }
     // 관리자 정보 조회
     if (['admin'].includes(type)) {
       if (appType !== 'admin') {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException(errorMessage);
       }
       user = await this.adminAccountService.findOne({ email: sub });
     }
 
     const hasPassword = Boolean(user.password);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ..._user } = user;
 
     if ('userName' in _user) {

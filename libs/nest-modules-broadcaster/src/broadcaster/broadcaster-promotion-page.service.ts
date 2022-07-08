@@ -1,36 +1,79 @@
 import { Injectable } from '@nestjs/common';
-import { Broadcaster, BroadcasterPromotionPage } from '@prisma/client';
+import { Broadcaster, BroadcasterPromotionPage, Prisma } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
-  broadcasterProductPromotionDto,
   BroadcasterPromotionPageDto,
   BroadcasterPromotionPageListRes,
   BroadcasterPromotionPageUpdateDto,
+  FindManyDto,
+  PromotionPagePromotionGoodsRes,
 } from '@project-lc/shared-types';
 
 @Injectable()
 export class BroadcasterPromotionPageService {
   constructor(private readonly prisma: PrismaService) {}
 
-  public async getFmGoodsSeqsLinkedToProductPromotions(
-    id: Broadcaster['id'],
-  ): Promise<broadcasterProductPromotionDto[]> {
-    const productPromotionFmGoodsSeq =
-      await this.prisma.broadcasterPromotionPage.findFirst({
-        where: {
-          broadcasterId: id,
-        },
-        select: {
-          productPromotions: {
-            select: {
-              fmGoodsSeq: true,
+  private async find(
+    opt: Prisma.BroadcasterPromotionPageWhereUniqueInput,
+  ): Promise<BroadcasterPromotionPage> {
+    return this.prisma.broadcasterPromotionPage.findUnique({ where: opt });
+  }
+
+  /** 고유ID별 개별조회 */
+  public async findById(
+    id: BroadcasterPromotionPage['id'],
+  ): Promise<BroadcasterPromotionPage> {
+    return this.find({ id });
+  }
+
+  /** 방송인고유ID별 개별조회 */
+  public async findByBroadcasterId(
+    broadcasterId: Broadcaster['id'],
+  ): Promise<BroadcasterPromotionPage> {
+    return this.find({ broadcasterId });
+  }
+
+  /** 방송인 상품홍보중 상품  */
+  public async findPromotionGoods(
+    broadcasterId: Broadcaster['id'],
+    dto: FindManyDto,
+  ): Promise<PromotionPagePromotionGoodsRes> {
+    const { skip, take } = dto;
+    const realTake = take + 1;
+    const result = await this.prisma.productPromotion.findMany({
+      where: { broadcasterId },
+      skip,
+      take: realTake,
+      select: {
+        id: true,
+        goods: {
+          select: {
+            id: true,
+            goods_name: true,
+            summary: true,
+            image: { take: 1, orderBy: { cut_number: 'asc' } },
+            options: {
+              select: {
+                id: true,
+                consumer_price: true,
+                price: true,
+                option1: true,
+                option_title: true,
+                default_option: true,
+              },
             },
           },
         },
-      });
-    const fmGoodsSeqs = productPromotionFmGoodsSeq?.productPromotions || [];
-
-    return fmGoodsSeqs;
+      },
+    });
+    const resResult = result.slice(0, take);
+    if (result.length === realTake)
+      // 다음 페이지 데이터가 있는 경우
+      return {
+        nextCursor: skip + take,
+        productPromotions: resResult,
+      };
+    return { nextCursor: undefined, productPromotions: resResult };
   }
 
   /** 상품홍보페이지 BroadcasterPromotionPage 생성 */
@@ -89,5 +132,26 @@ export class BroadcasterPromotionPageService {
         },
       },
     });
+  }
+
+  /** 방송인 id로 상품홍보페이지id 찾거나 생성 */
+  public async findOrCreatePromotionPageId({
+    broadcasterId,
+  }: {
+    broadcasterId: Broadcaster['id'];
+  }): Promise<BroadcasterPromotionPage['id']> {
+    const existPromotionPage = await this.prisma.broadcasterPromotionPage.findUnique({
+      where: { broadcasterId },
+    });
+    if (!existPromotionPage) {
+      // 없으면 홍보 페이지 만들기
+      const newPromotionPage = await this.prisma.broadcasterPromotionPage.create({
+        data: {
+          broadcaster: { connect: { id: broadcasterId } },
+        },
+      });
+      return newPromotionPage.id;
+    }
+    return existPromotionPage.id;
   }
 }

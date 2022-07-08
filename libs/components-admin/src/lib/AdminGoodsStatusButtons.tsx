@@ -1,16 +1,16 @@
 // 검수 승인 및 거절 버튼 그룹
 
-import { Grid, useDisclosure, Button } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
-import { AdminGoodsByIdRes } from '@project-lc/shared-types';
+import { Button, Grid, useDisclosure } from '@chakra-ui/react';
+import { GoodsByIdRes } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
 import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
 
 export function AdminGoodsStatusButtons(props: {
-  goods: AdminGoodsByIdRes;
-}): JSX.Element {
+  goods: GoodsByIdRes;
+}): JSX.Element | null {
   const { goods } = props;
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -29,6 +29,8 @@ export function AdminGoodsStatusButtons(props: {
     }),
     [goods],
   );
+
+  if (goods.confirmation.status === 'confirmed') return null;
 
   return (
     <>

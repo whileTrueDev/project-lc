@@ -9,13 +9,14 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Inquiry } from '@prisma/client';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { InquiryDto } from '@project-lc/shared-types';
 import { InquiryService } from './inquiry.service';
 
-@Controller('inquiry')
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('inquiry')
+@Controller('inquiry')
 export class InquiryController {
   constructor(private readonly inquiryService: InquiryService) {}
 

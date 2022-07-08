@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Modal,
   ModalBody,
@@ -10,6 +11,8 @@ import {
   ModalProps,
   Stack,
   Text,
+  useColorModeValue,
+  useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { ImageInput, ImageInputErrorTypes, ImageInputProps } from './ImageInput';
@@ -56,24 +59,41 @@ export interface ImageInputDialogProps
   onError?: (error: ImageInputErrorTypes) => any;
   modalTitle?: string;
 }
-export function ImageInputDialog(props: ImageInputDialogProps): JSX.Element {
-  const { modalTitle, isOpen, onClose, onConfirm, onError, ...restProps } = props;
-
+export function ImageInputDialog({
+  modalTitle,
+  isOpen,
+  onClose,
+  onConfirm,
+  onError,
+  imageSizeLimit = 10,
+  ...restProps
+}: ImageInputDialogProps): JSX.Element {
+  const toast = useToast();
+  const imagePreviewBgColor = useColorModeValue('gray.200', 'gray.700');
+  const [errMsg, setErrMsg] = useState('');
   const [imagePreview, setImagePreview] = useState<ImageInputFileReadData | null>(null);
-
   const handleSuccess = async (fileName: string, file: File): Promise<void> => {
+    setErrMsg('');
     readAsDataURL(file).then(async ({ data }) => {
       const imageData = { url: data, filename: fileName, file };
       setImagePreview(imageData);
     });
   };
 
+  const [loading, setLoading] = useState<boolean>(false);
   const handleRegist = (): void => {
     if (!imagePreview) return;
-    onConfirm(imagePreview).then(() => {
-      setImagePreview(null);
-      onClose();
-    });
+    setLoading(true);
+    onConfirm(imagePreview)
+      .then(() => {
+        setLoading(false);
+        setImagePreview(null);
+        onClose();
+      })
+      .catch(() => {
+        setLoading(false);
+        toast({ status: 'error', description: '이미지 등록 중 오류가 발생했습니다.' });
+      });
   };
 
   const handleClose = (): void => {
@@ -83,6 +103,12 @@ export function ImageInputDialog(props: ImageInputDialogProps): JSX.Element {
 
   const handleError = (error: ImageInputErrorTypes): void => {
     if (onError) onError(error);
+    else {
+      if (error === 'over-size') {
+        setErrMsg(`최대크기(${imageSizeLimit}MB)를 초과하는 이미지입니다.`);
+      }
+      if (error === 'invalid-format') setErrMsg('올바른 형식의 이미지를 업로드해주세요.');
+    }
     console.log(error);
   };
   return (
@@ -98,22 +124,35 @@ export function ImageInputDialog(props: ImageInputDialogProps): JSX.Element {
               {...restProps}
               handleSuccess={handleSuccess}
               handleError={handleError}
+              imageSizeLimit={imageSizeLimit}
             />
-            {imagePreview ? (
-              <img src={imagePreview.url as string} alt={imagePreview.filename} />
-            ) : (
-              <Text>이미지 파일을 선택하여 등록할 이미지를 확인하세요</Text>
-            )}
+            <Box
+              mt={4}
+              p={imagePreview ? 0 : 4}
+              rounded="md"
+              background={imagePreview ? 'transparent' : imagePreviewBgColor}
+            >
+              {imagePreview ? (
+                <img src={imagePreview.url as string} alt={imagePreview.filename} />
+              ) : (
+                <Text>이미지 파일을 선택하여 등록할 이미지를 확인하세요.</Text>
+              )}
+              {errMsg ? <Text color="red">{errMsg}</Text> : null}
+            </Box>
           </Stack>
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleRegist}>
+          <Button
+            isDisabled={!imagePreview}
+            isLoading={loading}
+            colorScheme="blue"
+            mr={3}
+            onClick={handleRegist}
+          >
             등록하기
           </Button>
-          <Button variant="ghost" onClick={handleClose}>
-            닫기
-          </Button>
+          <Button onClick={handleClose}>닫기</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

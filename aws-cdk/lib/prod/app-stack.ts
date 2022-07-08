@@ -147,6 +147,7 @@ export class LCProdAppStack extends cdk.Stack {
         WHILETRUE_IP_ADDRESS: Secret.fromSsmParameter(p.WHILETRUE_IP_ADDRESS),
         CACHE_REDIS_URL: Secret.fromSsmParameter(p.CACHE_REDIS_URL_KEY),
         MQ_REDIS_URL: Secret.fromSsmParameter(p.MQ_REDIS_URL_KEY),
+        TOSS_PAYMENTS_SECRET_KEY: Secret.fromSsmParameter(p.TOSS_PAYMENTS_SECRET_KEY),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
@@ -444,7 +445,7 @@ export class LCProdAppStack extends cdk.Stack {
         protocol: ApplicationProtocol.HTTP,
         healthCheck: {
           enabled: true,
-          path: '/',
+          path: '/health-check',
           interval: cdk.Duration.minutes(1),
         },
         targets: [this.overlayControllerService],
@@ -531,6 +532,7 @@ export class LCProdAppStack extends cdk.Stack {
       REDIS_URL: __loadSsmParmeter(c.REDIS_URL_KEY, 2),
       CACHE_REDIS_URL_KEY: __loadSsmParmeter(c.CACHE_REDIS_URL_KEY),
       MQ_REDIS_URL_KEY: __loadSsmParmeter(c.MQ_REDIS_URL_KEY),
+      TOSS_PAYMENTS_SECRET_KEY: __loadSsmParmeter(c.TOSS_PAYMENTS_SECRET_KEY),
     };
   }
 }

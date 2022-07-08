@@ -46,9 +46,8 @@ export class AuthController {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
     user.userType = userType;
-    if (user.inactiveFlag) {
-      return res.status(200).send(user);
-    }
+    if (user.inactiveFlag) return res.status(200).send(user);
+
     const loginToken: loginUserRes = this.authService.issueToken(
       user,
       stayLogedIn,
@@ -57,7 +56,7 @@ export class AuthController {
     this.authService.handleLogin(res, loginToken);
     // 로그인 히스토리 추가
     this.loginHistoryService.createLoginStamp(req, '이메일');
-    return res.status(200).send(loginToken);
+    return res.status(200).send({ ...loginToken, id: user.id, userType: user.type });
   }
 
   @UseGuards(JwtAuthGuard)

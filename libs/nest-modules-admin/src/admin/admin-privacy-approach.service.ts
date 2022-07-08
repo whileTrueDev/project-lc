@@ -15,6 +15,7 @@ export class AdminPrivacyApproachSevice {
         ip,
         infoType: dto.infoType,
         actionType: dto.actionType,
+        reason: dto.reason || undefined,
       },
     });
   }

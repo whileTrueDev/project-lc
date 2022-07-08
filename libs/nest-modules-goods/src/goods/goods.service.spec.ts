@@ -14,6 +14,7 @@ describe('GoodsService', () => {
   let __prisma: PrismaClient;
   let service: GoodsService;
   let TEST_USER_ID: number;
+  let TEST_CATEGORY_ID: number;
   const TEST_CONFIRMATION_GOODS_CONNECTION_ID = 999;
   let TEST_GOODS: Goods;
   beforeAll(async () => {
@@ -39,6 +40,15 @@ describe('GoodsService', () => {
       },
     });
     TEST_USER_ID = testSeller.id;
+    const testCategory = await __prisma.goodsCategory.create({
+      data: {
+        categoryCode: '3',
+        name: 'test-category',
+        mainCategoryFlag: true,
+      },
+    });
+
+    TEST_CATEGORY_ID = testCategory.id;
     // 테스트용 더미 Goods, GoodsConfirmation 생성
     TEST_GOODS = await __prisma.goods.create({
       data: {
@@ -71,6 +81,16 @@ describe('GoodsService', () => {
             firstmallGoodsConnectionId: TEST_CONFIRMATION_GOODS_CONNECTION_ID,
           },
         },
+        categories: {
+          connect: {
+            id: TEST_CATEGORY_ID,
+          },
+        },
+        informationNotice: {
+          create: {
+            contents: JSON.stringify({ name: 'testContents', value: 'testContents' }),
+          },
+        },
       },
     });
   });
@@ -80,17 +100,6 @@ describe('GoodsService', () => {
   });
   it('should be defined', () => {
     expect(service).toBeDefined();
-  });
-  describe('findMyGoodsIds', () => {
-    it('should return empty array', async () => {
-      const goodsIds = await service.findMyGoodsIds(5);
-      expect(goodsIds.length).toBe(0);
-      expect(goodsIds).toEqual([]);
-    });
-    it('should return array of goods ids (numbers)', async () => {
-      const goodsIds = await service.findMyGoodsIds(TEST_USER_ID);
-      expect(goodsIds).toEqual([TEST_CONFIRMATION_GOODS_CONNECTION_ID]);
-    });
   });
   describe('getGoodsList', () => {
     it('should have 1 item and totalItemCount : 1', async () => {
@@ -120,7 +129,7 @@ describe('GoodsService', () => {
   });
   describe('getOneGoods', () => {
     it('should return goods', async () => {
-      const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_ID);
+      const goods = await service.getOneGoods(TEST_GOODS.id);
       expect(goods).toBeDefined();
       expect(goods.confirmation).toBeDefined();
       expect(goods.confirmation.goodsId).toBe(TEST_GOODS.id);
@@ -140,7 +149,7 @@ describe('GoodsService', () => {
         .spyOn(service, 'deleteGoodsContentImagesFromS3')
         .mockImplementation(returnDeleteObjectsCommandOutput);
       await service.deleteLcGoods({ sellerId: TEST_USER_ID, ids: [TEST_GOODS.id] });
-      const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_ID);
+      const goods = await service.getOneGoods(TEST_GOODS.id);
       expect(goods).toBeNull();
     });
   });

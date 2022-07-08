@@ -98,7 +98,7 @@ export function CommonFooter({ footerLinkList }: CommonFooterProps): JSX.Element
             <SocialButton
               icon={<FaInstagram fontSize="20px" />}
               label="Instagram"
-              href="https://www.instagram.com/zzmarket/"
+              href="https://www.instagram.com/kk__market/"
             />
           </Stack>
           <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={2}>

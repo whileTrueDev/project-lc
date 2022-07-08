@@ -15,8 +15,13 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUnderlinedText';
 import { CenterBox } from '@project-lc/components-layout/CenterBox';
-import { useLoginMutation, InactiveUserPayload } from '@project-lc/hooks';
+import {
+  useLoginMutation,
+  InactiveUserPayload,
+  useCartMigrationMutation,
+} from '@project-lc/hooks';
 import { LoginUserDto, UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
@@ -52,11 +57,13 @@ export function LoginForm({
 
   // * 로그인 핸들러
   const login = useLoginMutation(userType);
-
+  // * 로그인시 카트 정보 소비자에 연결
+  const cartMutation = useCartMigrationMutation();
   const onSubmit = useCallback(
     async (data: LoginUserDto) => {
       const user = await login.mutateAsync(data).catch((err) => {
-        setFormError(getMessage(err?.response.data?.status));
+        console.log(err);
+        setFormError(getMessage(err?.response?.data?.status));
         setValue('password', '');
       });
       if (user && (user as InactiveUserPayload).inactiveFlag) {
@@ -65,10 +72,16 @@ export function LoginForm({
         return;
       }
       if (user) {
-        router.push('/mypage');
+        cartMutation.mutateAsync({ customerId: user.id });
+        const nextPage = router.query.nextpage as string;
+        if (nextPage) {
+          router.push(nextPage.startsWith('/') ? nextPage : `/${nextPage}`);
+        } else {
+          router.push('/mypage');
+        }
       }
     },
-    [login, setValue, router, setToActivateEmail],
+    [login, setValue, setToActivateEmail, router, cartMutation],
   );
 
   function getMessage(statusCode: number | undefined): string {
@@ -134,6 +147,23 @@ export function LoginForm({
           >
             로그인
           </Button>
+
+          {/* 비회원 주문 링크 */}
+          {router.query.from === 'purchase' && router.query.nextpage && (
+            <Box mt={4}>
+              <Text>
+                비회원으로 구매하시겠습니까?{' '}
+                <ClickableUnderlinedText
+                  color="blue.500"
+                  fontSize="md"
+                  onClick={() => router.push(router.query.nextpage as string)}
+                  as="span"
+                >
+                  비회원 구매
+                </ClickableUnderlinedText>
+              </Text>
+            </Box>
+          )}
         </Box>
 
         <Box pb={2}>
@@ -160,6 +190,13 @@ export function LoginForm({
           </Text>
         </Stack>
       </Stack>
+
+      {/* 비회원 주문조회버튼 - 소비자센터 로그인인 경우에만 표시 */}
+      {userType === 'customer' && router.query.from !== 'purchase' && (
+        <NextLink href="/nonmember" passHref>
+          <Button as={Link}>비회원 주문조회</Button>
+        </NextLink>
+      )}
     </CenterBox>
   );
 }
