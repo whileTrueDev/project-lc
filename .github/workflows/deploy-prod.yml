@@ -39,7 +39,10 @@ jobs:
 
       #  Build API server
       - name: Build
-        run: yarn affected:build --prod --base=origin/master~1 --head=HEAD
+        run: |
+          yarn affected:build --prod \
+          --base=origin/master~1 --head=HEAD \
+          --exclude=web-kkshow --exclude=web-broadcaster-center --exclude=web-seller  --exclude=admin
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -63,6 +66,7 @@ jobs:
           yarn affected \
             --target=dockerize \
             --base=origin/master~1 --head=HEAD \
+            --exclude=web-kkshow --exclude=web-broadcaster-center --exclude=web-seller  --exclude=admin \
             --args="--registry=$ECR_REGISTRY --tag=prod-$IMAGE_TAG"
 
   DeployAPI:
