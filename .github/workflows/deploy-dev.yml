@@ -39,9 +39,9 @@ jobs:
       #  Build API server
       - name: Build
         run: |
-        yarn affected:build --prod \
-        --base=origin/dev~1 --head=HEAD \
-        --exclude=web-kkshow --exclude=web-broadcaster-center --exclude=web-seller --exclude=admin
+          yarn affected:build --prod \
+          --base=origin/dev~1 --head=HEAD \
+          --exclude=web-kkshow --exclude=web-broadcaster-center --exclude=web-seller --exclude=admin
 
       - name: Configure AWS credentials
         if: ${{ success() }}
