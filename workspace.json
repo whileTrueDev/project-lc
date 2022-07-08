@@ -584,6 +584,27 @@
             "jestConfig": "apps/mailer/jest.config.js",
             "passWithNoTests": true
           }
+        },
+        "dockerize": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker build -f ./apps/mailer/Dockerfile -t {args.registry}/project-lc-mailer:{args.tag} --platform=linux/amd64 .",
+              "docker tag {args.registry}/project-lc-mailer:{args.tag} {args.registry}/project-lc-mailer:latest",
+              "docker push --all-tags {args.registry}/project-lc-mailer"
+            ],
+            "parallel": false
+          }
+        },
+        "dockerize-dev": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker build -f ./apps/mailer/Dockerfile -t {args.registry}/project-lc-mailer-dev:latest --platform=linux/amd64 .",
+              "docker push {args.registry}/project-lc-mailer-dev:latest"
+            ],
+            "parallel": false
+          }
         }
       }
     },
