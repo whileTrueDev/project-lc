@@ -11,6 +11,7 @@ import { throwError } from 'rxjs';
 export class OverlayControllerService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // 방송인 url 받아오기
   async getCreatorUrls(): Promise<
     { email: string; userNickname: string; overlayUrl: string }[]
   > {
@@ -25,6 +26,7 @@ export class OverlayControllerService {
     return urlAndNickname;
   }
 
+  // 응원메세지 create
   async uploadPurchase(data: PurchaseMessageWithLoginFlag): Promise<boolean> {
     const { nickname } = data;
     const text = data.message;
@@ -50,6 +52,7 @@ export class OverlayControllerService {
     return true;
   }
 
+  // 응원메세지 목록 get
   async getPurchaseMessage(
     liveShoppingId: number,
   ): Promise<liveShoppingPurchaseMessageDto[]> {
@@ -67,6 +70,7 @@ export class OverlayControllerService {
     });
   }
 
+  // 특정 응원메세지 delete
   async deletePurchaseMessage(messageId: number): Promise<boolean> {
     const deletePurchaseMessage = await this.prisma.liveShoppingPurchaseMessage.delete({
       where: { id: Number(messageId) },

@@ -33,6 +33,7 @@ export class OverlayService {
     };
   }
 
+  // 응원메세지 tts 변환
   async googleTextToSpeech(
     purchaseData: PurchaseMessage,
   ): Promise<string | false | Uint8Array> {
@@ -44,6 +45,7 @@ export class OverlayService {
     let messageWithAppreciate: string;
 
     switch (ttsSetting) {
+      // breaktime tag를 통해 문장 사이에 끊어 읽기
       case 'full':
         messageWithAppreciate = `
         <speak>
@@ -82,7 +84,10 @@ export class OverlayService {
         break;
     }
 
+    // speakingRate를 통해 읽는 속도 조절
     const audioConfig: AudioEncoding = { speakingRate: 1.3, audioEncoding: 'MP3' };
+
+    // name과 ssmlGender 변경을 통해 다른 보이스 타입 사용 가능
     const voice: Voice = {
       languageCode: 'ko-KR',
       name: 'ko-KR-Standard-A',
@@ -101,6 +106,7 @@ export class OverlayService {
     return false;
   }
 
+  // 방송 시작 알림
   async streamNotification(text: string): Promise<string | false | Uint8Array> {
     const client = new textToSpeech.TextToSpeechClient(this.options);
 
@@ -131,6 +137,7 @@ export class OverlayService {
     return false;
   }
 
+  // 중간금액 알림
   async streamObjectiveNotification(text: string): Promise<string | false | Uint8Array> {
     const client = new textToSpeech.TextToSpeechClient(this.options);
 
@@ -164,7 +171,8 @@ export class OverlayService {
     return false;
   }
 
-  async getRanking(overlayUrl): Promise<NicknameAndPrice[]> {
+  // 랭킹 받아오기
+  async getRanking(overlayUrl: string): Promise<NicknameAndPrice[]> {
     const topRanks = await this.prisma.liveShoppingPurchaseMessage.groupBy({
       by: ['nickname'],
       where: {
@@ -181,6 +189,7 @@ export class OverlayService {
     return topRanks;
   }
 
+  // 총 판매금액 받아오기
   async getTotalSoldPrice(): Promise<PriceSum> {
     const totalSoldPrice = await this.prisma.liveShoppingPurchaseMessage.aggregate({
       _sum: {
@@ -191,7 +200,8 @@ export class OverlayService {
     return totalSoldPrice;
   }
 
-  async getMessageAndNickname(overlayUrl): Promise<NicknameAndText[]> {
+  // 닉네임과 메세지 (하단띠배너에 사용)
+  async getMessageAndNickname(overlayUrl: string): Promise<NicknameAndText[]> {
     const messageAndNickname = await this.prisma.liveShoppingPurchaseMessage.findMany({
       select: {
         nickname: true,
@@ -208,6 +218,7 @@ export class OverlayService {
     return messageAndNickname;
   }
 
+  // 세로배너 받아오기
   async getBannerImagesFromS3(
     email: BroadcasterEmail,
     liveShoppingId: number,
@@ -235,6 +246,7 @@ export class OverlayService {
     return imagesUrls;
   }
 
+  // 방송 시작, 종료시간 받아오기
   async getRegisteredTime(liveShoppingId: number): Promise<LiveShoppingBroadcastDate> {
     return this.prisma.liveShopping.findFirst({
       where: {
@@ -247,6 +259,7 @@ export class OverlayService {
     });
   }
 
+  // 중간금액 알림시 하단 띠배너에 현재까지 구매한 모든 구매자의 목록
   async getCustomerIds(
     liveShoppingId: number,
   ): Promise<liveShoppingPurchaseMessageNickname[]> {

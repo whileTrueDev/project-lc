@@ -1,6 +1,6 @@
 const { gsap } = window;
 const { Back } = window;
-
+// 치킨 테마에서만 사용되는 크크쇼 플러스친구 이벤트 알림 애니메이션
 export function chickenMovement() {
   const tl = gsap.timeline();
 
