@@ -148,7 +148,7 @@ export class KkshowSearchService {
     await data.broadcasterSearch.forEach((row) => {
       goods.push({
         title: row.goods.goods_name,
-        linkUrl: row.goods.confirmation.firstmallGoodsConnectionId
+        linkUrl: row.goods?.confirmation?.firstmallGoodsConnectionId
           ? `https://k-kmarket.com/goods/view?no=${row.goods.confirmation.firstmallGoodsConnectionId}`
           : `${getKkshowWebHost()}/goods/${row.goods.id}`,
         imageUrl: row.goods.image[0].image,
