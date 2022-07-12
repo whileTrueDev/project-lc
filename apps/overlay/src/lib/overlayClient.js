@@ -845,6 +845,13 @@ socket.on('change theme from server', (themeType) => {
       $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').addClass(
         themeType,
       );
+      $('.ranking-area-inner').append(`
+      <img src='/images/wave_bg.png' id='summer-theme-ranking-background' style='width:100%;position:absolute;left:0px;bottom:0px;z-index:-1' />`);
+      $('.live-commerce').append(`
+      <div class='tube' id='left'>
+        <img src='/images/tube.png' />
+      </div>
+      `);
       break;
     case 'chicken':
       $(
