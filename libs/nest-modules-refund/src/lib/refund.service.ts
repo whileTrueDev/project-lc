@@ -105,24 +105,27 @@ export class RefundService {
       },
     });
 
-    // 연결된 주문취소 있는경우
-    if (orderCancellationId) {
-      // 환불정보와 연결 + 주문취소 상태를 완료로 업데이트
-      await this.orderCancellationService.updateOrderCancellationStatus(
-        orderCancellationId,
-        { status: 'complete', refundId: data.id },
-      );
-    }
-
-    // 연결된 반품요청 있는경우
-    if (returnId) {
-      // 환불정보와 연결 & 반품요청 상태 완료로 변경
-      await this.returnService.updateReturnStatus(returnId, {
-        status: 'complete',
-        refundId: data.id,
-      });
-    }
     return data;
+
+    // TODO: 주문취소 다이얼로그에서 처리
+    //  연결된 주문취소 있는경우
+    // if (orderCancellationId) {
+    //    환불정보와 연결 + 주문취소 상태를 완료로 업데이트
+    //   await this.orderCancellationService.updateOrderCancellationStatus(
+    //     orderCancellationId,
+    //     { status: 'complete', refundId: data.id },
+    //   );
+    // }
+
+    // TODO: 반품 환불처리 다이얼로그에서 처리
+    //  연결된 반품요청 있는경우
+    // if (returnId) {
+    //    환불정보와 연결 & 반품요청 상태 완료로 변경
+    //   await this.returnService.updateReturnStatus(returnId, {
+    //     status: 'complete',
+    //     refundId: data.id,
+    //   });
+    // }
   }
 
   /** 환불내역 목록 조회 - 소비자, 판매자 */
