@@ -112,7 +112,7 @@ export function LiveShoppingManagerContacts(): JSX.Element {
             {!data || watch('useContact') === 'new' ? (
               <Input
                 id="email"
-                placeholder="minsu@example.com"
+                placeholder="kkshow@example.com"
                 autoComplete="off"
                 maxWidth={300}
                 value={watch('email', '')}
@@ -122,7 +122,7 @@ export function LiveShoppingManagerContacts(): JSX.Element {
               <Input
                 id="email"
                 variant="filled"
-                placeholder="minsu@example.com"
+                placeholder="kkshow@example.com"
                 autoComplete="off"
                 maxWidth={300}
                 value={data.email}

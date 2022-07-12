@@ -186,7 +186,7 @@ export function SignupForm({
           <Input
             id="email"
             type="email"
-            placeholder="minsu@example.com"
+            placeholder="kkshow@example.com"
             isReadOnly={phase === 2}
             autoComplete="off"
             {...register('email', { ...emailRegisterOptions })}
