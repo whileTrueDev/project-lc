@@ -11,7 +11,7 @@ import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { INFINITE_ORDER_LIST_QUERY_KEY, useInfiniteOrderList } from '@project-lc/hooks';
 import { GetOrderListDto, OrderDataWithRelations } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/router';
@@ -128,6 +128,39 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
 
   const giftBroadcaster = order.orderItems.find((oi) => !!oi.support)?.support
     ?.broadcaster;
+
+  // 주문상품에 연결된 옵션 중 교환/환불/주문취소 요청에 포함된 옵션 제외
+  // 주문상품별이 아니라 주문상품옵션별로 표시됨
+  // 그 중 교환/환불/주문취소 요청된 옵션은 주문내역에 표시하지 않음
+  const filteredOrderItems = useMemo(() => {
+    // 반품요청된 주문상품옵션 id[]
+    const returnItemIds =
+      order.returns?.flatMap((r) => r.items).map((ri) => ri.orderItemOptionId) || [];
+    // 교환요청된 주문상품옵션 id[]
+    const exchangeItemIds =
+      order.exchanges
+        ?.flatMap((e) => e.exchangeItems)
+        .map((ei) => ei.orderItemOptionId) || [];
+    // 주문취소 요청된 주문상품옵션id []
+    const cancelItemIds =
+      order.orderCancellations
+        ?.flatMap((c) => c.items)
+        .map((ci) => ci.orderItemOptionId) || [];
+
+    // 주문상품에 연결된 주문상품옵션 중 교환,반품, 주문취소 있는 경우 제외
+    const filtered = order.orderItems.map((oi) => {
+      return {
+        ...oi,
+        options: oi.options.filter(
+          (opt) =>
+            !returnItemIds.includes(opt.id) &&
+            !exchangeItemIds.includes(opt.id) &&
+            !cancelItemIds.includes(opt.id),
+        ),
+      };
+    });
+    return filtered;
+  }, [order]);
   return (
     <Stack
       borderWidth="1px"
@@ -157,7 +190,7 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
       )}
 
       <Stack px={1}>
-        {order.orderItems.map((item) => (
+        {filteredOrderItems.map((item) => (
           <OrderItem key={item.id} orderItem={item} order={order} />
         ))}
       </Stack>
