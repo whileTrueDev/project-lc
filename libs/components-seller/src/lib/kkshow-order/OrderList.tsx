@@ -119,7 +119,8 @@ const columns: GridColumns = [
       const totalPrice = params.row.orderItems
         .flatMap((oi: OrderItemWithRelations) => oi.options)
         .reduce(
-          (sum: number, cur: OrderItemOption) => sum + Number(cur.discountPrice),
+          (sum: number, cur: OrderItemOption) =>
+            sum + Number(cur.discountPrice) * Number(cur.quantity), // 주문금액 += (할인가 * 주문상품개수)
           0,
         );
       const text = `${getLocaleNumber(totalPrice)}원`;
