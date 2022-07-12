@@ -1,17 +1,16 @@
 import { Box, Button, Flex, Stack, Text } from '@chakra-ui/react';
 import router from 'next/router';
 import React, { PropsWithChildren } from 'react';
-import KkshowLayout from './KkshowLayout';
 
-interface ErrorBoundaryState {
+interface MypageErrorBoundrayState {
   hasError: boolean;
 }
-type ErrorBoundaryProps = PropsWithChildren<Record<string, unknown>>;
-export class ErrorBoundary extends React.Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
+type MypageErrorBoundrayProps = PropsWithChildren<Record<string, unknown>>;
+export class MypageErrorBoundray extends React.Component<
+  MypageErrorBoundrayProps,
+  MypageErrorBoundrayState
 > {
-  constructor(props: ErrorBoundaryProps) {
+  constructor(props: MypageErrorBoundrayProps) {
     super(props);
 
     // Define a state variable to track whether is an error or not
@@ -34,17 +33,17 @@ export class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       // You can render any custom fallback UI
       return (
-        <KkshowLayout>
-          <Flex h="80vh" justify="center" align="center">
-            <Stack textAlign="center" spacing={4} p={8}>
-              <Box>
-                <Text>죄송합니다.</Text>
-                <Text>페이지를 표시하는 도중 오류가 발생했습니다.</Text>
-              </Box>
-              <Button onClick={() => router.push('/')}>메인페이지로</Button>
+        <Flex h="80vh" justify="center" align="center">
+          <Stack textAlign="center" spacing={4} p={8}>
+            <Box>
+              <Text>죄송합니다.</Text>
+              <Text>페이지를 표시하는 도중 오류가 발생했습니다.</Text>
+            </Box>
+            <Stack>
+              <Button onClick={() => router.back()}>뒤로가기</Button>
             </Stack>
-          </Flex>
-        </KkshowLayout>
+          </Stack>
+        </Flex>
       );
     }
 
@@ -53,4 +52,4 @@ export class ErrorBoundary extends React.Component<
   }
 }
 
-export default ErrorBoundary;
+export default MypageErrorBoundray;
