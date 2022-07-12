@@ -40,13 +40,13 @@ export function CustomerNicknameChangeDialog(
     const onSuccess = (): void => {
       // 성공시
       reset();
-      toast({ title: '닉네임이 변경되었습니다.', status: 'success' });
+      toast({ title: '닉네임이 설정되었습니다.', status: 'success' });
       onClose();
     };
     const onError = (err?: any): void => {
       const { status, message } = parseErrorObject(err);
       toast({
-        title: '닉네임 변경중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        title: '닉네임 설정중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
         description: status ? `code: ${status} - message: ${message}` : undefined,
         status: 'error',
       });
@@ -72,10 +72,10 @@ export function CustomerNicknameChangeDialog(
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(onSubmit)}>
-        <ModalHeader>닉네임 변경</ModalHeader>
+        <ModalHeader>닉네임 설정</ModalHeader>
         <ModalBody>
           <FormControl isInvalid={!!errors.nickname}>
-            <FormLabel>변경할 닉네임</FormLabel>
+            <FormLabel>설정할 닉네임</FormLabel>
             <Input
               isRequired
               placeholder="닉네임을 입력해주세요"
@@ -93,7 +93,7 @@ export function CustomerNicknameChangeDialog(
             취소
           </Button>
           <Button colorScheme="blue" type="submit">
-            변경
+            설정
           </Button>
         </ModalFooter>
       </ModalContent>
