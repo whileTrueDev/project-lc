@@ -27,7 +27,11 @@ export const GoodsDisplayDetail = ({
   fontSize = { base: 'md', md: 'lg' },
   noOfLines = 1,
 }: GoodsDisplayDetailProps): JSX.Element => {
-  const isDiscounted = useMemo(() => goods.discountedPrice, [goods.discountedPrice]);
+  const isDiscounted = useMemo(() => {
+    if (!goods.discountedPrice) return false;
+    if (goods.discountedPrice === goods.normalPrice) return false;
+    return true;
+  }, [goods.discountedPrice, goods.normalPrice]);
   return (
     <Box minH={20}>
       <Heading
