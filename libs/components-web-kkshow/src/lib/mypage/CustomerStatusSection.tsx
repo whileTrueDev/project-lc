@@ -1,14 +1,17 @@
 import {
   Box,
+  Button,
   Stack,
   Stat,
   StatLabel,
   StatNumber,
   Text,
   useColorModeValue,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { AvatarChangeButton } from '@project-lc/components-shared/AvatarChangeButton';
-import { useCustomerStatus, useProfile } from '@project-lc/hooks';
+import { useCustomerInfo, useCustomerStatus, useProfile } from '@project-lc/hooks';
+import CustomerNicknameChangeDialog from './info/CustomerNicknameChangeDialog';
 
 interface CustomerStatusSectionProps {
   mobileVisibility?: boolean;
@@ -41,7 +44,7 @@ export function CustomerStatusSection({
           <Text fontWeight="bold" fontSize={{ base: 'lg', md: 'xl' }}>
             {profileData?.name} 님
           </Text>
-          <Text>({profileData?.email})</Text>
+          <NicknameBox customerId={profileData?.id} />
         </Box>
       </Box>
 
@@ -60,5 +63,35 @@ function StatusBox({ label, value }: { label: string; value?: number }): JSX.Ele
       <StatLabel>{label}</StatLabel>
       <StatNumber>{value}</StatNumber>
     </Stat>
+  );
+}
+
+function NicknameBox({ customerId }: { customerId?: number }): JSX.Element | null {
+  const { data: customer } = useCustomerInfo(customerId);
+  const nicknameDialog = useDisclosure();
+  if (!customer) return null;
+  return (
+    <Box p={2} maxW={280}>
+      {customer.nickname ? (
+        <Text>{customer?.nickname}</Text>
+      ) : (
+        <Box>
+          <Button
+            size="sm"
+            variant="link"
+            textDecor="underline"
+            onClick={nicknameDialog.onOpen}
+          >
+            닉네임설정
+          </Button>
+          <CustomerNicknameChangeDialog
+            isOpen={nicknameDialog.isOpen}
+            onClose={nicknameDialog.onClose}
+            onConfirm={nicknameDialog.onClose}
+            userId={customer.id}
+          />
+        </Box>
+      )}
+    </Box>
   );
 }

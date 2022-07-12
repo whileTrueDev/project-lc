@@ -188,7 +188,7 @@ export function ResetPasswordForm(): JSX.Element {
               <Input
                 id="email"
                 type="email"
-                placeholder="minsu@example.com"
+                placeholder="kkshow@example.com"
                 autoComplete="off"
                 autoFocus
                 {...register('email', { ...emailRegisterOptions })}

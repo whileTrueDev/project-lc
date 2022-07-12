@@ -55,6 +55,6 @@ export const termsData = [
     category: PolicyCategory.termsOfService,
     publicFlag: true,
     enforcementDate: new Date('2022-01-01'),
-    content: BROADCASTER_TERMS_OF_SERVICE, // 소비자용 이용약관 없어서 임의로 방송인 이용약관 넣음
+    content: BROADCASTER_TERMS_OF_SERVICE.replace('방송인', '소비자'), // 소비자용 이용약관 없어서 임의로 방송인 이용약관 넣음
   },
 ];

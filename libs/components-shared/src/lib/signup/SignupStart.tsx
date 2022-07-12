@@ -63,7 +63,7 @@ export function SignupStart({
         <List spacing={3}>
           {displayTextList.map((text) => (
             <ListItem key={nanoid()}>
-              <ListIcon as={CheckIcon} color="green.500" />
+              <ListIcon as={CheckIcon} color="green.500" verticalAlign="middle" />
               {text}
             </ListItem>
           ))}

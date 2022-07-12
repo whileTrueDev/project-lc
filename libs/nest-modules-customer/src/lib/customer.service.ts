@@ -20,7 +20,13 @@ export class CustomerService {
   public async signUp(dto: SignUpDto): Promise<Customer> {
     const hashedPw = await this.pwManager.hashPassword(dto.password);
     const created = await this.prisma.customer.create({
-      data: { email: dto.email, password: hashedPw, nickname: '', name: dto.name },
+      data: {
+        email: dto.email,
+        password: hashedPw,
+        nickname: '',
+        name: dto.name,
+        agreementFlag: true,
+      },
     });
     return created;
   }

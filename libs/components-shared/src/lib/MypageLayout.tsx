@@ -10,6 +10,7 @@ import FullscreenLoading from '@project-lc/components-layout/FullscreenLoading';
 import MypageFooter from '@project-lc/components-layout/MypageFooter';
 import { useDisplaySize, useIsLoggedIn } from '@project-lc/hooks';
 import { FloatingHelpButton } from './FloatingHelpButton';
+import MypageErrorBoundray from './MypageErrorBoundary';
 import { MypageToolbar } from './MypageToolbar';
 import { Navbar } from './Navbar';
 import DesktopMypageSidebar from './navbar/DesktopMypageSidebar';
@@ -66,8 +67,10 @@ export function MypageLayout({
               className="content-wrapper"
               minHeight={`calc(100vh - ${NAVBAR_HEIGHT}px - ${FOOTER_HEIGHT}px)`}
             >
-              <MypageToolbar appType={appType} />
-              {children}
+              <MypageErrorBoundray>
+                <MypageToolbar appType={appType} />
+                {children}
+              </MypageErrorBoundray>
             </Box>
             {/* 하단 푸터 */}
             <MypageFooter />

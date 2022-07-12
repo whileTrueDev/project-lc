@@ -80,7 +80,7 @@ export function BuyerInfo(): JSX.Element {
             <Input
               maxW={250}
               type="email"
-              placeholder="minsu@example.com"
+              placeholder="kkshow@example.com"
               {...register('ordererEmail', { ...emailRegisterOptions })}
             />
             <FormErrorMessage>{errors.ordererEmail?.message}</FormErrorMessage>
