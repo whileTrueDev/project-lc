@@ -96,7 +96,7 @@ export function LoginForm({
 
   return (
     <CenterBox enableShadow={enableShadow} header={{ title: '로그인', desc: '' }}>
-      <Stack mt={4} spacing={4} as="form" onSubmit={handleSubmit(onSubmit)}>
+      <Stack mt={2} spacing={2} as="form" onSubmit={handleSubmit(onSubmit)}>
         <FormControl isInvalid={!!errors.email}>
           <FormLabel htmlFor="email">이메일</FormLabel>
           <Input
