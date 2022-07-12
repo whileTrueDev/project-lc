@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Query, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { Policy } from '@prisma/client';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { GetPolicyDto } from '@project-lc/shared-types';
@@ -17,7 +17,9 @@ export class PolicyController {
 
   // * 최신 데이터 1개 조회
   @Get()
-  async getPolicy(@Query() dto: GetPolicyDto): Promise<Policy> {
+  async getPolicy(
+    @Query(new ValidationPipe({ transform: true })) dto: GetPolicyDto,
+  ): Promise<Policy> {
     return this.policyService.getLatestPolicy(dto);
   }
 }
