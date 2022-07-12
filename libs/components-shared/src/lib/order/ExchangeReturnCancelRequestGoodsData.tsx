@@ -26,7 +26,7 @@ export function ExchangeReturnCancelRequestGoodsData(
           <TextDotConnector />
           <Text>{amount} 개 </Text>
           <TextDotConnector />
-          <Text>{getLocaleNumber(price)}원</Text>
+          <Text>{getLocaleNumber(price * amount)}원</Text>
         </Stack>
       </Stack>
     </Stack>
