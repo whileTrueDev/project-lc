@@ -171,7 +171,7 @@ export function SignupForm({
           <Input
             id="name"
             type="text"
-            placeholder="김민수"
+            placeholder="김크크쇼"
             autoComplete="off"
             isReadOnly={phase === 2}
             {...register('name', {
