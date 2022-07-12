@@ -66,6 +66,7 @@ export function PasswordCheckForm(props: PasswordCheckFormProps): JSX.Element {
         <Input
           type="password"
           mb={2}
+          placeholder="비밀번호를 입력해주세요."
           {...register('password', { required: '비밀번호를 입력해주세요.' })}
         />
         <FormErrorMessage>{errors.password?.message}</FormErrorMessage>

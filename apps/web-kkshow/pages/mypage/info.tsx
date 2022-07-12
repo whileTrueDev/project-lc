@@ -30,7 +30,7 @@ export function Info(): JSX.Element {
         </Text>
 
         {!isValidated && (
-          <Stack>
+          <Stack mt={1}>
             <Text>
               회원님의 개인정보를 안전하게 보호하기 위해 인증 후 변경이 가능합니다.
             </Text>
@@ -41,6 +41,7 @@ export function Info(): JSX.Element {
               borderRadius="5px"
               alignItems="space-between"
               justifyContent="flex-start"
+              maxW={400}
             >
               <Flex>
                 <Text mr={2}>이메일:</Text>
@@ -48,7 +49,7 @@ export function Info(): JSX.Element {
               </Flex>
 
               <Box>
-                <Text>비밀번호 입력</Text>
+                <Text>비밀번호</Text>
                 <PasswordCheckForm
                   email={profileData?.email}
                   onCancel={onClose}
