@@ -215,6 +215,13 @@ export function GoodsViewPriceTag({
 
   const deliveryFeeToggle = useDisclosure();
 
+  const discountRate = useMemo(() => {
+    return getDiscountedRate(
+      Number(defaultOption.consumer_price),
+      Number(defaultOption.price),
+    );
+  }, [defaultOption.consumer_price, defaultOption.price]);
+
   return (
     <Grid
       templateColumns="1fr 2fr"
@@ -240,13 +247,9 @@ export function GoodsViewPriceTag({
           <Text id="price" fontWeight="medium">
             {getLocaleNumber(defaultOption?.price)}원
           </Text>
-          {defaultOption && (
+          {defaultOption && discountRate !== '0' && (
             <Heading ml={2} as="span" fontSize="lg" color="blue.500" id="discount-rate">
-              {getDiscountedRate(
-                Number(defaultOption.consumer_price),
-                Number(defaultOption.price),
-              )}
-              %
+              {discountRate}%
             </Heading>
           )}
         </Flex>

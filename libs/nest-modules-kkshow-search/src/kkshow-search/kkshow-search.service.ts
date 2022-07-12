@@ -6,6 +6,7 @@ import {
   SearchResult,
   SearchKeyword,
 } from '@project-lc/shared-types';
+import { getKkshowWebHost } from '@project-lc/utils';
 
 @Injectable()
 export class KkshowSearchService {
@@ -110,10 +111,16 @@ export class KkshowSearchService {
     const liveContents = [];
 
     await data.productSearch.forEach((row) => {
+      const getCorrectLinkUrl = (): string => {
+        if (row.confirmation?.firstmallGoodsConnectionId) {
+          return `https://k-kmarket.com/goods/view?no=${row.confirmation.firstmallGoodsConnectionId}`;
+        }
+        return `${getKkshowWebHost()}/goods/${row.id}`;
+      };
       if (row.LiveShopping.length !== 0) {
         goods.push({
           title: row.goods_name,
-          linkUrl: `https://k-kmarket.com/goods/view?no=${row.confirmation.firstmallGoodsConnectionId}`,
+          linkUrl: getCorrectLinkUrl(),
           imageUrl: row.image[0].image,
         });
         broadcasters.push({
@@ -132,7 +139,7 @@ export class KkshowSearchService {
       } else {
         goods.push({
           title: row.goods_name,
-          linkUrl: `https://k-kmarket.com/goods/view?no=${row.confirmation.firstmallGoodsConnectionId}`,
+          linkUrl: getCorrectLinkUrl(),
           imageUrl: row.image[0].image,
         });
       }
@@ -141,13 +148,15 @@ export class KkshowSearchService {
     await data.broadcasterSearch.forEach((row) => {
       goods.push({
         title: row.goods.goods_name,
-        linkUrl: `https://k-kmarket.com/goods/view?no=${row.goods.confirmation.firstmallGoodsConnectionId}`,
+        linkUrl: row.goods?.confirmation?.firstmallGoodsConnectionId
+          ? `https://k-kmarket.com/goods/view?no=${row.goods.confirmation.firstmallGoodsConnectionId}`
+          : `${getKkshowWebHost()}/goods/${row.goods.id}`,
         imageUrl: row.goods.image[0].image,
       });
 
       broadcasters.push({
         title: row.broadcaster.userNickname,
-        linkUrl: row.broadcaster.channels[0].url,
+        linkUrl: row.broadcaster.channels[0].url, // 향후 상품홍보페이지로 이동하도록 변경
         imageUrl: row.broadcaster.avatar,
       });
 

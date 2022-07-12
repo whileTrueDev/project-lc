@@ -62,7 +62,8 @@ export function OrderItem({
       <Flex gap={2}>
         <Image
           draggable={false}
-          src={goods.data.image[1].image}
+          src={goods.data.image ? goods.data.image[0].image : ''}
+          alt={goods.data.goods_name}
           w={{ base: 45, sm: 85 }}
           h={{ base: 45, sm: 85 }}
           rounded="md"
