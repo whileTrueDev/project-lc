@@ -100,11 +100,47 @@ export class OrderCancellationService {
    * TODO : 주문에 포함된 일부 주문상품옵션을 취소하는 경우 => 주문취소요청에 포함된 주문상품옵션의 상태만 업데이트하도록 수정
    *
    */
-  private async updateOrderStateAfterOrderCancelApproved(orderId: number): Promise<void> {
+  private async updateOrderStateAfterOrderCancelApproved({
+    orderId,
+    orderCancellationId,
+  }: {
+    orderId: number;
+    orderCancellationId;
+  }): Promise<void> {
+    // 주문에 포함된 모든 주문상품옵션
+    const everyOrderItemOptions = await this.prisma.orderItemOption.findMany({
+      where: { orderItem: { orderId } },
+      select: { id: true, step: true, orderCancellationItems: true },
+    });
+    // 취소된 주문상품옵션
+    const canceledOrderItemOptions = everyOrderItemOptions.filter(
+      (o) =>
+        o.orderCancellationItems.length > 0 &&
+        o.orderCancellationItems.every((oc) => oc.status === 'complete'),
+    );
+
     const originOrder = await this.prisma.order.findUnique({
       where: { id: orderId },
       select: { step: true },
     });
+    const newOrderStep = originOrder.step;
+
+    const promises = [];
+
+    // 주문취소에 포함된 주문취소상품의 상태 변경 - 바꿔야하는 주문상품옵션들
+    const targetOrderItemOptions = canceledOrderItemOptions.filter((o) =>
+      o.orderCancellationItems.every(
+        (c) => c.orderCancellationId === orderCancellationId,
+      ),
+    );
+    // 주문에 포함된 모든 주문상품옵션이 취소되었다면
+    if (everyOrderItemOptions.length === canceledOrderItemOptions.length) {
+      // 주문의 상태도 변경
+    }
+
+    // TODO : 바꾸기
+
+    //------------
 
     if (originOrder) {
       let targetState: OrderProcessStep;
@@ -252,9 +288,12 @@ export class OrderCancellationService {
       },
     });
 
-    // 주문취소요청이 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
+    // 주문취소요청이 처리완료(승인)되면 주문취소요청된 주문상품옵션과 주문 상태 업데이트
     if (orderCancellation.status === 'complete') {
-      await this.updateOrderStateAfterOrderCancelApproved(orderCancellation.orderId);
+      await this.updateOrderStateAfterOrderCancelApproved({
+        orderId: orderCancellation.orderId,
+        orderCancellationId: orderCancellation.id,
+      });
     }
 
     return orderCancellation;

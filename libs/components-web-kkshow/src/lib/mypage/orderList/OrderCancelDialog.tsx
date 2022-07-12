@@ -7,6 +7,7 @@ import {
   useCreateRefundMutation,
   useCustomerOrderCancelMutation,
   useOrderDetail,
+  useUpdateOrderCancelMutation,
 } from '@project-lc/hooks';
 import {
   convertPaymentMethodToKrString,
@@ -36,6 +37,7 @@ export function OrderCancelDialog({
   const toast = useToast();
   const orderCancelMutation = useCustomerOrderCancelMutation();
   const createRefundMutation = useCreateRefundMutation();
+  const orderCancelUpdateMutation = useUpdateOrderCancelMutation();
 
   // 주문취소 요청 가능한 상품옵션
   const targetItemOptions: (OrderCancellationItemDto & {
@@ -78,7 +80,7 @@ export function OrderCancelDialog({
     return orderItemOptionsPrice + targetShippingCost;
   }, [orderDetailData, targetItemOptions]);
 
-  // 주문취소 요청
+  // * 주문취소 요청
   const purchaseConfirmRequest = async (): Promise<void> => {
     if (!orderDetailData) return;
     // 가상계좌 결제건인지
@@ -100,7 +102,6 @@ export function OrderCancelDialog({
       }),
     };
 
-    // try {
     //   /** 생성하거나 완료되지 않은 주문취소요청 가져오는 이유?
     //    * 원래 주문취소요청 생성 시 '완료됨' 상태로 생성했음
     //    * 이 경우 환불데이터 생성 이후 주문 자체가 '주문무효 | 결제취소' 상태로 변경됨
@@ -114,33 +115,41 @@ export function OrderCancelDialog({
     // TODO : 환불데이터 생성 이후 > 주문취소 상태 업데이트& 주문상태 업데이트 요청
     //    */
 
-    // 먼저 주문취소요청을 생성함(혹은 완료되지 않은 주문취소요청 가져옴)
-    //   const res = await orderCancelMutation.mutateAsync(dto);
+    try {
+      // 먼저 주문취소요청을 생성함(혹은 완료되지 않은 주문취소요청 가져옴)
+      const orderCancellationRes = await orderCancelMutation.mutateAsync(dto);
 
-    // 이후 결제완료 주문인 경우에만 환불처리 진행
-    // 선택된(dto에 포함된) 주문상품옵션들이 모두 결제완료 상태인 경우에만 - 주문 금액 일부만 결제하는 기능은 없으므로 모두 결제완료이거나 모두 입금대기 상태임)
-    // if (targetItemOptions.every((opt) => opt.step === 'paymentConfirmed')) {
-    //     const refundAccountInfo = formMethods.getValues();
-    //     const refundDto: CreateRefundDto = {
-    //       orderId: orderDetailData.id,
-    //       reason: '소비자의 주문취소신청',
-    //       items: dto.items,
-    //       orderCancellationId: res.id,
-    //       refundAmount: refundAmount, // 선택된(dto에 포함된) ((주문상품옵션들 가격 * 개수) + 해당 주문상품옵션에 적용된 배송비)로 수정
-    //       paymentKey: orderDetailData.payment?.paymentKey,
-    //       ...refundAccountInfo, // 가상계좌결제의 경우 환불 계좌 정보 추가
-    //       refundBank: refundAccountInfo.refundBank,
-    //     };
-    //     await createRefundMutation.mutateAsync(refundDto);
-    // }
-    //   toast({ title: '주문 취소 완료', status: 'success' });
-    // } catch (e: any) {
-    //   toast({
-    //     title: '주문 취소 중 오류가 발생하였습니다.',
-    //     status: 'error',
-    //     description: e?.response?.data?.message || e?.message,
-    //   });
-    // }
+      // - 주문 금액 일부만 결제하는 기능은 없으므로 선택된(dto에 포함된) 주문상품옵션들은 모두 결제완료이거나 모두 입금대기 상태임
+      // 선택된(dto에 포함된) 주문상품옵션들이 모두 "결제완료" 상태인 경우에만 결제취소 및 환불신청
+      if (targetItemOptions.every((opt) => opt.step === 'paymentConfirmed')) {
+        const refundAccountInfo = formMethods.getValues();
+        const refundDto: CreateRefundDto = {
+          orderId: orderDetailData.id,
+          reason: '소비자의 주문취소신청',
+          items: dto.items,
+          orderCancellationId: orderCancellationRes.id,
+          refundAmount, // 선택된(dto에 포함된) (주문상품옵션들 가격 * 개수) + 해당 주문상품옵션에 적용된 배송비
+          paymentKey: orderDetailData.payment?.paymentKey,
+          ...refundAccountInfo, // 가상계좌결제의 경우 환불 계좌 정보 추가
+          refundBank: refundAccountInfo.refundBank,
+        };
+        await createRefundMutation.mutateAsync(refundDto);
+      }
+
+      // 주문취소요청 상태 업데이트
+      await orderCancelUpdateMutation.mutateAsync({
+        orderCancelId: orderCancellationRes.id,
+        dto: { status: 'complete' },
+      });
+
+      toast({ title: '주문 취소 완료', status: 'success' });
+    } catch (e: any) {
+      toast({
+        title: '주문 취소 중 오류가 발생하였습니다.',
+        status: 'error',
+        description: e?.response?.data?.message || e?.message,
+      });
+    }
   };
 
   return (

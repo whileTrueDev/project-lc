@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -21,7 +20,6 @@ import {
   GetOrderCancellationListDto,
   OrderCancellationDetailRes,
   OrderCancellationListRes,
-  OrderCancellationRemoveRes,
   OrderCancellationUpdateRes,
   UpdateOrderCancellationStatusDto,
 } from '@project-lc/shared-types';
@@ -59,7 +57,7 @@ export class OrderCancellationController {
     return this.orderCancellationService.getOrderCancellationList(dto);
   }
 
-  /* 주문취소 수정(판매자, 관리자가 주문취소처리상태 수정 및 거절사유 입력 등) */
+  /* 주문취소 수정(주문취소처리상태 수정 및 거절사유 입력 등) */
   @Patch('/:orderCancellationId')
   updateOrderCancellationStatus(
     @Param('orderCancellationId', ParseIntPipe) id: number,
