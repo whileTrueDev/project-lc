@@ -1,4 +1,5 @@
 import {
+  Text,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -8,6 +9,7 @@ import {
   ModalCloseButton,
   Button,
   useToast,
+  Stack,
 } from '@chakra-ui/react';
 import { HtmlStringBox } from '@project-lc/components-core/TermBox';
 import { usePolicy, useCustomerInfoMutation, useProfile } from '@project-lc/hooks';
@@ -27,6 +29,10 @@ export function AgreementDialog(props: AgreementDialogProps): JSX.Element {
     category: 'privacy',
     targetUser: 'customer',
   });
+  const { data: termsOfService } = usePolicy({
+    category: 'termsOfService',
+    targetUser: 'customer',
+  });
 
   const onSubmit = (): void => {
     mutateAsync({ agreementFlag: true })
@@ -43,20 +49,33 @@ export function AgreementDialog(props: AgreementDialogProps): JSX.Element {
   };
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>개인정보이용동의</ModalHeader>
+          <ModalHeader>이용약관 동의</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <HtmlStringBox
-              maxHeight={120}
-              {...boxStyle}
-              mb={1}
-              overflowY="auto"
-              fontSize="sm"
-              htmlString={privacyTerm?.content || ''}
-            />
+            <Stack>
+              <Text fontWeight="bold">개인정보 처리방침</Text>
+              <HtmlStringBox
+                maxHeight={120}
+                {...boxStyle}
+                mb={1}
+                overflowY="auto"
+                fontSize="sm"
+                htmlString={privacyTerm?.content || ''}
+              />
+
+              <Text fontWeight="bold">이용약관</Text>
+              <HtmlStringBox
+                maxHeight={120}
+                {...boxStyle}
+                mb={1}
+                overflowY="auto"
+                fontSize="sm"
+                htmlString={termsOfService?.content || ''}
+              />
+            </Stack>
           </ModalBody>
 
           <ModalFooter>

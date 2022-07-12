@@ -100,7 +100,7 @@ export function UserInfo({ userId }: { userId: number }): JSX.Element {
             </HStack>
           </GridItem>
           <GridItem colSpan={1}>
-            <Text fontWeight="bold">개인정보이용동의</Text>
+            <Text fontWeight="bold">이용약관동의</Text>
           </GridItem>
           <GridItem colSpan={3}>
             <HStack>
