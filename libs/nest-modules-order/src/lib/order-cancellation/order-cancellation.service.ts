@@ -26,7 +26,11 @@ export class OrderCancellationService {
     private readonly cipherService: CipherService,
   ) {}
 
-  /* 주문취소 생성(소비자가 주문취소 요청 생성) 혹은 완료되지 않은 요청 반환 - 해당 주문에 대해 완료되지 않은 주문취소요청이 있으면 새로 생성하지 않고 완료되지 않은 주문취소요청을 반환 */
+  /* 주문취소 생성(소비자가 주문취소 요청 생성) 혹은 완료되지 않은 요청 반환 
+  
+  * 해당 주문에 대해 완료되지 않은 주문취소요청이 있으면 새로 생성하지 않고 완료되지 않은 주문취소요청을 반환 
+    => 220712 기준, 전체 주문상품옵션 취소만 가능하기 때문에 완료되지 않은 주문취소 요청이 있으면 반환하도록 만들어둠 // TODO :주문상품옵션 중 일부만 주문취소할 수 있도록 기능이 변경된다면 해당 함수도 같이 수정 필요
+  */
   async findOrCreateOrderCancellation(
     dto: CreateOrderCancellationDto,
   ): Promise<CreateOrderCancellationRes> {
@@ -88,9 +92,13 @@ export class OrderCancellationService {
     return data;
   }
 
-  /** 주문취소요청이 처리완료(승인) 후 주문의 상태 변경
+  /** 주문취소요청이 처리완료(승인) 후 주문 & 주문취소요청 승인된 주문상품옵션 상태 변경
+   *
    * 주문접수 상태에서 승인시 => 주문무효
    * 결제확인 상태에서 승인시 => 결제취소
+   *
+   * TODO : 주문에 포함된 일부 주문상품옵션을 취소하는 경우 => 주문취소요청에 포함된 주문상품옵션의 상태만 업데이트하도록 수정
+   *
    */
   private async updateOrderStateAfterOrderCancelApproved(orderId: number): Promise<void> {
     const originOrder = await this.prisma.order.findUnique({
