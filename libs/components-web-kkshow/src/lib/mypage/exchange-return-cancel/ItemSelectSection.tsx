@@ -1,5 +1,5 @@
 import { Box, Button, Checkbox, Stack, Text } from '@chakra-ui/react';
-import { OrderDetailRes } from '@project-lc/shared-types';
+import { exchangeReturnAbleSteps, OrderDetailRes } from '@project-lc/shared-types';
 import { Dispatch, SetStateAction, useCallback, useEffect } from 'react';
 import { OrderItemOptionInfo } from '../orderList/OrderItemOptionInfo';
 
@@ -52,41 +52,43 @@ export function ItemSelectSection({
 
       {/* 주문상품옵션 1개당 주문목록아이템 1개 생성 */}
       {orderItems.flatMap((item) =>
-        item.options.map((opt) => {
-          const isChecked = !!selectedItems.find(
-            (selectedItem) => selectedItem.orderItemOptionId === opt.id,
-          );
-          return (
-            <Checkbox
-              key={opt.id}
-              isChecked={isChecked}
-              onChange={() => {
-                if (isChecked) {
-                  setSelectedItems((state) =>
-                    state.filter((_item) => _item.orderItemOptionId !== opt.id),
-                  );
-                } else {
-                  setSelectedItems((state) => [
-                    ...state,
-                    {
-                      orderItemId: item.id,
-                      orderItemOptionId: opt.id,
-                      amount: opt.quantity,
-                    },
-                  ]);
-                }
-              }}
-            >
-              <OrderItemOptionInfo
+        item.options
+          .filter((opt) => exchangeReturnAbleSteps.includes(opt.step)) // 주문상품옵션 상태가 재배송/환불 신청이 가능한 것만
+          .map((opt) => {
+            const isChecked = !!selectedItems.find(
+              (selectedItem) => selectedItem.orderItemOptionId === opt.id,
+            );
+            return (
+              <Checkbox
                 key={opt.id}
-                order={order}
-                option={opt}
-                orderItem={item}
-                displayStatus={false}
-              />
-            </Checkbox>
-          );
-        }),
+                isChecked={isChecked}
+                onChange={() => {
+                  if (isChecked) {
+                    setSelectedItems((state) =>
+                      state.filter((_item) => _item.orderItemOptionId !== opt.id),
+                    );
+                  } else {
+                    setSelectedItems((state) => [
+                      ...state,
+                      {
+                        orderItemId: item.id,
+                        orderItemOptionId: opt.id,
+                        amount: opt.quantity,
+                      },
+                    ]);
+                  }
+                }}
+              >
+                <OrderItemOptionInfo
+                  key={opt.id}
+                  order={order}
+                  option={opt}
+                  orderItem={item}
+                  displayStatus={false}
+                />
+              </Checkbox>
+            );
+          }),
       )}
     </Stack>
   );
