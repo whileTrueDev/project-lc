@@ -27,6 +27,7 @@ import {
   NonMemberOrderDetailRes,
   OrderDataWithRelations,
   OrderDetailRes,
+  orderEndSteps,
   OrderListRes,
   orderProcessStepDict,
   OrderPurchaseConfirmationDto,
@@ -536,8 +537,47 @@ export class OrderService {
 
       return this.getStepNameByStringNumber(maxOptionStepStrNum);
     }
-    // 옵션 중 원래 주문상태보다 하나라도 낮거나 높은 상태가 있는 경우 그대로 반환
 
+    // 옵션들 중 원래 주문상태보다 하나라도 높은 상태가 있는 경우
+    // 일부 판매자의 상품이 취소, 무효, 실패 상태인 경우, 주문 자체는 다른 판매자 상품의 상태 중 가장 높은 상태일 수 있다(판매자1의 주문상품은 모두 취소상태, 판매자2의 주문상품은 출고완료상태인 경우, 주문 자체의 상태는 출고완료로 저장되어 있음)
+    if (
+      sellerGoodsOrderItemOptions.some(
+        (io) => Number(orderProcessStepDict[io.step]) > originOrderStepNum,
+      )
+    ) {
+      // 판매자의 상품옵션이 모두 동일하며, 구매확정 | 결제취소 | 주문무효 | 결제실패 인경우 => 해당 상태 리턴
+      const firstItemStep = sellerGoodsOrderItemOptions[0].step;
+      if (
+        sellerGoodsOrderItemOptions.every((io) => io.step === firstItemStep) &&
+        orderEndSteps.includes(firstItemStep)
+      ) {
+        return firstItemStep;
+      }
+      // 판매자의 상품옵션 상태가 다른 경우(일부 결제취소, 일부 구매확정인 경우가 존재할 수 있다 => 구매확정이 최종 상태여야함)
+      // 일부 결제실패인 경우는 존재할 수 없다. (결제실패 - 지불수단 가상계좌 선택후 입금기한 내 미입금하여 취소처리된 경우)
+      // 일부 주문무효인 경우는 현재는 존재하지 않음(주문무효 - 가상게좌 선택후 입금 전 소비자가 주문취소 하는 경우)
+      // 판매자 상품옵션 중 가장 높은 상태 구하기
+      const maxOptionStepNum = Math.max(
+        ...sellerGoodsOrderItemOptions.map((io) => Number(orderProcessStepDict[io.step])),
+      );
+      // 가장 높은 상태가 구매확정이거나 구매확정보다 낮은 단계라면 그대로 리턴
+      if (maxOptionStepNum <= 80) {
+        return this.getStepNameByStringNumber(
+          maxOptionStepNum.toString() as OrderStatusNumString,
+        );
+      }
+
+      // 가장 높은 상태가 결제취소, 주문무효, 결제실패라면 해당 상태 제외한 주문상품 중 가장 높은 상태 리턴
+      // 판매자 상품옵션 중 결제취소85, 주문무효95, 결제실패99 제외한 가장 높은 상태 구하기
+      const exceptSkipStepsMaxOptionsStepStrNum = Math.max(
+        ...sellerGoodsOrderItemOptions
+          .filter((io) => !skipSteps.includes(io.step))
+          .map((io) => Number(orderProcessStepDict[io.step])),
+      ).toString() as OrderStatusNumString;
+      return this.getStepNameByStringNumber(exceptSkipStepsMaxOptionsStepStrNum);
+    }
+
+    // 판매자의 상품옵션 상태가 주문 원상태보다 낮거나 높은 상태가 없다(주문상태와 동일하다)
     return originOrderStep;
   }
 
