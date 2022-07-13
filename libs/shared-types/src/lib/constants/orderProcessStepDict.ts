@@ -159,6 +159,9 @@ export const inquireDisableSteps = [
   'paymentFailed',
 ];
 
+/** 주문 상태 변경시 고려하지 않을 주문상품옵션의 상태 */
+export const skipSteps = ['paymentCanceled', 'orderInvalidated', 'paymentFailed'];
+
 /** 출고 가능한 주문상태 목록 */
 export const exportableSteps: OrderProcessStep[] = [
   'paymentConfirmed',

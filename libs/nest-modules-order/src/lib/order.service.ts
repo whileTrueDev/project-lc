@@ -36,6 +36,7 @@ import {
   sellerOrderSteps,
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
+  skipSteps,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
 import { calculateShippingCost } from '@project-lc/utils';
@@ -835,39 +836,54 @@ export class OrderService {
       };
     }
 
-    // 주문 업데이트
-    await this.prisma.order.update({
-      where: { id: orderId },
-      data: updateInput,
-    });
+    // 주문, 주문상품옵션 상태변경 promise 목록 - 주문 업데이트 추가
+    const promises = [];
+    promises.push(
+      this.prisma.order.update({
+        where: { id: orderId },
+        data: updateInput,
+      }),
+    );
 
-    // 주문 상태를 바꾸는 경우 주문상품옵션의 상태와 개수도 변경
+    // 주문 상태를 바꾸는 경우
     if (rest.step) {
-      const orderItemOptions = await this.prisma.orderItemOption.findMany({
-        where: { orderItem: { orderId } },
-        select: { id: true, quantity: true },
-      });
-      // 주문상태를 결제확인/결제취소/결제실패로 바꾸는경우(주문접수 -> 결제확인)
-      // => 해당 주문에 포함된 주문상품옵션의 상태도 모두 결제확인으로 변경
-      if (['paymentConfirmed', 'paymentCanceled', 'paymentFailed'].includes(rest.step)) {
-        await this.prisma.orderItemOption.updateMany({
-          where: { orderItem: { orderId } },
-          data: { step: rest.step },
-        });
-      }
-      // 주문상태를 상품준비로 바꾸는 경우(결제완료 -> 상품준비)
-      // => 해당 주문에 포함된 주문상품옵션 상태도 모두 상품준비로 변경
-      if (rest.step === 'goodsReady') {
-        await this.prisma.$transaction(
-          orderItemOptions.map((opt) => {
-            return this.prisma.orderItemOption.update({
-              where: { id: opt.id },
-              data: { step: rest.step },
-            });
+      // 주문상태를 결제확인/결제취소/결제실패/주문무효로 바꾸는경우
+      // => 해당 주문에 포함된 주문상품옵션의 상태도 일괄적으로 주문 상태와 동일하게 변경
+      // (220713 기준 결제를 여러번 나눠서 할 수는 없으므로 결제확인시에도 일괄적으로 주문상품옵션 상태 변경함)
+      if (
+        [
+          'paymentConfirmed',
+          'paymentCanceled',
+          'paymentFailed',
+          'orderInvalidated',
+        ].includes(rest.step)
+      ) {
+        promises.push(
+          this.prisma.orderItemOption.updateMany({
+            where: { orderItem: { orderId } },
+            data: { step: rest.step },
           }),
         );
       }
+      // TODO: 수정 필요 - 상품준비로 바꾸는 경우는 판매자가 진행하는 것으로 주문에 포함된 해당 판매자의 상품만 상품준비 상태로 변경되어야 함
+      // 주문상태를 상품준비로 바꾸는 경우(결제완료 -> 상품준비)
+      // => 해당 주문에 포함된 주문상품옵션 상태도 모두 상품준비로 변경 => 하면 안됨. 주문에 포함된 다른 판매자의 상품도 상품준비가 됨
+      // const orderItemOptions = await this.prisma.orderItemOption.findMany({
+      //   where: { orderItem: { orderId } },
+      //   select: { id: true },
+      // });
+      // if (rest.step === 'goodsReady') {
+      //   await this.prisma.$transaction(
+      //     orderItemOptions.map((opt) => {
+      //       return this.prisma.orderItemOption.update({
+      //         where: { id: opt.id },
+      //         data: { step: rest.step },
+      //       });
+      //     }),
+      //   );
+      // }
     }
+    await this.prisma.$transaction(promises);
 
     return true;
   }
@@ -952,6 +968,7 @@ export class OrderService {
     // 주문에 포함된 모든 주문상품옵션이 구매확정 되었다면 주문의 상태도 구매확정으로 변경
     const everyOrderItemOptionsPurchaseConfirmed = order.orderItems
       .flatMap((item) => item.options)
+      .filter((opt) => !skipSteps.includes(opt.step)) // 고려하지 않을 상태(주문취소, 결제취소, 주문무효)인 주문상품옵션 제외
       .every((opt) => opt.step === 'purchaseConfirmed');
 
     if (everyOrderItemOptionsPurchaseConfirmed) {
