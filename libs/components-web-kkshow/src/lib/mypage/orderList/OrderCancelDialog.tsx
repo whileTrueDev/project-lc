@@ -119,6 +119,7 @@ export function OrderCancelDialog({
       // 먼저 주문취소요청을 생성함(혹은 완료되지 않은 주문취소요청 가져옴)
       const orderCancellationRes = await orderCancelMutation.mutateAsync(dto);
 
+      let refundId: number | undefined;
       // - 주문 금액 일부만 결제하는 기능은 없으므로 선택된(dto에 포함된) 주문상품옵션들은 모두 결제완료이거나 모두 입금대기 상태임
       // 선택된(dto에 포함된) 주문상품옵션들이 모두 "결제완료" 상태인 경우에만 결제취소 및 환불신청
       if (targetItemOptions.every((opt) => opt.step === 'paymentConfirmed')) {
@@ -133,16 +134,17 @@ export function OrderCancelDialog({
           ...refundAccountInfo, // 가상계좌결제의 경우 환불 계좌 정보 추가
           refundBank: refundAccountInfo.refundBank,
         };
-        await createRefundMutation.mutateAsync(refundDto);
+        const refundData = await createRefundMutation.mutateAsync(refundDto);
+        refundId = refundData.id; // 환불데이터 생성 후 주문취소요청과 환불 연결하기 위해 refundId를 전달한다
       }
 
       // 주문취소요청 상태 업데이트
       await orderCancelUpdateMutation.mutateAsync({
         orderCancelId: orderCancellationRes.id,
-        dto: { status: 'complete' },
+        dto: { status: 'complete', refundId },
       });
 
-      toast({ title: '주문 취소 완료', status: 'success' });
+      toast({ title: '주문 취소 요청이 처리되었습니다', status: 'success' });
     } catch (e: any) {
       toast({
         title: '주문 취소 중 오류가 발생하였습니다.',
