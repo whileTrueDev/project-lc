@@ -492,11 +492,13 @@ export class OrderService {
     return getOrderProcessStepNameByStringNumber(stringNumber);
   }
 
-  /** 판매자의 주문조회시 주문에 포함된 판매자의 상품옵션의 상태에 따라 표시될 주문의 상태 구하는 함수
+  /** 주문에 포함된 상품옵션의 상태에 따라 표시될 주문의 상태 구하는 함수
+   * - 판매자의 주문조회시 주문에 포함된 판매자의 상품옵션의 상태에 따라 표시될 주문의 상태 구하는 경우 사용
+   * - 주문에 포함된 상품옵션 일부의 상태 변경 후 주문 상태 업데이트 시 사용
    */
-  private getOrderRealStep(
+  public getOrderRealStep(
     originOrderStep: OrderProcessStep,
-    sellerGoodsOrderItemOptions: OrderItemOption[],
+    sellerGoodsOrderItemOptions: { step: OrderItemOption['step'] }[],
   ): OrderProcessStep {
     // 주문상태가 partial000 인지 확인(부분000인지)
     const isPartialStep = [
