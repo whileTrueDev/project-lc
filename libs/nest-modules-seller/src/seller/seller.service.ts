@@ -26,6 +26,7 @@ export class SellerService {
         email: signUpInput.email,
         name: signUpInput.name,
         password: hashedPw,
+        agreementFlag: true,
       },
     });
     return seller;

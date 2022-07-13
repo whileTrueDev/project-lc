@@ -9,6 +9,7 @@ import { SignupProcessItemProps } from './SignupStart';
 
 type AgreeTermsData = {
   privacyPolicy: boolean;
+  termsOfService: boolean;
 };
 
 export type SignupAgreeTermsProps = SignupProcessItemProps;
@@ -21,11 +22,16 @@ export function SignupAgreeTerms({
     category: 'privacy',
     targetUser: userType,
   });
-  const { handleSubmit, register, watch } = useForm<AgreeTermsData>({
-    defaultValues: { privacyPolicy: false },
+  const { data: termsOfService } = usePolicy({
+    category: 'termsOfService',
+    targetUser: userType,
   });
 
-  const onSubmit = (data: AgreeTermsData): void => {
+  const { handleSubmit, register, watch } = useForm<AgreeTermsData>({
+    defaultValues: { privacyPolicy: false, termsOfService: false },
+  });
+
+  const onSubmit = (_data: AgreeTermsData): void => {
     if (!moveToNext) return;
     moveToNext();
   };
@@ -46,35 +52,52 @@ export function SignupAgreeTerms({
           as="form"
           onSubmit={handleSubmit(onSubmit)}
           py={4}
-          spacing={4}
           justifyContent="center"
+          spacing={6}
         >
-          <Checkbox {...register('privacyPolicy', { required: true })}>
-            크크쇼 개인정보 이용처리 방침에 동의합니다.
-            <Text as="span" size="xs" color="blue.500">
-              (필수)
-            </Text>
-          </Checkbox>
-          <HtmlStringBox
-            maxHeight={120}
-            {...boxStyle}
-            mb={1}
-            overflowY="auto"
-            fontSize="sm"
-            htmlString={privacyTerm?.content || ''}
-          />
+          <Stack>
+            <HtmlStringBox
+              maxHeight={120}
+              {...boxStyle}
+              mb={1}
+              overflowY="auto"
+              fontSize="sm"
+              htmlString={privacyTerm?.content || ''}
+            />
+            <Checkbox {...register('privacyPolicy', { required: true })}>
+              <Text as="span" size="xs" color="blue.500">
+                (필수){' '}
+              </Text>
+              크크쇼 개인정보 처리방침에 동의합니다.
+            </Checkbox>
+            <HtmlStringBox
+              maxHeight={120}
+              {...boxStyle}
+              mb={1}
+              overflowY="auto"
+              fontSize="sm"
+              htmlString={termsOfService?.content || ''}
+            />
+            <Checkbox {...register('termsOfService', { required: true })}>
+              <Text as="span" size="xs" color="blue.500">
+                (필수){' '}
+              </Text>
+              크크쇼 이용약관에 동의합니다.
+            </Checkbox>{' '}
+          </Stack>
 
-          <Button
-            bg="blue.400"
-            color="white"
-            _hover={{ bg: 'blue.500' }}
-            type="submit"
-            isDisabled={!everyChecked}
-          >
-            다음으로
-          </Button>
-
-          <Button onClick={moveToPrev}>돌아가기</Button>
+          <Stack>
+            <Button
+              bg="blue.400"
+              color="white"
+              _hover={{ bg: 'blue.500' }}
+              type="submit"
+              isDisabled={!everyChecked}
+            >
+              다음으로
+            </Button>
+            <Button onClick={moveToPrev}>돌아가기</Button>
+          </Stack>
         </Stack>
       )}
     </CenterBox>
