@@ -176,11 +176,14 @@ export class OrderCancellationService {
       orderNewStep = orderItemOptionNewStep;
     } else {
       // '일부만' 결제취소, 주문무효가 된 경우
-      // 결제취소, 주문무효, 결제실패 상태인 주문상품옵션 제외하고 나머지 주문상품옵션 상태에 기반한 상태로 주문의 상태 업데이트
+      // 결제취소, 주문무효, 결제실패 상태인 주문상품옵션 제외 && 주문취소 요청된 주문상품옵션 제외하고
+      // 나머지 주문상품옵션 상태에 기반한 상태로 주문의 상태 업데이트
       // 예) 주문: 부분출고, 주문상품옵션1: 출고완료, 주문상품옵션2: 결제취소 인 경우 주문의 상태를 출고완료로 변경
       orderNewStep = this.orderService.getOrderRealStep(
         originOrder.step,
-        everyOrderItemOptions.filter((o) => !skipSteps.includes(o.step)), // 주문상품옵션 중 결제취소, 주문무효, 결제실패 상태인거 제외
+        everyOrderItemOptions
+          .filter((o) => !skipSteps.includes(o.step)) // 주문상품옵션 중 결제취소, 주문무효, 결제실패 상태인거 제외
+          .filter((o) => !targetOrderItemOptionsIds.includes(o.id)), // 이번 주문취소 요청에 포함된 (아직 상태 바뀌기 전인) 주문상품옵션 제외
       );
     }
     // promises에 주문 상태 업데이트 작업 추가
