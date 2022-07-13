@@ -15,15 +15,18 @@ import {
   OrderCancellationDetailRes,
   OrderCancellationListRes,
   OrderCancellationUpdateRes,
+  skipSteps,
   UpdateOrderCancellationStatusDto,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
+import { OrderService } from '../order.service';
 
 @Injectable()
 export class OrderCancellationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cipherService: CipherService,
+    private readonly orderService: OrderService,
   ) {}
 
   /* 주문취소 생성(소비자가 주문취소 요청 생성) 혹은 완료되지 않은 요청 반환 
@@ -92,76 +95,93 @@ export class OrderCancellationService {
     return data;
   }
 
-  /** 주문취소요청이 처리완료(승인) 후 주문 & 주문취소요청 승인된 주문상품옵션 상태 변경
+  /** 주문취소요청이 처리완료(승인) 후, 주문취소요청 승인된 주문상품옵션 상태 변경 && 주문의 상태 변경
    *
    * 주문접수 상태에서 승인시 => 주문무효
    * 결제확인 상태에서 승인시 => 결제취소
-   *
-   * TODO : 주문에 포함된 일부 주문상품옵션을 취소하는 경우 => 주문취소요청에 포함된 주문상품옵션의 상태만 업데이트하도록 수정
    *
    */
   private async updateOrderStateAfterOrderCancelApproved({
     orderId,
     orderCancellationId,
   }: {
+    /** 주문취소요청 된 원 주문의 고유번호 */
     orderId: number;
+    /** 현재 승인처리된 주문취소요청 고유번호 */
     orderCancellationId;
   }): Promise<void> {
-    // 주문에 포함된 모든 주문상품옵션
+    // 주문에 포함된 모든 주문상품옵션 구하기
     const everyOrderItemOptions = await this.prisma.orderItemOption.findMany({
       where: { orderItem: { orderId } },
       select: { id: true, step: true, orderCancellationItems: true },
     });
-    // 취소된 주문상품옵션
+    // 위에서 구한 주문상품옵션 중 취소요청이 승인된 주문상품옵션(연결된 orderCancellation 존재, 해당 주문취소요청 상태가 '완료') 구하기
     const canceledOrderItemOptions = everyOrderItemOptions.filter(
       (o) =>
         o.orderCancellationItems.length > 0 &&
         o.orderCancellationItems.every((oc) => oc.status === 'complete'),
     );
 
+    // 원 주문 데이터 구하기(결제정보 확인용)
     const originOrder = await this.prisma.order.findUnique({
       where: { id: orderId },
-      select: { step: true },
+      select: { step: true, payment: true },
     });
-    const newOrderStep = originOrder.step;
 
+    // * 취소요청 승인된 주문상품옵션의 새로운 상태 -> 원주문의 결제완료 여부에 따라 달라짐
+    let orderItemOptionNewStep: OrderProcessStep;
+    if (originOrder.payment && originOrder.payment.depositDoneFlag) {
+      // 주문에 대한 결제정보 존재 && 입금완료 되었다면, 결제완료 상태의 주문을 취소하는 것이므로 '결제취소' 상태로 변경
+      orderItemOptionNewStep = 'paymentCanceled';
+    } else {
+      // 주문에 대한 결제정보가 없거나, 입금완료 되지 않았다면(가상계좌결제 입금하지 않은경우) '주문무효' 상태로 변경
+      orderItemOptionNewStep = 'orderInvalidated';
+    }
+
+    // prisma.$transaction에서 실행할 작업 배열
     const promises = [];
 
-    // 주문취소에 포함된 주문취소상품의 상태 변경 - 바꿔야하는 주문상품옵션들
-    const targetOrderItemOptions = canceledOrderItemOptions.filter((o) =>
-      o.orderCancellationItems.every(
-        (c) => c.orderCancellationId === orderCancellationId,
-      ),
+    /// 상태 업데이트할 주문상품옵션들 id 구하기
+    const targetOrderItemOptionsIds = canceledOrderItemOptions
+      .filter((o) =>
+        o.orderCancellationItems.every(
+          (c) => c.orderCancellationId === orderCancellationId, // 주문상품옵션 중 orderCancellationId가 현재 승인처리된 주문취소인 경우
+        ),
+      )
+      .map((opt) => opt.id);
+
+    // promises에 주문상품옵션 상태 업데이트 작업 추가
+    promises.push(
+      this.prisma.orderItemOption.updateMany({
+        where: { orderItem: { orderId }, id: { in: targetOrderItemOptionsIds } },
+        data: { step: orderItemOptionNewStep },
+      }),
     );
-    // 주문에 포함된 모든 주문상품옵션이 취소되었다면
+
+    // * 주문 상태 업데이트 - 주문에 포함된 주문상품옵션의 상태에 따라 다름
+    let orderNewStep: OrderProcessStep;
     if (everyOrderItemOptions.length === canceledOrderItemOptions.length) {
-      // 주문의 상태도 변경
+      // 주문에 포함된 '모든 주문상품옵션이 취소된 경우'에만 주문의 상태를 '결제취소' | '주문무효' 로 변경한다
+      orderNewStep = orderItemOptionNewStep;
+    } else {
+      // '일부만' 결제취소, 주문무효가 된 경우
+      // 결제취소, 주문무효, 결제실패 상태인 주문상품옵션 제외하고 나머지 주문상품옵션 상태에 기반한 상태로 주문의 상태 업데이트
+      // 예) 주문: 부분출고, 주문상품옵션1: 출고완료, 주문상품옵션2: 결제취소 인 경우 주문의 상태를 출고완료로 변경
+      orderNewStep = this.orderService.getOrderRealStep(
+        originOrder.step,
+        everyOrderItemOptions.filter((o) => !skipSteps.includes(o.step)), // 주문상품옵션 중 결제취소, 주문무효, 결제실패 상태인거 제외
+      );
     }
+    // promises에 주문 상태 업데이트 작업 추가
+    promises.push(
+      this.prisma.order.update({
+        where: { id: orderId },
+        data: { step: orderNewStep },
+      }),
+    );
 
-    // TODO : 바꾸기
-
-    //------------
-
-    if (originOrder) {
-      let targetState: OrderProcessStep;
-      if (originOrder.step === 'orderReceived') {
-        targetState = 'orderInvalidated';
-      }
-
-      if (originOrder.step === 'paymentConfirmed') {
-        targetState = 'paymentCanceled';
-      }
-
-      await this.prisma.$transaction([
-        // 주문 상태 변경
-        this.prisma.order.update({ where: { id: orderId }, data: { step: targetState } }),
-        // 주문상품옵션 상태 변경
-        this.prisma.orderItemOption.updateMany({
-          where: { orderItem: { orderId } },
-          data: { step: targetState },
-        }),
-      ]);
-    }
+    // 주문상품옵션, 주문 상태 업데이트 작업 실행
+    await this.prisma.$transaction(promises);
   }
 
   /* 주문취소 내역 조회 */
