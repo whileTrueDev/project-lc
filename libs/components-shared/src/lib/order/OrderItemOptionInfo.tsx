@@ -48,10 +48,15 @@ export function OrderItemOptionInfo({
           {goodsName}
         </Text>
         <Stack direction="row">
-          <Text>
-            {option.name} : {option.value}
-          </Text>
-          <TextDotConnector />
+          {option.name && option.value && (
+            <>
+              <Text>
+                {option.name} : {option.value}
+              </Text>
+              <TextDotConnector />
+            </>
+          )}
+
           <Text>{option.quantity} 개 </Text>
           <TextDotConnector />
           <Text>{getLocaleNumber(option.discountPrice)}원</Text>
