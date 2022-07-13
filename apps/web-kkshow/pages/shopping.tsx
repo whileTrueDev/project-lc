@@ -41,7 +41,7 @@ export default function Shopping(): JSX.Element {
         <ShoppingEventBanner />
         <ShoppingRecommendations />
         <ShoppingReviews />
-        <ShoppingKeywords />
+        {/* <ShoppingKeywords /> */}
       </KkshowLayout>
     </Box>
   );
