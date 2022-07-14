@@ -58,7 +58,7 @@ export function OrderItemOptionInfo({
           )}
           <Text>{option.quantity} 개 </Text>
           <TextDotConnector />
-          <Text>{getLocaleNumber(option.discountPrice)}원</Text>
+          <Text>{getLocaleNumber(Number(option.discountPrice) * option.quantity)}원</Text>
         </Stack>
       </Stack>
     </Stack>
