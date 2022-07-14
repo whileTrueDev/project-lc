@@ -8,7 +8,6 @@ export interface GoodsDetailInfoProps {
   goods: GoodsByIdRes;
 }
 export function GoodsDetailInfo({ goods }: GoodsDetailInfoProps): JSX.Element {
-  console.log('goods.informationNotice.contents: ', goods.informationNotice.contents);
   return (
     <Stack>
       <Box>
@@ -47,7 +46,7 @@ export function GoodsDetailInfo({ goods }: GoodsDetailInfoProps): JSX.Element {
         </Box>
       </Box>
 
-      {goods.informationNotice && (
+      {goods.informationNotice && goods.informationNotice.contents && (
         <Box>
           <Text fontWeight="bold">상품 필수 정보</Text>
           <Box fontSize="sm">
