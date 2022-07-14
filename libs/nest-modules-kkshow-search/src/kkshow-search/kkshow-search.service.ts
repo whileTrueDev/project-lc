@@ -121,11 +121,11 @@ export class KkshowSearchService {
         goods.push({
           title: row.goods_name,
           linkUrl: getCorrectLinkUrl(),
-          imageUrl: row.image[0].image,
+          imageUrl: row.image[0]?.image,
         });
         broadcasters.push({
           title: row.LiveShopping[0].broadcaster.userNickname,
-          linkUrl: row.LiveShopping[0].broadcaster.channels[0].url,
+          linkUrl: row.LiveShopping[0].broadcaster.channels[0]?.url,
           imageUrl: row.LiveShopping[0].broadcaster.avatar,
         });
 
