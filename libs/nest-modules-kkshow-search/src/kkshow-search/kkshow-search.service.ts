@@ -156,7 +156,7 @@ export class KkshowSearchService {
 
       broadcasters.push({
         title: row.broadcaster.userNickname,
-        linkUrl: row.broadcaster.channels[0].url, // 향후 상품홍보페이지로 이동하도록 변경
+        linkUrl: row.broadcaster.channels[0]?.url, // 향후 상품홍보페이지로 이동하도록 변경
         imageUrl: row.broadcaster.avatar,
       });
 
