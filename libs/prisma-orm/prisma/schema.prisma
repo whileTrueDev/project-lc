@@ -2017,7 +2017,7 @@ model GoodsInformationNotice {
 model GoodsCategory {
   id                 Int             @id @default(autoincrement())
   categoryCode       String          @unique // 카테고리 코드
-  name               String // 카테고리명
+  name               String          @unique // 카테고리명 
   mainCategoryFlag   Boolean         @default(false) // 대표카테고리인지 여부 (카테고리 트리의 잎 여부)
   parentCategoryId   Int?
   parentCategory     GoodsCategory?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id], onDelete: Cascade) // 상위 부모 카테고리

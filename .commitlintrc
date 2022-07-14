@@ -29,6 +29,7 @@
                 "revert",
                 "style",
                 "test",
+                "db",
                 "infra"
             ]
         ],
