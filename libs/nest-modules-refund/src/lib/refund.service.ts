@@ -1,9 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CipherService } from '@project-lc/nest-modules-cipher';
-// import { OrderCancellationService } from '@project-lc/nest-modules-order';
 import { PaymentService } from '@project-lc/nest-modules-payment';
-import { ReturnService } from '@project-lc/nest-modules-return';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminRefundRes,
@@ -26,9 +24,7 @@ import { nanoid } from 'nanoid';
 export class RefundService {
   constructor(
     private readonly prisma: PrismaService,
-    // private readonly orderCancellationService: OrderCancellationService,
     private readonly paymentService: PaymentService,
-    private readonly returnService: ReturnService,
     private readonly cipherService: CipherService,
   ) {}
 
@@ -106,26 +102,6 @@ export class RefundService {
     });
 
     return data;
-
-    // TODO: 주문취소 다이얼로그에서 처리
-    //  연결된 주문취소 있는경우
-    // if (orderCancellationId) {
-    //    환불정보와 연결 + 주문취소 상태를 완료로 업데이트
-    //   await this.orderCancellationService.updateOrderCancellationStatus(
-    //     orderCancellationId,
-    //     { status: 'complete', refundId: data.id },
-    //   );
-    // }
-
-    // TODO: 반품 환불처리 다이얼로그에서 처리
-    //  연결된 반품요청 있는경우
-    // if (returnId) {
-    //    환불정보와 연결 & 반품요청 상태 완료로 변경
-    //   await this.returnService.updateReturnStatus(returnId, {
-    //     status: 'complete',
-    //     refundId: data.id,
-    //   });
-    // }
   }
 
   /** 환불내역 목록 조회 - 소비자, 판매자 */
