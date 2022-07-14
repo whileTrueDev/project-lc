@@ -1,4 +1,13 @@
-import { Text, Grid, GridItem, Button, HStack, useDisclosure } from '@chakra-ui/react';
+import {
+  Text,
+  Grid,
+  GridItem,
+  Button,
+  HStack,
+  useDisclosure,
+  Center,
+  Spinner,
+} from '@chakra-ui/react';
 import { PasswordChangeDialog } from '@project-lc/components-shared/PasswordChangeDialog';
 import { useCustomerInfo } from '@project-lc/hooks';
 import { CustomerNicknameChangeDialog } from './CustomerNicknameChangeDialog';
@@ -9,7 +18,7 @@ import { CustomerDelete } from './CustomerDelete';
 import { AgreementDialog } from '../../AgreementDialog';
 
 export function UserInfo({ userId }: { userId: number }): JSX.Element {
-  const { data } = useCustomerInfo(userId);
+  const { data, isError, isLoading } = useCustomerInfo(userId);
   const { isOpen, onClose, onOpen } = useDisclosure();
   const {
     isOpen: nicknameIsOpen,
@@ -22,6 +31,18 @@ export function UserInfo({ userId }: { userId: number }): JSX.Element {
     onOpen: agreementOnOpen,
     onClose: agreementOnClose,
   } = useDisclosure();
+
+  if (isLoading)
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
+
+  if (isError)
+    return (
+      <Text>내 정보를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</Text>
+    );
 
   return (
     <Grid templateColumns="repeat(4, 1fr)" gap={4}>
@@ -64,9 +85,9 @@ export function UserInfo({ userId }: { userId: number }): JSX.Element {
           </GridItem>
           <GridItem colSpan={3}>
             <HStack>
-              <Text>{data.nickname}</Text>
+              {data.nickname && <Text>{data.nickname}</Text>}
               <Button size="xs" onClick={() => nicknameOnOpen()}>
-                변경
+                {data.nickname ? '닉네임 변경' : '닉네임 설정'}
               </Button>
             </HStack>
           </GridItem>
@@ -79,7 +100,7 @@ export function UserInfo({ userId }: { userId: number }): JSX.Element {
             </HStack>
           </GridItem>
           <GridItem colSpan={1}>
-            <Text fontWeight="bold">개인정보이용동의</Text>
+            <Text fontWeight="bold">이용약관동의</Text>
           </GridItem>
           <GridItem colSpan={3}>
             <HStack>

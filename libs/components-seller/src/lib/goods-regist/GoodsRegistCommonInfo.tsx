@@ -287,17 +287,19 @@ export function GoodsRegistCommonInfo(): JSX.Element {
               <Input {...register('common_contents_name')} />
             </Stack>
 
-            <SunEditor
-              getSunEditorInstance={getSunEditorInstance}
-              lang="ko"
-              setOptions={{
-                height: '500px',
-                imageUploadSizeLimit: 20 * MB, // 퍼스트몰 최대 20mb
-                buttonList: [['font', 'fontSize', 'align', 'list'], ['image']],
-              }}
-              defaultValue={watch('common_contents')}
-            />
-            <Button onClick={registGoodsCommonInfo}>등록</Button>
+            <Stack alignItems="flex-start">
+              <SunEditor
+                getSunEditorInstance={getSunEditorInstance}
+                lang="ko"
+                setOptions={{
+                  height: '500px',
+                  imageUploadSizeLimit: 20 * MB, // 퍼스트몰 최대 20mb
+                  buttonList: [['font', 'fontSize', 'align', 'list'], ['image']],
+                }}
+                defaultValue={watch('common_contents')}
+              />
+              <Button onClick={registGoodsCommonInfo}>등록</Button>
+            </Stack>
           </ModalBody>
         </ModalContent>
       </Modal>

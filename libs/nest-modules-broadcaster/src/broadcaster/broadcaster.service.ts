@@ -129,6 +129,7 @@ export class BroadcasterService {
         password: hashedPw,
         userNickname: '',
         overlayUrl: `/${dto.email}`,
+        agreementFlag: true,
       },
     });
     return new BroadcasterRes(broadcaster); // for password serialization

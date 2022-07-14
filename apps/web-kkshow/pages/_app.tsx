@@ -10,6 +10,7 @@ import {
   createMuiTheme,
   createQueryClient,
 } from '@project-lc/utils-frontend';
+import { ErrorBoundary } from '@project-lc/components-web-kkshow/ErrorBoundary';
 import dayjs from 'dayjs';
 import kolocale from 'dayjs/locale/ko';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -56,7 +57,9 @@ function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
               <ThemeProvider theme={muiTheme}>
                 <main>
                   <NextNProgress options={{ showSpinner: false }} />
-                  <Component {...pageProps} />
+                  <ErrorBoundary>
+                    <Component {...pageProps} />
+                  </ErrorBoundary>
                 </main>
               </ThemeProvider>
             </ChakraProvider>

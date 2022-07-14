@@ -168,7 +168,7 @@ export function OrderCancelStatusDialog({
                   // 주문취소하려는 주문이 결제승인이 완료된 상태였다면 예상환불금액은 상품 전체 가격 합 표시, 아니면 0 원
                   cancelDetail.order?.payment?.depositDoneFlag
                     ? cancelDetail.items
-                        .map((item) => item.price)
+                        .map((item) => item.price * item.amount) // 취소상품 개수 * 가격
                         .reduce((sum, price) => sum + price, 0)
                     : 0
                 }

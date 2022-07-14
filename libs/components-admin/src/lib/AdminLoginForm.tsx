@@ -75,7 +75,7 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
           <Input
             id="email"
             type="email"
-            placeholder="minsu@example.com"
+            placeholder="kkshow@example.com"
             autoComplete="off"
             {...register('email', { required: '이메일을 작성해주세요.' })}
           />
