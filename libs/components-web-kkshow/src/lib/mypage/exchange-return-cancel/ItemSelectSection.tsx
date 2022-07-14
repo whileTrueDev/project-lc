@@ -1,6 +1,6 @@
 import { Box, Button, Checkbox, Stack, Text } from '@chakra-ui/react';
 import { exchangeReturnAbleSteps, OrderDetailRes } from '@project-lc/shared-types';
-import { Dispatch, SetStateAction, useCallback, useEffect } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react';
 import { OrderItemOptionInfo } from '../orderList/OrderItemOptionInfo';
 
 export type SelectedOrderItem = {
@@ -26,11 +26,13 @@ export function ItemSelectSection({
   const selectAll = useCallback(() => {
     if (orderItems) {
       const all = orderItems.flatMap((item) =>
-        item.options.map((opt) => ({
-          orderItemId: item.id,
-          orderItemOptionId: opt.id,
-          amount: opt.quantity,
-        })),
+        item.options
+          .filter((opt) => exchangeReturnAbleSteps.includes(opt.step)) // 주문상품옵션 상태가 재배송/환불 신청이 가능한 것만
+          .map((opt) => ({
+            orderItemId: item.id,
+            orderItemOptionId: opt.id,
+            amount: opt.quantity,
+          })),
       );
       setSelectedItems(all);
     }
