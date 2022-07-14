@@ -790,8 +790,17 @@ export class OrderService {
 
     // 특정 판매자가 개별주문 상세조회시
     // 주문상품 중 판매자의 상품만 보내기 & 판매자의 주문상품 상태에 따라 주문상태 표시 & 판매자의 베송비그룹으로 계산된 배송비만 보내기
+    // && 교환/반품/취소 - 해당 판매자의 상품이 포함된 것만 보내기
     if (dto.sellerId) {
-      const { orderItems, shippings, ...orderRestData } = result;
+      const {
+        orderItems,
+        shippings,
+        exchanges,
+        orderCancellations,
+        returns,
+        exports,
+        ...orderRestData
+      } = result;
 
       // * 주문상품옵션 중 판매자 본인의 상품옵션만 남기기
       const sellerGoodsOrderItems = orderItems.filter(
@@ -818,11 +827,52 @@ export class OrderService {
         );
       }
 
+      // * 판매자 상품이 포함된 교환/반품/취소/출고 데이터, 상품만 보내기
+      // 해당 판매자의 상품인 주문상품id (OrderItem.id) 목록
+      const sellerOrderItemsIdList = sellerGoodsOrderItems.map((item) => item.id);
+      // 판매자의 상품이 포함된 교환(재배송)요청
+      const sellerExchanges = exchanges
+        .map((ex) => ({
+          ...ex,
+          // 교환요청 상품 중 판매자의 상품만 필터
+          exchangeItems: ex.exchangeItems.filter((item) =>
+            sellerOrderItemsIdList.includes(item.orderItemId),
+          ),
+        }))
+        .filter((ex) => ex.exchangeItems.length > 0); // 판매자 상품이 포함된 교환요청만 필터
+
+      // 판매자 상품이 포함된 주문취소요청
+      const sellerOrderCancellations = orderCancellations
+        .map((oc) => ({
+          ...oc,
+          items: oc.items.filter((item) =>
+            sellerOrderItemsIdList.includes(item.orderItemId),
+          ),
+        }))
+        .filter((oc) => oc.items.length > 0);
+
+      // 판매자 상품이 포함된 반품요청
+      const sellerReturns = returns
+        .map((r) => ({
+          ...r,
+          items: r.items.filter((item) =>
+            sellerOrderItemsIdList.includes(item.orderItemId),
+          ),
+        }))
+        .filter((r) => r.items.length > 0);
+
+      // 판매자가 진행한  출고 (출고는 판매자별로 처리됨)
+      const sellerExports = exports.filter((exp) => exp.sellerId === dto.sellerId);
+
       result = {
         ...orderRestData,
         shippings: sellerShippings,
         step: displaySellerOrderStep,
         orderItems: sellerGoodsOrderItems,
+        exchanges: sellerExchanges,
+        orderCancellations: sellerOrderCancellations,
+        returns: sellerReturns,
+        exports: sellerExports,
       };
     }
 
