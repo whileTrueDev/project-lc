@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, Return } from '@prisma/client';
 import { CipherService } from '@project-lc/nest-modules-cipher';
+import { OrderService } from '@project-lc/nest-modules-order';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminReturnRes,
@@ -20,6 +21,7 @@ export class ReturnService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cipherService: CipherService,
+    private readonly orderService: OrderService,
   ) {}
 
   /** 반품코드 생성 */
@@ -236,7 +238,10 @@ export class ReturnService {
 
     // 반품요청 처리완료(승인)되면 주문 상태를 결제취소 로 업데이트
     if (dto.status === 'complete') {
-      await this.updateOrderStateAfterRefundFinish(returnData.orderId);
+      await this.updateOrderStateAfterRefundFinish({
+        orderId: returnData.orderId,
+        returnId: returnData.id,
+      });
     }
 
     return true;
@@ -244,18 +249,36 @@ export class ReturnService {
 
   /** 주문의 상태를 결제취소 로 변경(반품요청 처리완료(승인)되었을 때 사용)
    */
-  private async updateOrderStateAfterRefundFinish(orderId: number): Promise<void> {
+  private async updateOrderStateAfterRefundFinish({
+    orderId,
+    returnId,
+  }: {
+    /** 환불요청한 원주문 고유번호 */
+    orderId: number;
+    /** 처리된 환불요청 고유번호 */
+    returnId: number;
+  }): Promise<void> {
     // 변경될 상태 : "결제취소" (반품요청시 이미 결제가 완료된 상태이므로 결제취소로 변경함)
     const targetState = 'paymentCanceled';
-    await this.prisma.$transaction([
-      // 주문 상태 결제취소 변경
-      this.prisma.order.update({ where: { id: orderId }, data: { step: targetState } }),
-      // 주문상품옵션 상태 결제취소로 변경
-      this.prisma.orderItemOption.updateMany({
-        where: { orderItem: { orderId } },
-        data: { step: targetState },
-      }),
-    ]);
+
+    // 처리된 환불요청에 포함된 상품 고유번호들 구하기
+    const compeletedReturnItems = await this.prisma.returnItem.findMany({
+      where: { returnId, status: 'complete' },
+      select: { orderItemOptionId: true },
+    });
+
+    const targetOptionIds = compeletedReturnItems.map((ri) => ri.orderItemOptionId);
+
+    // 먼저 환불처리된 주문상품옵션들 상태 '결제취소'로 업데이트
+    await this.prisma.orderItemOption.updateMany({
+      where: { id: { in: targetOptionIds } },
+      data: { step: targetState },
+    });
+
+    // 변경된 주문상품옵션 바탕으로 주문 상태 업데이트
+    await this.orderService.updateOrderStepByOrderItemOptionsSteps({
+      orderId,
+    });
   }
 
   /** 반품요청 삭제 */

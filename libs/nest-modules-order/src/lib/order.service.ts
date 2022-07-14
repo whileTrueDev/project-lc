@@ -1297,4 +1297,28 @@ export class OrderService {
 
     return tempResult;
   }
+
+  /** 주문 상태 업데이트 - 주문상품 상태에 기반하여 주문 자체의 상태를 업데이트함 */
+  public async updateOrderStepByOrderItemOptionsSteps({
+    orderId,
+  }: {
+    orderId: Order['id'];
+  }): Promise<void> {
+    // 주문에 포함된 모든 상품옵션들
+    const allOptions = await this.prisma.orderItemOption.findMany({
+      where: { orderItem: { orderId } },
+      select: { id: true, step: true },
+    });
+
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+
+    const orderNewStep = this.getOrderRealStep(order.step, allOptions);
+
+    await this.prisma.order.update({
+      where: { id: orderId },
+      data: { step: orderNewStep },
+    });
+  }
 }

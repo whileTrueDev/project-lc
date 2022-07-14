@@ -23,11 +23,15 @@ import { CardDetail } from '@project-lc/components-shared/payment/CardDetail';
 import { TransferDetail } from '@project-lc/components-shared/payment/TransferDetail';
 import { VirtualAccountDetail } from '@project-lc/components-shared/payment/VirtualAccountDetail';
 import { RefundAccountForm } from '@project-lc/components-shared/payment/RefundAccountForm';
-import { useCreateRefundMutation, usePaymentByOrderCode } from '@project-lc/hooks';
+import {
+  ReturnMutationDto,
+  useCreateRefundMutation,
+  usePaymentByOrderCode,
+  useUpdateReturnMutation,
+} from '@project-lc/hooks';
 import {
   AdminReturnData,
   CreateRefundDto,
-  CreateRefundRes,
   RefundAccountDto,
   ReturnItemWithOriginOrderItemInfo,
 } from '@project-lc/shared-types';
@@ -76,7 +80,7 @@ export function AdminReturnRequestDetail({
     formState: { errors },
   } = methods;
 
-  const handleSuccess = (res: CreateRefundRes): void => {
+  const handleSuccess = (res: any): void => {
     console.log('success', res);
     toast({ status: 'success', title: '결제취소 성공' });
     if (onSubmit) onSubmit();
@@ -85,14 +89,15 @@ export function AdminReturnRequestDetail({
   const handleError = (e: any): void => {
     toast({
       status: 'error',
-      title: '결제취소 실패',
-      description: e?.response?.data?.message,
+      title: '결제취소 중 오류가 발생했습니다',
+      description: e?.response?.data?.message || e?.message,
     });
     console.log('error', e);
   };
 
-  const { mutateAsync, isLoading } = useCreateRefundMutation();
-  const submitHandler = (formData: AdminRefundCreateFormData): void => {
+  const createRefund = useCreateRefundMutation();
+  const updateReturnStatus = useUpdateReturnMutation();
+  const submitHandler = async (formData: AdminRefundCreateFormData): Promise<void> => {
     if (!data) return;
 
     // 결제수단이 가상계좌인 경우 환불받을 은행, 계좌, 예금주 정보를 함께 전송해야함
@@ -105,7 +110,7 @@ export function AdminReturnRequestDetail({
           }
         : undefined;
 
-    const dto: CreateRefundDto = {
+    const createRefundDto: CreateRefundDto = {
       orderId: data.order.id,
       reason: '소비자 환불 요청',
       items: data.items.map((i: ReturnItemWithOriginOrderItemInfo) => {
@@ -118,7 +123,25 @@ export function AdminReturnRequestDetail({
       ...virtualAccountRefundInfo, // 가상계좌 환불수단 정보
     };
 
-    mutateAsync(dto).then(handleSuccess).catch(handleError);
+    // mutateAsync(dto).then(handleSuccess).catch(handleError);
+
+    try {
+      // 환불처리 진행
+      const refundData = await createRefund.mutateAsync(createRefundDto);
+
+      // 반품요청(환불요청) 상태 업데이트
+      const returnStatusUpdateDto: ReturnMutationDto = {
+        returnId: data.id,
+        dto: {
+          status: 'complete',
+          refundId: refundData?.id, // 환불정보와 연결
+        },
+      };
+      const res = await updateReturnStatus.mutateAsync(returnStatusUpdateDto);
+      handleSuccess(res);
+    } catch (e) {
+      handleError(e);
+    }
   };
 
   if (!data) return <Spinner />;
@@ -291,7 +314,11 @@ export function AdminReturnRequestDetail({
         {paymentData && paymentData.method === '가상계좌' && <RefundAccountForm />}
 
         <Stack spacing={4} direction="row-reverse">
-          <Button type="submit" colorScheme="red" isLoading={isLoading}>
+          <Button
+            type="submit"
+            colorScheme="red"
+            isLoading={createRefund.isLoading || updateReturnStatus.isLoading}
+          >
             환불처리하기
           </Button>
           <Button onClick={onCancel}>취소</Button>
