@@ -119,7 +119,7 @@ export class OrderCancellationService {
     /** 주문취소요청 된 원 주문의 고유번호 */
     orderId: number;
     /** 현재 승인처리된 주문취소요청 고유번호 */
-    orderCancellationId;
+    orderCancellationId: number;
   }): Promise<void> {
     // 주문에 포함된 모든 주문상품옵션 구하기
     const everyOrderItemOptions = await this.prisma.orderItemOption.findMany({
@@ -149,9 +149,6 @@ export class OrderCancellationService {
       orderItemOptionNewStep = 'orderInvalidated';
     }
 
-    // prisma.$transaction에서 실행할 작업 배열
-    const promises = [];
-
     /// 상태 업데이트할 주문상품옵션들 id 구하기
     const targetOrderItemOptionsIds = canceledOrderItemOptions
       .filter((o) =>
@@ -161,41 +158,14 @@ export class OrderCancellationService {
       )
       .map((opt) => opt.id);
 
-    // promises에 주문상품옵션 상태 업데이트 작업 추가
-    promises.push(
-      this.prisma.orderItemOption.updateMany({
-        where: { orderItem: { orderId }, id: { in: targetOrderItemOptionsIds } },
-        data: { step: orderItemOptionNewStep },
-      }),
-    );
+    // 먼저 취소된 주문상품옵션 상태 업데이트 작업
+    await this.prisma.orderItemOption.updateMany({
+      where: { orderItem: { orderId }, id: { in: targetOrderItemOptionsIds } },
+      data: { step: orderItemOptionNewStep },
+    });
 
-    // * 주문 상태 업데이트 - 주문에 포함된 주문상품옵션의 상태에 따라 다름
-    let orderNewStep: OrderProcessStep;
-    if (everyOrderItemOptions.length === canceledOrderItemOptions.length) {
-      // 주문에 포함된 '모든 주문상품옵션이 취소된 경우'에만 주문의 상태를 '결제취소' | '주문무효' 로 변경한다
-      orderNewStep = orderItemOptionNewStep;
-    } else {
-      // '일부만' 결제취소, 주문무효가 된 경우
-      // 결제취소, 주문무효, 결제실패 상태인 주문상품옵션 제외 && 주문취소 요청된 주문상품옵션 제외하고
-      // 나머지 주문상품옵션 상태에 기반한 상태로 주문의 상태 업데이트
-      // 예) 주문: 부분출고, 주문상품옵션1: 출고완료, 주문상품옵션2: 결제취소 인 경우 주문의 상태를 출고완료로 변경
-      orderNewStep = this.orderService.getOrderRealStep(
-        originOrder.step,
-        everyOrderItemOptions
-          .filter((o) => !skipSteps.includes(o.step)) // 주문상품옵션 중 결제취소, 주문무효, 결제실패 상태인거 제외
-          .filter((o) => !targetOrderItemOptionsIds.includes(o.id)), // 이번 주문취소 요청에 포함된 (아직 상태 바뀌기 전인) 주문상품옵션 제외
-      );
-    }
-    // promises에 주문 상태 업데이트 작업 추가
-    promises.push(
-      this.prisma.order.update({
-        where: { id: orderId },
-        data: { step: orderNewStep },
-      }),
-    );
-
-    // 주문상품옵션, 주문 상태 업데이트 작업 실행
-    await this.prisma.$transaction(promises);
+    // 그 다음 주문 주문 상태 업데이트(모든 주문상품옵션들 상태 모두 고려하여 주문 상태 업데이트)
+    await this.orderService.updateOrderStepByOrderItemOptionsSteps({ orderId });
   }
 
   /* 주문취소 내역 조회 */
