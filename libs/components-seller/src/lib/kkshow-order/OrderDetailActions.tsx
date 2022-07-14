@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
-import { useOrderUpdateMutation } from '@project-lc/hooks';
+import { useOrderUpdateMutation, useProfile } from '@project-lc/hooks';
 import { exportableSteps, OrderDetailRes } from '@project-lc/shared-types';
 import { useCallback } from 'react';
 import { FaTruck } from 'react-icons/fa';
@@ -21,19 +21,34 @@ export interface OrderDetailActionsProps {
 }
 export function OrderDetailActions({ order }: OrderDetailActionsProps): JSX.Element {
   const { mutateAsync: changeStatus, isLoading } = useOrderUpdateMutation();
+  const { data: profileData } = useProfile();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const exportModal = useDisclosure();
-  // const cancelOrderRequestModal = useDisclosure();
   const toast = useToast();
 
-  const handleStatusChange = useCallback(
-    () =>
-      changeStatus({ orderId: order.id, dto: { step: 'goodsReady' } }).then(() =>
-        toast({ description: '주문 상태가 올바르게 변경되었습니다.', status: 'success' }),
-      ),
-    [changeStatus, order.id, toast],
-  );
+  const handleStatusChange = useCallback(() => {
+    if (profileData) {
+      return changeStatus({
+        orderId: order.id,
+        dto: { step: 'goodsReady', sellerId: profileData.id },
+      })
+        .then(() =>
+          toast({
+            description: '주문 상태가 올바르게 변경되었습니다.',
+            status: 'success',
+          }),
+        )
+        .catch((e) => {
+          console.log(e);
+          toast({
+            title: '주문 상태 변경 중 오류가 발생했습니다.',
+            description: e?.message || e?.response?.data?.message,
+          });
+        });
+    }
+    return Promise.resolve();
+  }, [changeStatus, order.id, profileData, toast]);
 
   return (
     <>

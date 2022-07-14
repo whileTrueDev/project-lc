@@ -369,6 +369,11 @@ export class OrderService {
         deleteFlag: false,
         // 주문에 포함된 "모든 주문상품옵션"이 대해 환불 or 교환 or 주문취소 생성한 주문은 제외한다 (220712 기준 주문 일부상품에 대해서만 교환/환불 신청을 할 수 있다)
         // refund 는 Return, OrderCancellation 이 완료된 이후 생기는 데이터므로 orderCancellation, return 데이터만 확인하면 됨
+        /** 클라이언트에서 주문목록.filter(조건) 로 처리하지 않고 where절 사용한 이유 :
+         * 서버세서는 5개씩 조회하여 클라이언트로 응답했는데
+         * 그 5개 모두 교환/환불/취소 요청이 존재하는 주문이라 클라이언트에서 필터링되는 경우가 있을 수 있다
+         * 이 경우 서버에서 5개를 응답하였음에도 소비자 주문목록에는 아무것도 표시되지 않음
+         * */
         NOT: {
           orderItems: {
             every: {
@@ -862,7 +867,7 @@ export class OrderService {
     // 주문이 존재하는지 확인
     await this.findOneOrder({ id: orderId });
 
-    const { customerId, ...rest } = dto;
+    const { customerId, sellerId, ...rest } = dto;
 
     let updateInput: Prisma.OrderUpdateInput = { ...rest };
 
@@ -874,18 +879,24 @@ export class OrderService {
       };
     }
 
-    // 주문, 주문상품옵션 상태변경 promise 목록 - 주문 업데이트 추가
-    const promises = [];
-    promises.push(
-      this.prisma.order.update({
-        where: { id: orderId },
-        data: updateInput,
-      }),
-    );
+    // 주문 정보 업데이트
+    await this.prisma.order.update({
+      where: { id: orderId },
+      data: updateInput,
+    });
 
-    // 주문 상태를 바꾸는 경우
+    // 주문 상태를 바꾸는 경우 -> 주문에 포함된 주문상품 옵션도 같이 변경한다
     if (rest.step) {
-      // 주문상태를 결제확인/결제취소/결제실패/주문무효로 바꾸는경우
+      // 판매자가 주문상태를 변경하는 경우(주문에는 다른 판매자의 상품이 포함되어 있을수 있으므로, 자신의 상품상태만 변경해야함)
+      if (sellerId) {
+        await this.updateOrderItemOptionsStepBySeller({
+          orderId,
+          sellerId,
+          step: rest.step,
+        });
+        return true;
+      }
+      // 주문상태를 결제확인/결제취소/결제실패/주문무효로 바꾸는경우 (웹훅에서 처리 등)
       // => 해당 주문에 포함된 주문상품옵션의 상태도 일괄적으로 주문 상태와 동일하게 변경
       // (220713 기준 결제를 여러번 나눠서 할 수는 없으므로 결제확인시에도 일괄적으로 주문상품옵션 상태 변경함)
       if (
@@ -896,32 +907,13 @@ export class OrderService {
           'orderInvalidated',
         ].includes(rest.step)
       ) {
-        promises.push(
-          this.prisma.orderItemOption.updateMany({
-            where: { orderItem: { orderId } },
-            data: { step: rest.step },
-          }),
-        );
+        await this.prisma.orderItemOption.updateMany({
+          where: { orderItem: { orderId } },
+          data: { step: rest.step },
+        });
+        return true;
       }
-      // TODO: 수정 필요 - 상품준비로 바꾸는 경우는 판매자가 진행하는 것으로 주문에 포함된 해당 판매자의 상품만 상품준비 상태로 변경되어야 함
-      // 주문상태를 상품준비로 바꾸는 경우(결제완료 -> 상품준비)
-      // => 해당 주문에 포함된 주문상품옵션 상태도 모두 상품준비로 변경 => 하면 안됨. 주문에 포함된 다른 판매자의 상품도 상품준비가 됨
-      // const orderItemOptions = await this.prisma.orderItemOption.findMany({
-      //   where: { orderItem: { orderId } },
-      //   select: { id: true },
-      // });
-      // if (rest.step === 'goodsReady') {
-      //   await this.prisma.$transaction(
-      //     orderItemOptions.map((opt) => {
-      //       return this.prisma.orderItemOption.update({
-      //         where: { id: opt.id },
-      //         data: { step: rest.step },
-      //       });
-      //     }),
-      //   );
-      // }
     }
-    await this.prisma.$transaction(promises);
 
     return true;
   }
@@ -1298,7 +1290,7 @@ export class OrderService {
     return tempResult;
   }
 
-  /** 주문 상태 업데이트 - 주문상품 상태에 기반하여 주문 자체의 상태를 업데이트함 */
+  /** 주문 "상태" 업데이트 - 주문상품 상태에 기반하여 주문 자체의 상태를 업데이트함 */
   public async updateOrderStepByOrderItemOptionsSteps({
     orderId,
   }: {
@@ -1320,5 +1312,27 @@ export class OrderService {
       where: { id: orderId },
       data: { step: orderNewStep },
     });
+  }
+
+  /** 주문에 포함된 상품 중 "특정 판매자 상품"의 상태 변경 => 주문상품옵션 상태에 따라 주문상태 업데이트 */
+  public async updateOrderItemOptionsStepBySeller({
+    orderId,
+    sellerId,
+    step,
+  }: {
+    orderId: number;
+    sellerId: number;
+    step: OrderProcessStep;
+  }): Promise<boolean> {
+    // 판매자 상품인 주문상품옵션의 상태 업데이트
+    await this.prisma.orderItemOption.updateMany({
+      where: { orderItem: { orderId, goods: { sellerId } } },
+      data: { step },
+    });
+
+    // 변경된 주문상품옵션 상태에 따라 주문 상태 업데이트
+    await this.updateOrderStepByOrderItemOptionsSteps({ orderId });
+
+    return true;
   }
 }
