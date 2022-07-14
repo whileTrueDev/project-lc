@@ -730,7 +730,7 @@ export class GoodsService {
   public async findAllGoodsIds(): Promise<AllGoodsIdsRes> {
     return this.prisma.goods.findMany({
       select: { id: true, goods_name: true },
-      where: { goods_view: { not: 'notLook' } },
+      where: { confirmation: { status: 'confirmed' }, goods_view: { not: 'notLook' } },
     });
   }
 }
