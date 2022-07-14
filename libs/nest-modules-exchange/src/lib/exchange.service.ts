@@ -184,6 +184,12 @@ export class ExchangeService {
         ...rest,
         completeDate: dto.status && dto.status === 'complete' ? new Date() : undefined,
         export: exportId ? { connect: { id: exportId } } : undefined,
+        exchangeItems: {
+          updateMany: {
+            where: { exchangeId: id },
+            data: { status: dto.status },
+          },
+        },
       },
     });
 
