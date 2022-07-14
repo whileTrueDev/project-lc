@@ -1303,7 +1303,7 @@ export class OrderService {
     orderId,
   }: {
     orderId: Order['id'];
-  }): Promise<void> {
+  }): Promise<Order> {
     // 주문에 포함된 모든 상품옵션들
     const allOptions = await this.prisma.orderItemOption.findMany({
       where: { orderItem: { orderId } },
@@ -1316,7 +1316,7 @@ export class OrderService {
 
     const orderNewStep = this.getOrderRealStep(order.step, allOptions);
 
-    await this.prisma.order.update({
+    return this.prisma.order.update({
       where: { id: orderId },
       data: { step: orderNewStep },
     });

@@ -1,4 +1,5 @@
 import { Module, DynamicModule } from '@nestjs/common';
+import { OrderModule } from '@project-lc/nest-modules-order';
 import { ExportController } from './export.controller';
 import { ExportService } from './export.service';
 
@@ -14,10 +15,12 @@ export class ExportModule {
 
   private static readonly controllers = [ExportController];
 
+  private static readonly imports = [OrderModule.withoutControllers()];
+
   static withoutControllers(): DynamicModule {
     return {
       module: ExportModule,
-      imports: [],
+      imports: this.imports,
       providers: this.providers,
       exports: this.exports,
     };
@@ -26,7 +29,7 @@ export class ExportModule {
   static withControllers(): DynamicModule {
     return {
       module: ExportModule,
-      imports: [],
+      imports: this.imports,
       providers: this.providers,
       exports: this.exports,
       controllers: this.controllers,
