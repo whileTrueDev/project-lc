@@ -367,26 +367,22 @@ export class OrderService {
         ...where,
         customerId,
         deleteFlag: false,
-        // 주문에 포함된 "모든 주문상품옵션"에 대해 환불 or 교환 or 주문취소 생성한 주문은 제외한다 (220712 기준 주문 일부상품에 대해서만 교환/환불 신청을 할 수 있다)
+        // 주문에 포함된 "모든 주문상품옵션"이 대해 환불 or 교환 or 주문취소 생성한 주문은 제외한다 (220712 기준 주문 일부상품에 대해서만 교환/환불 신청을 할 수 있다)
         // refund 는 Return, OrderCancellation 이 완료된 이후 생기는 데이터므로 orderCancellation, return 데이터만 확인하면 됨
         NOT: {
-          OR: [
-            {
-              orderItems: {
-                every: { options: { every: { returnItems: { some: {} } } } },
+          orderItems: {
+            every: {
+              options: {
+                every: {
+                  OR: [
+                    { returnItems: { some: {} } },
+                    { exchangeItems: { some: {} } },
+                    { orderCancellationItems: { some: {} } },
+                  ],
+                },
               },
             },
-            {
-              orderItems: {
-                every: { options: { every: { exchangeItems: { some: {} } } } },
-              },
-            },
-            {
-              orderItems: {
-                every: { options: { every: { orderCancellationItems: { some: {} } } } },
-              },
-            },
-          ],
+          },
         },
       };
     }
