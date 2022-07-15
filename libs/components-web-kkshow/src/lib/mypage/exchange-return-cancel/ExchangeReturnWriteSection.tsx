@@ -89,7 +89,12 @@ export function ExchangeReturnWriteSection({
   const exchangeRequest = useCustomerExchangeMutation();
   const returnRequest = useCustomerReturnMutation();
 
-  /** 주문에 포함된 상품 중 재배송/환불 클릭한 상품과 동일한 판매자&동일배송정책으로 묶여서 주문된 상품만 표시 => 환불,재배송 처리시 판매자별로 승인하고 처리하므로 */
+  /** 재배송/환불 요청 가능한 상품 목록
+   * 주문에 포함된 상품 중 재배송/환불 클릭한 상품과 동일한 판매자 & 동일배송정책으로 묶여서 주문된 상품만 포함 => 환불,재배송 처리시 판매자별로 승인하고 처리하므로
+   * 주문상품옵션의 경우
+   *  - 상태가 재배송/환불 신청이 가능한 상태인것만 포함
+   *  - 교환요청이 있으나 완료된 경우는 포함
+   */
   const selectableItems = useMemo(() => {
     if (!data || !optionId) return [];
 
@@ -98,9 +103,23 @@ export function ExchangeReturnWriteSection({
     );
     const targetOrderShippingId = orderItemIncludesClickedOption?.orderShippingId;
 
-    return data.orderItems.filter(
-      (item) => item.orderShippingId === targetOrderShippingId,
-    );
+    // 교환요청이 완료되지 않은 주문상품옵션 id[]
+    const unCompletedExchangeItemIds =
+      data.exchanges
+        ?.flatMap((e) => e.exchangeItems)
+        .filter((ei) => ei.status !== 'complete') // 교환 요청 완료되지 않은 상품 (교환요청 완료된 경우, 재배송받은 상품에 대해 다시 교환 요청하는 경우가 존재할 수 있으므로)
+        .map((ei) => ei.orderItemOptionId) || [];
+
+    return data.orderItems
+      .filter((item) => item.orderShippingId === targetOrderShippingId)
+      .map((item) => ({
+        ...item,
+        options: item.options.filter(
+          (opt) =>
+            exchangeReturnAbleSteps.includes(opt.step) && // 주문상품옵션 상태가 재배송/환불 신청이 가능한 것만
+            !unCompletedExchangeItemIds.includes(opt.id), // 교환요청 완료되지 않은 주문상품 옵션이 아닌 경우에만
+        ),
+      }));
   }, [data, optionId]);
 
   const onSubmit: SubmitHandler<ExchangeReturnFormData> = async (formData) => {
