@@ -64,9 +64,12 @@ type ExchangeReturnFormData = {
   Record<string, any>;
 export interface ExchangeReturnWriteFormProps {
   orderId?: number;
+  /** 재배송/반품요청 클릭한 상품옵션 -> 동일한 판매자의 상품만 표시하기 위해 전달함 */
+  optionId?: number;
 }
 export function ExchangeReturnWriteSection({
   orderId,
+  optionId,
 }: ExchangeReturnWriteFormProps): JSX.Element {
   const toast = useToast();
   const router = useRouter();
@@ -86,30 +89,19 @@ export function ExchangeReturnWriteSection({
   const exchangeRequest = useCustomerExchangeMutation();
   const returnRequest = useCustomerReturnMutation();
 
-  // 주문의 상태가 재배송/환불이 가능한지 확인
-  const isPossibleExchangeOrReturn = useMemo(() => {
-    if (!data) return true;
-    const { step } = data;
-    return exchangeReturnAbleSteps.includes(step);
-  }, [data]);
-  // 주문의 상태가 재배송/환불이 불가능하다면 목록으로 리다이렉트 시킴
-  if (!isPossibleExchangeOrReturn) {
-    return <ExchangeReturnNotAllowed />;
-  }
-  if (isLoading)
-    return (
-      <Center>
-        <Spinner />
-      </Center>
+  /** 주문에 포함된 상품 중 재배송/환불 클릭한 상품과 동일한 판매자&동일배송정책으로 묶여서 주문된 상품만 표시 => 환불,재배송 처리시 판매자별로 승인하고 처리하므로 */
+  const selectableItems = useMemo(() => {
+    if (!data || !optionId) return [];
+
+    const orderItemIncludesClickedOption = data.orderItems.find((item) =>
+      item.options.some((opt) => opt.id === optionId),
     );
-  if (isError)
-    return (
-      <Text>
-        주문정보 조회 중 오류가 발생하였습니다. 잠시 후 다시 시도해주세요. 문제가 반복되면
-        고객센터로 문의 부탁드립니다.
-      </Text>
+    const targetOrderShippingId = orderItemIncludesClickedOption?.orderShippingId;
+
+    return data.orderItems.filter(
+      (item) => item.orderShippingId === targetOrderShippingId,
     );
-  if (!data) return <ExchangeReturnNotAllowed />;
+  }, [data, optionId]);
 
   const onSubmit: SubmitHandler<ExchangeReturnFormData> = async (formData) => {
     const { solution, reason, previews, ...rest } = formData;
@@ -231,14 +223,29 @@ export function ExchangeReturnWriteSection({
     }
   };
 
+  if (isLoading)
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
+  if (isError)
+    return (
+      <Text>
+        주문정보 조회 중 오류가 발생하였습니다. 잠시 후 다시 시도해주세요. 문제가 반복되면
+        고객센터로 문의 부탁드립니다.
+      </Text>
+    );
+  if (!data) return <ExchangeReturnNotAllowed />;
   return (
     <Stack p={1} spacing={4}>
       <Text>주문번호 : {data.orderCode}</Text>
       <Divider />
 
+      {/* 재배송/환불할 상품 선택하는 부분 => 주문에 포함된 전체 상품을 표시하지 않음. 재배송/환불 신청 버튼 눌렀던 상품과 동일한 판매자&배송비정책인 상품만 표시 */}
       <ItemSelectSection
         order={data}
-        orderItems={data.orderItems}
+        orderItems={selectableItems}
         selectedItems={selectedItems}
         setSelectedItems={setSelectedItems}
       />
@@ -273,7 +280,10 @@ export default ExchangeReturnWriteSection;
 function ExchangeReturnNotAllowed(): JSX.Element {
   const router = useRouter();
   useEffect(() => {
-    router.push('/mypage/orders');
+    const timeout = setTimeout(() => {
+      router.push('/mypage/orders');
+    }, 2000);
+    return () => clearTimeout(timeout);
   }, [router]);
 
   return <Text>재배송/환불 신청이 불가능한 주문입니다</Text>;
