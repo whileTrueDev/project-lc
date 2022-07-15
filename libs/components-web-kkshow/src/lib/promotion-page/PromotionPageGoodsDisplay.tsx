@@ -28,6 +28,9 @@ export function PromotinoPageGoodsDisplay({
 }: PromotinoPageGoodsDisplayProps): JSX.Element | null {
   const defaultOpt = item.goods.options.find((x) => x.default_option === 'y');
   if (!defaultOpt) return null;
+
+  const isDiscounted = defaultOpt.consumer_price > defaultOpt.price;
+
   return (
     <LinkBox pos="relative">
       <MotionBox whileHover="hover">
@@ -61,17 +64,21 @@ export function PromotinoPageGoodsDisplay({
           <Box>
             <Flex fontSize="xl" gap={2} maxW={270}>
               <Text>
-                <Text as="span" color="red">
-                  {getDiscountedRate(
-                    Number(defaultOpt.consumer_price),
-                    Number(defaultOpt.price),
-                  )}
-                  %
-                </Text>{' '}
+                {isDiscounted ? (
+                  <Text as="span" color="red">
+                    {getDiscountedRate(
+                      Number(defaultOpt.consumer_price),
+                      Number(defaultOpt.price),
+                    )}
+                    %{' '}
+                  </Text>
+                ) : null}
                 {getLocaleNumber(defaultOpt.price)}원{' '}
-                <RedLinedText color="GrayText" as="span" fontSize="sm">
-                  {getLocaleNumber(defaultOpt.consumer_price)}원
-                </RedLinedText>
+                {isDiscounted ? (
+                  <RedLinedText color="GrayText" as="span" fontSize="sm">
+                    {getLocaleNumber(defaultOpt.consumer_price)}원
+                  </RedLinedText>
+                ) : null}
               </Text>
             </Flex>
           </Box>
