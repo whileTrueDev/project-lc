@@ -136,25 +136,28 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
     // 반품요청된 주문상품옵션 id[]
     const returnItemIds =
       order.returns?.flatMap((r) => r.items).map((ri) => ri.orderItemOptionId) || [];
-    // 교환요청된 주문상품옵션 id[]
-    const exchangeItemIds =
-      order.exchanges
-        ?.flatMap((e) => e.exchangeItems)
-        .map((ei) => ei.orderItemOptionId) || [];
+
     // 주문취소 요청된 주문상품옵션id []
     const cancelItemIds =
       order.orderCancellations
         ?.flatMap((c) => c.items)
         .map((ci) => ci.orderItemOptionId) || [];
 
-    // 주문상품에 연결된 주문상품옵션 중 교환,반품, 주문취소 있는 경우 제외
+    // 교환요청이 완료되지 않은 주문상품옵션 id[]
+    const unCompletedExchangeItemIds =
+      order.exchanges
+        ?.flatMap((e) => e.exchangeItems)
+        .filter((ei) => ei.status !== 'complete') // 교환 요청 완료되지 않은 상품 (교환요청 완료된 경우, 재배송받은 상품에 대해 다시 교환 요청하는 경우가 존재할 수 있으므로)
+        .map((ei) => ei.orderItemOptionId) || [];
+
+    // 주문상품에 연결된 주문상품옵션 중 반품요청 있는 경우 || 주문취소 있는 경우 || 완료되지 않은 교환요청 있는경우 제외
     const filtered = order.orderItems.map((oi) => {
       return {
         ...oi,
         options: oi.options.filter(
           (opt) =>
             !returnItemIds.includes(opt.id) &&
-            !exchangeItemIds.includes(opt.id) &&
+            !unCompletedExchangeItemIds.includes(opt.id) &&
             !cancelItemIds.includes(opt.id),
         ),
       };

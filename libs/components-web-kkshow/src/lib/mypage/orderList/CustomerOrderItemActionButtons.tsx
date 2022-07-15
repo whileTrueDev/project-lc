@@ -1,4 +1,5 @@
 import { Button, SimpleGrid, Text, useDisclosure, useToast } from '@chakra-ui/react';
+import { ExchangeProcessStatus } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { ReviewCreateDialog } from '@project-lc/components-shared/goods-review/ReviewCreateDialog';
 import { useOrderPurchaseConfirmMutation } from '@project-lc/hooks';
@@ -28,13 +29,13 @@ export function OrderItemActionButtons({
   // 주문 하나에 대해 여러개의 주문취소요청이 생성될 수 없다(주문취소시 전체 주문상품옵션을 선택하여 취소하게 되어있음)
   const orderCancel = order.orderCancellations?.[0];
 
-  // 해당 주문상품이 포함된 교환(재배송)요청
+  // 해당 주문상품이 포함된 완료되지 않은 교환(재배송)요청 - 재배송요청 완료된 상품에 대해서 다시 재배송요청 하는 경우 존재할 수 있으므로
   const exchangeDataIncludingThisOrderItem = order.exchanges
     ?.flatMap((e) => {
       const { exchangeItems, exchangeCode } = e;
       return exchangeItems.map((i) => ({ exchangeCode, ...i }));
     })
-    .find((oc) => oc.orderItemOptionId === option.id);
+    .find((oc) => oc.status !== 'complete' && oc.orderItemOptionId === option.id);
 
   // 해당 주문상품이 포함된 반품(환불)요청
   const returnDataIncludingThisOrderItem = order.returns
