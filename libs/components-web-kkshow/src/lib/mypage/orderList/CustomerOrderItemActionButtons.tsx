@@ -82,7 +82,13 @@ export function OrderItemActionButtons({
       onClick: () => {
         // 재배송/환불신청 없으면 재배송/환불 작성페이지로 이동
         if (!exchangeDataIncludingThisOrderItem && !returnDataIncludingThisOrderItem) {
-          router.push(`/mypage/exchange-return-cancel/write?orderId=${orderId}`);
+          router.push({
+            pathname: `/mypage/exchange-return-cancel/write`,
+            query: {
+              orderId,
+              optionId: option.id,
+            },
+          });
         }
         // 해당 주문상품이 포함된 재배송(교환)요청 있으면 재배송요청 상세페이지로 이동
         if (exchangeDataIncludingThisOrderItem) {
