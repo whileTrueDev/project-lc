@@ -17,9 +17,9 @@ import {
 import {
   CreateExchangeDto,
   CreateReturnDto,
-  exchangeReturnAbleSteps,
   RefundAccountDto,
 } from '@project-lc/shared-types';
+import { getFilteredCustomerOrderItems } from '@project-lc/utils-frontend';
 import { s3 } from '@project-lc/utils-s3';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
@@ -90,36 +90,22 @@ export function ExchangeReturnWriteSection({
   const returnRequest = useCustomerReturnMutation();
 
   /** 재배송/환불 요청 가능한 상품 목록
-   * 주문에 포함된 상품 중 재배송/환불 클릭한 상품과 동일한 판매자 & 동일배송정책으로 묶여서 주문된 상품만 포함 => 환불,재배송 처리시 판매자별로 승인하고 처리하므로
-   * 주문상품옵션의 경우
-   *  - 상태가 재배송/환불 신청이 가능한 상태인것만 포함
-   *  - 교환요청이 있으나 완료된 경우는 포함
+   * 주문에 포함된 상품 중 재배송/환불 클릭한 상품과 동일한 판매자 & 동일배송정책으로 묶여서 주문된 상품만 포함 => 환불,재배송 처리시 판매자별로 승인하고 처리하므
    */
   const selectableItems = useMemo(() => {
     if (!data || !optionId) return [];
 
-    const orderItemIncludesClickedOption = data.orderItems.find((item) =>
+    // 소비자 주문목록 조회시 주문상품옵션 표시하는 기준과 동일하게 필터 처리한 이후 그 중 동일 배송비정책인 상품만 포함
+    const filteredOrderItems = getFilteredCustomerOrderItems({ order: data });
+
+    const orderItemIncludesClickedOption = filteredOrderItems.find((item) =>
       item.options.some((opt) => opt.id === optionId),
     );
     const targetOrderShippingId = orderItemIncludesClickedOption?.orderShippingId;
 
-    // 교환요청이 완료되지 않은 주문상품옵션 id[]
-    const unCompletedExchangeItemIds =
-      data.exchanges
-        ?.flatMap((e) => e.exchangeItems)
-        .filter((ei) => ei.status !== 'complete') // 교환 요청 완료되지 않은 상품 (교환요청 완료된 경우, 재배송받은 상품에 대해 다시 교환 요청하는 경우가 존재할 수 있으므로)
-        .map((ei) => ei.orderItemOptionId) || [];
-
-    return data.orderItems
-      .filter((item) => item.orderShippingId === targetOrderShippingId)
-      .map((item) => ({
-        ...item,
-        options: item.options.filter(
-          (opt) =>
-            exchangeReturnAbleSteps.includes(opt.step) && // 주문상품옵션 상태가 재배송/환불 신청이 가능한 것만
-            !unCompletedExchangeItemIds.includes(opt.id), // 교환요청 완료되지 않은 주문상품 옵션이 아닌 경우에만
-        ),
-      }));
+    return filteredOrderItems.filter(
+      (item) => item.orderShippingId === targetOrderShippingId,
+    );
   }, [data, optionId]);
 
   const onSubmit: SubmitHandler<ExchangeReturnFormData> = async (formData) => {

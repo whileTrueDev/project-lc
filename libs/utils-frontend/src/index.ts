@@ -1,3 +1,4 @@
+export * from './lib/getFilteredCustomerOrderItems';
 export * from './lib/asteriskify';
 export * from './lib/checkCouponAvailable';
 export * from './lib/checkGoodsPurchasable';

@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/router';
+import { getFilteredCustomerOrderItems } from '@project-lc/utils-frontend';
 import { OrderItem } from './CustomerOrderItem';
 import CustomerOrderPeriodFilter, { PeriodInputs } from './CustomerOrderPeriodFilter';
 
@@ -129,40 +130,8 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
   const giftBroadcaster = order.orderItems.find((oi) => !!oi.support)?.support
     ?.broadcaster;
 
-  // 주문상품에 연결된 옵션 중 교환/환불/주문취소 요청에 포함된 옵션 제외
-  // 주문상품별이 아니라 주문상품옵션별로 표시됨
-  // 그 중 교환/환불/주문취소 요청된 옵션은 주문내역에 표시하지 않음
   const filteredOrderItems = useMemo(() => {
-    // 반품요청된 주문상품옵션 id[]
-    const returnItemIds =
-      order.returns?.flatMap((r) => r.items).map((ri) => ri.orderItemOptionId) || [];
-
-    // 주문취소 요청된 주문상품옵션id []
-    const cancelItemIds =
-      order.orderCancellations
-        ?.flatMap((c) => c.items)
-        .map((ci) => ci.orderItemOptionId) || [];
-
-    // 교환요청이 완료되지 않은 주문상품옵션 id[]
-    const unCompletedExchangeItemIds =
-      order.exchanges
-        ?.flatMap((e) => e.exchangeItems)
-        .filter((ei) => ei.status !== 'complete') // 교환 요청 완료되지 않은 상품 (교환요청 완료된 경우, 재배송받은 상품에 대해 다시 교환 요청하는 경우가 존재할 수 있으므로)
-        .map((ei) => ei.orderItemOptionId) || [];
-
-    // 주문상품에 연결된 주문상품옵션 중 반품요청 있는 경우 || 주문취소 있는 경우 || 완료되지 않은 교환요청 있는경우 제외
-    const filtered = order.orderItems.map((oi) => {
-      return {
-        ...oi,
-        options: oi.options.filter(
-          (opt) =>
-            !returnItemIds.includes(opt.id) &&
-            !unCompletedExchangeItemIds.includes(opt.id) &&
-            !cancelItemIds.includes(opt.id),
-        ),
-      };
-    });
-    return filtered;
+    return getFilteredCustomerOrderItems({ order });
   }, [order]);
   return (
     <Stack
