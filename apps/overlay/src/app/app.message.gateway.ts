@@ -53,30 +53,42 @@ export class AppMessageGateway
     return null;
   }
 
+  /**
+   * @author M'baku
+   * @description 응원메세지를 받아오는 함수
+   */
   @SubscribeMessage('right top purchase message')
   async getRightTopPurchaseMessage(
     @MessageBody() purchase: PurchaseMessage,
   ): Promise<void> {
     const { roomName } = purchase;
     const nicknameAndPrice = [];
-    const bottomAreaTextAndNickname: string[] = [];
+    /** 하단 띠배너 응원메세지 띄울 때 사용
+     const bottomAreaTextAndNickname: string[] = [];
+    */
     const { ttsSetting } = purchase;
     const rankings = await this.overlayService.getRanking(roomName);
     let audioBuffer;
-    // const totalSold = await this.overlayService.getTotalSoldPrice();
-    const messageAndNickname = await this.overlayService.getMessageAndNickname(roomName);
+
+    /** 총 금액 오버레이에 띄울 때 필요 현재는 사용안함 
+    const totalSold = await this.overlayService.getTotalSoldPrice();
+    */
+
+    /** 하단 띠배너 영역에 닉네임과 메세지 띄울 때 사용 현재는 사용안함
+     const messageAndNickname = await this.overlayService.getMessageAndNickname(roomName);
+     messageAndNickname.forEach((d: { nickname: string; text: string }) => {
+       bottomAreaTextAndNickname.push(`${d.text} - [${d.nickname}]`);
+     });
+     */
 
     rankings.forEach((eachNickname) => {
       const price = Object.values(eachNickname._sum).toString();
       const { nickname } = eachNickname;
       nicknameAndPrice.push({ nickname, price: Number(price) });
     });
+
     nicknameAndPrice.sort((a, b) => {
       return b.price - a.price;
-    });
-
-    messageAndNickname.forEach((d: { nickname: string; text: string }) => {
-      bottomAreaTextAndNickname.push(`${d.text} - [${d.nickname}]`);
     });
 
     if (
@@ -85,10 +97,12 @@ export class AppMessageGateway
       ttsSetting === 'nick-purchase-price' ||
       ttsSetting === 'only-message'
     ) {
+      // tts 변환
       audioBuffer = await this.overlayService.googleTextToSpeech(purchase);
     }
 
     if (ttsSetting === 'no-sound') {
+      // 콤보모드 (콤보모드는 응원메세지 이미지 대신 콤보를 사용해서 기존과 다른 이벤트를 사용한다)
       this.server.to(roomName).emit('get right-top pop purchase message', { purchase });
     } else {
       this.server
@@ -97,16 +111,23 @@ export class AppMessageGateway
     }
 
     this.server.to(roomName).emit('get top-left ranking', nicknameAndPrice);
-    // this.server.to(roomName).emit('get current quantity', totalSold);
+    /** 총 판매금액 오버레이에 띄울 때 사용
+     this.server.to(roomName).emit('get current quantity', totalSold);
+     */
+    /** 하단 띠배너 응원메세지 띄울 때 사용
     this.server
       .to(roomName)
       .emit('get bottom purchase message', bottomAreaTextAndNickname);
+    */
+
+    // 네쇼라 이벤트
     this.server.to(roomName).emit('get nsl donation message from server', {
       nickname: purchase.nickname,
       price: purchase.purchaseNum,
     });
   }
 
+  // 하단 응원메세지 복구
   @SubscribeMessage('bottom area message')
   handleBottomAreaReply(@MessageBody() data: RoomAndText): void {
     const { roomName } = data;
@@ -114,6 +135,7 @@ export class AppMessageGateway
     this.server.to(roomName).emit('get bottom area message', message);
   }
 
+  // 비회원 구매 알림 (오버레이 중앙 상단에 뜸)
   @SubscribeMessage('get non client purchase message from admin')
   getNonClientMessage(@MessageBody() data: PurchaseMessage): void {
     const { roomName } = data;
@@ -124,6 +146,7 @@ export class AppMessageGateway
     });
   }
 
+  // 중간 금액 알림 (뉴스 배너 형태)
   @SubscribeMessage('get objective message from admin')
   async getObjectiveMessage(
     @MessageBody()
@@ -136,6 +159,7 @@ export class AppMessageGateway
     this.server.to(roomName).emit('get objective message', toClient);
   }
 
+  // 중간 금액 알림 (불꽃 놀이 형태)
   @SubscribeMessage('get objective firework from admin')
   async getObjectiveFirework(
     @MessageBody()
@@ -147,6 +171,7 @@ export class AppMessageGateway
     this.server.to(roomName).emit('get objective firework from server', toClient);
   }
 
+  // 피버메세지
   @SubscribeMessage('get fever signal from admin')
   getFeverMessage(@MessageBody() data: RoomAndText): void {
     const { roomName } = data;

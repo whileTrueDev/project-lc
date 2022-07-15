@@ -37,6 +37,7 @@ function getOS() {
 
 const device = getOS();
 
+// 가로배너 변경
 async function switchImage() {
   if (rankingVisible) {
     $('.nsl-ranking').css('display', 'flex');
@@ -86,6 +87,7 @@ switchImage();
 
 socket.emit('new client', { pageUrl, device });
 
+// 랭킹
 socket.on('get top-left ranking', (data) => {
   const rankingArray = data;
   rankingArray.forEach((value, index) => {
@@ -96,6 +98,9 @@ socket.on('get top-left ranking', (data) => {
   });
 });
 
+// 구매알림
+// 화면 좌측 하단에 뜸
+// 메세지는 뜨지 않고, ~원 구매 감사합니다만 뜸
 socket.on('get nsl donation message from server', (data) => {
   const { nickname } = data;
   const { price } = data;
@@ -115,6 +120,7 @@ socket.on('get nsl donation message from server', (data) => {
   topMessages.push({ messageHtml });
 });
 
+// 랭킹 새로고침
 socket.on('refresh ranking from server', () => {
   $('.nsl-ranking-text-area-id').text('');
   $('.nsl-quantity').text('');
