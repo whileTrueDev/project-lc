@@ -381,7 +381,7 @@ export class OrderService {
                 every: {
                   OR: [
                     { returnItems: { some: {} } },
-                    { exchangeItems: { some: {} } },
+                    { exchangeItems: { some: { NOT: { status: 'complete' } } } }, // 교환요청의 경우 재배송처리 완료시 해당 상품의 상태를 다시 출고완료로 변경함 -> 소비자 주문목록에 표시되어야 함
                     { orderCancellationItems: { some: {} } },
                   ],
                 },
