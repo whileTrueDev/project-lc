@@ -243,7 +243,7 @@ export function ExchangeReturnWriteSection({
     );
   if (!data) return <ExchangeReturnNotAllowed />;
   return (
-    <Stack p={1} spacing={4}>
+    <Stack p={4} spacing={4}>
       <Text>주문번호 : {data.orderCode}</Text>
       <Divider />
 
