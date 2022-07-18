@@ -8,6 +8,7 @@ import {
   OrderProcessStep,
   PaymentMethod,
   ProductPromotion,
+  Seller,
   SellType,
   ShippingMethod,
 } from '@prisma/client';
@@ -386,7 +387,12 @@ export class GetOneOrderDetailDto {
 // ------------------수정 dto--------------------
 /** 주문 수정 dto */
 export class UpdateOrderDto {
-  /** 소비자 고유번호 */
+  /** 판매자 고유번호 - 판매자가 주문 수정 요청을 하는 경우 전달 */
+  @IsNumber()
+  @IsOptional()
+  sellerId?: Seller['id'];
+
+  /** 소비자 고유번호 - 주문에 연결된 소비자 수정하는 경우 */
   @IsNumber()
   @IsOptional()
   customerId?: Order['customerId'];

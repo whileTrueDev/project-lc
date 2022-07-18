@@ -119,7 +119,7 @@ export class OrderController {
   }
 
   /*
-   * 관리자 | 판매자가 사용
+   * 관리자/판매자 사용
    */
   @UseGuards(JwtAuthGuard)
   @Patch(':orderId')

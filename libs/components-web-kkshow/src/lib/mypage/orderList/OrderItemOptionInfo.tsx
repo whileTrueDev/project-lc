@@ -1,10 +1,10 @@
-import { Box, Image, Stack, Text } from '@chakra-ui/react';
+import { Image, Stack, Text, LinkBox, LinkOverlay } from '@chakra-ui/react';
 import { OrderItemOption } from '@prisma/client';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { OrderDataWithRelations, OrderItemWithRelations } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 export interface OrderItemOptionInfoProps {
   option: OrderItemOption;
@@ -17,13 +17,12 @@ export function OrderItemOptionInfo({
   orderItem,
   displayStatus = true,
 }: OrderItemOptionInfoProps): JSX.Element {
-  const router = useRouter();
   const goodsId = orderItem.goods.id;
   const goodsName = orderItem.goods.goods_name;
   const goodsImage = orderItem.goods.image?.[0]?.image;
   return (
-    <Stack direction="row" alignItems="center">
-      <Box cursor="pointer" onClick={() => router.push(`goods/${goodsId}`)}>
+    <LinkBox display="flex" alignItems="center" justifyContent="center">
+      <Stack direction="row" alignItems="center">
         <Image
           objectFit="cover"
           rounded="md"
@@ -32,31 +31,36 @@ export function OrderItemOptionInfo({
           src={goodsImage}
           alt=""
         />
-      </Box>
-      {/* 주문상품 옵션 */}
-      <Stack spacing={0}>
-        {displayStatus && (
+        {/* 주문상품 옵션 */}
+        <Stack spacing={0}>
+          {displayStatus && (
+            <Stack direction="row">
+              <OrderStatusBadge step={option.step} />
+            </Stack>
+          )}
+          <Link passHref href={`/goods/${goodsId}`}>
+            <LinkOverlay isExternal>
+              <Text fontWeight="bold">{goodsName}</Text>
+            </LinkOverlay>
+          </Link>
+
           <Stack direction="row">
-            <OrderStatusBadge step={option.step} />
+            {option.name && option.value && (
+              <>
+                <Text>
+                  {option.name} : {option.value}
+                </Text>
+                <TextDotConnector />
+              </>
+            )}
+            <Text>{option.quantity} 개 </Text>
+            <TextDotConnector />
+            <Text>
+              {getLocaleNumber(Number(option.discountPrice) * option.quantity)}원
+            </Text>
           </Stack>
-        )}
-        <Text
-          fontWeight="bold"
-          cursor="pointer"
-          onClick={() => router.push(`goods/${goodsId}`)}
-        >
-          {goodsName}
-        </Text>
-        <Stack direction="row">
-          <Text>
-            {option.name} : {option.value}
-          </Text>
-          <TextDotConnector />
-          <Text>{option.quantity} 개 </Text>
-          <TextDotConnector />
-          <Text>{getLocaleNumber(option.discountPrice)}원</Text>
         </Stack>
       </Stack>
-    </Stack>
+    </LinkBox>
   );
 }

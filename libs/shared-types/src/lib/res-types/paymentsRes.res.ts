@@ -150,3 +150,8 @@ export interface TossPaymentCancel {
   /** 취소 건에 대한 고유한 키 값입니다. 여러 건의 취소 거래를 구분하는데 사용됩니다. */
   transactionKey: string;
 }
+
+/** 결제취소 응답 */
+export interface PaymentCancelRequestResult extends Record<string, any> {
+  transactionKey: string;
+}

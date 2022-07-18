@@ -1,4 +1,5 @@
 import { Button, SimpleGrid, Text, useDisclosure, useToast } from '@chakra-ui/react';
+import { ExchangeProcessStatus } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { ReviewCreateDialog } from '@project-lc/components-shared/goods-review/ReviewCreateDialog';
 import { useOrderPurchaseConfirmMutation } from '@project-lc/hooks';
@@ -28,13 +29,13 @@ export function OrderItemActionButtons({
   // 주문 하나에 대해 여러개의 주문취소요청이 생성될 수 없다(주문취소시 전체 주문상품옵션을 선택하여 취소하게 되어있음)
   const orderCancel = order.orderCancellations?.[0];
 
-  // 해당 주문상품이 포함된 교환(재배송)요청
+  // 해당 주문상품이 포함된 완료되지 않은 교환(재배송)요청 - 재배송요청 완료된 상품에 대해서 다시 재배송요청 하는 경우 존재할 수 있으므로
   const exchangeDataIncludingThisOrderItem = order.exchanges
     ?.flatMap((e) => {
       const { exchangeItems, exchangeCode } = e;
       return exchangeItems.map((i) => ({ exchangeCode, ...i }));
     })
-    .find((oc) => oc.orderItemOptionId === option.id);
+    .find((oc) => oc.status !== 'complete' && oc.orderItemOptionId === option.id);
 
   // 해당 주문상품이 포함된 반품(환불)요청
   const returnDataIncludingThisOrderItem = order.returns
@@ -74,9 +75,7 @@ export function OrderItemActionButtons({
         // 아니면 다이얼로그 오픈
         orderCancelDialog.onOpen();
       },
-      display: orderCancellationAbleSteps.includes(step), // || //  // 상품준비 이전에만 표시
-      // step === 'paymentCanceled', // 실제 신청은불가, 정보를 보여주는 버튼을 위해
-      // => 결제취소 외에 환불(=수거없는 반품)요청 처리완료 이후에도 주문의 상태가 '결제취소'상태가 되어서 일단 주석처리함
+      display: orderCancellationAbleSteps.includes(step),
       disabled: false,
     },
     {
@@ -84,7 +83,13 @@ export function OrderItemActionButtons({
       onClick: () => {
         // 재배송/환불신청 없으면 재배송/환불 작성페이지로 이동
         if (!exchangeDataIncludingThisOrderItem && !returnDataIncludingThisOrderItem) {
-          router.push(`/mypage/exchange-return-cancel/write?orderId=${orderId}`);
+          router.push({
+            pathname: `/mypage/exchange-return-cancel/write`,
+            query: {
+              orderId,
+              optionId: option.id,
+            },
+          });
         }
         // 해당 주문상품이 포함된 재배송(교환)요청 있으면 재배송요청 상세페이지로 이동
         if (exchangeDataIncludingThisOrderItem) {

@@ -76,7 +76,7 @@ export type OrderCancelMutationDto = {
   orderCancelId: number;
   dto: UpdateOrderCancellationStatusDto;
 };
-/** 크크쇼 db 반품 업데이트 훅 */
+/** 크크쇼 소비자 주문취소 업데이트 훅 */
 export const useUpdateOrderCancelMutation = (): UseMutationResult<
   OrderCancellationUpdateRes,
   AxiosError,

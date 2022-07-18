@@ -1,5 +1,6 @@
 import { Module, DynamicModule } from '@nestjs/common';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
+import { OrderModule } from '@project-lc/nest-modules-order';
 import { ReturnController } from './return.controller';
 import { ReturnService } from './return.service';
 
@@ -11,7 +12,7 @@ export class ReturnModule {
 
   private static readonly controllers = [ReturnController];
 
-  private static readonly imports = [CipherModule];
+  private static readonly imports = [CipherModule, OrderModule.withoutControllers()];
 
   static withoutControllers(): DynamicModule {
     return {

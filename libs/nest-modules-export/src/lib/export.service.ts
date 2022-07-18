@@ -13,6 +13,7 @@ import {
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
+import { OrderService } from '@project-lc/nest-modules-order';
 
 type ExportCodeType = 'normal' | 'bundle'; // 일반출고코드 | 합포장출고코드
 const exportCodePrefix: Record<ExportCodeType, string> = {
@@ -21,7 +22,10 @@ const exportCodePrefix: Record<ExportCodeType, string> = {
 };
 @Injectable()
 export class ExportService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly orderService: OrderService,
+  ) {}
 
   /** 출고코드 생성 */
   private generateExportCode({ type = 'normal' }: { type: ExportCodeType }): string {
@@ -123,21 +127,11 @@ export class ExportService {
     return true;
   }
 
-  /** 연결된 주문 상태변경 */
+  /** 연결된 주문 상태변경
+   */
   async updateOrderStatus(dto: CreateKkshowExportDto): Promise<Order> {
-    // 주문과 연결된 주문상품옵션의 상태가 모두 출고완료이면 주문도 출고완료
-    // 아니면 부분출고로 업데이트
-    const orderItemOptions = await this.prisma.orderItemOption.findMany({
-      where: { orderItem: { order: { id: dto.orderId } } },
-    });
-
-    const isOrderItemAllExportDone = orderItemOptions.every(
-      (oi) => oi.step === 'exportDone',
-    );
-
-    return this.prisma.order.update({
-      where: { id: dto.orderId },
-      data: { step: isOrderItemAllExportDone ? 'exportDone' : 'partialExportDone' },
+    return this.orderService.updateOrderStepByOrderItemOptionsSteps({
+      orderId: dto.orderId,
     });
   }
 

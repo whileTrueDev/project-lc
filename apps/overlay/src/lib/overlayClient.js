@@ -8,6 +8,7 @@ const socket = io({ transports: ['websocket'] });
 const pageUrl = window.location.href;
 const messageArray = [];
 let prevRankingArray = [];
+// script tag에서 정보를 받아옵니다
 const iterateLimit = $('#primary-info').data('number') + 1;
 const liveShoppingId = $('#primary-info').data('liveshopping-id');
 const email = $('#primary-info').data('email');
@@ -51,6 +52,7 @@ function getOS() {
   return os;
 }
 
+// 방송시간 타이머
 function dailyMissionTimer() {
   setInterval(function timer() {
     const roomName = pageUrl.split('/').pop();
@@ -106,10 +108,12 @@ function dailyMissionTimer() {
     seconds = seconds < 10 ? `0${String(seconds)}` : String(seconds);
 
     if (hours !== '00') {
+      // 남은 시간이 1시간 이상이면 시간까지 표시
       $('#time-hour').show();
       $('#hour-min-separator').show();
       $('#time-hour').text(hours);
     } else {
+      // 남은 시간이 1시간 이하면 시간 표시 안함
       $('#time-hour').css({ display: 'none' });
       $('#hour-min-separator').css({ display: 'none' });
     }
@@ -180,6 +184,7 @@ function dailyMissionTimer() {
   }, 1000);
 }
 
+// 피버타임 타이머
 function feverTimer() {
   setInterval(function timer() {
     // 현재 날짜를 new 연산자를 사용해서 Date 객체를 생성
@@ -200,6 +205,7 @@ function feverTimer() {
   }, 1000);
 }
 
+// 세로배너 전환
 async function switchImage() {
   if (bannerId === iterateLimit) {
     bannerId = 1;
@@ -219,7 +225,9 @@ async function switchImage() {
   }, 10000);
 }
 
-// 우측상단 응원문구 이벤트 및 랭킹
+// 우측상단 응원문구 이벤트 및 랭킹 10초간격 setInterval
+// 메세지가 뜰 때, 랭킹도 같이 반영된다
+// 이전의 메세지가 완전히 사라진 후, 다음 메세지가 뜬다
 setInterval(async () => {
   if (messageArray.length && $('.top-right').css('display') === 'none') {
     if (rankingToRenderArray.length) {
@@ -228,6 +236,7 @@ setInterval(async () => {
         $(`.quantity#rank-${index}`).text(
           `${value.price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}원`,
         );
+        // 랭킹 1위가 변경된 경우에 랭킹 1위 닉네임 하이라이트 애니메이션 발생
         if (index === 0 && rankingToRenderArray[0].animate) {
           $('.ranking-text-area-id#rank-0').addClass('ranking-pop');
           setTimeout(() => {
@@ -261,6 +270,7 @@ setInterval(async () => {
 }, 2000);
 
 // 비회원 메세지
+// 회원 응원메세지와는 다르게 5초동안만 보여진다
 setInterval(async () => {
   if (topMessages.length !== 0 && $('.top-wrapper').css('display') === 'none') {
     $('.top-wrapper').css({ display: 'flex' });
@@ -272,6 +282,7 @@ setInterval(async () => {
   }
 }, 2000);
 
+// 중간금액 알림 폭죽효과 사용시 하늘에서 떨어지는 닉네임들 애니메이션 효과
 function makeRain(users, delay) {
   let i = 0;
   $('.letters').show();
@@ -291,6 +302,8 @@ function makeRain(users, delay) {
   }, delay);
 }
 
+// 하단 띠 배너 영역 구매메세지 기능 현재는 사용안함
+// 필요시 주석해제
 // async function switchBottomText() {
 //   if (bottomTextIndex >= bottomMessages.length) {
 //     bottomTextIndex = 0;
@@ -314,26 +327,33 @@ function makeRain(users, delay) {
 dailyMissionTimer();
 switchImage();
 feverTimer();
+// 하단 띠 배너 영역 구매메세지 기능 현재는 사용안함
+// 필요시 주석해제
 // switchBottomText();
 //------------------------------------------------------------------------------
 
 const device = getOS();
 
+// 최초 접속시 room에 socketId를 등록하기 위한 이벤트
 socket.emit('new client', { pageUrl, device });
 
+// 방송 시작 시간 종료시간 받아오는 이벤트
 socket.emit('get date from registered liveshopping', {
   liveShoppingId,
   roomName: pageUrl.split('/').pop(),
 });
 
+// 랭킹
 socket.on('get top-left ranking', (rankings) => {
   if ($('.ranking-text-area#title').css('display') === 'none') {
     if (prevRankingArray[0].nickname !== rankings[0].nickname) {
+      // 랭킹 1위가 바뀌는 경우, 닉네임 하이라이트 효과
       rankingToRenderArray.push({ rankings, animate: true });
     } else {
       rankingToRenderArray.push({ rankings, animate: false });
     }
   } else {
+    // 첫 구매 발생시 랭킹 영역 포디움 이미지에서 랭킹 형태로 전환
     $('.ranking-text-area#title').css({ display: 'none' });
     $('.ranking-area-inner').html(
       `<p class="ranking-text-area" id="rank-0">
@@ -388,6 +408,7 @@ socket.on('get top-left ranking', (rankings) => {
   prevRankingArray = rankings;
 });
 
+// 구매메세지
 socket.on('get right-top purchase message', async (data) => {
   const alarmType = data.purchase.level;
   const { nickname } = data.purchase;
@@ -402,6 +423,7 @@ socket.on('get right-top purchase message', async (data) => {
     const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
     audioBlob = window.URL.createObjectURL(blob);
   }
+  // html string 생성
   messageHtml = `
   <div class="donation-wrapper">
     ${
@@ -435,9 +457,11 @@ socket.on('get right-top purchase message', async (data) => {
     </div>
   </div>
   `;
+  // array에 html string push
   messageArray.push({ audioBlob, messageHtml });
 });
 
+// 비회원 응원메세지
 socket.on('get non client purchase message', async (data) => {
   const { nickname } = data;
   const { productName } = data;
@@ -502,10 +526,12 @@ socket.on('get right-top pop purchase message', async (data) => {
   messageArray.push({ messageHtml });
 });
 
+// 콤보 리셋 이벤트
 socket.on('combo reset from server', async () => {
   combo = 1;
 });
 
+// 중간금액 알림
 socket.on('get objective message', async (data) => {
   const { nickname } = data.objective;
   const { price } = data.objective;
@@ -535,6 +561,7 @@ socket.on('get objective message', async (data) => {
   $('.bottom-area-right').css({ opacity: 1 });
   $('.bottom-area-text').css({ opacity: 1 });
 
+  // 중간금액 알림 tts를 위한 이벤트
   socket.emit('send objective notification signal', data);
 
   await setTimeout(() => {
@@ -543,6 +570,7 @@ socket.on('get objective message', async (data) => {
   }, 7000);
 });
 
+// 중간금액 알림 폭죽효과
 socket.on('get objective firework from server', async (data) => {
   const fireworkHtml = `
   <img src="/images/firework.gif" id="firework" alt="firework"/>
@@ -558,6 +586,7 @@ socket.on('get objective firework from server', async (data) => {
     </div>
   </div>`;
 
+  // 중간금액 알림 tts를 위한 이벤트
   socket.emit('send objective notification signal', data);
 
   $('.objective-wrapper').attr('id', 'soldout');
@@ -572,6 +601,8 @@ socket.on('get objective firework from server', async (data) => {
   }, 10000);
 });
 
+// 오버레이 우측 상단 로고 변경
+// 기본로고와 방송별로 등록한 특별 로고 2개 중 선택 가능
 socket.on('toggle right-top onad logo from server', () => {
   if ($('#kks-logo').attr('src').includes('s3')) {
     $('#kks-logo').attr('src', '/images/kks-default-logo.png');
@@ -601,6 +632,7 @@ socket.on('get bottom area message', (data) => {
   }, 10000);
 });
 
+// 피버 메세지
 socket.on('get bottom fever message', (data) => {
   $('.bottom-area-text').css({ opacity: 0 });
   $('.bottom-area-right')
@@ -619,6 +651,7 @@ socket.on('get bottom fever message', (data) => {
 //   bottomMessages = data;
 // });
 
+// 하단 띠 배너 영역 토글
 socket.on('handle bottom area to client', () => {
   if ($('.bottom-area-right').css('opacity') === '1') {
     $('.bottom-area-text').text('');
@@ -629,30 +662,37 @@ socket.on('handle bottom area to client', () => {
   }
 });
 
+// 오버레이 띄우기
 socket.on('show screen', () => {
   $('.live-commerce').fadeIn(500);
 });
 
+// 오버레이 숨기기
 socket.on('hide screen', () => {
   $('.live-commerce').fadeOut(500);
 });
 
+// 세로배너 토글
 socket.on('hide vertical-banner from server', () => {
   $('.left-banner-area').toggle();
 });
 
+// 방송종료 시간
 socket.on('d-day from server', (date) => {
   endDate = new Date(date);
 });
 
+// 피버 종료시간
 socket.on('get fever date from server', (date) => {
   feverDate = new Date(date);
 });
 
+// 화면 새로고침
 socket.on('refresh signal', () => {
   window.location.reload();
 });
 
+// 인트로/아웃트로 띄우기
 socket.on('show video from server', (type) => {
   if (type === 'intro') {
     const introHtml = `
@@ -683,16 +723,20 @@ socket.on('show video from server', (type) => {
   }
 });
 
+// 비디오 끄기
 socket.on('clear full video from server', () => {
   $('.full-video').fadeOut(800);
 });
 
+// 방송 시작 시간 전송받기
 socket.on('get start time from server', (startSetting) => {
   streamerAndProduct = startSetting.streamerAndProduct;
   $('.alive-check').css('background-color', 'blue');
   startDate = new Date(startSetting.date);
 });
 
+// 혹시 모를 에러 방지를 위해 방송시작 알림 tts는 한 번만 뜨도록 되어있음
+// 방송 시작 tts를 다시 보내고 싶은 경우, 새로고침 이후, 사용 (컨트롤러의 새로고침 버튼 사용)
 socket.once('get stream start notification tts', (audioBuffer) => {
   if (audioBuffer) {
     const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
@@ -704,6 +748,7 @@ socket.once('get stream start notification tts', (audioBuffer) => {
   }
 });
 
+// 중간금액 알림 tts
 socket.on('get objective notification tts', (audioBuffer) => {
   if (audioBuffer) {
     const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
@@ -715,6 +760,7 @@ socket.on('get objective notification tts', (audioBuffer) => {
   }
 });
 
+// 방송종료 5분전 알림
 socket.on('get stream end notification tts', (audioBuffer) => {
   if (audioBuffer) {
     const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
@@ -730,10 +776,13 @@ socket.on('get stream end notification tts', (audioBuffer) => {
   }, 5000);
 });
 
+// 연결체크
+// 화면 좌측 하단 연결체크를 위한 비콘 토글
 socket.on('connection check from server', () => {
   $('.alive-check').toggle();
 });
 
+// 매진 알림
 socket.on('get soldout signal from server', async () => {
   const soldoutHtml = `
   <img src="/images/firework.gif" id="firework" alt="firework"/>
@@ -757,10 +806,13 @@ socket.on('get soldout signal from server', async () => {
   }, 10000);
 });
 
+// 세로배너 영역에 버츄얼 캐릭터를 띄우기 위한 세로배너 위에 흰 배경을 띄움
 socket.on('get virtual character from server', async () => {
   $('.virtual-background').toggle();
 });
 
+// 버츄얼 캐릭터 오디오 재생
+// 관리자 페이지에 따로 오디오 파일을 등록하는 기능이 없으므로 s3에 직접 올려야 함
 socket.on('get virtual character audio from server', async () => {
   $('body').append(`
     <iframe src="https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-audio/${email}/${liveShoppingId}/voice"
@@ -768,14 +820,17 @@ socket.on('get virtual character audio from server', async () => {
     `);
 });
 
+// 버츄얼 캐릭터 오디오 재생 종료
 socket.on('delete virtual character audio from server', async () => {
   $('#virtual-voice').remove();
 });
 
+// 세로배너의 매진알림 표시 제거
 socket.on('remove soldout banner from server', () => {
   $('.vertical-soldout-banner').css({ opacity: 0 });
 });
 
+// 피버메세지 띄우기
 socket.on('get fever signal from server', (text) => {
   $('.bottom-area-right').css({ opacity: 1 });
   $('.bottom-area-right-fever-wrapper').show();
@@ -788,6 +843,7 @@ socket.on('get fever signal from server', (text) => {
   }, 5000);
 });
 
+// 전화이벤트/퀴즈 이벤트 이미지 띄우기
 socket.on('get notification image from server', (type) => {
   if (type === 'calling') {
     $('.notification').append(`<img id="notification" src="/images/calling.png" />`);
@@ -796,10 +852,14 @@ socket.on('get notification image from server', (type) => {
   }
 });
 
+// 전화이벤트/퀴즈 이벤트 이미지 숨기기
 socket.on('remove notification image from server', () => {
   $('.notification').empty();
 });
 
+// 라이브 쇼핑 아이디가 정상적으로 전달되지 않은 경우, 라이브 쇼핑id를 받아오는 이벤트
+// 라이브 쇼핑 아이디가 제대로 전달되지 않은경우, s3에서 세로배너, 응원메세지 등을 가져오지 못하므로
+// 해당 부분에서 오류 발생시 시도해 볼 수 있는 방법
 socket.on('get liveshopping id from server', (liveShoppingIdAndProductName) => {
   $('.alive-check').css('background-color', 'yellow');
   streamerAndProduct = liveShoppingIdAndProductName.streamerAndProduct;
@@ -811,16 +871,20 @@ socket.on('get liveshopping id from server', (liveShoppingIdAndProductName) => {
   });
 });
 
+// 상품명 받아오기
+// 실제 상품명과 방송 tts, 응원메세지에서 사용하는 상품명은 다른 경우가 대부분이라, 상품명을 따로 입력 받아야 함
 socket.on('get product name from server', (streamerAndProductName) => {
   $('.alive-check').css('background-color', 'burlywood');
   streamerAndProduct = streamerAndProductName;
 });
 
+// 방송 시작, 종료 시간이 제대로 전송되지 않았을 경우 받아옴
 socket.on('get registered date from server', (registeredTime) => {
   startDate = new Date(registeredTime.broadcastStartDate);
   endDate = new Date(registeredTime.broadcastEndDate);
 });
 
+// 랭킹영역만 새로고침
 socket.on('refresh ranking from server', () => {
   $('.ranking-text-area#title').css({ display: 'flex' });
   $('.ranking-area-inner').html(
@@ -828,6 +892,7 @@ socket.on('refresh ranking from server', () => {
   );
 });
 
+// 테마변경
 socket.on('change theme from server', (themeType) => {
   switch (themeType) {
     case 'spring':
@@ -887,6 +952,7 @@ socket.on('change theme from server', (themeType) => {
   }
 });
 
+// bgm 재생
 socket.on('start bgm from server', (data) => {
   const bgmNumber = data;
   if (isBgmPlaying) {
@@ -901,11 +967,13 @@ socket.on('start bgm from server', (data) => {
   }
 });
 
+// bgm 종료
 socket.on('off bgm from server', () => {
   $('#bgm').remove();
   isBgmPlaying = false;
 });
 
+// bgm 볼륨 조절
 socket.on('bgm volume from server', (volume) => {
   if (volume === 'up') {
     bgmVolume += 0.01;
@@ -919,6 +987,7 @@ socket.on('bgm volume from server', (volume) => {
   }
 });
 
+// 버츄얼 캐릭터 오디오 재생
 socket.on('get virtual character audio from server', async () => {
   $('body').append(`
     <iframe src="https://${bucketName}.ap-northeast-2.amazonaws.com/overlay-audio/${email}/${liveShoppingId}/voice"
@@ -926,6 +995,7 @@ socket.on('get virtual character audio from server', async () => {
     `);
 });
 
+// 치킨 테마에서만 사용되는 이벤트 알림 애니메이션
 socket.on('get chicken move from server', async () => {
   $('.chicken-move').css({ display: 'flex' });
   chickenMovement();
@@ -934,6 +1004,7 @@ socket.on('get chicken move from server', async () => {
   }, 15000);
 });
 
+// 뉴스 속보 형태의 알림
 socket.on('get news message from server', (data) => {
   $('.news-banner p').html(
     `<span>${data}</span> 
@@ -946,6 +1017,8 @@ socket.on('get news message from server', (data) => {
   }, 5000);
 });
 
+// 버츄얼 캐릭터 영상 재생
+// 관리자 페이지에 따로 업로드 하는 기능이 없으므로, s3에 직접 비디오 등록해야함
 socket.on('play virtual video from server', () => {
   $('.left-banner-area').append(`
   <video class='virtual-video' autoplay width='100%' height='100%'>

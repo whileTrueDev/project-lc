@@ -38,6 +38,7 @@ export class AppController {
     return 'No-content';
   }
 
+  // 오버레이 렌더링 시 필요한 정보들 받아오고, hbs로 넘겨줌
   @Get([':id', '/nsl/:id'])
   async getRender(
     @Param('id') id: string,

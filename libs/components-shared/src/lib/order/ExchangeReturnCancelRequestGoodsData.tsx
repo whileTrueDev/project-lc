@@ -20,10 +20,15 @@ export function ExchangeReturnCancelRequestGoodsData(
       <Stack spacing={0}>
         <Text fontWeight="bold">{goodsName}</Text>
         <Stack direction="row" fontSize="sm">
-          <Text>
-            {optionName} : {optionValue}
-          </Text>
-          <TextDotConnector />
+          {optionName && optionValue && (
+            <>
+              <Text>
+                {optionName} : {optionValue}
+              </Text>
+              <TextDotConnector />
+            </>
+          )}
+
           <Text>{amount} 개 </Text>
           <TextDotConnector />
           <Text>{getLocaleNumber(price * amount)}원</Text>

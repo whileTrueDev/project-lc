@@ -33,6 +33,7 @@ import {
   testadminData,
   testBroadcasterData,
   testsellerData,
+  testsellerData2,
   testsellerExtraData,
 } from './seedData/dummyData';
 import {
@@ -65,18 +66,24 @@ export type SellerAccountType = Seller & {
   SellerContacts: SellerContacts[];
 };
 /** 테스트 판매자 계정 & 판매자 기본 공통정보, 정산계정, 연락처, 배송그룹 생성 */
-async function createSellerAccount(): Promise<SellerAccountType> {
+async function createSellerAccount({
+  sellerData,
+  sellerExtraData,
+}: {
+  sellerData: Prisma.SellerCreateInput;
+  sellerExtraData: typeof testsellerExtraData;
+}): Promise<SellerAccountType> {
   const {
     sellerShop,
     goodsInfo,
     sellerSettlementAccount,
     sellerContacts,
     shippingGroup,
-  } = testsellerExtraData;
+  } = sellerExtraData;
   // 판매자 계정 생성
   const seller = await prisma.seller.create({
     data: {
-      ...testsellerData,
+      ...sellerData,
       // 판매자 상점정보 생성
       sellerShop: { create: sellerShop },
       // 판매자 공통정보 생성
@@ -399,7 +406,18 @@ async function main(): Promise<void> {
   await createAdminAccount();
 
   // 판매자 계정 생성
-  const seller = await createSellerAccount();
+  const seller = await createSellerAccount({
+    sellerData: testsellerData,
+    sellerExtraData: testsellerExtraData,
+  });
+
+  const seller2 = await createSellerAccount({
+    sellerData: testsellerData2,
+    sellerExtraData: {
+      ...testsellerExtraData,
+      sellerShop: { shopName: '테스트 판매자2 상점2' },
+    },
+  });
 
   // 소비자 계정 생성
   await createCustomer();
@@ -425,6 +443,7 @@ async function main(): Promise<void> {
   await createDummyGoods(seller, dummyGoodsList[1]);
   await createDummyGoods(seller, dummyGoodsList[2]);
   const goods4 = await createDummyGoods(seller, dummyGoodsList[3]);
+  await createDummyGoods(seller2, dummyGoodsList[4]);
 
   // 테스트상품4의 라이브쇼핑 생성
   await createDummyLiveShopping(seller, testbroadcaster, goods4);

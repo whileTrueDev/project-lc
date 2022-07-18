@@ -1600,9 +1600,9 @@ enum OrderProcessStep {
   partialShippingDone // 부분배송완료, 70
   shippingDone // 배송완료, 75
   purchaseConfirmed // 구매확정(임의로 추가함)
-  paymentCanceled // 결제취소, 85
-  orderInvalidated // 주문무효, 95
-  paymentFailed // 결제실패, 99
+  paymentCanceled // 결제취소, 85 -> 지불완료된 상태에서 환불처리 한 경우 이 상태가 됨 (220713 기준)
+  orderInvalidated // 주문무효, 95 -> 지불수단 : 가상계좌로 주문생성 하였으나 입금하지 않고 소비자가 주문취소한 경우 이 상태가 됨 (220713 기준)
+  paymentFailed // 결제실패, 99 -> 지불수단 : 가상계좌로 주문생성 하였으나 기간내에 입금되지 않은 경우 이 상태가 됨 (220713 기준)
 }
 
 enum VirtualAccountDepositStatus {
@@ -2017,7 +2017,7 @@ model GoodsInformationNotice {
 model GoodsCategory {
   id                 Int             @id @default(autoincrement())
   categoryCode       String          @unique // 카테고리 코드
-  name               String // 카테고리명
+  name               String          @unique // 카테고리명 
   mainCategoryFlag   Boolean         @default(false) // 대표카테고리인지 여부 (카테고리 트리의 잎 여부)
   parentCategoryId   Int?
   parentCategory     GoodsCategory?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id], onDelete: Cascade) // 상위 부모 카테고리

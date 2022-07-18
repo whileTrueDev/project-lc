@@ -11,6 +11,7 @@ import {
   CreatePaymentRes,
   KKsPaymentProviders,
   Payment,
+  PaymentCancelRequestResult,
   PaymentRequestDto,
   PaymentTransaction,
   TossPaymentCancelDto,
@@ -140,7 +141,7 @@ export class PaymentService {
   public async requestCancel<
     P extends KKsPaymentProviders,
     DTO extends PaymentCancelDto<P>,
-  >(provider: P, _dto: DTO): Promise<{ transactionKey: string } & Record<string, any>> {
+  >(provider: P, _dto: DTO): Promise<PaymentCancelRequestResult> {
     try {
       if (provider === KKsPaymentProviders.TossPayments) {
         const dto = _dto as TossPaymentCancelDto;
