@@ -27,6 +27,7 @@ import {
   NonMemberOrderDetailRes,
   OrderDataWithRelations,
   OrderDetailRes,
+  orderEndSteps,
   OrderListRes,
   orderProcessStepDict,
   OrderPurchaseConfirmationDto,
@@ -36,6 +37,7 @@ import {
   sellerOrderSteps,
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
+  skipSteps,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
 import { calculateShippingCost } from '@project-lc/utils';
@@ -365,10 +367,28 @@ export class OrderService {
         ...where,
         customerId,
         deleteFlag: false,
-        exchanges: { none: {} },
-        returns: { none: {} },
-        refunds: { none: {} },
-        orderCancellations: { none: {} },
+        // 주문에 포함된 "모든 주문상품옵션"이 대해 환불 or 교환 or 주문취소 생성한 주문은 제외한다 (220712 기준 주문 일부상품에 대해서만 교환/환불 신청을 할 수 있다)
+        // refund 는 Return, OrderCancellation 이 완료된 이후 생기는 데이터므로 orderCancellation, return 데이터만 확인하면 됨
+        /** 클라이언트에서 주문목록.filter(조건) 로 처리하지 않고 where절 사용한 이유 :
+         * 서버세서는 5개씩 조회하여 클라이언트로 응답했는데
+         * 그 5개 모두 교환/환불/취소 요청이 존재하는 주문이라 클라이언트에서 필터링되는 경우가 있을 수 있다
+         * 이 경우 서버에서 5개를 응답하였음에도 소비자 주문목록에는 아무것도 표시되지 않음
+         * */
+        NOT: {
+          orderItems: {
+            every: {
+              options: {
+                every: {
+                  OR: [
+                    { returnItems: { some: {} } },
+                    { exchangeItems: { some: { NOT: { status: 'complete' } } } }, // 교환요청의 경우 재배송처리 완료시 해당 상품의 상태를 다시 출고완료로 변경함 -> 소비자 주문목록에 표시되어야 함
+                    { orderCancellationItems: { some: {} } },
+                  ],
+                },
+              },
+            },
+          },
+        },
       };
     }
 
@@ -474,11 +494,13 @@ export class OrderService {
     return getOrderProcessStepNameByStringNumber(stringNumber);
   }
 
-  /** 판매자의 주문조회시 주문에 포함된 판매자의 상품옵션의 상태에 따라 표시될 주문의 상태 구하는 함수
+  /** 주문에 포함된 상품옵션의 상태에 따라 표시될 주문의 상태 구하는 함수
+   * - 판매자의 주문조회시 주문에 포함된 판매자의 상품옵션의 상태에 따라 표시될 주문의 상태 구하는 경우 사용
+   * - 주문에 포함된 상품옵션 일부의 상태 변경 후 주문 상태 업데이트 시 사용
    */
-  private getOrderRealStep(
+  public getOrderRealStep(
     originOrderStep: OrderProcessStep,
-    sellerGoodsOrderItemOptions: OrderItemOption[],
+    sellerGoodsOrderItemOptions: { step: OrderItemOption['step'] }[],
   ): OrderProcessStep {
     // 주문상태가 partial000 인지 확인(부분000인지)
     const isPartialStep = [
@@ -516,8 +538,47 @@ export class OrderService {
 
       return this.getStepNameByStringNumber(maxOptionStepStrNum);
     }
-    // 옵션 중 원래 주문상태보다 하나라도 낮거나 높은 상태가 있는 경우 그대로 반환
 
+    // 옵션들 중 원래 주문상태보다 하나라도 높은 상태가 있는 경우
+    // 일부 판매자의 상품이 취소, 무효, 실패 상태인 경우, 주문 자체는 다른 판매자 상품의 상태 중 가장 높은 상태일 수 있다(판매자1의 주문상품은 모두 취소상태, 판매자2의 주문상품은 출고완료상태인 경우, 주문 자체의 상태는 출고완료로 저장되어 있음)
+    if (
+      sellerGoodsOrderItemOptions.some(
+        (io) => Number(orderProcessStepDict[io.step]) > originOrderStepNum,
+      )
+    ) {
+      // 판매자의 상품옵션이 모두 동일하며, 구매확정 | 결제취소 | 주문무효 | 결제실패 인경우 => 해당 상태 리턴
+      const firstItemStep = sellerGoodsOrderItemOptions[0].step;
+      if (
+        sellerGoodsOrderItemOptions.every((io) => io.step === firstItemStep) &&
+        orderEndSteps.includes(firstItemStep)
+      ) {
+        return firstItemStep;
+      }
+      // 판매자의 상품옵션 상태가 다른 경우(일부 결제취소, 일부 구매확정인 경우가 존재할 수 있다 => 구매확정이 최종 상태여야함)
+      // 일부 결제실패인 경우는 존재할 수 없다. (결제실패 - 지불수단 가상계좌 선택후 입금기한 내 미입금하여 취소처리된 경우)
+      // 일부 주문무효인 경우는 현재는 존재하지 않음(주문무효 - 가상게좌 선택후 입금 전 소비자가 주문취소 하는 경우)
+      // 판매자 상품옵션 중 가장 높은 상태 구하기
+      const maxOptionStepNum = Math.max(
+        ...sellerGoodsOrderItemOptions.map((io) => Number(orderProcessStepDict[io.step])),
+      );
+      // 가장 높은 상태가 구매확정이거나 구매확정보다 낮은 단계라면 그대로 리턴
+      if (maxOptionStepNum <= 80) {
+        return this.getStepNameByStringNumber(
+          maxOptionStepNum.toString() as OrderStatusNumString,
+        );
+      }
+
+      // 가장 높은 상태가 결제취소, 주문무효, 결제실패라면 해당 상태 제외한 주문상품 중 가장 높은 상태 리턴
+      // 판매자 상품옵션 중 결제취소85, 주문무효95, 결제실패99 제외한 가장 높은 상태 구하기
+      const exceptSkipStepsMaxOptionsStepStrNum = Math.max(
+        ...sellerGoodsOrderItemOptions
+          .filter((io) => !skipSteps.includes(io.step))
+          .map((io) => Number(orderProcessStepDict[io.step])),
+      ).toString() as OrderStatusNumString;
+      return this.getStepNameByStringNumber(exceptSkipStepsMaxOptionsStepStrNum);
+    }
+
+    // 판매자의 상품옵션 상태가 주문 원상태보다 낮거나 높은 상태가 없다(주문상태와 동일하다)
     return originOrderStep;
   }
 
@@ -729,8 +790,17 @@ export class OrderService {
 
     // 특정 판매자가 개별주문 상세조회시
     // 주문상품 중 판매자의 상품만 보내기 & 판매자의 주문상품 상태에 따라 주문상태 표시 & 판매자의 베송비그룹으로 계산된 배송비만 보내기
+    // && 교환/반품/취소 - 해당 판매자의 상품이 포함된 것만 보내기
     if (dto.sellerId) {
-      const { orderItems, shippings, ...orderRestData } = result;
+      const {
+        orderItems,
+        shippings,
+        exchanges,
+        orderCancellations,
+        returns,
+        exports,
+        ...orderRestData
+      } = result;
 
       // * 주문상품옵션 중 판매자 본인의 상품옵션만 남기기
       const sellerGoodsOrderItems = orderItems.filter(
@@ -757,11 +827,52 @@ export class OrderService {
         );
       }
 
+      // * 판매자 상품이 포함된 교환/반품/취소/출고 데이터, 상품만 보내기
+      // 해당 판매자의 상품인 주문상품id (OrderItem.id) 목록
+      const sellerOrderItemsIdList = sellerGoodsOrderItems.map((item) => item.id);
+      // 판매자의 상품이 포함된 교환(재배송)요청
+      const sellerExchanges = exchanges
+        .map((ex) => ({
+          ...ex,
+          // 교환요청 상품 중 판매자의 상품만 필터
+          exchangeItems: ex.exchangeItems.filter((item) =>
+            sellerOrderItemsIdList.includes(item.orderItemId),
+          ),
+        }))
+        .filter((ex) => ex.exchangeItems.length > 0); // 판매자 상품이 포함된 교환요청만 필터
+
+      // 판매자 상품이 포함된 주문취소요청
+      const sellerOrderCancellations = orderCancellations
+        .map((oc) => ({
+          ...oc,
+          items: oc.items.filter((item) =>
+            sellerOrderItemsIdList.includes(item.orderItemId),
+          ),
+        }))
+        .filter((oc) => oc.items.length > 0);
+
+      // 판매자 상품이 포함된 반품요청
+      const sellerReturns = returns
+        .map((r) => ({
+          ...r,
+          items: r.items.filter((item) =>
+            sellerOrderItemsIdList.includes(item.orderItemId),
+          ),
+        }))
+        .filter((r) => r.items.length > 0);
+
+      // 판매자가 진행한  출고 (출고는 판매자별로 처리됨)
+      const sellerExports = exports.filter((exp) => exp.sellerId === dto.sellerId);
+
       result = {
         ...orderRestData,
         shippings: sellerShippings,
         step: displaySellerOrderStep,
         orderItems: sellerGoodsOrderItems,
+        exchanges: sellerExchanges,
+        orderCancellations: sellerOrderCancellations,
+        returns: sellerReturns,
+        exports: sellerExports,
       };
     }
 
@@ -806,7 +917,7 @@ export class OrderService {
     // 주문이 존재하는지 확인
     await this.findOneOrder({ id: orderId });
 
-    const { customerId, ...rest } = dto;
+    const { customerId, sellerId, ...rest } = dto;
 
     let updateInput: Prisma.OrderUpdateInput = { ...rest };
 
@@ -818,37 +929,39 @@ export class OrderService {
       };
     }
 
-    // 주문 업데이트
+    // 주문 정보 업데이트
     await this.prisma.order.update({
       where: { id: orderId },
       data: updateInput,
     });
 
-    // 주문 상태를 바꾸는 경우 주문상품옵션의 상태와 개수도 변경
+    // 주문 상태를 바꾸는 경우 -> 주문에 포함된 주문상품 옵션도 같이 변경한다
     if (rest.step) {
-      const orderItemOptions = await this.prisma.orderItemOption.findMany({
-        where: { orderItem: { orderId } },
-        select: { id: true, quantity: true },
-      });
-      // 주문상태를 결제확인/결제취소/결제실패로 바꾸는경우(주문접수 -> 결제확인)
-      // => 해당 주문에 포함된 주문상품옵션의 상태도 모두 결제확인으로 변경
-      if (['paymentConfirmed', 'paymentCanceled', 'paymentFailed'].includes(rest.step)) {
+      // 판매자가 주문상태를 변경하는 경우(주문에는 다른 판매자의 상품이 포함되어 있을수 있으므로, 자신의 상품상태만 변경해야함)
+      if (sellerId) {
+        await this.updateOrderItemOptionsStepBySeller({
+          orderId,
+          sellerId,
+          step: rest.step,
+        });
+        return true;
+      }
+      // 주문상태를 결제확인/결제취소/결제실패/주문무효로 바꾸는경우 (웹훅에서 처리 등)
+      // => 해당 주문에 포함된 주문상품옵션의 상태도 일괄적으로 주문 상태와 동일하게 변경
+      // (220713 기준 결제를 여러번 나눠서 할 수는 없으므로 결제확인시에도 일괄적으로 주문상품옵션 상태 변경함)
+      if (
+        [
+          'paymentConfirmed',
+          'paymentCanceled',
+          'paymentFailed',
+          'orderInvalidated',
+        ].includes(rest.step)
+      ) {
         await this.prisma.orderItemOption.updateMany({
           where: { orderItem: { orderId } },
           data: { step: rest.step },
         });
-      }
-      // 주문상태를 상품준비로 바꾸는 경우(결제완료 -> 상품준비)
-      // => 해당 주문에 포함된 주문상품옵션 상태도 모두 상품준비로 변경
-      if (rest.step === 'goodsReady') {
-        await this.prisma.$transaction(
-          orderItemOptions.map((opt) => {
-            return this.prisma.orderItemOption.update({
-              where: { id: opt.id },
-              data: { step: rest.step },
-            });
-          }),
-        );
+        return true;
       }
     }
 
@@ -935,6 +1048,7 @@ export class OrderService {
     // 주문에 포함된 모든 주문상품옵션이 구매확정 되었다면 주문의 상태도 구매확정으로 변경
     const everyOrderItemOptionsPurchaseConfirmed = order.orderItems
       .flatMap((item) => item.options)
+      .filter((opt) => !skipSteps.includes(opt.step)) // 고려하지 않을 상태(주문취소, 결제취소, 주문무효)인 주문상품옵션 제외
       .every((opt) => opt.step === 'purchaseConfirmed');
 
     if (everyOrderItemOptionsPurchaseConfirmed) {
@@ -1224,5 +1338,51 @@ export class OrderService {
     }, {} as ShippingCostByShippingGroupId);
 
     return tempResult;
+  }
+
+  /** 주문 "상태" 업데이트 - 주문상품 상태에 기반하여 주문 자체의 상태를 업데이트함 */
+  public async updateOrderStepByOrderItemOptionsSteps({
+    orderId,
+  }: {
+    orderId: Order['id'];
+  }): Promise<Order> {
+    // 주문에 포함된 모든 상품옵션들
+    const allOptions = await this.prisma.orderItemOption.findMany({
+      where: { orderItem: { orderId } },
+      select: { id: true, step: true },
+    });
+
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+
+    const orderNewStep = this.getOrderRealStep(order.step, allOptions);
+
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: { step: orderNewStep },
+    });
+  }
+
+  /** 주문에 포함된 상품 중 "특정 판매자 상품"의 상태 변경 => 주문상품옵션 상태에 따라 주문상태 업데이트 */
+  public async updateOrderItemOptionsStepBySeller({
+    orderId,
+    sellerId,
+    step,
+  }: {
+    orderId: number;
+    sellerId: number;
+    step: OrderProcessStep;
+  }): Promise<boolean> {
+    // 판매자 상품인 주문상품옵션의 상태 업데이트
+    await this.prisma.orderItemOption.updateMany({
+      where: { orderItem: { orderId, goods: { sellerId } } },
+      data: { step },
+    });
+
+    // 변경된 주문상품옵션 상태에 따라 주문 상태 업데이트
+    await this.updateOrderStepByOrderItemOptionsSteps({ orderId });
+
+    return true;
   }
 }

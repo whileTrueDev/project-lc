@@ -11,6 +11,7 @@ export type SelectedOrderItem = {
 
 export interface ItemSelectSectionProps {
   order: OrderDetailRes;
+  /** 주문의 모든 상품이 아닌 동일한 판매자의 배송상품 목록만 전달 */
   orderItems: OrderDetailRes['orderItems'];
   selectedItems: SelectedOrderItem[];
   setSelectedItems: Dispatch<SetStateAction<SelectedOrderItem[]>>;

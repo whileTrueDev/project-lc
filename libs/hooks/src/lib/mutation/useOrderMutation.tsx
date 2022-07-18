@@ -6,7 +6,7 @@ import axios from '../../axios';
 
 export type OrderMutationDto = { orderId: Order['id']; dto: UpdateOrderDto };
 
-/** 주문 update 훅 */
+/** 주문 update 훅 : 판매자가 요청하는 경우 sellerId를 dto에 포함해야한다 */
 export const useOrderUpdateMutation = (): UseMutationResult<
   boolean,
   AxiosError,

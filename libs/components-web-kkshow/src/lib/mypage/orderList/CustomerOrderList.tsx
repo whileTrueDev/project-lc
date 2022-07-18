@@ -11,10 +11,11 @@ import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { INFINITE_ORDER_LIST_QUERY_KEY, useInfiniteOrderList } from '@project-lc/hooks';
 import { GetOrderListDto, OrderDataWithRelations } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/router';
+import { getFilteredCustomerOrderItems } from '@project-lc/utils-frontend';
 import { OrderItem } from './CustomerOrderItem';
 import CustomerOrderPeriodFilter, { PeriodInputs } from './CustomerOrderPeriodFilter';
 
@@ -128,6 +129,10 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
 
   const giftBroadcaster = order.orderItems.find((oi) => !!oi.support)?.support
     ?.broadcaster;
+
+  const filteredOrderItems = useMemo(() => {
+    return getFilteredCustomerOrderItems({ order });
+  }, [order]);
   return (
     <Stack
       borderWidth="1px"
@@ -157,7 +162,7 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
       )}
 
       <Stack px={1}>
-        {order.orderItems.map((item) => (
+        {filteredOrderItems.map((item) => (
           <OrderItem key={item.id} orderItem={item} order={order} />
         ))}
       </Stack>

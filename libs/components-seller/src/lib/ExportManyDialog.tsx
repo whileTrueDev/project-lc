@@ -82,8 +82,13 @@ export function ExportManyDialog({
       if (isValid) {
         formMethods.setValue(`${orderIdx}.orderId`, orderId);
         const dto = formMethods.getValues(fieldID);
-        // options배열의 빈 값 정리
-        const realDto = { ...dto, exportOptions: dto.items.filter((x) => !!x.amount) };
+        // options배열, items의 빈 값 정리
+        const realDto = {
+          ...dto,
+          items: dto.items.filter((v) => !!v),
+          exportOptions: dto.items.filter((x) => !!x.amount),
+        };
+
         if (dto.items.every((o) => Number(o.amount) === 0)) {
           toast({
             status: 'warning',

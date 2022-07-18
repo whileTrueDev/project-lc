@@ -83,10 +83,15 @@ export function OrderItem({
               flexWrap="wrap"
               gap={{ base: 0.5, sm: 1 }}
             >
-              <Text>
-                {option.name} : {option.value}
-              </Text>
-              <TextDotConnector />
+              {option.name && option.value && (
+                <>
+                  <Text>
+                    {option.name} : {option.value}
+                  </Text>
+                  <TextDotConnector />
+                </>
+              )}
+
               <Text>{option.quantity} 개 </Text>
               <TextDotConnector />
               <Text>
