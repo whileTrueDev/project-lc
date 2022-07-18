@@ -38,7 +38,7 @@ export function OrderItemOptionInfo({
               <OrderStatusBadge step={option.step} />
             </Stack>
           )}
-          <Link passHref href={`goods/${goodsId}`}>
+          <Link passHref href={`/goods/${goodsId}`}>
             <LinkOverlay isExternal>
               <Text fontWeight="bold">{goodsName}</Text>
             </LinkOverlay>
