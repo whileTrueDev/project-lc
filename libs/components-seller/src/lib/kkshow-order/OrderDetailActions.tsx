@@ -43,6 +43,7 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps): JSX.Elem
           console.log(e);
           toast({
             title: '주문 상태 변경 중 오류가 발생했습니다.',
+            status: 'error',
             description: e?.message || e?.response?.data?.message,
           });
         });
