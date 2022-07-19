@@ -46,7 +46,7 @@ export const kkshowFooterLinkList: FooterLinkListItem[] = sellerFooterLinkList;
 
 export const footerInfoArr = [
   '상호명 : 와일트루',
-  '사업장소재지 : 부산광역시 금정구 장전온천천로 51 (테라스파크) 313호',
+  '사업장소재지 : 부산광역시 연제구 연제로 24, 2층 207호(연산동, 부산청년창업허브)',
   '사업자등록번호 : 659-03-01549',
   '통신판매업신고 : 2019-부산금정-0581',
   '대표이사 : 강동기',
