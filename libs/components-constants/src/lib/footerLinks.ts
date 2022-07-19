@@ -7,8 +7,8 @@ export interface FooterLink {
   href: string;
   isBold?: boolean;
 }
-/** 판매자센터 푸터 링크 목록 */
-export const sellerFooterLinkList: FooterLinkListItem[] = [
+
+export const commonFooterLinkList: FooterLinkListItem[] = [
   {
     title: '정책',
     items: [
@@ -33,60 +33,16 @@ export const sellerFooterLinkList: FooterLinkListItem[] = [
     ],
   },
 ];
+/** 추후 센터별 푸터링크 달라지는 경우 대비하여 다른 변수에 저장 *
+ * /
+/** 판매자센터 푸터 링크 목록 */
+export const sellerFooterLinkList: FooterLinkListItem[] = commonFooterLinkList;
 
 /** 방송인센터 푸터 링크 목록 */
-export const broadcasterFooterLinkList: FooterLinkListItem[] = [
-  {
-    title: '정책',
-    items: [
-      {
-        title: '개인정보처리방침',
-        href: '/privacy',
-        isBold: true,
-      },
-      {
-        title: '이용약관',
-        href: '/termsOfService',
-      },
-    ],
-  },
-  {
-    title: '고객지원',
-    items: [
-      {
-        title: 'FAQ',
-        href: 'https://whiletrue.notion.site/FAQ-f182f90b7e984badb031a62ddd1bd00d',
-      },
-    ],
-  },
-];
+export const broadcasterFooterLinkList: FooterLinkListItem[] = sellerFooterLinkList;
 
 /** 크크쇼(소비자) 푸터 링크 목록 */
-export const kkshowFooterLinkList: FooterLinkListItem[] = [
-  {
-    title: '정책',
-    items: [
-      {
-        title: '개인정보처리방침',
-        href: '/privacy',
-        isBold: true,
-      },
-      {
-        title: '이용약관',
-        href: '/termsOfService',
-      },
-    ],
-  },
-  {
-    title: '고객지원',
-    items: [
-      {
-        title: 'FAQ',
-        href: 'https://whiletrue.notion.site/FAQ-f182f90b7e984badb031a62ddd1bd00d',
-      },
-    ],
-  },
-];
+export const kkshowFooterLinkList: FooterLinkListItem[] = sellerFooterLinkList;
 
 export const footerInfoArr = [
   '상호명 : 와일트루',
