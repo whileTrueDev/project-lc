@@ -40,7 +40,7 @@ export type OrderCancellationItemData = ExchangeReturnCancelItemBaseData & {
   /** 주문취소상품 고유번호 */
   id: OrderCancellationItem['id'];
   /** 주문취소상품 개수 */
-  amount: OrderCancellationItem['amount'];
+  quantity: OrderCancellationItem['quantity'];
   /** 주문취소상품 처리 상태 */
   status: OrderCancellationItem['status'];
 };
