@@ -58,7 +58,7 @@ export default GoodsRegistCategory;
 interface CategoriesProps {
   onCategoryClick: (category: GoodsCategoryItem) => void;
 }
-function Categories({ onCategoryClick }: CategoriesProps): JSX.Element | null {
+export function Categories({ onCategoryClick }: CategoriesProps): JSX.Element | null {
   const { data, isLoading } = useGoodsCategory({ mainCategoryFlag: true });
   if (isLoading)
     return (
@@ -85,7 +85,7 @@ interface CategoryProps {
   category: GoodsCategoryItem;
   onClick: (category: GoodsCategoryItem) => void;
 }
-function Category({ depth = 0, category, onClick }: CategoryProps): JSX.Element {
+export function Category({ depth = 0, category, onClick }: CategoryProps): JSX.Element {
   const subCategory = useDisclosure();
   const subCategories = useGoodsCategory(
     { parentCategoryId: category.id },
