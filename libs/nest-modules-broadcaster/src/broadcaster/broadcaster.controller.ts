@@ -158,7 +158,6 @@ export class BroadcasterController {
   }
 
   /** 방송인 채널 목록 조회 */
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(HttpCacheInterceptor)
   @Get('/:broadcasterId/channel-list')
   getBroadcasterChannelList(

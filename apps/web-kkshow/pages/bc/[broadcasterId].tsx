@@ -14,7 +14,7 @@ import {
 import KkshowLayout from '@project-lc/components-web-kkshow/KkshowLayout';
 import { PromotionPageGoodsList } from '@project-lc/components-web-kkshow/promotion-page/PromotionPageGoodsList';
 import { PromotionPageProfile } from '@project-lc/components-web-kkshow/promotion-page/PromotionPageProfile';
-import { useBroadcaster } from '@project-lc/hooks';
+import { useBroadcaster, usePromotionPage } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 
@@ -22,6 +22,7 @@ export function BroadcasterPromotionPage(): JSX.Element {
   const router = useRouter();
   const broadcasterId = router.query.broadcasterId as string;
   const bc = useBroadcaster({ id: broadcasterId });
+  const promotionPage = usePromotionPage(broadcasterId);
 
   const tabInfo = useMemo(
     () => [
@@ -47,8 +48,7 @@ export function BroadcasterPromotionPage(): JSX.Element {
   }
 
   if (!bc.data) return null;
-
-  if (bc.data && !bc.data.userNickname)
+  if ((bc.data && !bc.data.userNickname) || !promotionPage.data)
     return (
       <Box>
         <KkshowLayout>

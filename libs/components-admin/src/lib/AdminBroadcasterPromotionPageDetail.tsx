@@ -1,4 +1,4 @@
-import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { DeleteIcon, ExternalLinkIcon } from '@chakra-ui/icons';
 import {
   Alert,
   AlertDescription,
@@ -6,6 +6,7 @@ import {
   AlertTitle,
   Box,
   Button,
+  ButtonGroup,
   Heading,
   Link,
   Stack,
@@ -31,7 +32,7 @@ export function AdminBroadcasterPromotionPageDetail({
 }: AdminBroadcasterPromotionPageDetailProps): JSX.Element {
   const toast = useToast();
 
-  const { id, url, broadcaster } = pageData;
+  const { id, url, broadcaster, comment } = pageData;
   const { userNickname } = broadcaster;
 
   // 페이지 삭제
@@ -51,11 +52,17 @@ export function AdminBroadcasterPromotionPageDetail({
         <Heading mt={4} size="lg">
           {userNickname}의 상품홍보페이지
         </Heading>
-        <Button onClick={deleteDialog.onOpen}>삭제</Button>
       </Stack>
 
+      <ButtonGroup my={2} size="sm">
+        <AdminBroadcasterPromotionPageUpdateSection pageData={pageData} />
+        <Button leftIcon={<DeleteIcon />} onClick={deleteDialog.onOpen}>
+          삭제
+        </Button>
+      </ButtonGroup>
+
       <Stack direction="row">
-        <Text>페이지 id : </Text>
+        <Text>페이지 고유ID : </Text>
         <Text>{id}</Text>
       </Stack>
 
@@ -65,14 +72,25 @@ export function AdminBroadcasterPromotionPageDetail({
       </Stack>
 
       <Stack direction="row">
+        <Text>방송인 소개글 : </Text>
+        <Box borderWidth="thin" rounded="md" p={1}>
+          {comment ? (
+            <Text whiteSpace="break-spaces" fontSize={{ base: 'sm', md: 'md' }}>
+              {comment}
+            </Text>
+          ) : (
+            '-'
+          )}
+        </Box>
+      </Stack>
+
+      <Stack direction="row">
         <Text>url : </Text>
         {url && (
           <Link href={url} isExternal color="blue.500">
             {url} <ExternalLinkIcon mx="2px" />
           </Link>
         )}
-
-        <AdminBroadcasterPromotionPageUpdateSection pageData={pageData} />
       </Stack>
 
       {/* 상품홍보페이지 삭제 모달창 */}

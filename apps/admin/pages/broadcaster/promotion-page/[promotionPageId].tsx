@@ -37,6 +37,7 @@ export function BroadcasterPromotionPageDetail(): JSX.Element {
           promotionPageId={promotionPageId}
           onDeleteSuccess={goBackToList}
         />
+
         <Divider my={10} />
 
         {/* 상품홍보페이지에 연결된 상품홍보 영역 */}
