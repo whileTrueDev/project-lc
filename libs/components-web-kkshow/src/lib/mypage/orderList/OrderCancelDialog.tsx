@@ -1,7 +1,6 @@
 import { Box, Center, Flex, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
 import { OrderProcessStep } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
-import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { RefundAccountForm } from '@project-lc/components-shared/payment/RefundAccountForm';
 import {
   useCreateRefundMutation,
@@ -51,7 +50,7 @@ export function OrderCancelDialog({
         .map((opt) => ({
           orderItemId: item.id,
           orderItemOptionId: opt.id,
-          amount: opt.quantity,
+          quantity: opt.quantity,
           discountPrice: Number(opt.discountPrice), // CreateOrderCancellationDto와 무관. CreateRefundDto.refundAmount 계산용
           step: opt.step,
         })),
@@ -63,7 +62,7 @@ export function OrderCancelDialog({
     if (!orderDetailData) return 0;
     // 1. 취소할 상품들 옵션별 가격*개수 합
     const orderItemOptionsPrice = targetItemOptions
-      .map((opt) => opt.amount * opt.discountPrice)
+      .map((opt) => opt.quantity * opt.discountPrice)
       .reduce((sum, cur) => sum + cur, 0);
 
     // 주문취소상품에 적용된 배송비 정보 찾기
@@ -93,11 +92,11 @@ export function OrderCancelDialog({
     const dto: CreateOrderCancellationDto = {
       orderId: orderDetailData.id,
       items: targetItemOptions.map((opt) => {
-        const { orderItemId, orderItemOptionId, amount } = opt;
+        const { orderItemId, orderItemOptionId, quantity } = opt;
         return {
           orderItemId,
           orderItemOptionId,
-          amount,
+          quantity,
         };
       }),
     };

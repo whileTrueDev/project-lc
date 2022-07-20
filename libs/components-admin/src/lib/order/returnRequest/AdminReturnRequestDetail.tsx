@@ -114,8 +114,8 @@ export function AdminReturnRequestDetail({
       orderId: data.order.id,
       reason: '소비자 환불 요청',
       items: data.items.map((i: ReturnItemWithOriginOrderItemInfo) => {
-        const { orderItemId, orderItemOptionId, amount } = i;
-        return { orderItemId, orderItemOptionId, amount };
+        const { orderItemId, orderItemOptionId, quantity } = i;
+        return { orderItemId, orderItemOptionId, quantity };
       }),
       returnId: data.id, // 연결된 반품(환불)요청
       refundAmount: formData.refundAmount, // 환불금액

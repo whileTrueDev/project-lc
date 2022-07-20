@@ -17,7 +17,7 @@ export function OrderDetailExportInfo({
 }): JSX.Element {
   const totalExportedEa = useMemo(() => {
     return exportData.items.reduce((prev, curr) => {
-      return prev + Number(curr.amount);
+      return prev + Number(curr.quantity);
     }, 0);
   }, [exportData.items]);
 

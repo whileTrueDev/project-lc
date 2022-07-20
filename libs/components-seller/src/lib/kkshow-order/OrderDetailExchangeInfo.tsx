@@ -32,7 +32,7 @@ export function OrderDetailExchangeInfo({
         <TextDotConnector />
         <Text isTruncated>
           {exchangeData.exchangeItems
-            .map((item) => item.amount)
+            .map((item) => item.quantity)
             .reduce((sum, cur) => sum + cur, 0)}{' '}
           개
         </Text>
