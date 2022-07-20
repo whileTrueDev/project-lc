@@ -81,11 +81,12 @@ export class BroadcasterPromotionPageService {
   public async createPromotionPage(
     dto: BroadcasterPromotionPageDto,
   ): Promise<BroadcasterPromotionPage> {
-    const { url, broadcasterId } = dto;
+    const { comment, broadcasterId } = dto;
     const promotionPage = await this.prisma.broadcasterPromotionPage.create({
       data: {
-        url: url || `${getKkshowWebHost()}/bc/${broadcasterId}`,
+        url: `${getKkshowWebHost()}/bc/${broadcasterId}`,
         broadcaster: { connect: { id: broadcasterId } },
+        comment,
       },
     });
     return promotionPage;

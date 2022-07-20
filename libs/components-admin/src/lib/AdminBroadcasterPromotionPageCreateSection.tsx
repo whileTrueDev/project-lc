@@ -13,6 +13,7 @@ import {
   ModalOverlay,
   Stack,
   Text,
+  Textarea,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
@@ -21,28 +22,26 @@ import {
   useAdminBroadcaster,
   useAdminBroadcasterPromotionPageCreateMutation,
 } from '@project-lc/hooks';
+import { BroadcasterPromotionPageDto } from '@project-lc/shared-types';
 import { useMemo } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
 
-export type BroadcasterPromotionPageFormDataType = {
-  url: string;
+export interface BroadcasterPromotionPageFormDto
+  extends Omit<BroadcasterPromotionPageDto, 'broadcasterId'> {
   broadcasterId: number | null;
-  id?: number | null;
-};
-
+}
 export function AdminBroadcasterPromotionPageForm({
   onSubmitHandler,
   onCancel,
-  defaultValues = { url: '', broadcasterId: null },
+  defaultValues = { comment: '', broadcasterId: undefined },
 }: {
-  onSubmitHandler: SubmitHandler<BroadcasterPromotionPageFormDataType>;
+  onSubmitHandler: SubmitHandler<BroadcasterPromotionPageFormDto>;
   onCancel: () => void;
-  defaultValues?: BroadcasterPromotionPageFormDataType;
+  defaultValues?: Partial<BroadcasterPromotionPageFormDto>;
 }): JSX.Element {
-  const { handleSubmit, setValue, watch } = useForm<BroadcasterPromotionPageFormDataType>(
-    { defaultValues },
-  );
+  const { handleSubmit, setValue, watch, register } =
+    useForm<BroadcasterPromotionPageFormDto>({ defaultValues });
 
   /** 방송인 중 상품홍보페이지가 등록되지 않은 방송인만 표시 */
   const { data: broadcasters, isLoading } = useAdminBroadcaster();
@@ -78,6 +77,14 @@ export function AdminBroadcasterPromotionPageForm({
         </FormHelperText>
       </FormControl>
 
+      <FormControl>
+        <FormLabel>알림말(선택)</FormLabel>
+        <Textarea
+          {...register('comment')}
+          placeholder="방송인페이지에 프로필 섹션에 표시되는 알림말을 작성할 수 있습니다.(작성하지않아도 됩니다) 팁: 소개글에 이모지를활용하면 더 깔끔해보입니다."
+        />
+      </FormControl>
+
       <Box textAlign="right" pt={4}>
         <ButtonGroup>
           <Button colorScheme="blue" type="submit" disabled={!watch('broadcasterId')}>
@@ -100,11 +107,11 @@ export function AdminBroadcasterPromotionPageCreateModal({
   const toast = useToast();
   const createPageUrl = useAdminBroadcasterPromotionPageCreateMutation();
   const queryClient = useQueryClient();
-  const onSubmit: SubmitHandler<BroadcasterPromotionPageFormDataType> = async (data) => {
-    const { broadcasterId, url } = data;
-    if (!url || !broadcasterId) return;
+  const onSubmit: SubmitHandler<BroadcasterPromotionPageFormDto> = async (data) => {
+    const { broadcasterId, comment } = data;
+    if (!broadcasterId) return;
 
-    createPageUrl.mutateAsync({ url, broadcasterId }).then((res) => {
+    createPageUrl.mutateAsync({ broadcasterId, comment }).then(() => {
       toast({ title: '방송인 상품홍보페이지를 등록하였습니다', status: 'success' });
       queryClient.invalidateQueries('getBroadcaster');
       onClose();
