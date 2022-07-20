@@ -40,7 +40,7 @@ export class CreateReturnItemDto {
 
   /** 개수 */
   @IsNumber()
-  amount: number;
+  quantity: number;
 }
 
 /** 반품 생성 dto */
