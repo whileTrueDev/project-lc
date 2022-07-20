@@ -1,19 +1,23 @@
 import {
-  useDisclosure,
   Box,
   Button,
-  useToast,
+  ButtonGroup,
+  FormControl,
+  FormErrorMessage,
+  FormHelperText,
+  FormLabel,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
   Stack,
+  Text,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import {
   getAdminDuplicatePromotionPageFlag,
@@ -39,7 +43,7 @@ export function AdminBroadcasterPromotionPageUpdateModal({
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty, isSubmitting },
   } = useForm<BroadcasterPromotionPageFormDataType>({
     defaultValues: {
       id: pageData.id,
@@ -71,15 +75,16 @@ export function AdminBroadcasterPromotionPageUpdateModal({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>방송인 상품 홍보 페이지 url 수정</ModalHeader>
+        <ModalHeader>방송인 상품 홍보 페이지 URL 수정</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Stack as="form" onSubmit={handleSubmit(onSubmit)}>
             <FormControl isInvalid={!!errors.url}>
-              <FormLabel htmlFor="url">url</FormLabel>
+              <FormLabel htmlFor="url">방송인 홍보페이지 URL</FormLabel>
+
               <Input
                 id="url"
-                placeholder="https://k-kmarket.com/goods/catalog?code=00160001"
+                placeholder="https://www.xn--hp4b17xa.com/bc/방송인고유ID"
                 autoComplete="off"
                 {...register('url', {
                   required: 'url을 작성해주세요.',
@@ -92,15 +97,33 @@ export function AdminBroadcasterPromotionPageUpdateModal({
                 })}
               />
               <FormErrorMessage>{errors.url && errors.url.message}</FormErrorMessage>
+              <FormHelperText>
+                크크쇼 방송인 페이지URL입니다. 대부분의 경우 기본적으로 올바른 페이지가
+                자동생성되도록 구현되어 있습니다. 부득이하게 수정이 필요한 경우에만 작업을
+                진행하시기 바랍니다.
+              </FormHelperText>
+              <FormHelperText>
+                올바른URL형식:{' '}
+                <Text color="red.500" as="span">
+                  https://www.xn--hp4b17xa.com/bc/방송인고유ID
+                </Text>
+              </FormHelperText>
             </FormControl>
-            <Stack direction="row">
-              <Button type="submit" colorScheme="blue" disabled={!watch('url')}>
-                수정
-              </Button>
-              <Button onClick={onClose}>닫기</Button>
-            </Stack>
           </Stack>
         </ModalBody>
+        <ModalFooter>
+          <ButtonGroup>
+            <Button
+              type="submit"
+              colorScheme="blue"
+              disabled={!watch('url') || !isDirty}
+              isLoading={isSubmitting || updateRequest.isLoading}
+            >
+              수정
+            </Button>
+            <Button onClick={onClose}>닫기</Button>
+          </ButtonGroup>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

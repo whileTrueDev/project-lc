@@ -1,10 +1,10 @@
 import {
   Box,
   Button,
+  ButtonGroup,
   FormControl,
-  FormErrorMessage,
+  FormHelperText,
   FormLabel,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -18,7 +18,6 @@ import {
 } from '@chakra-ui/react';
 import { ChakraAutoComplete } from '@project-lc/components-core/ChakraAutoComplete';
 import {
-  getAdminDuplicatePromotionPageFlag,
   useAdminBroadcaster,
   useAdminBroadcasterPromotionPageCreateMutation,
 } from '@project-lc/hooks';
@@ -34,20 +33,16 @@ export type BroadcasterPromotionPageFormDataType = {
 
 export function AdminBroadcasterPromotionPageForm({
   onSubmitHandler,
+  onCancel,
   defaultValues = { url: '', broadcasterId: null },
 }: {
   onSubmitHandler: SubmitHandler<BroadcasterPromotionPageFormDataType>;
+  onCancel: () => void;
   defaultValues?: BroadcasterPromotionPageFormDataType;
 }): JSX.Element {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<BroadcasterPromotionPageFormDataType>({
-    defaultValues,
-  });
+  const { handleSubmit, setValue, watch } = useForm<BroadcasterPromotionPageFormDataType>(
+    { defaultValues },
+  );
 
   /** 방송인 중 상품홍보페이지가 등록되지 않은 방송인만 표시 */
   const { data: broadcasters, isLoading } = useAdminBroadcaster();
@@ -57,18 +52,19 @@ export function AdminBroadcasterPromotionPageForm({
   }, [broadcasters]);
 
   if (isLoading) return <Text>로딩중...</Text>;
-
   if (validBroadcasters.length === 0) {
     return <Text>상품홍보페이지를 등록할 수 있는 방송인이 없습니다.</Text>;
   }
 
   return (
     <Stack as="form" onSubmit={handleSubmit(onSubmitHandler)}>
-      <Box>
-        <Text>방송인</Text>
+      <FormControl>
+        <FormLabel>방송인</FormLabel>
         <ChakraAutoComplete
           options={validBroadcasters}
-          getOptionLabel={(option) => option?.userNickname || ''}
+          getOptionLabel={(option) =>
+            option?.userNickname || option?.email || option?.id.toString() || ''
+          }
           onChange={(newV) => {
             if (newV) {
               setValue('broadcasterId', newV.id);
@@ -77,27 +73,19 @@ export function AdminBroadcasterPromotionPageForm({
             }
           }}
         />
-      </Box>
-
-      <FormControl isInvalid={!!errors.url}>
-        <FormLabel htmlFor="url">url</FormLabel>
-        <Input
-          id="url"
-          placeholder="https://k-kmarket.com/goods/catalog?code=00160001"
-          autoComplete="off"
-          {...register('url', {
-            required: 'url을 작성해주세요.',
-            validate: async (_url) => {
-              const isDuplicateUrl = await getAdminDuplicatePromotionPageFlag(_url);
-              return !isDuplicateUrl || '이미 등록된 url 입니다. 다시 확인해주세요.';
-            },
-          })}
-        />
-        <FormErrorMessage>{errors.url && errors.url.message}</FormErrorMessage>
+        <FormHelperText>
+          상품홍보페이지가 아직 생성되지 않은 방송인만 표시됩니다.
+        </FormHelperText>
       </FormControl>
-      <Button type="submit" disabled={!watch('url') || !watch('broadcasterId')}>
-        생성
-      </Button>
+
+      <Box textAlign="right" pt={4}>
+        <ButtonGroup>
+          <Button colorScheme="blue" type="submit" disabled={!watch('broadcasterId')}>
+            생성
+          </Button>
+          <Button onClick={onCancel}>닫기</Button>
+        </ButtonGroup>
+      </Box>
     </Stack>
   );
 }
@@ -123,13 +111,16 @@ export function AdminBroadcasterPromotionPageCreateModal({
     });
   };
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>방송인 상품 홍보 페이지 생성</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <AdminBroadcasterPromotionPageForm onSubmitHandler={onSubmit} />
+          <AdminBroadcasterPromotionPageForm
+            onSubmitHandler={onSubmit}
+            onCancel={onClose}
+          />
         </ModalBody>
       </ModalContent>
     </Modal>
