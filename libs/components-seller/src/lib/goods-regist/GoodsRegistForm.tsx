@@ -25,6 +25,7 @@ import GoodsRegistDataOptions from './GoodsRegistDataOptions';
 import GoodsRegistDataSales from './GoodsRegistDataSales';
 import GoodsRegistDescription from './GoodsRegistDescription';
 import GoodsRegistExtraInfo from './GoodsRegistExtraInfo';
+import { GoodsRegistInformationNotice } from './GoodsRegistInformationNotice';
 import GoodsRegistKeywords from './GoodsRegistKeywords';
 import GoodsRegistMemo from './GoodsRegistMemo';
 import GoodsRegistPictures from './GoodsRegistPictures';
@@ -295,6 +296,9 @@ export function GoodsRegistForm(): JSX.Element {
 
         {/* 상품 카테고리 정보 */}
         <GoodsRegistCategory />
+
+        {/* 상품정보제공고시 */}
+        <GoodsRegistInformationNotice />
 
         {/* 판매정보 */}
         <GoodsRegistDataSales />

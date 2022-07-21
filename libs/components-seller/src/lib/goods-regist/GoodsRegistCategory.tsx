@@ -5,11 +5,7 @@ import {
   Center,
   Flex,
   FormControl,
-  FormLabel,
-  Grid,
-  GridItem,
   IconButton,
-  Input,
   ListItem,
   Spinner,
   Stack,
@@ -19,10 +15,9 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
-import { useGoodsCategory, useGoodsInformationSubjectById } from '@project-lc/hooks';
+import { useGoodsCategory } from '@project-lc/hooks';
 import { GoodsCategoryItem, RegistGoodsDto } from '@project-lc/shared-types';
 import { goodsRegistStore } from '@project-lc/stores';
-import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 export function GoodsRegistCategory(): JSX.Element {
@@ -43,12 +38,6 @@ export function GoodsRegistCategory(): JSX.Element {
         </UnorderedList>
         <Categories onCategoryClick={handleClick} />
       </FormControl>
-
-      <Box my={2}>
-        <GoodsRegistInformationNotice
-          informationSubjectId={selectedCategory?.informationSubjectId}
-        />
-      </Box>
     </SectionWithTitle>
   );
 }
@@ -141,64 +130,6 @@ export function Category({ depth = 0, category, onClick }: CategoryProps): JSX.E
           ))}
         </Stack>
       )}
-    </Box>
-  );
-}
-
-function GoodsRegistInformationNotice({
-  informationSubjectId,
-}: {
-  informationSubjectId?: GoodsCategoryItem['informationSubjectId'] | null;
-}): JSX.Element | null {
-  const { initializeNotice, informationNotice, handleChange } = goodsRegistStore();
-  const { data } = useGoodsInformationSubjectById(informationSubjectId);
-
-  useEffect(() => {
-    if (data) initializeNotice(data.items);
-  }, [data, initializeNotice]);
-
-  if (!data) return null;
-  return (
-    <Box>
-      <Box mb={2}>
-        <Text fontSize="xl" fontWeight="bold">
-          품목별 필수 정보
-          <Text as="span" fontSize="sm">
-            {` (${data.subject})`}
-          </Text>
-        </Text>
-
-        <UnorderedList fontSize="xs" color="GrayText">
-          <ListItem>
-            항목을 비워두는 경우 상세설명 및 상세이미지 참조로 작성됩니다.
-          </ListItem>
-        </UnorderedList>
-      </Box>
-      {informationNotice &&
-        Object.keys(data.items as object).map((key) => (
-          <FormControl key={key}>
-            <Grid templateColumns="repeat(4, 1fr)" gap={2} mb={2}>
-              <GridItem colSpan={[4, 4, 1]}>
-                <FormLabel fontSize="sm" fontWeight="normal">
-                  {key}
-                </FormLabel>
-              </GridItem>
-              <GridItem colSpan={[4, 4, 3]}>
-                <Input
-                  size="sm"
-                  placeholder="상세설명 및 상세이미지 참조"
-                  value={
-                    key === '소비자상담 관련 전화번호'
-                      ? data.items[key]
-                      : informationNotice[key]
-                  }
-                  isReadOnly={key === '소비자상담 관련 전화번호'}
-                  onChange={(e) => handleChange(key, e.target.value)}
-                />
-              </GridItem>
-            </Grid>
-          </FormControl>
-        ))}
     </Box>
   );
 }
