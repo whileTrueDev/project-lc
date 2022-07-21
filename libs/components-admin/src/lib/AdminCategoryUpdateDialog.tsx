@@ -46,7 +46,7 @@ export function CategoryUpdateFormDialog(
     reset,
     setValue,
     watch,
-    formState: { errors, isSubmitting, isDirty },
+    formState: { errors, isSubmitting },
   } = useForm<UpdateGoodsCategoryDto>({
     defaultValues: {
       name: props.category.name,
@@ -182,7 +182,6 @@ export function CategoryUpdateFormDialog(
               <Button
                 colorScheme="blue"
                 type="submit"
-                isDisabled={!isDirty}
                 isLoading={isSubmitting || isLoading}
               >
                 수정
