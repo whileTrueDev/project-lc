@@ -7,6 +7,7 @@ import {
   useBoolean,
   useDisclosure,
 } from '@chakra-ui/react';
+import { MdImage, MdOutlineImage } from 'react-icons/md';
 import { CategoryCreateFormDialog } from './AdminCategoryCreateDialog';
 import { CategoryDeleteDiaglog, CategoryItemType } from './AdminCategoryDeleteDialog';
 import { CategoryUpdateFormDialog } from './AdminCategoryUpdateDialog';
@@ -29,7 +30,7 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
   return (
     <Stack borderWidth="1px" borderRadius="md" px={1} spacing={0}>
       <Stack direction="row" justifyContent="space-between">
-        <Stack direction="row">
+        <Stack direction="row" align="center" spacing={1}>
           {!mainCategoryFlag && (
             <Text as="span" color="gray.400">
               ㄴ
@@ -47,6 +48,7 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
           >
             {name}
           </Text>
+          {item.imageSrc && <MdImage color="green" />}
           <Text as="span">({goodsCount})</Text>
           {hasChildren && (
             <IconButton
