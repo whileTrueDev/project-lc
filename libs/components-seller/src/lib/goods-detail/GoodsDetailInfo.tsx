@@ -13,6 +13,7 @@ import {
   ModalHeader,
   ModalOverlay,
   ModalProps,
+  SimpleGrid,
   Spinner,
   Stack,
   Text,
@@ -22,7 +23,11 @@ import {
 import { GOODS_CANCEL_TYPE } from '@project-lc/components-constants/goodsRegistTypes';
 import { GoodsConfirmStatusBadge } from '@project-lc/components-shared/GoodsConfirmStatusBadge';
 import GoodsStatusBadge from '@project-lc/components-shared/GoodsStatusBadge';
-import { useConnectCategoryOnGoodsMutation, useGoodsCategory } from '@project-lc/hooks';
+import {
+  useConnectCategoryOnGoodsMutation,
+  useDisconnectCategoryOnGoodsMutation,
+  useGoodsCategory,
+} from '@project-lc/hooks';
 import { GoodsByIdRes, GoodsCategoryItem } from '@project-lc/shared-types';
 import { useState } from 'react';
 import { Category } from '../goods-regist/GoodsRegistCategory';
@@ -131,18 +136,19 @@ export function CategoryOnGoodsDialog({
     <Modal isOpen={isOpen} onClose={onClose} size="4xl">
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Modal Title</ModalHeader>
+        <ModalHeader>카테고리 연결 및 해제</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <ConnectCategoryOnGoodsSection
-            goodsId={goodsId}
-            currentCategories={currentCategories}
-          />
-          <Divider />
-          <DisconnectCategoryOnGoodsSection
-            goodsId={goodsId}
-            currentCategories={currentCategories}
-          />
+          <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={8}>
+            <ConnectCategoryOnGoodsSection
+              goodsId={goodsId}
+              currentCategories={currentCategories}
+            />
+            <DisconnectCategoryOnGoodsSection
+              goodsId={goodsId}
+              currentCategories={currentCategories}
+            />
+          </SimpleGrid>
         </ModalBody>
 
         <ModalFooter>
@@ -166,9 +172,8 @@ export function ConnectCategoryOnGoodsSection({
     setSelectedCategory(category);
   };
 
-  const successHandler = (res: any): void => {
+  const successHandler = (): void => {
     toast({ status: 'success', title: '선택된 카테고리를 상품에 연결하였습니다' });
-    console.log(res);
   };
   const errorHandler = (e: any): void => {
     toast({
@@ -203,6 +208,7 @@ export function ConnectCategoryOnGoodsSection({
     <Stack spacing={1}>
       <Stack direction="row">
         <Text>선택된 카테고리: {selectedCategory?.name || '없음'}</Text>
+
         <Button
           size="xs"
           onClick={connectHandler}
@@ -212,6 +218,7 @@ export function ConnectCategoryOnGoodsSection({
           카테고리 추가하기
         </Button>
       </Stack>
+      <Divider />
       {data.map((mainCategory) => (
         <Category
           key={mainCategory.id}
@@ -227,17 +234,45 @@ export function DisconnectCategoryOnGoodsSection({
   goodsId,
   currentCategories,
 }: CategoryOnGoodsManagementProps): JSX.Element {
+  const toast = useToast();
+
+  const successHandler = (): void => {
+    toast({ status: 'success', title: '선택된 카테고리 연결을 해제하였습니다' });
+  };
+  const errorHandler = (e: any): void => {
+    toast({
+      status: 'error',
+      title: '선택된 카테고리 연결을 해제하지 못했습니다',
+      description: e?.response?.data?.message || e?.message,
+    });
+    console.error(e);
+  };
+  const disconnectMutation = useDisconnectCategoryOnGoodsMutation();
+  const disconnectCategory = (categoryId: number): void => {
+    disconnectMutation
+      .mutateAsync({ categoryId, goodsId })
+      .then(successHandler)
+      .catch(errorHandler);
+  };
   return (
-    <Box>
-      상품에 연결된 카테고리 목록 = 연결해제할 카테고리 선택 = 카테고리 해제
+    <Stack spacing={1}>
+      <Text>상품에 연결된 카테고리 목록</Text>
+      <Divider />
       <Stack spacing={1}>
+        {currentCategories.length === 0 && <Text>없음</Text>}
         {currentCategories.map((c) => (
           <Stack direction="row" key={c.id}>
             <Box>{c.name}</Box>
-            <Button size="xs">해제</Button>
+            <Button
+              size="xs"
+              onClick={() => disconnectCategory(c.id)}
+              isLoading={disconnectMutation.isLoading}
+            >
+              해제
+            </Button>
           </Stack>
         ))}
       </Stack>
-    </Box>
+    </Stack>
   );
 }
