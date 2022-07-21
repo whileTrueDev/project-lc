@@ -35,7 +35,7 @@ export class GoodsCategoryService {
       return newCategory;
     } catch (e) {
       if (e.code && e.code === 'P2002') {
-        throw new BadRequestException('중복된 카테고리 코드 입력');
+        throw new BadRequestException('중복된 카테고리');
       }
       throw new InternalServerErrorException(e);
     }

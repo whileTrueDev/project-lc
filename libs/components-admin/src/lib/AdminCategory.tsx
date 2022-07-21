@@ -1,3 +1,4 @@
+import { AddIcon } from '@chakra-ui/icons';
 import { Box, Button, Heading, Stack, Text, useDisclosure } from '@chakra-ui/react';
 import { useAdminCategory } from '@project-lc/hooks';
 import { useState } from 'react';
@@ -71,14 +72,17 @@ export function AdminCategory(): JSX.Element {
         onClose={createDialog.onClose}
       />
 
-      <Text>
-        * 괄호안의 숫자는 해당 카테고리에 포함된 상품의 개수입니다(상위 카테고리 상품
-        개수는 하위 카테고리 상품 개수를 포함)
-      </Text>
-      <Text>* 상품이 연결되어 있는 카테고리는 삭제할 수 없습니다</Text>
-      <Text>* 상위 카테고리를 삭제하면 연결된 하위 카테고리도 함께 삭제됩니다</Text>
+      <Stack spacing={0}>
+        <Text>
+          * 괄호안의 숫자는 해당 카테고리에 포함된 상품의 개수입니다(상위 카테고리 상품
+          개수는 하위 카테고리 상품 개수를 포함)
+        </Text>
+        <Text>* 상품이 연결되어 있는 카테고리는 삭제할 수 없습니다</Text>
+        <Text>* 상위 카테고리를 삭제하면 연결된 하위 카테고리도 함께 삭제됩니다</Text>
+      </Stack>
+
       <Box>
-        <Button size="sm" onClick={createDialog.onOpen}>
+        <Button leftIcon={<AddIcon />} size="sm" onClick={createDialog.onOpen}>
           메인 카테고리 만들기
         </Button>
       </Box>
