@@ -4,12 +4,14 @@ import {
   GoodsCategoryWithFamily,
   KkshowShoppingTabResData,
 } from '@project-lc/shared-types';
+import { KkshowShoppingCategoryService } from './kkshow-shopping-category.service';
 import { KkshowShoppingService } from './kkshow-shopping.service';
 
 @Controller('kkshow-shopping')
 export class KkshowShoppingController {
   constructor(
     private readonly kkshowShoppingService: KkshowShoppingService,
+    private readonly shoppingCategoryService: KkshowShoppingCategoryService,
     private readonly goodsCategoryService: GoodsCategoryService,
   ) {}
 
@@ -20,12 +22,8 @@ export class KkshowShoppingController {
 
   @Get('categories')
   public async getCategoriesToDisplay(): Promise<GoodsCategoryWithFamily[]> {
-    // TODO: 임시값. 크크마켓 카테고리 목록 UI + UI관리 작업에서 크크마켓에 표시할 카테고리 목록을 불러오도록 구성
-    const codes = [
-      '3OODwX2OsE8nUeu79ca59',
-      'dcVxki4tX7nJOExarqAbi',
-      '4bAH23CrgZ7xP1oAs2C0I',
-    ];
+    const codes = await this.shoppingCategoryService.findAll();
+    console.log(codes);
     return this.goodsCategoryService.findCategoriesByCodes(codes);
   }
 }
