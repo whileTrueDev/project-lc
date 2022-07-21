@@ -1169,6 +1169,13 @@ model KkshowShoppingTab {
   keywords        Json // 쇼핑탭 테마별 키워드 영역 아이템[]
 }
 
+model KkshowShoppingTabCategory {
+  id Int @id @default(autoincrement())
+
+  category        GoodsCategory @relation(fields: [goodsCategoryId], references: [id], onDelete: Cascade)
+  goodsCategoryId Int           @unique
+}
+
 enum UserType {
   seller // 판매자
   broadcaster // 방송인
@@ -2028,4 +2035,6 @@ model GoodsCategory {
 
   informationSubjectId Int? // 정보제공고시 품목고유번호
   informationSubject   GoodsInformationSubject? @relation(fields: [informationSubjectId], references: [id]) // 해당되는 정보제공고시 품목
+
+  kkshowShoppingTabCategory KkshowShoppingTabCategory?
 }
