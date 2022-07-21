@@ -3,10 +3,12 @@ import {
   Box,
   Button,
   Center,
+  Divider,
   Flex,
   FormControl,
   IconButton,
   ListItem,
+  SimpleGrid,
   Spinner,
   Stack,
   Text,
@@ -16,28 +18,48 @@ import {
 } from '@chakra-ui/react';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { useGoodsCategory } from '@project-lc/hooks';
-import { GoodsCategoryItem, RegistGoodsDto } from '@project-lc/shared-types';
+import { GoodsCategoryItem } from '@project-lc/shared-types';
 import { goodsRegistStore } from '@project-lc/stores';
-import { useFormContext } from 'react-hook-form';
 
 export function GoodsRegistCategory(): JSX.Element {
-  const selectedCategory = goodsRegistStore((s) => s.selectedCategory);
-  const handleCaregorySelect = goodsRegistStore((s) => s.handleCaregorySelect);
-  const { setValue } = useFormContext<RegistGoodsDto>();
+  const selectedCategories = goodsRegistStore((s) => s.selectedCategories);
+  const addToSelectedCategories = goodsRegistStore((s) => s.addToSelectedCategories);
+  const removeFromSelectedCategories = goodsRegistStore(
+    (s) => s.removeFromSelectedCategories,
+  );
+
   const handleClick = (category: GoodsCategoryItem): void => {
-    setValue('categoryId', category.id);
-    handleCaregorySelect(category);
+    addToSelectedCategories(category);
   };
 
   return (
     <SectionWithTitle title="상품 카테고리" variant="outlined">
-      <FormControl>
-        <Text>선택된 카테고리: {selectedCategory?.name}</Text>
-        <UnorderedList fontSize="xs" color="GrayText">
-          <ListItem>아래 카테고리 트리에서 선택해주세요.</ListItem>
-        </UnorderedList>
-        <Categories onCategoryClick={handleClick} />
-      </FormControl>
+      <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={8}>
+        <FormControl>
+          <Text fontSize="xs" color="GrayText">
+            아래 카테고리 트리에서 선택해주세요.
+          </Text>
+          <Categories onCategoryClick={handleClick} />
+        </FormControl>
+
+        {/* 카테고리 트리에서 선택한 카테고리가 표시되는 목록 */}
+        <Stack spacing={1}>
+          <Text fontSize="xs" color="GrayText">
+            상품에 연결될 카테고리 목록
+          </Text>
+          <Stack spacing={1} fontWeight="normal" fontSize="sm">
+            {selectedCategories.length === 0 && <Text>없음</Text>}
+            {selectedCategories.map((c) => (
+              <Stack direction="row" key={c.id}>
+                <Box>{c.name}</Box>
+                <Button size="xs" onClick={() => removeFromSelectedCategories(c.id)}>
+                  해제
+                </Button>
+              </Stack>
+            ))}
+          </Stack>
+        </Stack>
+      </SimpleGrid>
     </SectionWithTitle>
   );
 }

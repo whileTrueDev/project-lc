@@ -7,6 +7,10 @@ export interface GoodsRegistStore {
   informationNotice: Record<string, string>;
   initializeNotice: (noticeObj: Record<string, string>) => void;
   handleChange: (key: string, value: string) => void;
+  selectedCategories: GoodsCategory[];
+  addToSelectedCategories: (cat: GoodsCategory) => void;
+  removeFromSelectedCategories: (categoryId: number) => void;
+  resetSelectedCategories: () => void;
 }
 
 export const goodsRegistStore = create<GoodsRegistStore>((set, get) => ({
@@ -18,5 +22,22 @@ export const goodsRegistStore = create<GoodsRegistStore>((set, get) => ({
   },
   handleChange: (key: string, value: string) => {
     set((prev) => ({ informationNotice: { ...prev.informationNotice, [key]: value } }));
+  },
+  selectedCategories: [],
+  addToSelectedCategories: (cat: GoodsCategory) => {
+    const prevSelectedCategories = get().selectedCategories;
+    if (!prevSelectedCategories.find((item) => item.id === cat.id)) {
+      set((prev) => ({ selectedCategories: [...prev.selectedCategories, cat] }));
+    }
+  },
+  removeFromSelectedCategories: (removeCategoryId: number) => {
+    set((prev) => ({
+      selectedCategories: prev.selectedCategories.filter(
+        (item) => item.id !== removeCategoryId,
+      ),
+    }));
+  },
+  resetSelectedCategories: () => {
+    set({ selectedCategories: [] });
   },
 }));
