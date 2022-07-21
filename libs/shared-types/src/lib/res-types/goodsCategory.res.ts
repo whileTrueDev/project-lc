@@ -10,3 +10,14 @@ export type GoodsCategoryItem = GoodsCategory & {
 };
 /** 상품카테고리 조회 반환 타입 */
 export type GoodsCategoryRes = GoodsCategoryItem[];
+
+export interface GoodsCategoryWithParent extends GoodsCategory {
+  parentCategory?: GoodsCategoryWithParent;
+}
+export interface GoodsCategoryWithChildren extends GoodsCategory {
+  childrenCategories?: GoodsCategoryWithChildren[];
+}
+export interface GoodsCategoryWithFamily extends GoodsCategory {
+  childrenCategories?: GoodsCategoryWithChildren[];
+  parentCategory?: GoodsCategoryWithParent;
+}
