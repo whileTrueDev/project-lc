@@ -42,7 +42,7 @@ export class GoodsCategoryController {
   @Post()
   async connectCategoryOnGoods(
     @Body(ValidationPipe) dto: CategoryOnGoodsConnectionDto,
-  ): Promise<any> {
+  ): Promise<boolean> {
     return this.goodsCategoryService.connectCategoryOnGoods(dto);
   }
 
@@ -50,7 +50,7 @@ export class GoodsCategoryController {
   @Delete()
   async disconnectCategoryOnGoods(
     @Body(ValidationPipe) dto: CategoryOnGoodsConnectionDto,
-  ): Promise<any> {
+  ): Promise<boolean> {
     return this.goodsCategoryService.disconnectCategoryOnGoods(dto);
   }
 }

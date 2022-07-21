@@ -94,26 +94,24 @@ export class GoodsCategoryService {
   /**
    * 특정 상품과 카테고리 연결 생성
    */
-  async connectCategoryOnGoods(dto: CategoryOnGoodsConnectionDto): Promise<any> {
+  async connectCategoryOnGoods(dto: CategoryOnGoodsConnectionDto): Promise<boolean> {
     const { goodsId, categoryId } = dto;
-
-    const result = await this.prisma.goods.update({
-      where: { id: goodsId },
-      data: { categories: { connect: { id: categoryId } } },
+    await this.prisma.goodsCategory.update({
+      where: { id: categoryId },
+      data: { goods: { connect: { id: goodsId } } },
     });
-    return result;
+    return true;
   }
 
   /**
    * 특정 상품과 카테고리 연결 해제
    */
-  async disconnectCategoryOnGoods(dto: CategoryOnGoodsConnectionDto): Promise<any> {
+  async disconnectCategoryOnGoods(dto: CategoryOnGoodsConnectionDto): Promise<boolean> {
     const { goodsId, categoryId } = dto;
-
-    const result = await this.prisma.goods.update({
-      where: { id: goodsId },
-      data: { categories: { disconnect: { id: categoryId } } },
+    await this.prisma.goodsCategory.update({
+      where: { id: categoryId },
+      data: { goods: { disconnect: { id: goodsId } } },
     });
-    return result;
+    return true;
   }
 }
