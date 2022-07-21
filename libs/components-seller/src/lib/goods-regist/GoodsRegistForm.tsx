@@ -121,6 +121,7 @@ export function GoodsRegistForm(): JSX.Element {
   const router = useRouter();
   const goBackAlertDialog = useDisclosure();
   const informationNotice = goodsRegistStore((s) => s.informationNotice);
+  const selectedCategories = goodsRegistStore((s) => s.selectedCategories);
 
   const methods = useForm<GoodsFormValues>({
     defaultValues: {
@@ -167,6 +168,7 @@ export function GoodsRegistForm(): JSX.Element {
       option_title,
       option_values,
       categoryId,
+      categoryIdList,
       ...goodsData
     } = data;
 
@@ -179,11 +181,11 @@ export function GoodsRegistForm(): JSX.Element {
       min_purchase_ea: Number(min_purchase_ea) || 0,
       shippingGroupId: Number(shippingGroupId) || undefined,
       categoryId,
+      categoryIdList,
     };
 
     // 상품필수정보 (품목별 정보제공고시 정보)
     const informationNoticeDto: Record<string, string> = {};
-    console.log('informationNotice: ', informationNotice);
     Object.entries(informationNotice).forEach(([key, value]) => {
       if (!value) {
         // 기본값 처리
@@ -194,7 +196,10 @@ export function GoodsRegistForm(): JSX.Element {
     });
     goodsDto.informationNoticeContents = JSON.stringify(informationNoticeDto);
 
-    if (!categoryId) {
+    // goodsRegistStore.selectedCategories에서 카테고리 id만 가져와서 할당
+    goodsDto.categoryIdList = selectedCategories.map((cat) => cat.id);
+
+    if (goodsDto.categoryIdList.length < 1) {
       toast({ description: '상품 카테고리를 선택해주세요', status: 'warning' });
       return;
     }

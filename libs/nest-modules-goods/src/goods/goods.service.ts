@@ -431,9 +431,10 @@ export class GoodsService {
         image,
         shippingGroupId,
         goodsInfoId,
-        categoryId,
+        categoryId, // TODO : 사용하는 부분이 없는경우 삭제
         informationNoticeContents,
         searchKeywords,
+        categoryIdList,
         ...goodsData
       } = dto;
       const optionsData = options.map((opt) => {
@@ -452,7 +453,7 @@ export class GoodsService {
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
           confirmation: { create: { status: 'waiting' } },
-          categories: { connect: { id: categoryId } },
+          categories: { connect: categoryIdList.map((id) => ({ id })) },
           informationNotice: {
             create: { contents: JSON.stringify(JSON.parse(informationNoticeContents)) },
           },
