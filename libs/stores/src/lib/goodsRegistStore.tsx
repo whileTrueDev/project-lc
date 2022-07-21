@@ -11,6 +11,7 @@ export interface GoodsRegistStore {
   addToSelectedCategories: (cat: GoodsCategory) => void;
   removeFromSelectedCategories: (categoryId: number) => void;
   resetSelectedCategories: () => void;
+  setSelectedCategories: (categories: GoodsCategory[]) => void;
 }
 
 export const goodsRegistStore = create<GoodsRegistStore>((set, get) => ({
@@ -39,5 +40,8 @@ export const goodsRegistStore = create<GoodsRegistStore>((set, get) => ({
   },
   resetSelectedCategories: () => {
     set({ selectedCategories: [] });
+  },
+  setSelectedCategories: (categories: GoodsCategory[]) => {
+    set({ selectedCategories: categories });
   },
 }));

@@ -110,15 +110,18 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
   });
 
   const informationNotice = goodsRegistStore((s) => s.informationNotice);
+  const selectedCategories = goodsRegistStore((s) => s.selectedCategories);
+  const resetSelectedCategories = goodsRegistStore((s) => s.resetSelectedCategories);
+
   // 카테고리 초기값 구성
-  const handleCaregorySelect = goodsRegistStore((s) => s.handleCaregorySelect);
+  const setSelectedCategories = goodsRegistStore((s) => s.setSelectedCategories);
   const initializeNotice = goodsRegistStore((s) => s.initializeNotice);
   useEffect(() => {
     if (goodsData) {
-      handleCaregorySelect(goodsData.categories[0]);
+      setSelectedCategories(goodsData.categories);
       initializeNotice(goodsData.informationNotice?.contents);
     }
-  }, [goodsData, handleCaregorySelect, initializeNotice]);
+  }, [goodsData, setSelectedCategories, initializeNotice]);
 
   const { handleSubmit } = methods;
 
@@ -140,6 +143,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       contents,
       image,
       categoryId,
+      categoryIdList,
       ...goodsFormData
     } = data;
 
@@ -154,7 +158,11 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       min_purchase_ea: Number(min_purchase_ea) || 0,
       shippingGroupId: Number(shippingGroupId) || undefined,
       categoryId,
+      categoryIdList,
     };
+
+    // goodsRegistStore.selectedCategories에서 카테고리 id만 가져와서 할당
+    goodsDto.categoryIdList = selectedCategories.map((cat) => cat.id);
 
     // 상품필수정보 (품목별 정보제공고시 정보)
     const informationNoticeDto: Record<string, string> = {};
@@ -168,7 +176,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
     });
     goodsDto.informationNoticeContents = JSON.stringify(informationNoticeDto);
 
-    if (!categoryId) {
+    if (goodsDto.categoryIdList.length < 1) {
       toast({ description: '상품 카테고리를 선택해주세요', status: 'warning' });
       return;
     }
@@ -246,7 +254,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
           title: '상품을 성공적으로 수정하였습니다',
           status: 'success',
         });
-
+        resetSelectedCategories(); // GoodsRegistStore에서 선택된 카테고리 목록 초기화
         router.push(`/mypage/goods/${id}`);
       })
       .catch((error) => {
@@ -301,6 +309,8 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
 
         {/* 상품 카테고리 정보 */}
         <GoodsRegistCategory />
+
+        {/* ?//TODO : 상품정보제공고시 추가 */}
 
         {/* 판매정보 */}
         <GoodsRegistDataSales />
