@@ -1172,8 +1172,8 @@ model KkshowShoppingTab {
 model KkshowShoppingTabCategory {
   id Int @id @default(autoincrement())
 
-  category        GoodsCategory @relation(fields: [goodsCategoryId], references: [id], onDelete: Cascade)
-  goodsCategoryId Int           @unique
+  category          GoodsCategory @relation(fields: [goodsCategoryCode], references: [categoryCode], onDelete: Cascade)
+  goodsCategoryCode String        @unique
 }
 
 enum UserType {
