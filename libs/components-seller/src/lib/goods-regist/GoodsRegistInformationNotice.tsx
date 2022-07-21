@@ -1,18 +1,17 @@
 import {
   Box,
   FormControl,
-  FormHelperText,
   FormLabel,
   Grid,
   GridItem,
   Input,
   ListItem,
+  Select,
   Spinner,
   Stack,
   Text,
   UnorderedList,
 } from '@chakra-ui/react';
-import { ChakraAutoComplete } from '@project-lc/components-core/ChakraAutoComplete';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import {
   useGoodsInformationSubject,
@@ -71,24 +70,25 @@ export function GoodsRegistInformationNotice(): JSX.Element | null {
       <Box>
         <FormControl>
           <FormLabel>카테고리 품목</FormLabel>
-          <Stack>
-            <FormHelperText fontSize="xs">
-              아래 자동완성창을 통해 선택해주세요
-            </FormHelperText>
-            {/* 품목 선택창 */}
-            <ChakraAutoComplete
-              value={defaultSubject}
-              options={subjectList || []}
-              getOptionLabel={(o) => o?.subject || ''}
-              onChange={(newV) => {
-                if (newV && newV.id) {
-                  setInformationSubjectId(newV.id);
-                } else {
-                  setInformationSubjectId(null);
-                }
-              }}
-            />
-          </Stack>
+          <Select
+            placeholder="상품정보제공고시 품목을 선택해주세요"
+            value={informationSubjectId || undefined}
+            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+              const { value } = event.target;
+              setInformationSubjectId(Number(value));
+            }}
+          >
+            {subjectList &&
+              subjectList.map((subject) => (
+                <option
+                  key={subject.id}
+                  value={subject.id}
+                  selected={subject.id === informationSubjectId}
+                >
+                  {subject.subject}
+                </option>
+              ))}
+          </Select>
         </FormControl>
       </Box>
 
