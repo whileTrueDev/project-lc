@@ -13,11 +13,17 @@ import {
 } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { useCreateGoodsCommonInfo, useProfile, useRegistGoods } from '@project-lc/hooks';
-import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
+import {
+  GoodsFormSubmitDataType,
+  GoodsFormValues,
+  GoodsOptionDto,
+  RegistGoodsDto,
+} from '@project-lc/shared-types';
 import { goodsRegistStore } from '@project-lc/stores';
 import { s3 } from '@project-lc/utils-s3';
 import { useRouter } from 'next/router';
-import { FormProvider, NestedValue, useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import GoodsRegistCategory from './GoodsRegistCategory';
 import GoodsRegistCommonInfo from './GoodsRegistCommonInfo';
 import GoodsRegistDataBasic from './GoodsRegistDataBasic';
@@ -30,27 +36,6 @@ import GoodsRegistKeywords from './GoodsRegistKeywords';
 import GoodsRegistMemo from './GoodsRegistMemo';
 import GoodsRegistPictures from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
-
-export type GoodsFormOption = Omit<GoodsOptionDto, 'default_option'> & {
-  id?: number;
-};
-
-export type GoodsFormOptionsType = GoodsFormOption[];
-
-export type GoodsFormValues = Omit<RegistGoodsDto, 'options'> & {
-  id?: number;
-  options: NestedValue<GoodsFormOptionsType>;
-  pictures?: { file: File; filename: string; id: number }[];
-  option_title: string; // 옵션명
-  option_values: string; // 옵션값 (, 로 분리된 문자열)
-  common_contents: string;
-  common_contents_name?: string; // 공통 정보 이름
-  common_contents_type: 'new' | 'load'; // 공통정보 신규 | 기존 불러오기
-};
-
-type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
-  options: Omit<GoodsOptionDto, 'default_option'>[];
-};
 
 // 상품 사진, 상세설명 이미지를 s3에 업로드 -> url 리턴
 export async function uploadGoodsImageToS3(
@@ -122,6 +107,16 @@ export function GoodsRegistForm(): JSX.Element {
   const goBackAlertDialog = useDisclosure();
   const informationNotice = goodsRegistStore((s) => s.informationNotice);
   const selectedCategories = goodsRegistStore((s) => s.selectedCategories);
+  const initializeNotice = goodsRegistStore((s) => s.initializeNotice);
+  const resetSelectedCategories = goodsRegistStore((s) => s.resetSelectedCategories);
+  const informationSubjectId = goodsRegistStore((s) => s.informationSubjectId);
+
+  // 마운트시 최초 한번만 실행 : 카테고리, 상품정보제공고시 항목 초기화
+  useEffect(() => {
+    initializeNotice({});
+    resetSelectedCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const methods = useForm<GoodsFormValues>({
     defaultValues: {
@@ -181,10 +176,23 @@ export function GoodsRegistForm(): JSX.Element {
       min_purchase_ea: Number(min_purchase_ea) || 0,
       shippingGroupId: Number(shippingGroupId) || undefined,
       categoryId,
-      categoryIdList,
+      categoryIdList: selectedCategories.map((cat) => cat.id),
     };
 
-    // 상품필수정보 (품목별 정보제공고시 정보)
+    // * 상품 카테고리 확인
+    if (goodsDto.categoryIdList.length < 1) {
+      toast({ description: '상품 카테고리를 선택해주세요', status: 'warning' });
+      return;
+    }
+
+    // * 상품필수정보(품목별 정보제공고시 정보) 확인
+    if (!informationSubjectId) {
+      toast({
+        description: '상품정보제공고시 카테고리 품목을 선택해주세요',
+        status: 'warning',
+      });
+      return;
+    }
     const informationNoticeDto: Record<string, string> = {};
     Object.entries(informationNotice).forEach(([key, value]) => {
       if (!value) {
@@ -195,30 +203,25 @@ export function GoodsRegistForm(): JSX.Element {
       }
     });
     goodsDto.informationNoticeContents = JSON.stringify(informationNoticeDto);
-
-    // goodsRegistStore.selectedCategories에서 카테고리 id만 가져와서 할당
-    goodsDto.categoryIdList = selectedCategories.map((cat) => cat.id);
-
-    if (goodsDto.categoryIdList.length < 1) {
-      toast({ description: '상품 카테고리를 선택해주세요', status: 'warning' });
-      return;
-    }
-
-    if (!shippingGroupId) {
-      // 배송비정책 그룹을 선택하지 않은 경우
-      toast({ description: '배송비 정책을 선택해주세요', status: 'warning' });
-      return;
-    }
-
-    if (!image || image.length < 1) {
-      // 등록된 사진이 없는 경우
-      toast({ description: '상품 사진을 1개 이상 등록해주세요', status: 'warning' });
+    // * 상품필수정보 내용 확인
+    if (goodsDto.informationNoticeContents === '{}') {
+      // 상품정보제공고시 내용이 빈객체인 경우 - 항목 선택 안함 혹은 값을 입력하지 않음
+      toast({
+        description: '상품정보제공고시 카테고리 품목을 선택하고 값을 입력해주세요',
+        status: 'warning',
+      });
       return;
     }
 
     if (options.length === 0) {
       // 등록된 옵션이 없는 경우
       toast({ description: '상품 옵션을 1개 이상 등록해주세요', status: 'warning' });
+      return;
+    }
+
+    if (!image || image.length < 1) {
+      // 등록된 사진이 없는 경우
+      toast({ description: '상품 사진을 1개 이상 등록해주세요', status: 'warning' });
       return;
     }
 
@@ -259,6 +262,12 @@ export function GoodsRegistForm(): JSX.Element {
         description: '상품 공통 정보를 입력하거나 기존 정보를 불러와서 등록해주세요',
         status: 'warning',
       });
+      return;
+    }
+
+    if (!shippingGroupId) {
+      // 배송비정책 그룹을 선택하지 않은 경우
+      toast({ description: '배송비 정책을 선택해주세요', status: 'warning' });
       return;
     }
 
