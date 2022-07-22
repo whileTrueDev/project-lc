@@ -15,7 +15,10 @@ import {
   SellerShop,
 } from '@prisma/client';
 
-type SellerSettlementTargetsExportItem = Pick<ExportItem, 'id' | 'amount' | 'status'> & {
+type SellerSettlementTargetsExportItem = Pick<
+  ExportItem,
+  'id' | 'quantity' | 'status'
+> & {
   orderItem: {
     channel: OrderItem['channel'];
     goods: {

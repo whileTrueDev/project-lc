@@ -106,7 +106,7 @@ export function OrderDetailOptionDescription({
                     (ei) => ei.orderItemOptionId === opt.id,
                   );
                   const exportedCount = currentOptionExportItems
-                    .map((ei) => ei.amount)
+                    .map((ei) => ei.quantity)
                     .reduce((sum, cur) => sum + cur, 0);
                   return (
                     <Tr key={opt.id}>

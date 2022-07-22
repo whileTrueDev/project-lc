@@ -39,7 +39,7 @@ export class CreateExchangeItemDto {
 
   /** 개수 */
   @IsNumber()
-  amount: number;
+  quantity: number;
 }
 
 /** 교환 생성 dto */

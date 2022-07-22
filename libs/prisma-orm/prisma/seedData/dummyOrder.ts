@@ -348,7 +348,7 @@ export const createDummyOrderWithCancellation = async (): Promise<void> => {
         create: {
           orderItemId,
           orderItemOptionId,
-          amount: 1,
+          quantity: 1,
         },
       },
     },
@@ -372,7 +372,7 @@ export const createDummyOrderWithExchange = async (): Promise<void> => {
         create: {
           orderItemId,
           orderItemOptionId,
-          amount: 1,
+          quantity: 1,
         },
       },
       images: { create: [{ imageUrl: 'https://dummyimage.com/300' }] },
@@ -396,7 +396,7 @@ export const createDummyOrderWithReturn = async (): Promise<void> => {
         create: {
           orderItemId,
           orderItemOptionId,
-          amount: 1,
+          quantity: 1,
         },
       },
       images: { create: [{ imageUrl: 'https://dummyimage.com/300' }] },
@@ -440,7 +440,7 @@ export const createDummyOrderWithSupport = async (): Promise<void> => {
       items: {
         create: [
           {
-            amount: 1,
+            quantity: 1,
             status: 'purchaseConfirmed',
             orderItemId: order1.orderItemId,
             orderItemOptionId: order1.orderItemOptionId,
@@ -468,7 +468,7 @@ export const createDummyOrderWithSupport = async (): Promise<void> => {
       items: {
         create: [
           {
-            amount: 1,
+            quantity: 1,
             status: 'purchaseConfirmed',
             orderItemId: order2.orderItemId,
             orderItemOptionId: order2.orderItemOptionId,

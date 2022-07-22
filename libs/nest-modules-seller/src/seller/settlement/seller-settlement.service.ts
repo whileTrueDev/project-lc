@@ -201,7 +201,7 @@ export class SellerSettlementService {
               },
             },
             orderItemOption: true,
-            amount: true,
+            quantity: true,
             status: true,
           },
         },

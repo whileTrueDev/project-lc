@@ -178,7 +178,7 @@ export function OrderInfoExportsItem({
             <Text>
               {orderItemOption.name}: {orderItemOption.value}
             </Text>
-            <Text>{exportItem.amount}개</Text>
+            <Text>{exportItem.quantity}개</Text>
           </HStack>
 
           <HStack>

@@ -12,7 +12,6 @@ import {
   GetExchangeListDto,
   UpdateExchangeDto,
 } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
 import { nanoid } from 'nanoid';
 
 @Injectable()
@@ -38,7 +37,7 @@ export class ExchangeService {
           create: exchangeItems.map((item) => ({
             orderItem: { connect: { id: item.orderItemId } },
             orderItemOption: { connect: { id: item.orderItemOptionId } },
-            amount: item.amount,
+            quantity: item.quantity,
           })),
         },
         images: {
@@ -100,7 +99,7 @@ export class ExchangeService {
 
       const _items = exchangeItems.map((i) => ({
         id: i.id, // 교환 상품 고유번호
-        amount: i.amount, // 교환 상품 개수
+        quantity: i.quantity, // 교환 상품 개수
         status: i.status, // 교환 상품 처리상태
         goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
         image: i.orderItem.goods.image?.[0]?.image, // 주문 상품 이미지
@@ -156,7 +155,7 @@ export class ExchangeService {
 
     const _items = exchangeItems.map((i) => ({
       id: i.id, // 교환 상품 고유번호
-      amount: i.amount, // 교환 상품 개수
+      quantity: i.quantity, // 교환 상품 개수
       status: i.status, // 교환 상품 처리상태
       goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
       image: i.orderItem.goods.image?.[0]?.image, // 주문 상품 이미지

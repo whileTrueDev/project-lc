@@ -23,7 +23,7 @@ export class CreateRefundItemDto {
 
   /** 개수 */
   @IsNumber()
-  amount: number;
+  quantity: number;
 }
 
 /** 환불받을 계좌정보 */
