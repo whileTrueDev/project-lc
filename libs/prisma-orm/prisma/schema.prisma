@@ -38,14 +38,13 @@ model SellerShop {
   sellerId Int    @unique
   shopName String
   seller   Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-
 }
 
 // 관리자가 설정할 마일리지 세팅
 model MileageSetting {
   id                    Int             @id @default(autoincrement())
   defaultMileagePercent Int             @default(0) // 상품 구매시 결제금액의 몇퍼센트를 적립금으로 지금할지
-  mileageStrategy       MileageStrategy @default(onPaymentPriceExceptMileageUsage) // 적립금 지급방식
+  mileageStrategy       MileageStrategy @default(noMileage) // 적립금 지급방식
 }
 
 // [enum] 적립금 지급 방식(결제시 적립금을 사용한 경우)
@@ -73,6 +72,7 @@ model SellerBusinessRegistration {
   seller                           Seller                            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
   confirmHistory ConfirmHistory[]
+
   @@index(name: "BusinessRegistrationIndex", fields: [id])
 }
 
@@ -158,6 +158,7 @@ model SellerSettlementAccount {
   seller                     Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
   confirmHistory ConfirmHistory[]
+
   @@index([id], name: "SellerSettlementAccountIndex")
 }
 
@@ -280,7 +281,6 @@ model GoodsOptions {
   option_view      YesOrNo_UPPERCASE     @default(Y) // 옵션 노출 여부
   cartItemOptions  CartItemOption[]
   orderItemOptions OrderItemOption[]
-
 
   @@index([goodsId], name: "goodsId")
 }
@@ -550,6 +550,7 @@ model Broadcaster {
   orderItemSupport  OrderItemSupport[] // 주문된 상품의 후원정보 => 방송인이 후원받은 내역 조회시 사용할듯
   followers         CustomerFollowBroadcaster[] // 팔로우하는 소비자
   productPromotions ProductPromotion[] // 홍보중인상품
+
   @@fulltext([userNickname])
 }
 
@@ -611,7 +612,6 @@ model BroadcasterSettlements {
   broadcasterId              Int
   broadcaster                Broadcaster                  @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
   broadcasterSettlementItems BroadcasterSettlementItems[]
-
 
   @@unique([broadcasterId, round])
 }
@@ -1722,7 +1722,6 @@ model OrderItemOption {
   exportItems            ExportItem[] // 출고상품
   orderCancellationItems OrderCancellationItem[] // 주문취소상품
   exchangeItems          ExchangeItem[] // 교환상품
-
 }
 
 // 주문상품후원
