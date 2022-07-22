@@ -160,6 +160,14 @@ export class GoodsController {
   }
 
   /** 상품 개별 조회 */
+  @Get('by-category/:categoryCode')
+  getGoodsByCategory(
+    @Param('categoryCode') categoryCode: string,
+  ): Promise<GoodsOutlineByIdRes[]> {
+    return this.goodsService.getGoodsOutlineByCategory(categoryCode);
+  }
+
+  /** 상품 개별 조회 */
   @Get(':goodsId')
   getOneGoods(@Param('goodsId', ParseIntPipe) goodsId: number): Promise<GoodsByIdRes> {
     return this.goodsService.getOneGoods(goodsId);

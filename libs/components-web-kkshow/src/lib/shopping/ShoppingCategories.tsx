@@ -8,6 +8,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useDisplaySize, useKkshowShoppingCategories } from '@project-lc/hooks';
+import Link from 'next/link';
 import { useMemo } from 'react';
 
 export function ShoppingCategories(): JSX.Element | null {
@@ -49,11 +50,13 @@ export function ShoppingCategories(): JSX.Element | null {
                   _groupHover={{ shadow: 'lg', transform: 'translateY(2px)' }}
                   _groupActive={{ shadow: 'lg', transform: 'translateY(2px)' }}
                 />
-                <LinkOverlay href={`shopping/category/${category.id}`}>
-                  <Text fontSize={['xs', 'xs', 'md']} noOfLines={2} textAlign="center">
-                    {category.name}
-                  </Text>
-                </LinkOverlay>
+                <Link href={`shopping/category/${category.categoryCode}`} passHref>
+                  <LinkOverlay href={`shopping/category/${category.categoryCode}`}>
+                    <Text fontSize={['xs', 'xs', 'md']} noOfLines={2} textAlign="center">
+                      {category.name}
+                    </Text>
+                  </LinkOverlay>
+                </Link>
               </Stack>
             </LinkBox>
           ))}

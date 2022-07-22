@@ -418,6 +418,24 @@ export class GoodsService {
     });
   }
 
+  /** 카테고리 코드를 기준으로 상품 간략 정보 목록 조회 */
+  public async getGoodsOutlineByCategory(
+    categoryCode: string,
+  ): Promise<GoodsOutlineByIdRes[]> {
+    return this.prisma.goods.findMany({
+      where: { categories: { every: { categoryCode } } },
+      select: {
+        id: true,
+        goods_name: true,
+        summary: true,
+        goods_status: true,
+        options: { include: { supply: true } },
+        confirmation: true,
+        image: { orderBy: { cut_number: 'asc' } },
+      },
+    });
+  }
+
   // 상품 등록
   public async registGoods(
     sellerId: number,

@@ -47,6 +47,27 @@ export const useGoodsOutlineById = (
   );
 };
 
+export const generateGoodsOutlineByCategoryCodeKey = (
+  categoryCode?: string,
+): Array<string | undefined> => ['GoodsOutlineByCategoryCode', categoryCode];
+export const getGoodsOutlineByCategoryCode = async (
+  categoryCode?: string,
+): Promise<GoodsOutlineByIdRes[]> => {
+  return axios
+    .get<GoodsOutlineByIdRes[]>(`/goods/by-category/${categoryCode}`)
+    .then((res) => res.data);
+};
+/** 카테고리 코드를 통해 상품 간략 정보 조회 */
+export const useGoodsOutlineByCategoryCode = (
+  categoryCode?: string,
+): UseQueryResult<GoodsOutlineByIdRes[], AxiosError> => {
+  return useQuery<GoodsOutlineByIdRes[], AxiosError>(
+    generateGoodsOutlineByCategoryCodeKey(categoryCode),
+    () => getGoodsOutlineByCategoryCode(categoryCode),
+    { enabled: !!categoryCode },
+  );
+};
+
 export const ALL_GOODS_IDS_KEY = 'AllGoodsIds';
 export const getAllGoodsIds = async (): Promise<AllGoodsIdsRes> => {
   return axios
