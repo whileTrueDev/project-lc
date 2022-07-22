@@ -43,7 +43,7 @@ export function GoodsRegistInformationNotice(): JSX.Element | null {
   // 입력해야 할 필수정보항목 객체
   // 상품 수정시 EditForm에서 informationNotice 값이 상품작성시 값으로 초기화되어있으므로 그 값을 사용,
   // 상품 생성시에는 카테고리 항목 선택하여 불러온 템플릿 그대로 사용
-  const templateObject = informationNotice || data;
+  const templateObject = informationNotice || data?.items;
 
   if (subjectListLoading) {
     return (
