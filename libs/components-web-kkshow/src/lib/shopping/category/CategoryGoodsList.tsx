@@ -11,11 +11,11 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import GoodsDisplay from '@project-lc/components-web-kkshow/GoodsDisplay';
 import { useGoodsOutlineByCategoryCode, useOneGoodsCategory } from '@project-lc/hooks';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
+import { GoodsDisplay } from '../../GoodsDisplay';
 
 export function CategoryGoodsList(): JSX.Element | null {
   const router = useRouter();
