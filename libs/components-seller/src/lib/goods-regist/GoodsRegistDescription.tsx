@@ -18,12 +18,12 @@ import {
 import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 import { MB } from '@project-lc/components-core/ImageInput';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle'; // Import Sun Editor's CSS File
+import { GoodsFormValues } from '@project-lc/shared-types';
 import dynamic from 'next/dynamic';
 import { useEffect, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import 'suneditor/dist/css/suneditor.min.css';
 import SunEditorCore from 'suneditor/src/lib/core';
-import { GoodsFormValues } from './GoodsRegistForm';
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,

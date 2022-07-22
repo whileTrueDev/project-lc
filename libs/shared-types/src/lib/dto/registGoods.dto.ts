@@ -6,19 +6,17 @@ import {
   RunoutPolicy,
   ShopOrGoods,
 } from '@prisma/client';
+import { Type } from 'class-transformer';
 import {
   IsIn,
-  IsString,
-  IsOptional,
-  ValidateNested,
-  IsNumber,
-  IsObject,
   IsJSON,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { GoodsOptionDto } from './goodsOption.dto';
 import { GoodsImageDto } from './goodsImage.dto';
-import { GoodsInformationNoticeDto } from './goodsInformationNotice.dto';
+import { GoodsOptionDto } from './goodsOption.dto';
 
 /** 상품 키워드 DTO */
 class GoodsSearchKeywordDto {
@@ -134,8 +132,8 @@ export class RegistGoodsDto {
   @Type(() => GoodsSearchKeywordDto)
   searchKeywords?: GoodsSearchKeywordDto[] = [];
 
-  @IsNumber()
-  categoryId: number;
+  @IsNumber({}, { each: true })
+  categoryIdList: number[];
 
   @IsOptional()
   @IsNumber()

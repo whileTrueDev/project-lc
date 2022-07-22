@@ -32,13 +32,13 @@ import {
   useGoodsCommonInfoList,
   useProfile,
 } from '@project-lc/hooks';
+import { GoodsFormValues } from '@project-lc/shared-types';
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
 import 'suneditor/dist/css/suneditor.min.css';
 import SunEditorCore from 'suneditor/src/lib/core';
-import { GoodsFormValues } from './GoodsRegistForm';
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,

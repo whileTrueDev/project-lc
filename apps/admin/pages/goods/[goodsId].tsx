@@ -59,7 +59,7 @@ export function GoodsDetail(): JSX.Element {
         {/* 상품 정보 */}
 
         <SectionWithTitle title="기본 정보">
-          <GoodsDetailInfo goods={goods.data} />
+          <GoodsDetailInfo goods={goods.data} enableCategoryOnGoodsManagement />
         </SectionWithTitle>
 
         <SectionWithTitle title="상품사진 및 설명">
