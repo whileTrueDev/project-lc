@@ -431,7 +431,6 @@ export class GoodsService {
         image,
         shippingGroupId,
         goodsInfoId,
-        categoryId, // TODO : 사용하는 부분이 없는경우 삭제
         informationNoticeContents,
         searchKeywords,
         categoryIdList,
@@ -585,7 +584,6 @@ export class GoodsService {
       goodsInfoId,
       informationNoticeId,
       informationNoticeContents,
-      categoryId,
       searchKeywords,
       categoryIdList,
       ...goodsData
@@ -645,7 +643,6 @@ export class GoodsService {
               contents: JSON.stringify(JSON.parse(informationNoticeContents)),
             },
           },
-          // categories: { connect: { id: categoryId } },
           categories: {
             connect: categoryIdList.map((_categoryId) => ({ id: _categoryId })),
             disconnect: disconnectCategoryIdList.map((_categoryId) => ({

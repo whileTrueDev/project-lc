@@ -2,9 +2,6 @@ import { GoodsCategory } from '@prisma/client';
 import create from 'zustand';
 
 export interface GoodsRegistStore {
-  selectedCategory: GoodsCategory | null;
-  handleCaregorySelect: (cate: GoodsCategory | null) => void;
-
   /** 상품정보제공고시 품목별 필수정보 저장 */
   informationNotice: Record<string, string>;
   initializeNotice: (noticeObj: Record<string, string>) => void;
@@ -24,8 +21,6 @@ export interface GoodsRegistStore {
 }
 
 export const goodsRegistStore = create<GoodsRegistStore>((set, get) => ({
-  selectedCategory: null,
-  handleCaregorySelect: (cate) => set({ selectedCategory: cate }),
   informationNotice: {},
   initializeNotice: (noticeObj: Record<string, string>) => {
     set({ informationNotice: noticeObj });

@@ -162,7 +162,6 @@ export function GoodsRegistForm(): JSX.Element {
       image,
       option_title,
       option_values,
-      categoryId,
       categoryIdList,
       ...goodsData
     } = data;
@@ -175,7 +174,6 @@ export function GoodsRegistForm(): JSX.Element {
       max_purchase_ea: Number(max_purchase_ea) || 0,
       min_purchase_ea: Number(min_purchase_ea) || 0,
       shippingGroupId: Number(shippingGroupId) || undefined,
-      categoryId,
       categoryIdList: selectedCategories.map((cat) => cat.id),
     };
 

@@ -107,7 +107,6 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       option_view_type: 'divide',
       option_suboption_use: '0',
       member_input_use: '0',
-      categoryId: goodsData.categories[0]?.id,
       searchKeywords:
         goodsData.searchKeyword?.split(',').map((k) => ({ keyword: k })) || [],
     },
@@ -117,6 +116,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
   const selectedCategories = goodsRegistStore((s) => s.selectedCategories);
   const resetSelectedCategories = goodsRegistStore((s) => s.resetSelectedCategories);
   const setInformationSubjectId = goodsRegistStore((s) => s.setInformationSubjectId);
+  const setSelectedCategories = goodsRegistStore((s) => s.setSelectedCategories);
 
   // 마운트 이후 최초 1번만 실행 - 상품정보제공고시 카테고리 품목 초기화
   useEffect(() => {
@@ -125,8 +125,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
   }, []);
 
   // 카테고리 초기값 구성
-  const setSelectedCategories = goodsRegistStore((s) => s.setSelectedCategories);
-  // 상품정보제공고시 내용 초기값 구성
+  // && 상품정보제공고시 내용 초기값 구성
   const initializeNotice = goodsRegistStore((s) => s.initializeNotice);
   useEffect(() => {
     if (goodsData) {
@@ -154,7 +153,6 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       shippingGroupId,
       contents,
       image,
-      categoryId,
       categoryIdList,
       ...goodsFormData
     } = data;
@@ -169,7 +167,6 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       max_purchase_ea: Number(max_purchase_ea) || 0,
       min_purchase_ea: Number(min_purchase_ea) || 0,
       shippingGroupId: Number(shippingGroupId) || undefined,
-      categoryId,
       categoryIdList: selectedCategories.map((cat) => cat.id),
     };
 

@@ -132,11 +132,6 @@ export class RegistGoodsDto {
   @Type(() => GoodsSearchKeywordDto)
   searchKeywords?: GoodsSearchKeywordDto[] = [];
 
-  // TODO : array로 바꾸기
-  @IsNumber()
-  @IsOptional()
-  categoryId?: number;
-
   @IsNumber({}, { each: true })
   categoryIdList: number[];
 
