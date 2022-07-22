@@ -7,9 +7,11 @@ import {
   useBoolean,
   useDisclosure,
 } from '@chakra-ui/react';
-import { MdImage, MdOutlineImage } from 'react-icons/md';
+import { GiLighthouse } from 'react-icons/gi';
+import { MdImage } from 'react-icons/md';
 import { CategoryCreateFormDialog } from './AdminCategoryCreateDialog';
 import { CategoryDeleteDiaglog, CategoryItemType } from './AdminCategoryDeleteDialog';
+import { CategoryDisplayDiaglog } from './AdminCategoryDisplayDialog';
 import { CategoryUpdateFormDialog } from './AdminCategoryUpdateDialog';
 
 export interface CategoryItemProps {
@@ -24,11 +26,23 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
   const createDialog = useDisclosure();
   const updateDialog = useDisclosure();
   const deleteDialog = useDisclosure();
+  const displayDialog = useDisclosure();
   const { onClick, item, selectedCategoryId } = props;
   const { id, name, childrenCategories, mainCategoryFlag, depth, goodsCount } = item;
   const hasChildren = childrenCategories && childrenCategories.length > 0;
+  const actionsVisible = useDisclosure();
+  const onActionVisible = (): void => actionsVisible.onOpen();
+  const onActionInvisible = (): void => actionsVisible.onClose();
   return (
-    <Stack borderWidth="1px" borderRadius="md" px={1} spacing={0}>
+    <Stack
+      borderWidth="1px"
+      borderRadius="md"
+      mt={1}
+      p={1}
+      spacing={0}
+      onMouseEnter={onActionVisible}
+      onMouseLeave={onActionInvisible}
+    >
       <Stack direction="row" justifyContent="space-between">
         <Stack direction="row" align="center" spacing={1}>
           {!mainCategoryFlag && (
@@ -49,6 +63,8 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
             {name}
           </Text>
           {item.imageSrc && <MdImage color="green" />}
+          {item.kkshowShoppingTabCategory && <GiLighthouse color="blue" />}
+
           <Text as="span">({goodsCount})</Text>
           {hasChildren && (
             <IconButton
@@ -59,7 +75,8 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
             />
           )}
         </Stack>
-        {selectedCategoryId === id && (
+
+        {actionsVisible.isOpen && (
           <Stack direction="row">
             {/* depth 2 미만일때만 하위 카테고리 생성 가능하도록 제한함 */}
             {depth < 2 && (
@@ -67,20 +84,20 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
                 하위 카테고리 생성
               </Button>
             )}
-            <CategoryCreateFormDialog
-              isOpen={createDialog.isOpen}
-              onClose={createDialog.onClose}
-              parentCategory={item}
-            />
+
+            <Button
+              size="xs"
+              leftIcon={
+                <GiLighthouse color={item.kkshowShoppingTabCategory ? 'red' : 'blue'} />
+              }
+              onClick={displayDialog.onOpen}
+            >
+              {item.kkshowShoppingTabCategory ? '전시제거' : '전시'}
+            </Button>
 
             <Button size="xs" onClick={updateDialog.onOpen}>
               수정
             </Button>
-            <CategoryUpdateFormDialog
-              isOpen={updateDialog.isOpen}
-              onClose={updateDialog.onClose}
-              category={item}
-            />
 
             <Button
               size="xs"
@@ -89,14 +106,31 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
             >
               삭제
             </Button>
-            <CategoryDeleteDiaglog
-              isOpen={deleteDialog.isOpen}
-              onClose={deleteDialog.onClose}
-              category={item}
-            />
           </Stack>
         )}
       </Stack>
+
+      <CategoryCreateFormDialog
+        isOpen={createDialog.isOpen}
+        onClose={createDialog.onClose}
+        parentCategory={item}
+      />
+      <CategoryDisplayDiaglog
+        isOpen={displayDialog.isOpen}
+        onClose={displayDialog.onClose}
+        category={item}
+      />
+      <CategoryUpdateFormDialog
+        isOpen={updateDialog.isOpen}
+        onClose={updateDialog.onClose}
+        category={item}
+      />
+      <CategoryDeleteDiaglog
+        isOpen={deleteDialog.isOpen}
+        onClose={deleteDialog.onClose}
+        category={item}
+      />
+
       {open && (
         <Stack pl={6} spacing={0}>
           {hasChildren &&

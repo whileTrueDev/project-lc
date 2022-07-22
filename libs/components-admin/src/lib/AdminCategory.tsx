@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { useAdminCategory } from '@project-lc/hooks';
 import { useState } from 'react';
+import { GiLighthouse } from 'react-icons/gi';
 import { MdImage } from 'react-icons/md';
 import { CategoryCreateFormDialog } from './AdminCategoryCreateDialog';
 import { CategoryItem } from './AdminCategoryItem';
@@ -100,6 +101,16 @@ export function AdminCategory(): JSX.Element {
           </Text>
         </ListItem>
         <ListItem>
+          <Text>
+            * 쇼핑페이지에 전시중인 카테고리는{' '}
+            <GiLighthouse
+              color="blue"
+              style={{ display: 'inline-block', verticalAlign: 'middle' }}
+            />{' '}
+            표시가 적용되어있습니다.
+          </Text>
+        </ListItem>
+        <ListItem>
           <Text>* 상품이 연결되어 있는 카테고리는 삭제할 수 없습니다</Text>
         </ListItem>
         <ListItem>
@@ -114,7 +125,7 @@ export function AdminCategory(): JSX.Element {
       </Box>
 
       {/* 카테고리 목록 */}
-      <Stack w="400px" fontSize="sm" spacing={0}>
+      <Stack w="500px" fontSize="sm" spacing={0}>
         {categoryTree.map((mainC) => (
           <CategoryItem
             key={mainC.id}

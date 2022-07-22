@@ -45,7 +45,7 @@ export class GoodsCategoryService {
   // 카테고리 조회
   async getCategories(): Promise<AdminGoodsCategoryRes> {
     const categories = await this.prisma.goodsCategory.findMany({
-      include: { _count: { select: { goods: true } } },
+      include: { _count: { select: { goods: true } }, kkshowShoppingTabCategory: true },
     });
 
     return categories.map((c) => {

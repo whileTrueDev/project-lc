@@ -1,6 +1,8 @@
-import { GoodsCategory } from '@prisma/client';
+import { GoodsCategory, KkshowShoppingTabCategory } from '@prisma/client';
 
-export type CategoryWithGoodsCount = GoodsCategory & { goodsCount: number };
+export type CategoryWithGoodsCount = GoodsCategory & { goodsCount: number } & {
+  kkshowShoppingTabCategory?: KkshowShoppingTabCategory | null;
+};
 export type AdminGoodsCategoryRes = CategoryWithGoodsCount[];
 
 export type GoodsCategoryItem = GoodsCategory & {

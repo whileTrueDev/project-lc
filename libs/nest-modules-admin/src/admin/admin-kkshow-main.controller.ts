@@ -1,5 +1,17 @@
-import { Body, Controller, Delete, Get, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+  UseInterceptors,
+  ValidationPipe,
+} from '@nestjs/common';
 import { KkshowShoppingTabCategory } from '@prisma/client';
+import { HttpCacheInterceptor, CacheClearKeys } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   KkshowMainService,
@@ -52,16 +64,22 @@ export class AdminKkshowMainController {
   }
 
   // 쇼핑페이지 카테고리 목록 요소 추가
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('goods-category', 'goods')
   @Post('kkshow-shopping/category')
   async addCategory(
-    @Body() dto: KkshowShoppingTabCategoryDto,
+    @Body(new ValidationPipe({ transform: true })) dto: KkshowShoppingTabCategoryDto,
   ): Promise<KkshowShoppingTabCategory> {
     return this.kkshowShoppingCategoryService.add(dto.categoryCode);
   }
 
   // 쇼핑페이지 카테고리 목록 요소 제거
-  @Delete('kkshow-shopping/category')
-  async removeCategory(@Body() dto: KkshowShoppingTabCategoryDto): Promise<boolean> {
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('goods-category', 'goods')
+  @Delete('kkshow-shopping/category/:categoryCode')
+  async removeCategory(
+    @Param(new ValidationPipe({ transform: true })) dto: KkshowShoppingTabCategoryDto,
+  ): Promise<boolean> {
     return this.kkshowShoppingCategoryService.remove(dto.categoryCode);
   }
 }
