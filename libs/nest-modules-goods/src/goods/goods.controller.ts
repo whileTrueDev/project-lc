@@ -25,6 +25,7 @@ import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   AllGoodsIdsRes,
   ChangeGoodsViewDto,
+  DefaultPaginationDto,
   DeleteGoodsDto,
   GoodsByIdRes,
   GoodsImageDto,
@@ -163,8 +164,9 @@ export class GoodsController {
   @Get('by-category/:categoryCode')
   getGoodsByCategory(
     @Param('categoryCode') categoryCode: string,
+    @Query(new ValidationPipe({ transform: true })) dto?: DefaultPaginationDto,
   ): Promise<GoodsOutlineByIdRes[]> {
-    return this.goodsService.getGoodsOutlineByCategory(categoryCode);
+    return this.goodsService.getGoodsOutlineByCategory(categoryCode, dto);
   }
 
   /** 상품 개별 조회 */

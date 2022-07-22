@@ -12,6 +12,7 @@ import {
   AdminAllLcGoodsList,
   AllGoodsIdsRes,
   ApprovedGoodsNameAndId,
+  DefaultPaginationDto,
   getLiveShoppingProgress,
   GoodsByIdRes,
   GoodsImageDto,
@@ -421,8 +422,12 @@ export class GoodsService {
   /** 카테고리 코드를 기준으로 상품 간략 정보 목록 조회 */
   public async getGoodsOutlineByCategory(
     categoryCode: string,
+    paginationOpts?: DefaultPaginationDto,
   ): Promise<GoodsOutlineByIdRes[]> {
+    const { skip, take } = paginationOpts;
     return this.prisma.goods.findMany({
+      skip,
+      take,
       where: { categories: { every: { categoryCode } } },
       select: {
         id: true,

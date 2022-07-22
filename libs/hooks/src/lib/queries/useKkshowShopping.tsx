@@ -32,7 +32,8 @@ export const getKkshowShoppingCategories = async (): Promise<
 > => {
   return axios
     .get<GoodsCategoryWithFamily[]>('/kkshow-shopping/categories')
-    .then((res) => res.data);
+    .then((res) => res.data)
+    .catch(() => []);
 };
 export const useKkshowShoppingCategories = (): UseQueryResult<
   GoodsCategoryWithFamily[],

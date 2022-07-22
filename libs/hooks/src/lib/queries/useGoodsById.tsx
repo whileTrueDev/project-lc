@@ -1,5 +1,6 @@
 import {
   AllGoodsIdsRes,
+  DefaultPaginationDto,
   GoodsByIdRes,
   GoodsOutlineByIdRes,
 } from '@project-lc/shared-types';
@@ -52,18 +53,22 @@ export const generateGoodsOutlineByCategoryCodeKey = (
 ): Array<string | undefined> => ['GoodsOutlineByCategoryCode', categoryCode];
 export const getGoodsOutlineByCategoryCode = async (
   categoryCode?: string,
+  paginationDto?: DefaultPaginationDto,
 ): Promise<GoodsOutlineByIdRes[]> => {
   return axios
-    .get<GoodsOutlineByIdRes[]>(`/goods/by-category/${categoryCode}`)
+    .get<GoodsOutlineByIdRes[]>(`/goods/by-category/${categoryCode}`, {
+      params: { ...paginationDto },
+    })
     .then((res) => res.data);
 };
 /** 카테고리 코드를 통해 상품 간략 정보 조회 */
 export const useGoodsOutlineByCategoryCode = (
   categoryCode?: string,
+  paginationDto?: DefaultPaginationDto,
 ): UseQueryResult<GoodsOutlineByIdRes[], AxiosError> => {
   return useQuery<GoodsOutlineByIdRes[], AxiosError>(
     generateGoodsOutlineByCategoryCodeKey(categoryCode),
-    () => getGoodsOutlineByCategoryCode(categoryCode),
+    () => getGoodsOutlineByCategoryCode(categoryCode, paginationDto),
     { enabled: !!categoryCode },
   );
 };
