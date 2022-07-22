@@ -19,10 +19,10 @@ import {
   useGoodsImageMutation,
   useProfile,
 } from '@project-lc/hooks';
-import { GoodsImageDto } from '@project-lc/shared-types';
+import { GoodsFormValues, GoodsImageDto } from '@project-lc/shared-types';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';
+import { uploadGoodsImageToS3 } from './GoodsRegistForm';
 import { GoodsRegistPictureOrderChangeDialog } from './GoodsRegistPictureOrderChangeDialog';
 import { GoodsRegistPictureDialog } from './GoodsRegistPictureDialog';
 

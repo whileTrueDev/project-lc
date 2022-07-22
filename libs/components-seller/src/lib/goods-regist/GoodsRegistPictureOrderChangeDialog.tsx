@@ -16,10 +16,9 @@ import {
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { useGoodsImageOrderMutation } from '@project-lc/hooks';
-import { GoodsImageDto } from '@project-lc/shared-types';
+import { GoodsFormValues, GoodsImageDto } from '@project-lc/shared-types';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { GoodsFormValues } from './GoodsRegistForm';
 import { PREVIEW_SIZE } from './GoodsRegistPictures';
 
 export function GoodsRegistPictureOrderChangeDialog({

@@ -36,6 +36,7 @@ import {
   useShippingGroupList,
 } from '@project-lc/hooks';
 import {
+  GoodsFormValues,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
   ShippingCalculTypeOptions,
@@ -46,7 +47,6 @@ import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ShippingGroupDetailModal } from '../ShippingGroupDetailModal';
 import ShippingPolicyForm from '../ShippingPolicyForm';
-import { GoodsFormValues } from './GoodsRegistForm';
 
 // 컬럼 헤더와 목록으로 이뤄진 상자 스타일 컴포넌트 - 배송비그룹 컨테이너, 연결된상품 컨테이너에 사용할 예정
 export function OutlinedContainerBox({
