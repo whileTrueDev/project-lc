@@ -125,7 +125,7 @@ export function AdminCategory(): JSX.Element {
       </Box>
 
       {/* 카테고리 목록 */}
-      <Stack w="500px" fontSize="sm" spacing={0}>
+      <Stack minW="500px" w="100%" maxW="600px" fontSize="sm" spacing={0}>
         {categoryTree.map((mainC) => (
           <CategoryItem
             key={mainC.id}

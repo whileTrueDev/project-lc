@@ -39,7 +39,7 @@ export const useOneGoodsCategory = (
   categoryCode?: string,
 ): UseQueryResult<useOneGoodsCategoryResult, AxiosError> => {
   return useQuery<useOneGoodsCategoryResult, AxiosError>(
-    'OneGoodsCategory',
+    ['OneGoodsCategory', categoryCode],
     () => getOneGoodsCategory(categoryCode),
     { enabled: !!categoryCode },
   );

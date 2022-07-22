@@ -28,7 +28,7 @@ import { Searcher } from './search-input/Searcher';
 
 export const kkshowNavHeight = 120;
 
-type KkshowNavbarVariant = 'blue' | 'white';
+export type KkshowNavbarVariant = 'blue' | 'white';
 interface KkshowNavbarProps {
   variant?: KkshowNavbarVariant;
 }

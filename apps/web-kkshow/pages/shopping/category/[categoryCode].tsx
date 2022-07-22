@@ -1,18 +1,16 @@
 import { Box } from '@chakra-ui/react';
 import KkshowLayout from '@project-lc/components-web-kkshow/KkshowLayout';
+import { CategoryGoodsList } from '@project-lc/components-web-kkshow/shopping/category/CategoryGoodsList';
 import {
   generateGoodsOutlineByCategoryCodeKey,
   getGoodsOutlineByCategoryCode,
   getKkshowShoppingCategories,
   kkshowShoppingCategoriesKey,
-  useGoodsOutlineByCategoryCode,
-  useOneGoodsCategory,
 } from '@project-lc/hooks';
 import { GoodsCategoryWithFamily } from '@project-lc/shared-types';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { AxiosError } from 'axios';
 import { GetStaticPaths, GetStaticProps } from 'next';
-import { useRouter } from 'next/router';
 import { dehydrate, DehydratedState } from 'react-query';
 
 type ShoppingCategoryProps = { dehydratedState: DehydratedState };
@@ -49,25 +47,10 @@ export const getStaticProps: GetStaticProps<
 };
 
 export function ShoppingCategory(): JSX.Element {
-  const router = useRouter();
-  const categoryCode = router.query.categoryCode as string;
-
-  const { data } = useOneGoodsCategory(categoryCode);
-  const { data: goodsList } = useGoodsOutlineByCategoryCode(data?.categoryCode);
-  console.log(goodsList);
-
   return (
     <Box overflow="hidden" position="relative">
       <KkshowLayout>
-        <Box maxW="5xl" margin="auto" w="100%" p={2}>
-          카테고리별 상품 목록 {categoryCode}
-        </Box>
-
-        <Box maxW="5xl" margin="auto" w="100%" p={2}>
-          {goodsList?.map((goods) => (
-            <Box key={goods.id}>{goods.goods_name}</Box>
-          ))}
-        </Box>
+        <CategoryGoodsList />
       </KkshowLayout>
     </Box>
   );

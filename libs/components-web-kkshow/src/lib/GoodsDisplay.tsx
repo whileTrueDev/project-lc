@@ -17,7 +17,7 @@ import { HTMLMotionProps, motion } from 'framer-motion';
 import Link from 'next/link';
 import { useMemo } from 'react';
 
-interface GoodsDisplayDetailProps {
+export interface GoodsDisplayDetailProps {
   goods: Pick<KkshowShoppingTabGoodsData, 'discountedPrice' | 'normalPrice' | 'name'>;
   fontSize?: HeadingProps['fontSize'];
   noOfLines?: HeadingProps['noOfLines'];
@@ -25,7 +25,7 @@ interface GoodsDisplayDetailProps {
 export const GoodsDisplayDetail = ({
   goods,
   fontSize = { base: 'md', md: 'lg' },
-  noOfLines = 1,
+  noOfLines = 2,
 }: GoodsDisplayDetailProps): JSX.Element => {
   const isDiscounted = useMemo(() => {
     if (!goods.discountedPrice) return false;
@@ -36,7 +36,7 @@ export const GoodsDisplayDetail = ({
     <Box minH={20}>
       <Heading
         fontSize={fontSize}
-        fontWeight="medium"
+        fontWeight="normal"
         noOfLines={isDiscounted ? noOfLines : 2}
       >
         {goods.name}
@@ -125,10 +125,12 @@ export const GoodsDisplayImage = ({
 export interface GoodsDisplayProps extends GoodsDisplayDetailProps {
   goods: KkshowShoppingTabGoodsData;
   variant?: 'small' | 'middle' | 'card';
+  detailProps?: Omit<GoodsDisplayDetailProps, 'goods'>;
 }
 export function GoodsDisplay({
   goods,
   variant = 'small',
+  detailProps,
 }: GoodsDisplayProps): JSX.Element {
   const borderRadius = 'xl';
 
@@ -160,7 +162,7 @@ export function GoodsDisplay({
   };
 
   return (
-    <LinkBox>
+    <LinkBox w="100%">
       <MotionBox whileHover="hover">
         <GoodsDisplayImage
           alt={goods.name}
@@ -178,7 +180,7 @@ export function GoodsDisplay({
         >
           <Link href={goods.linkUrl} passHref>
             <LinkOverlay href={goods.linkUrl}>
-              <GoodsDisplayDetail goods={goods} />
+              <GoodsDisplayDetail goods={goods} {...detailProps} />
             </LinkOverlay>
           </Link>
         </GoodsDisplayContainer>
