@@ -114,6 +114,7 @@ export class GoodsCategoryService {
     // 하위 카테고리가 이미지가 없는 경우 상위카테고리의 이미지로 채워넣는 작업
     const imageFilledResult = result.map((r) => {
       const tmp = { ...r };
+      if (tmp.imageSrc) return tmp;
       if (r.parentCategory) {
         if (r.parentCategory.imageSrc) tmp.imageSrc = r.parentCategory?.imageSrc;
         if (
