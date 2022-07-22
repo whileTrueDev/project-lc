@@ -18,11 +18,12 @@ import {
   useGoodsInformationSubjectById,
 } from '@project-lc/hooks';
 import { goodsRegistStore } from '@project-lc/stores';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 
 export function GoodsRegistInformationNotice(): JSX.Element | null {
   // 선택된 상품필수정보 품목
-  const [informationSubjectId, setInformationSubjectId] = useState<null | number>(null);
+  const informationSubjectId = goodsRegistStore((s) => s.informationSubjectId);
+  const setInformationSubjectId = goodsRegistStore((s) => s.setInformationSubjectId);
 
   // 상품필수정보 품목 목록 조회
   const { data: subjectList, isLoading: subjectListLoading } =
@@ -31,24 +32,18 @@ export function GoodsRegistInformationNotice(): JSX.Element | null {
   const { data, isLoading: informationSubjectLoading } =
     useGoodsInformationSubjectById(informationSubjectId);
 
-  const { initializeNotice, informationNotice, handleChange } = goodsRegistStore();
-
-  // 기본 품목 = '가공식품'
-  const defaultSubject = useMemo(
-    () => subjectList?.find((subject) => subject.subject === '가공식품'),
-    [subjectList],
-  );
-
-  // 맨처음 품목 선택 안된 경우 가공식품을 기본항목으로 선택함
-  useEffect(() => {
-    if (!informationSubjectId && !data && defaultSubject) {
-      setInformationSubjectId(defaultSubject.id);
-    }
-  }, [defaultSubject, informationSubjectId, data]);
+  const initializeNotice = goodsRegistStore((s) => s.initializeNotice);
+  const informationNotice = goodsRegistStore((s) => s.informationNotice);
+  const handleChange = goodsRegistStore((s) => s.handleChange);
 
   useEffect(() => {
     if (data) initializeNotice(data.items);
   }, [data, initializeNotice]);
+
+  // 입력해야 할 필수정보항목 객체
+  // 상품 수정시 EditForm에서 informationNotice 값이 상품작성시 값으로 초기화되어있으므로 그 값을 사용,
+  // 상품 생성시에는 카테고리 항목 선택하여 불러온 템플릿 그대로 사용
+  const templateObject = informationNotice || data;
 
   if (subjectListLoading) {
     return (
@@ -92,7 +87,7 @@ export function GoodsRegistInformationNotice(): JSX.Element | null {
         </FormControl>
       </Box>
 
-      <Box mb={2}>
+      <Box my={2}>
         <Text fontSize="xl" fontWeight="bold">
           품목별 필수 정보
           {data && (
@@ -112,9 +107,8 @@ export function GoodsRegistInformationNotice(): JSX.Element | null {
       {/* 선택된 품목에 따른 필수정보항목 */}
       <Stack>
         {informationSubjectLoading && <Spinner />}
-        {informationNotice &&
-          data &&
-          Object.keys(data.items as object).map((key) => (
+        {templateObject &&
+          Object.keys(templateObject).map((key) => (
             <FormControl key={key}>
               <Grid templateColumns="repeat(4, 1fr)" gap={2} mb={2}>
                 <GridItem colSpan={[4, 4, 1]}>
@@ -126,11 +120,7 @@ export function GoodsRegistInformationNotice(): JSX.Element | null {
                   <Input
                     size="sm"
                     placeholder="상세설명 및 상세이미지 참조"
-                    value={
-                      key === '소비자상담 관련 전화번호'
-                        ? data.items[key]
-                        : informationNotice[key]
-                    }
+                    value={templateObject[key]}
                     isReadOnly={key === '소비자상담 관련 전화번호'}
                     onChange={(e) => handleChange(key, e.target.value)}
                   />

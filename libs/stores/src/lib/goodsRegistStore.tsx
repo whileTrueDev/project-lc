@@ -4,9 +4,18 @@ import create from 'zustand';
 export interface GoodsRegistStore {
   selectedCategory: GoodsCategory | null;
   handleCaregorySelect: (cate: GoodsCategory | null) => void;
+
+  /** 상품정보제공고시 품목별 필수정보 저장 */
   informationNotice: Record<string, string>;
   initializeNotice: (noticeObj: Record<string, string>) => void;
+  /** 상품정보제공고시 품목별 필수정보 변경 핸들러 */
   handleChange: (key: string, value: string) => void;
+
+  /** 상품정보제공고시 품목 id */
+  informationSubjectId: number | null;
+  setInformationSubjectId: (id: number | null) => void;
+
+  /** --- 카테고리 관련 ------- */
   selectedCategories: GoodsCategory[];
   addToSelectedCategories: (cat: GoodsCategory) => void;
   removeFromSelectedCategories: (categoryId: number) => void;
@@ -43,5 +52,9 @@ export const goodsRegistStore = create<GoodsRegistStore>((set, get) => ({
   },
   setSelectedCategories: (categories: GoodsCategory[]) => {
     set({ selectedCategories: categories });
+  },
+  informationSubjectId: null,
+  setInformationSubjectId: (id: number | null) => {
+    set({ informationSubjectId: id });
   },
 }));
