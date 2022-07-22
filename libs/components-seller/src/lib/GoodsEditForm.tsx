@@ -15,7 +15,12 @@ import {
   useGoodsOnLiveFlag,
   useProfile,
 } from '@project-lc/hooks';
-import { GoodsByIdRes, RegistGoodsDto } from '@project-lc/shared-types';
+import {
+  GoodsByIdRes,
+  GoodsFormOption,
+  GoodsFormValues,
+  RegistGoodsDto,
+} from '@project-lc/shared-types';
 import { goodsRegistStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -29,10 +34,9 @@ import GoodsRegistDescription from './goods-regist/GoodsRegistDescription';
 import GoodsRegistExtraInfo from './goods-regist/GoodsRegistExtraInfo';
 import {
   addGoodsOptionInfo,
-  GoodsFormOption,
-  GoodsFormValues,
   saveContentsImageToS3,
 } from './goods-regist/GoodsRegistForm';
+import { GoodsRegistInformationNotice } from './goods-regist/GoodsRegistInformationNotice';
 import GoodsRegistKeywords from './goods-regist/GoodsRegistKeywords';
 import GoodsRegistMemo from './goods-regist/GoodsRegistMemo';
 import GoodsRegistPictures from './goods-regist/GoodsRegistPictures';
@@ -112,9 +116,17 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
   const informationNotice = goodsRegistStore((s) => s.informationNotice);
   const selectedCategories = goodsRegistStore((s) => s.selectedCategories);
   const resetSelectedCategories = goodsRegistStore((s) => s.resetSelectedCategories);
+  const setInformationSubjectId = goodsRegistStore((s) => s.setInformationSubjectId);
+
+  // 마운트 이후 최초 1번만 실행 - 상품정보제공고시 카테고리 품목 초기화
+  useEffect(() => {
+    setInformationSubjectId(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 카테고리 초기값 구성
   const setSelectedCategories = goodsRegistStore((s) => s.setSelectedCategories);
+  // 상품정보제공고시 내용 초기값 구성
   const initializeNotice = goodsRegistStore((s) => s.initializeNotice);
   useEffect(() => {
     if (goodsData) {
@@ -158,13 +170,16 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       min_purchase_ea: Number(min_purchase_ea) || 0,
       shippingGroupId: Number(shippingGroupId) || undefined,
       categoryId,
-      categoryIdList,
+      categoryIdList: selectedCategories.map((cat) => cat.id),
     };
 
-    // goodsRegistStore.selectedCategories에서 카테고리 id만 가져와서 할당
-    goodsDto.categoryIdList = selectedCategories.map((cat) => cat.id);
+    // * 상품 카테고리 확인
+    if (goodsDto.categoryIdList.length < 1) {
+      toast({ description: '상품 카테고리를 선택해주세요', status: 'warning' });
+      return;
+    }
 
-    // 상품필수정보 (품목별 정보제공고시 정보)
+    // 상품필수정보 (품목별 정보제공고시 정보) => 수정페이지에서는 상품등록시 작성한 값이 존재하므로 상품필수정보 품목(informationSubjectId) 선택여부는 확인하지 않는다
     const informationNoticeDto: Record<string, string> = {};
     Object.entries(informationNotice).forEach(([key, value]) => {
       if (!value) {
@@ -176,24 +191,11 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
     });
     goodsDto.informationNoticeContents = JSON.stringify(informationNoticeDto);
 
-    if (goodsDto.categoryIdList.length < 1) {
-      toast({ description: '상품 카테고리를 선택해주세요', status: 'warning' });
-      return;
-    }
-
-    if (!shippingGroupId) {
-      // 배송비정책 그룹을 선택하지 않은 경우
+    // * 상품필수정보 내용 확인
+    if (goodsDto.informationNoticeContents === '{}') {
+      // 상품정보제공고시 내용이 빈객체인 경우 - 항목 선택 안함 혹은 값을 입력하지 않음
       toast({
-        title: '배송비 정책을 선택해주세요',
-        status: 'warning',
-      });
-      return;
-    }
-
-    if (!image || image.length < 1) {
-      // 등록된 사진이 없는 경우
-      toast({
-        title: '상품 사진을 1개 이상 등록해주세요',
+        description: '상품정보제공고시 카테고리 품목을 선택하고 값을 입력해주세요',
         status: 'warning',
       });
       return;
@@ -203,6 +205,15 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       // 등록된 옵션이 없는 경우
       toast({
         title: '상품 옵션을 1개 이상 등록해주세요',
+        status: 'warning',
+      });
+      return;
+    }
+
+    if (!image || image.length < 1) {
+      // 등록된 사진이 없는 경우
+      toast({
+        title: '상품 사진을 1개 이상 등록해주세요',
         status: 'warning',
       });
       return;
@@ -248,6 +259,15 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       return;
     }
 
+    if (!shippingGroupId) {
+      // 배송비정책 그룹을 선택하지 않은 경우
+      toast({
+        title: '배송비 정책을 선택해주세요',
+        status: 'warning',
+      });
+      return;
+    }
+
     editGoodsRequest({ id, dto: goodsDto })
       .then(() => {
         toast({
@@ -255,6 +275,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
           status: 'success',
         });
         resetSelectedCategories(); // GoodsRegistStore에서 선택된 카테고리 목록 초기화
+        setInformationSubjectId(null); // 선택된 품목id 초기화
         router.push(`/mypage/goods/${id}`);
       })
       .catch((error) => {
@@ -310,7 +331,8 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
         {/* 상품 카테고리 정보 */}
         <GoodsRegistCategory />
 
-        {/* ?//TODO : 상품정보제공고시 추가 */}
+        {/* 상품정보제공고시 */}
+        <GoodsRegistInformationNotice />
 
         {/* 판매정보 */}
         <GoodsRegistDataSales />
