@@ -25,10 +25,10 @@ export function ShoppingGoodsOfTheWeek(): JSX.Element {
       bulletSize={[3, 4]}
       distance={5}
     >
-      <Heading as="p" fontSize="2xl" color="blue.500">
+      <Heading as="p" fontSize={['xl', '2xl']} color="blue.500">
         시선 집중!
       </Heading>
-      <Heading as="p" fontSize="2xl" color="blue.500">
+      <Heading as="p" fontSize={['xl', '2xl']} color="blue.500">
         금주의 상품
       </Heading>
     </KkshowMainTitle>
@@ -41,7 +41,7 @@ export function ShoppingGoodsOfTheWeek(): JSX.Element {
           <LinkOverlay href={active.linkUrl}>
             <GoodsDisplayDetail
               goods={active}
-              fontSize={['xl', 'xl', '2xl']}
+              fontSize={['md', 'lg', '2xl']}
               noOfLines={2}
             />
           </LinkOverlay>

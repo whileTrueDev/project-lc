@@ -22,7 +22,7 @@ export function ShoppingNewLineUp(): JSX.Element {
         bulletVariant="outline"
         color="blue.500"
       >
-        <Heading as="p" color="blue.500" fontSize="2xl">
+        <Heading as="p" color="blue.500" fontSize={['xl', '2xl']}>
           놓치면 아쉬운 신상 라인업
         </Heading>
       </KkshowMainTitle>

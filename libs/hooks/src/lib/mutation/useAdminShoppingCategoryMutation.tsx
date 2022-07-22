@@ -3,6 +3,7 @@ import { KkshowShoppingTabCategoryDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
+import { kkshowShoppingCategoriesKey } from '../queries/useKkshowShopping';
 
 export type useAdminShoppingCategoryAddMutationDto = KkshowShoppingTabCategoryDto;
 export type useAdminShoppingCategoryAddMutationRes = KkshowShoppingTabCategory;
@@ -29,6 +30,7 @@ export const useAdminShoppingCategoryAddMutation = (): UseMutationResult<
       onSuccess: (data) => {
         queryClient.invalidateQueries('GoodsCategory');
         queryClient.invalidateQueries('AdminCategory');
+        queryClient.invalidateQueries(kkshowShoppingCategoriesKey);
       },
     },
   );
@@ -58,6 +60,7 @@ export const useAdminShoppingCategoryRemoveMutation = (): UseMutationResult<
       onSuccess: (data) => {
         queryClient.invalidateQueries('GoodsCategory');
         queryClient.invalidateQueries('AdminCategory');
+        queryClient.invalidateQueries(kkshowShoppingCategoriesKey);
       },
     },
   );

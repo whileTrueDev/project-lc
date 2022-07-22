@@ -1,4 +1,7 @@
-import { KkshowShoppingTabResData } from '@project-lc/shared-types';
+import {
+  GoodsCategoryWithFamily,
+  KkshowShoppingTabResData,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
@@ -19,5 +22,24 @@ export const useKkshowShopping = (): UseQueryResult<
   return useQuery<KkshowShoppingTabResData, AxiosError>(
     kkshowShoppingQueryKey,
     getKkshowShopping,
+  );
+};
+
+// 크크마켓 전시 카테고리 목록 조회
+export const kkshowShoppingCategoriesKey = 'KkshowShoppingCategories';
+export const getKkshowShoppingCategories = async (): Promise<
+  GoodsCategoryWithFamily[]
+> => {
+  return axios
+    .get<GoodsCategoryWithFamily[]>('/kkshow-shopping/categories')
+    .then((res) => res.data);
+};
+export const useKkshowShoppingCategories = (): UseQueryResult<
+  GoodsCategoryWithFamily[],
+  AxiosError
+> => {
+  return useQuery<GoodsCategoryWithFamily[], AxiosError>(
+    kkshowShoppingCategoriesKey,
+    getKkshowShoppingCategories,
   );
 };
