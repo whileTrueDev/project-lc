@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { KkshowShoppingTabCategory } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 
 @Injectable()
@@ -10,11 +11,16 @@ export class KkshowShoppingCategoryService {
     return result.map((x) => x.goodsCategoryCode);
   }
 
-  public async add(): Promise<any> {
-    // TODO: 카테고리 목록 추가 구성
+  public async add(categoryCode: string): Promise<KkshowShoppingTabCategory> {
+    return this.prisma.kkshowShoppingTabCategory.create({
+      data: { goodsCategoryCode: categoryCode },
+    });
   }
 
-  public async remove(): Promise<any> {
-    // TODO: 카테고리 목록 제거 구성
+  public async remove(categoryCode: string): Promise<boolean> {
+    const result = await this.prisma.kkshowShoppingTabCategory.delete({
+      where: { goodsCategoryCode: categoryCode },
+    });
+    return !!result.goodsCategoryCode;
   }
 }

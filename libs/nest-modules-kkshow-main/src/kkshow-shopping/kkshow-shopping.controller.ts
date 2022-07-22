@@ -23,7 +23,6 @@ export class KkshowShoppingController {
   @Get('categories')
   public async getCategoriesToDisplay(): Promise<GoodsCategoryWithFamily[]> {
     const codes = await this.shoppingCategoryService.findAll();
-    console.log(codes);
     return this.goodsCategoryService.findCategoriesByCodes(codes);
   }
 }
