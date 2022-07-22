@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { MileageSetting } from '@prisma/client';
-import { MileageSettingDto } from '@project-lc/shared-types';
+import { MileageSettingDto, MileageSettingUpdateDto } from '@project-lc/shared-types';
 
 @Injectable()
 export class MileageSettingService {
@@ -23,12 +23,14 @@ export class MileageSettingService {
   }
 
   /** 마일리지 설정 수정 */
-  updateMileageSetting(dto: MileageSettingDto & { id: number }): Promise<MileageSetting> {
+  updateMileageSetting(
+    dto: MileageSettingUpdateDto & { id: number },
+  ): Promise<MileageSetting> {
     return this.prismaService.mileageSetting.update({
       where: { id: dto.id },
       data: {
-        defaultMileagePercent: dto.defaultMileagePercent || undefined,
-        mileageStrategy: dto.mileageStrategy || undefined,
+        defaultMileagePercent: dto.defaultMileagePercent,
+        mileageStrategy: dto.mileageStrategy,
       },
     });
   }
