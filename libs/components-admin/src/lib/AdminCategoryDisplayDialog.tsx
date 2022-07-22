@@ -8,6 +8,8 @@ import {
 import { CategoryWithGoodsCount } from '@project-lc/shared-types';
 import { useMemo } from 'react';
 
+const MAX_CATEGORY_NUM = 12;
+const MIN_CATEGORY_NUM = 12;
 export type CategoryItemType = CategoryWithGoodsCount & {
   childrenCategories?: CategoryItemType[];
   depth: number;
@@ -71,11 +73,11 @@ export function CategoryDisplayDiaglog({
   const isInValid = useMemo(() => {
     if (category.kkshowShoppingTabCategory) {
       // 카테고리 목록에서 제거하는 경우, 5개이하가 되면 안됨
-      return !!((displayedCategories?.length || 0) <= 5);
+      return !!((displayedCategories?.length || 0) <= MIN_CATEGORY_NUM);
     }
     // 새로 추가하는 경우 10개 초과로 설정할 수 없음.
     if (!displayedCategories?.length) return false;
-    if (displayedCategories.length >= 10) return true;
+    if (displayedCategories.length >= MAX_CATEGORY_NUM) return true;
     return false;
   }, [category.kkshowShoppingTabCategory, displayedCategories?.length]);
 
@@ -94,14 +96,14 @@ export function CategoryDisplayDiaglog({
           </ListItem>
           <ListItem>
             <Text>
-              전시 카테고리의 최소 개수는 5개입니다. 카테고리 제거로 총 카테고리 개수가
-              5개 미만이 되는 경우 삭제가 불가능합니다.
+              전시 카테고리의 최소 개수는 {MIN_CATEGORY_NUM}개입니다. 카테고리 제거로 총
+              카테고리 개수가 5개 미만이 되는 경우 삭제가 불가능합니다.
             </Text>
           </ListItem>
           <ListItem>
             <Text>
-              전시 카테고리의 최대 개수는 10개 입니다. 카테고리 추가로 최대 개수가 10개를
-              초과하게 되는 경우 진행이 불가합니다.
+              전시 카테고리의 최대 개수는 {MAX_CATEGORY_NUM}개 입니다. 카테고리 추가로
+              최대 개수가 {MAX_CATEGORY_NUM}개를 초과하게 되는 경우 진행이 불가합니다.
             </Text>
           </ListItem>
         </UnorderedList>
