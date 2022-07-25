@@ -1,8 +1,11 @@
+/* eslint-disable react/no-array-index-key */
 import {
   Box,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
+  Button,
+  Center,
   GridItem,
   LinkBox,
   LinkOverlay,
@@ -12,40 +15,47 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useGoodsOutlineByCategoryCode, useOneGoodsCategory } from '@project-lc/hooks';
+import { GoodsOutlineByIdRes } from '@project-lc/shared-types';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useMemo } from 'react';
+import { Fragment, useCallback, useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { GoodsDisplay } from '../../GoodsDisplay';
 
 export function CategoryGoodsList(): JSX.Element | null {
   const router = useRouter();
   const categoryCode = router.query.categoryCode as string;
   const { data: category } = useOneGoodsCategory(categoryCode);
-  const { data, isLoading } = useGoodsOutlineByCategoryCode(category?.categoryCode);
+  const { data, isLoading, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useGoodsOutlineByCategoryCode(category?.categoryCode, { take: 3 });
 
-  const goodsList = useMemo(() => {
-    return (
-      data
-        ?.filter((goods) => goods.options.find((x) => x.default_option === 'y'))
-        .map((goods) => {
-          const defaultOpt = goods.options.find((x) => x.default_option === 'y');
-          const normalPrice = Number.isNaN(Number(defaultOpt?.consumer_price))
-            ? 0
-            : Number(defaultOpt?.consumer_price);
-          const discountedPrice = Number.isNaN(Number(defaultOpt?.price))
-            ? 0
-            : Number(defaultOpt?.price);
-          return {
-            id: goods.id,
-            name: goods.goods_name,
-            imageUrl: goods.image[0]?.image,
-            linkUrl: `/goods/${goods.id}`,
-            normalPrice,
-            discountedPrice,
-          };
-        }) || []
-    );
-  }, [data]);
+  // ref 전달한 더보기버튼이 화면에 들어왔는지 확인하여 다음목록 요청
+  const { ref, inView } = useInView({ threshold: 1 });
+  useEffect(() => {
+    if (inView) fetchNextPage();
+  }, [fetchNextPage, inView]);
+
+  // goods outline 데이터를 GoodsDisplay 데이터로 변환하는 작업
+  const makeGoodsOutlineToGoodsDisplay = useCallback(
+    (goodsOutline: GoodsOutlineByIdRes) => {
+      const defaultOpt = goodsOutline.options.find((x) => x.default_option === 'y');
+      const normalPrice = Number.isNaN(Number(defaultOpt?.consumer_price))
+        ? 0
+        : Number(defaultOpt?.consumer_price);
+      const discountedPrice = Number.isNaN(Number(defaultOpt?.price))
+        ? 0
+        : Number(defaultOpt?.price);
+      return {
+        id: goodsOutline.id,
+        name: goodsOutline.goods_name,
+        imageUrl: goodsOutline.image[0]?.image,
+        linkUrl: `/goods/${goodsOutline.id}`,
+        normalPrice,
+        discountedPrice,
+      };
+    },
+    [],
+  );
 
   if (!category) return null;
   return (
@@ -76,18 +86,37 @@ export function CategoryGoodsList(): JSX.Element | null {
       </SimpleGrid>
 
       <SimpleGrid my={10} gap={6} columns={[1, 2, 4]}>
-        {isLoading && <Spinner />}
-        {goodsList.map((goodsOutline) => (
-          <GridItem
-            key={goodsOutline.id}
-            display="flex"
-            justifyContent="stretch"
-            alignItems="stretch"
-          >
-            <GoodsDisplay goods={goodsOutline} detailProps={{ noOfLines: 2 }} />
-          </GridItem>
+        {data?.pages?.map((goodsList, idx) => (
+          <Fragment key={`GoodsOutlineByCategory${idx}`}>
+            {goodsList?.edges?.map((goodsOutline) => (
+              <GridItem
+                key={goodsOutline.id}
+                display="flex"
+                justifyContent="stretch"
+                alignItems="stretch"
+              >
+                <GoodsDisplay
+                  goods={makeGoodsOutlineToGoodsDisplay(goodsOutline)}
+                  detailProps={{ noOfLines: 2 }}
+                />
+              </GridItem>
+            ))}
+          </Fragment>
         ))}
       </SimpleGrid>
+
+      <Center my={10}>
+        {hasNextPage && (
+          <Button
+            ref={ref}
+            isLoading={isFetchingNextPage}
+            onClick={() => fetchNextPage()}
+          >
+            더보기
+          </Button>
+        )}
+        {(isLoading || isFetching) && <Spinner />}
+      </Center>
     </Box>
   );
 }

@@ -3,9 +3,15 @@ import {
   DefaultPaginationDto,
   GoodsByIdRes,
   GoodsOutlineByIdRes,
+  GoodsOutlineByIdPaginationRes,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useQuery, UseQueryResult } from 'react-query';
+import {
+  useInfiniteQuery,
+  UseInfiniteQueryResult,
+  useQuery,
+  UseQueryResult,
+} from 'react-query';
 import axios from '../../axios';
 
 export const generateGoodsByIdKey = (
@@ -54,22 +60,27 @@ export const generateGoodsOutlineByCategoryCodeKey = (
 export const getGoodsOutlineByCategoryCode = async (
   categoryCode?: string,
   paginationDto?: DefaultPaginationDto,
-): Promise<GoodsOutlineByIdRes[]> => {
+): Promise<GoodsOutlineByIdPaginationRes> => {
   return axios
-    .get<GoodsOutlineByIdRes[]>(`/goods/by-category/${categoryCode}`, {
+    .get<GoodsOutlineByIdPaginationRes>(`/goods/by-category/${categoryCode}`, {
       params: { ...paginationDto },
     })
     .then((res) => res.data);
 };
-/** 카테고리 코드를 통해 상품 간략 정보 조회 */
+/** 카테고리 코드를 통해 상품 간략 정보 조회 + 페이지네이션 */
 export const useGoodsOutlineByCategoryCode = (
   categoryCode?: string,
   paginationDto?: DefaultPaginationDto,
-): UseQueryResult<GoodsOutlineByIdRes[], AxiosError> => {
-  return useQuery<GoodsOutlineByIdRes[], AxiosError>(
+): UseInfiniteQueryResult<GoodsOutlineByIdPaginationRes, AxiosError> => {
+  return useInfiniteQuery<GoodsOutlineByIdPaginationRes, AxiosError>(
     generateGoodsOutlineByCategoryCodeKey(categoryCode),
-    () => getGoodsOutlineByCategoryCode(categoryCode, paginationDto),
-    { enabled: !!categoryCode },
+    ({ pageParam = 0 }) => {
+      return getGoodsOutlineByCategoryCode(categoryCode, {
+        ...paginationDto,
+        skip: pageParam,
+      });
+    },
+    { enabled: !!categoryCode, getNextPageParam: (lastPage) => lastPage?.nextCursor },
   );
 };
 

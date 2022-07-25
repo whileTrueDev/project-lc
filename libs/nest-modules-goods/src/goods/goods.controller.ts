@@ -31,6 +31,7 @@ import {
   GoodsImageDto,
   GoodsListRes,
   GoodsOptionWithStockInfo,
+  GoodsOutlineByIdPaginationRes,
   GoodsOutlineByIdRes,
   RegistGoodsDto,
   SellerGoodsSortColumn,
@@ -165,7 +166,7 @@ export class GoodsController {
   getGoodsByCategory(
     @Param('categoryCode') categoryCode: string,
     @Query(new ValidationPipe({ transform: true })) dto?: DefaultPaginationDto,
-  ): Promise<GoodsOutlineByIdRes[]> {
+  ): Promise<GoodsOutlineByIdPaginationRes> {
     return this.goodsService.getGoodsOutlineByCategory(categoryCode, dto);
   }
 

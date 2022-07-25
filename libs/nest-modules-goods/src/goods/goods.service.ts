@@ -21,6 +21,7 @@ import {
   GoodsOptionDto,
   GoodsOptionsWithSupplies,
   GoodsOptionWithStockInfo,
+  GoodsOutlineByIdPaginationRes,
   GoodsOutlineByIdRes,
   RegistGoodsDto,
   TotalStockInfo,
@@ -423,11 +424,12 @@ export class GoodsService {
   public async getGoodsOutlineByCategory(
     categoryCode: string,
     paginationOpts?: DefaultPaginationDto,
-  ): Promise<GoodsOutlineByIdRes[]> {
+  ): Promise<GoodsOutlineByIdPaginationRes> {
     const { skip, take } = paginationOpts;
-    return this.prisma.goods.findMany({
+    const realTake = take + 1;
+    const result = await this.prisma.goods.findMany({
       skip,
-      take,
+      take: realTake,
       where: { categories: { every: { categoryCode } } },
       select: {
         id: true,
@@ -439,6 +441,13 @@ export class GoodsService {
         image: { orderBy: { cut_number: 'asc' } },
       },
     });
+    const resResult = result.slice(0, take);
+    const hasNextPage = result.length === realTake;
+    return {
+      edges: resResult,
+      hasNextPage,
+      nextCursor: hasNextPage ? take + skip : undefined,
+    };
   }
 
   // 상품 등록
