@@ -1,5 +1,6 @@
-import { Box, Button, Center, Divider, Flex, Text } from '@chakra-ui/react';
+import { Box, Button, Center, Divider, Flex, Spinner, Text } from '@chakra-ui/react';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
+import { useDefaultMileageSetting } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
 import { getCustomerWebHost } from '@project-lc/utils';
@@ -54,29 +55,35 @@ export function MileageBenefit({
   mileage,
 }: {
   productPrice: number;
+  /** 사용한 마일리지 */
   mileage?: number;
 }): JSX.Element {
+  const { data: mileageSettingData, isLoading } = useDefaultMileageSetting();
+  if (isLoading) return <Spinner />;
+  if (!mileageSettingData || mileageSettingData.mileageStrategy === 'noMileage') {
+    return (
+      <Flex justifyContent="space-between" h="60px" alignItems="center">
+        <Text>적립 혜택이 없습니다</Text>
+      </Flex>
+    );
+  }
   return (
     <Flex justifyContent="space-between" h="60px" alignItems="center">
-      {mileageSetting.mileageStrategy === 'noMileage' ? (
-        <Text>적립 혜택이 없습니다</Text>
-      ) : (
-        <Box>
-          <Text as="span" fontWeight="bold">
-            {mileageSetting.mileageStrategy === 'onPaymentPrice' &&
-              (
-                productPrice *
-                (mileageSetting.defaultMileagePercent * 0.01)
-              ).toLocaleString()}
-            {mileageSetting.mileageStrategy === 'onPaymentPriceExceptMileageUsage' &&
-              (
-                (productPrice - (mileage || 0)) *
-                (mileageSetting.defaultMileagePercent * 0.01)
-              ).toLocaleString()}
-          </Text>
-          <Text as="span">원 적립예정</Text>
-        </Box>
-      )}
+      <Box>
+        <Text as="span" fontWeight="bold">
+          {mileageSetting.mileageStrategy === 'onPaymentPrice' &&
+            (
+              productPrice *
+              (mileageSetting.defaultMileagePercent * 0.01)
+            ).toLocaleString()}
+          {mileageSetting.mileageStrategy === 'onPaymentPriceExceptMileageUsage' &&
+            (
+              (productPrice - (mileage || 0)) *
+              (mileageSetting.defaultMileagePercent * 0.01)
+            ).toLocaleString()}
+        </Text>
+        <Text as="span">원 적립예정</Text>
+      </Box>
     </Flex>
   );
 }

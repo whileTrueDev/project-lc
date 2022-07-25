@@ -21,6 +21,7 @@ export const useAdminMileageSettingUpdateMutation = (): UseMutationResult<
         .patch<MileageSetting>(`/mileage-setting/${dto.id}`, {
           defaultMileagePercent: dto.defaultMileagePercent,
           mileageStrategy: dto.mileageStrategy,
+          useMileageFeature: dto.useMileageFeature,
         })
         .then((res) => res.data),
     {

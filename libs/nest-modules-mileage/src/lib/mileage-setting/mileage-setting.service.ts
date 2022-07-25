@@ -31,6 +31,7 @@ export class MileageSettingService {
       data: {
         defaultMileagePercent: dto.defaultMileagePercent,
         mileageStrategy: dto.mileageStrategy,
+        useMileageFeature: dto.useMileageFeature,
       },
     });
   }

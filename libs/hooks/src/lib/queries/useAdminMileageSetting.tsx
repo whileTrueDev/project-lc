@@ -8,7 +8,10 @@ export const getAdminMileageSetting = async (): Promise<MileageSetting> => {
 };
 
 /** 관리자 기본 마일리지 세팅 조회 훅 */
-export const useAdminMileageSetting = (): UseQueryResult<MileageSetting, AxiosError> => {
+export const useDefaultMileageSetting = (): UseQueryResult<
+  MileageSetting,
+  AxiosError
+> => {
   return useQuery<MileageSetting, AxiosError>(
     'AdminMileageSetting',
     getAdminMileageSetting,

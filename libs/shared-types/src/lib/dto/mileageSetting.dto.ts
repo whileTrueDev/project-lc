@@ -1,5 +1,5 @@
 import { MileageStrategy } from '@prisma/client';
-import { IsNumber, IsEnum, IsOptional } from 'class-validator';
+import { IsNumber, IsEnum, IsOptional, IsBoolean } from 'class-validator';
 
 export class MileageSettingDto {
   @IsNumber()
@@ -17,4 +17,8 @@ export class MileageSettingUpdateDto {
   @IsEnum(MileageStrategy)
   @IsOptional()
   mileageStrategy?: MileageStrategy;
+
+  @IsBoolean()
+  @IsOptional()
+  useMileageFeature?: boolean;
 }

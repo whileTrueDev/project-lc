@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { MileageSetting, MileageStrategy } from '@prisma/client';
 import {
-  useAdminMileageSetting,
+  useDefaultMileageSetting,
   useAdminMileageSettingUpdateMutation,
 } from '@project-lc/hooks';
 import { useForm, Controller } from 'react-hook-form';
@@ -20,13 +20,15 @@ import { mileageStrategiesToKorean } from '@project-lc/components-constants/admi
 import { useEffect } from 'react';
 import { percentageRateMinMax } from '../AdminBroadcasterProductPromotionSection';
 
-type formData = Pick<MileageSetting, 'defaultMileagePercent' | 'mileageStrategy'>;
+type formData = Pick<MileageSetting, 'defaultMileagePercent' | 'mileageStrategy'> & {
+  useMileageFeature: 'use' | 'notUse';
+};
 
 const DEFAULT_MILEAGE_SETTING_ID = 1;
 
 export function AdminOrderMileageSetting(): JSX.Element {
   const toast = useToast();
-  const { data } = useAdminMileageSetting();
+  const { data } = useDefaultMileageSetting();
   const {
     register,
     handleSubmit,
@@ -38,24 +40,37 @@ export function AdminOrderMileageSetting(): JSX.Element {
     defaultValues: {
       defaultMileagePercent: data?.defaultMileagePercent || 1,
       mileageStrategy: data?.mileageStrategy || 'noMileage',
+      useMileageFeature: data?.useMileageFeature === true ? 'use' : 'notUse',
     },
   });
 
   useEffect(() => {
     if (data) {
+      console.log('effect', data);
       setValue('defaultMileagePercent', data.defaultMileagePercent);
       setValue('mileageStrategy', data.mileageStrategy);
+      setValue('useMileageFeature', data.useMileageFeature === true ? 'use' : 'notUse');
     }
-  }, [data, setValue]);
+    // 최초 한번만 실행
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const updateMileageSetting = useAdminMileageSettingUpdateMutation();
 
   const onSubmit = (submitData: formData): void => {
-    console.log(submitData);
+    let useMileageFeature;
+    if (submitData.useMileageFeature === 'use') useMileageFeature = true;
+    if (submitData.useMileageFeature === 'notUse') useMileageFeature = false;
+
+    const dto = {
+      id: DEFAULT_MILEAGE_SETTING_ID,
+      ...submitData,
+      useMileageFeature,
+    };
+
     updateMileageSetting
-      .mutateAsync({ id: DEFAULT_MILEAGE_SETTING_ID, ...submitData })
+      .mutateAsync(dto)
       .then((res) => {
-        console.log(res);
         toast({ title: '기본 마일리지 설정 변경 성공', status: 'success' });
         reset(submitData); // isDirty값을 false로 돌리기 위해 default 값을 변경
       })
@@ -82,6 +97,31 @@ export function AdminOrderMileageSetting(): JSX.Element {
         )}
       </Stack>
 
+      <FormControl isInvalid={!!errors.useMileageFeature}>
+        <Stack direction="row" alignItems="center">
+          <Text mr={1}>마일리지 기능 사용여부</Text>
+          <Controller
+            name="useMileageFeature"
+            control={control}
+            render={({ field }) => (
+              <Select
+                placeholder="마일리지 기능 사용여부를 선택하세요"
+                {...field}
+                w="200px"
+              >
+                <option value="use">사용</option>
+                <option value="notUse">미사용</option>
+              </Select>
+            )}
+            rules={{
+              required: '마일리지 기능 사용여부를 선택하세요',
+            }}
+          />
+        </Stack>
+
+        <FormErrorMessage>{errors.useMileageFeature?.message}</FormErrorMessage>
+      </FormControl>
+
       <FormControl isInvalid={!!errors.defaultMileagePercent}>
         <InputGroup alignItems="center">
           <Text mr={1}>상품 구매시 마일리지 적립률</Text>
@@ -106,7 +146,7 @@ export function AdminOrderMileageSetting(): JSX.Element {
             name="mileageStrategy"
             control={control}
             render={({ field }) => (
-              <Select placeholder="마일리지 적립방식을 선택하세요" {...field} w="400px">
+              <Select placeholder="마일리지 적립방식을 선택하세요" {...field} w="700px">
                 {Object.keys(MileageStrategy).map((strategy) => (
                   <option value={strategy} key={strategy}>
                     {mileageStrategiesToKorean[strategy as MileageStrategy]}
