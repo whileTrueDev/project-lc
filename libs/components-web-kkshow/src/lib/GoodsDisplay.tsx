@@ -100,7 +100,7 @@ export const GoodsDisplayImage = ({
   <AspectRatio ratio={ratio}>
     <Box
       position="relative"
-      maxWidth={340}
+      maxWidth={{ base: 'unset', md: 340 }}
       borderRadius={rest.borderRadius || 'xl'}
       {...rest}
     >
