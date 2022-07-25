@@ -6,7 +6,6 @@ import {
   GridItem,
   Icon,
   Link,
-  Text,
   Stack,
   Tooltip,
   useColorModeValue,
@@ -25,10 +24,8 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import { MdAccountCircle } from 'react-icons/md';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import KkshowSubNavbar from './KkshowSubNavbar';
 import { Searcher } from './search-input/Searcher';
-
-export const kkshowNavHeight = 120;
 
 type KkshowNavbarVariant = 'blue' | 'white';
 interface KkshowNavbarProps {
@@ -64,7 +61,6 @@ export function KkshowNavbar({ variant = 'blue' }: KkshowNavbarProps): JSX.Eleme
       bg={palette.bg}
       color={palette.color}
       pt={{ base: 0, md: 6 }}
-      minH={kkshowNavHeight}
       w="100%"
       zIndex="sticky"
     >
@@ -100,7 +96,8 @@ export function KkshowNavbar({ variant = 'blue' }: KkshowNavbarProps): JSX.Eleme
         {/* 우측 */}
         <KkshowNavbarRightButtonSection />
       </Flex>
-      <SubNav />
+      {/* 서브내비 (링크 모음 섹션) */}
+      <KkshowSubNavbar />
     </Box>
   );
 }
@@ -225,28 +222,5 @@ function LoginButton(): JSX.Element {
         로그인
       </Button>
     </Tooltip>
-  );
-}
-
-function SubNav(): JSX.Element {
-  const subNavLinks = ['카테고리1', '카테고리2', '카테고리3', '카테고리4', '다른링크1'];
-  return (
-    <Flex
-      display={{ base: 'none', md: 'flex' }}
-      maxW="5xl"
-      m="auto"
-      minH="60px"
-      px={4}
-      py={4}
-      gap={4}
-    >
-      {subNavLinks.map((subNavLink) => (
-        <NextLink key={subNavLink} href="#" passHref>
-          <Link pr={2}>
-            <Text>{subNavLink}</Text>
-          </Link>
-        </NextLink>
-      ))}
-    </Flex>
   );
 }
