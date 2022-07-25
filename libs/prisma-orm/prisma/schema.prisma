@@ -45,7 +45,7 @@ model MileageSetting {
   id                    Int             @id @default(autoincrement())
   defaultMileagePercent Int             @default(0) // 상품 구매시 결제금액의 몇퍼센트를 적립금으로 지금할지
   mileageStrategy       MileageStrategy @default(noMileage) // 적립금 지급방식
-  useMileageFeature     Boolean         @default(false) // 마일리지 기능사용여부 저장 기본 false
+  useMileageFeature     Boolean         @default(false) // 마일리지 적립기능 사용여부 저장, 기본 false
 }
 
 // [enum] 적립금 지급 방식(결제시 적립금을 사용한 경우)
