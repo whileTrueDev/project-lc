@@ -1,14 +1,29 @@
-import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard, AdminGuard } from '@project-lc/nest-modules-authguard';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+  UseInterceptors,
+  ValidationPipe,
+} from '@nestjs/common';
+import { KkshowShoppingTabCategory } from '@prisma/client';
+import { HttpCacheInterceptor, CacheClearKeys } from '@project-lc/nest-core';
+import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   KkshowMainService,
+  KkshowShoppingCategoryService,
   KkshowShoppingService,
 } from '@project-lc/nest-modules-kkshow-main';
 import {
-  KkshowMainResData,
   KkshowMainDto,
-  KkshowShoppingTabResData,
+  KkshowMainResData,
   KkshowShoppingDto,
+  KkshowShoppingTabCategoryDto,
+  KkshowShoppingTabResData,
 } from '@project-lc/shared-types';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
@@ -17,6 +32,7 @@ export class AdminKkshowMainController {
   constructor(
     private readonly kkshowMainService: KkshowMainService,
     private readonly kkshowShoppingService: KkshowShoppingService,
+    private readonly kkshowShoppingCategoryService: KkshowShoppingCategoryService,
   ) {}
 
   /** ================================= */
@@ -45,5 +61,25 @@ export class AdminKkshowMainController {
     @Body() data: KkshowShoppingDto,
   ): Promise<KkshowShoppingTabResData> {
     return this.kkshowShoppingService.upsert(data);
+  }
+
+  // 쇼핑페이지 카테고리 목록 요소 추가
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('goods-category', 'goods')
+  @Post('kkshow-shopping/category')
+  async addCategory(
+    @Body(new ValidationPipe({ transform: true })) dto: KkshowShoppingTabCategoryDto,
+  ): Promise<KkshowShoppingTabCategory> {
+    return this.kkshowShoppingCategoryService.add(dto.categoryCode);
+  }
+
+  // 쇼핑페이지 카테고리 목록 요소 제거
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('goods-category', 'goods')
+  @Delete('kkshow-shopping/category/:categoryCode')
+  async removeCategory(
+    @Param(new ValidationPipe({ transform: true })) dto: KkshowShoppingTabCategoryDto,
+  ): Promise<boolean> {
+    return this.kkshowShoppingCategoryService.remove(dto.categoryCode);
   }
 }

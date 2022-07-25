@@ -1,6 +1,18 @@
-import { Box, Button, Heading, Stack, Text, useDisclosure } from '@chakra-ui/react';
+import { AddIcon } from '@chakra-ui/icons';
+import {
+  Box,
+  Button,
+  Heading,
+  ListItem,
+  Stack,
+  Text,
+  UnorderedList,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { useAdminCategory } from '@project-lc/hooks';
 import { useState } from 'react';
+import { GiLighthouse } from 'react-icons/gi';
+import { MdImage } from 'react-icons/md';
 import { CategoryCreateFormDialog } from './AdminCategoryCreateDialog';
 import { CategoryItem } from './AdminCategoryItem';
 
@@ -71,20 +83,49 @@ export function AdminCategory(): JSX.Element {
         onClose={createDialog.onClose}
       />
 
-      <Text>
-        * 괄호안의 숫자는 해당 카테고리에 포함된 상품의 개수입니다(상위 카테고리 상품
-        개수는 하위 카테고리 상품 개수를 포함)
-      </Text>
-      <Text>* 상품이 연결되어 있는 카테고리는 삭제할 수 없습니다</Text>
-      <Text>* 상위 카테고리를 삭제하면 연결된 하위 카테고리도 함께 삭제됩니다</Text>
+      <UnorderedList spacing={0} listStyleType="none">
+        <ListItem>
+          <Text>
+            * 괄호안의 숫자는 해당 카테고리에 포함된 상품의 개수입니다(상위 카테고리 상품
+            개수는 하위 카테고리 상품 개수를 포함)
+          </Text>
+        </ListItem>
+        <ListItem>
+          <Text>
+            * 이미지가 등록된 카테고리는{' '}
+            <MdImage
+              style={{ display: 'inline-block', verticalAlign: 'middle' }}
+              color="green"
+            />{' '}
+            표시가 적용되어있습니다.
+          </Text>
+        </ListItem>
+        <ListItem>
+          <Text>
+            * 쇼핑페이지에 전시중인 카테고리는{' '}
+            <GiLighthouse
+              color="blue"
+              style={{ display: 'inline-block', verticalAlign: 'middle' }}
+            />{' '}
+            표시가 적용되어있습니다.
+          </Text>
+        </ListItem>
+        <ListItem>
+          <Text>* 상품이 연결되어 있는 카테고리는 삭제할 수 없습니다</Text>
+        </ListItem>
+        <ListItem>
+          <Text>* 상위 카테고리를 삭제하면 연결된 하위 카테고리도 함께 삭제됩니다</Text>
+        </ListItem>
+      </UnorderedList>
+
       <Box>
-        <Button size="sm" onClick={createDialog.onOpen}>
+        <Button leftIcon={<AddIcon />} size="sm" onClick={createDialog.onOpen}>
           메인 카테고리 만들기
         </Button>
       </Box>
 
       {/* 카테고리 목록 */}
-      <Stack w="400px" fontSize="sm" spacing={0}>
+      <Stack minW="500px" w="100%" maxW="600px" fontSize="sm" spacing={0}>
         {categoryTree.map((mainC) => (
           <CategoryItem
             key={mainC.id}

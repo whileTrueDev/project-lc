@@ -1169,6 +1169,13 @@ model KkshowShoppingTab {
   keywords        Json // 쇼핑탭 테마별 키워드 영역 아이템[]
 }
 
+model KkshowShoppingTabCategory {
+  id Int @id @default(autoincrement())
+
+  category          GoodsCategory @relation(fields: [goodsCategoryCode], references: [categoryCode], onDelete: Cascade)
+  goodsCategoryCode String        @unique
+}
+
 enum UserType {
   seller // 판매자
   broadcaster // 방송인
@@ -2015,10 +2022,12 @@ model GoodsInformationNotice {
 // 상품 카테고리
 // ****************
 model GoodsCategory {
-  id                 Int             @id @default(autoincrement())
-  categoryCode       String          @unique // 카테고리 코드
-  name               String          @unique // 카테고리명 
-  mainCategoryFlag   Boolean         @default(false) // 대표카테고리인지 여부 (카테고리 트리의 잎 여부)
+  id               Int     @id @default(autoincrement())
+  categoryCode     String  @unique // 카테고리 코드
+  name             String  @unique // 카테고리명 
+  mainCategoryFlag Boolean @default(false) // 대표카테고리인지 여부 (트리의 root 노드 여부)
+  imageSrc         String? @db.LongText // 카테고리 대표 이미지 주소
+
   parentCategoryId   Int?
   parentCategory     GoodsCategory?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id], onDelete: Cascade) // 상위 부모 카테고리
   childrenCategories GoodsCategory[] @relation("CategoryHierarchy") // 하위 자식카테고리들
@@ -2026,4 +2035,6 @@ model GoodsCategory {
 
   informationSubjectId Int? // 정보제공고시 품목고유번호
   informationSubject   GoodsInformationSubject? @relation(fields: [informationSubjectId], references: [id]) // 해당되는 정보제공고시 품목
+
+  kkshowShoppingTabCategory KkshowShoppingTabCategory?
 }

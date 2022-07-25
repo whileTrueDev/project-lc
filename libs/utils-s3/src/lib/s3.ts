@@ -213,10 +213,17 @@ export const s3 = (() => {
   ): Promise<boolean> {
     const { deleteObjects, quite, ...rest } = input;
     try {
+      const deleteObjectsCleaned = deleteObjects.map((obj) => {
+        const newObj = obj;
+        if (obj.Key.includes(s3.bucketDomain)) {
+          newObj.Key = obj.Key.replace(s3.bucketDomain, '');
+        }
+        return { ...newObj };
+      });
       const command = new DeleteObjectsCommand({
         ...rest,
         Delete: {
-          Objects: deleteObjects,
+          Objects: deleteObjectsCleaned,
           Quiet: quite,
         },
         Bucket: S3_BUCKET_NAME,

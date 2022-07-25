@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Param,
   Query,
   UseGuards,
   UseInterceptors,
@@ -8,7 +9,11 @@ import {
 } from '@nestjs/common';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
-import { FindGoodsCategoryDto, GoodsCategoryRes } from '@project-lc/shared-types';
+import {
+  FindGoodsCategoryDto,
+  GoodsCategoryRes,
+  GoodsCategoryWithFamily,
+} from '@project-lc/shared-types';
 import { GoodsCategoryService } from './goods-category.service';
 
 @Controller('goods-category')
@@ -26,5 +31,12 @@ export class GoodsCategoryController {
     }
     if (dto.mainCategoryFlag) return this.goodsCategoryService.findMainCategories();
     return [];
+  }
+
+  @Get(':categoryCode')
+  public async getOneCategory(
+    @Param('categoryCode') categoryCode: string,
+  ): Promise<GoodsCategoryWithFamily> {
+    return this.goodsCategoryService.findCategory(categoryCode);
   }
 }

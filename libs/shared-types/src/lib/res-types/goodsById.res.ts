@@ -17,6 +17,7 @@ import {
   ShippingOption,
   ShippingSet,
 } from '@prisma/client';
+import { PaginationResult } from '../core/paginationResult';
 
 export interface GoodsInformationNoticeRes extends GoodsInformationNotice {
   contents: Record<string, string>;
@@ -74,4 +75,6 @@ export interface GoodsOutlineByIdRes {
   options: GoodsByIdResBase['options'];
   image: GoodsImages[];
 }
+export type GoodsOutlineByIdPaginationRes = PaginationResult<GoodsOutlineByIdRes>;
+
 export type AllGoodsIdsRes = { goods_name: Goods['goods_name']; id: Goods['id'] }[];

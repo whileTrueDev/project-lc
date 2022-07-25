@@ -22,7 +22,8 @@ export type s3KeyType =
   | 'overlay-logo'
   | 'public' // 예시이미지, 가이드이미지 등 공개이미지
   | 'settlement-account' // 판매자 통장사본 settlement-account/:email/:filename.ext
-  | 'vertical-banner'; // 세로배너
+  | 'vertical-banner' // 세로배너
+  | 'goods-category'; // 상품 카테고리 대표이미지
 
 export type s3FileNameParams = {
   userMail: string;

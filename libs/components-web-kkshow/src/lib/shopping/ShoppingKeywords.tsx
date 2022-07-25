@@ -39,7 +39,7 @@ export function ShoppingKeywords(): JSX.Element {
   return (
     <Box maxW="5xl" mx="auto" my={[10, 20]} minH={[600, 600, 700]} px={2}>
       <KkshowMainTitle bulletVariant="none" color="blue.500" bulletPosition="left">
-        <Heading as="p" fontSize={{ base: '2xl', md: '3xl' }} color="blue.500">
+        <Heading as="p" fontSize={{ base: 'xl', sm: '2xl', md: '3xl' }} color="blue.500">
           뭘 먹을지 모르겠다면?
         </Heading>
       </KkshowMainTitle>

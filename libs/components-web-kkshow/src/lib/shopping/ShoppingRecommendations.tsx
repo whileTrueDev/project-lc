@@ -24,14 +24,14 @@ export function ShoppingRecommendations(): JSX.Element {
           bulletVariant="outline"
           color="blue.500"
         >
-          <Heading as="p" color="blue.500" fontSize="2xl">
+          <Heading as="p" color="blue.500" fontSize={['xl', '2xl']}>
             크크마켓 추천상품
           </Heading>
         </KkshowMainTitle>
 
         <FadeUp>
           <Swiper
-            style={{ paddingTop: 24, paddingBottom: 24 }}
+            style={{ paddingTop: 16, paddingBottom: 24 }}
             spaceBetween={16}
             slidesPerView={useBreakpointValue({ base: 'auto', md: 3 })}
           >

@@ -17,6 +17,7 @@ export * from './lib/mutation/useAdminOrderPatchMutation';
 export * from './lib/mutation/useAdminPolicyMutation';
 export * from './lib/mutation/useAdminPrivacyApproadchHistoryMutation';
 export * from './lib/mutation/useAdminProductPromotionMutation';
+export * from './lib/mutation/useAdminShoppingCategoryMutation';
 export * from './lib/mutation/useAvatarMutation';
 export * from './lib/mutation/useBroadcasterAddressMutation';
 export * from './lib/mutation/useBroadcasterChannelMutation';
