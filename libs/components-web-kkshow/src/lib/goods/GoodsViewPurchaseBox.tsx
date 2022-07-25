@@ -66,21 +66,24 @@ export function GoodsViewPurchaseBox({
   isOnDrawer = false,
 }: GoodsViewPurchaseBoxProps): JSX.Element {
   const toast = useToast({ isClosable: true });
-  const store = useGoodsViewStore();
+  const handleSelectOpt = useGoodsViewStore((s) => s.handleSelectOpt);
+  const selectedOpts = useGoodsViewStore((s) => s.selectedOpts);
+  const handleDecreaseOptQuantity = useGoodsViewStore((s) => s.handleDecreaseOptQuantity);
+  const handleIncreaseOptQuantity = useGoodsViewStore((s) => s.handleIncreaseOptQuantity);
+  const handleRemoveOpt = useGoodsViewStore((s) => s.handleRemoveOpt);
 
   // 기본 옵션 1개만 존재하는 상품 인지 판단
   const isOnlyDefaultOption = useMemo(
     () =>
-      goods.options.length === 1 &&
-      goods.options.filter((x) => x.default_option === 'y').length === 1,
+      goods.options.length === 1 && goods.options.every((x) => x.default_option === 'y'),
     [goods.options],
   );
   // 기본 옵션 1개만 존재하는 경우 기본 선택되도록
   useEffect(() => {
-    if (isOnlyDefaultOption) {
-      store.handleSelectOpt({ ...goods.options[0], quantity: 1 });
+    if (isOnlyDefaultOption && selectedOpts.length === 0) {
+      handleSelectOpt({ ...goods.options[0], quantity: 1 });
     }
-  }, [goods.options, isOnlyDefaultOption, store]);
+  }, [goods.options, handleSelectOpt, isOnlyDefaultOption, selectedOpts.length]);
 
   return (
     <Grid templateColumns="1fr 2fr" mt={{ base: 2, md: 6 }} gridRowGap={2} maxH="75vh">
@@ -99,7 +102,7 @@ export function GoodsViewPurchaseBox({
                   (o) => o.id === Number(e.target.value),
                 );
                 if (!targetopt) return;
-                store.handleSelectOpt({ ...targetopt, quantity: 1 }, () => {
+                handleSelectOpt({ ...targetopt, quantity: 1 }, () => {
                   toast({ title: '이미 선택된 옵션입니다.', status: 'warning' });
                 });
               }}
@@ -117,7 +120,7 @@ export function GoodsViewPurchaseBox({
       <GridItem colSpan={3} fontSize="sm">
         {/* 선택된 옵션 목록 */}
         <Stack mt={2}>
-          {store.selectedOpts.map((opt) => (
+          {selectedOpts.map((opt) => (
             <Flex
               rounded="md"
               key={opt.id}
@@ -140,8 +143,8 @@ export function GoodsViewPurchaseBox({
 
                 <OptionQuantity
                   quantity={opt.quantity}
-                  handleDecrease={() => store.handleDecreaseOptQuantity(opt.id)}
-                  handleIncrease={() => store.handleIncreaseOptQuantity(opt.id)}
+                  handleDecrease={() => handleDecreaseOptQuantity(opt.id)}
+                  handleIncrease={() => handleIncreaseOptQuantity(opt.id)}
                 />
               </Box>
               {!isOnlyDefaultOption && (
@@ -150,7 +153,7 @@ export function GoodsViewPurchaseBox({
                   size="xs"
                   variant="unstyled"
                   aria-label="delete-option"
-                  onClick={() => store.handleRemoveOpt(opt.id)}
+                  onClick={() => handleRemoveOpt(opt.id)}
                   icon={<CloseIcon />}
                 />
               )}
