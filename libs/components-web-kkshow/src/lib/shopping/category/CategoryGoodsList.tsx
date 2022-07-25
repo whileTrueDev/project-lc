@@ -69,7 +69,7 @@ export function CategoryGoodsList(): JSX.Element | null {
         </Text>
       </Box>
 
-      <SimpleGrid my={2} columns={[3, 3, 5]} gap={2}>
+      <SimpleGrid columns={[3, 3, 5]} gap={2}>
         {category?.parentCategory && (
           <CategoryLinkButton
             categoryCode={category.parentCategory.categoryCode}
@@ -133,11 +133,11 @@ export function CategoryLinkButton(props: CategoryLinkButtonProps): JSX.Element 
         justifyContent="center"
         display="flex"
         alignItems="center"
-        py={4}
+        py={[1, 2, 4]}
         px={2}
         w="100%"
         h="100%"
-        maxH="70px"
+        maxH={['50px', '50px', '70px']}
         overflow="hidden"
         textAlign="center"
         wordBreak="keep-all"
