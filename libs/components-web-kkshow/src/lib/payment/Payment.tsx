@@ -109,8 +109,9 @@ export function PaymentBox(): JSX.Element {
     formState: { isSubmitting },
   } = useFormContext<CreateOrderForm>();
 
-  const noMileageBenefit =
-    mileageSetting.mileageStrategy === 'noMileage' || !watch('customerId'); // 로그인 안한경우도 적립안됨
+  /* 마일리지 적립 기능 아직 없으므로 임시 주석처리 @by hwasurr, 220726 */
+  // const noMileageBenefit =
+  //   mileageSetting.mileageStrategy === 'noMileage' || !watch('customerId'); // 로그인 안한경우도 적립안됨
 
   return (
     <Box
@@ -120,7 +121,8 @@ export function PaymentBox(): JSX.Element {
       left="0px"
       right="0px"
     >
-      <SectionWithTitle title="적립혜택" disableDivider>
+      {/* 마일리지 적립 기능 아직 없으므로 임시 주석처리 @by hwasurr, 220726 */}
+      {/* <SectionWithTitle title="적립혜택" disableDivider>
         <Flex justifyContent="space-between" h="60px" alignItems="center">
           {noMileageBenefit ? (
             <Text>적립 혜택이 없습니다</Text>
@@ -134,7 +136,7 @@ export function PaymentBox(): JSX.Element {
             </>
           )}
         </Flex>
-      </SectionWithTitle>
+      </SectionWithTitle> */}
 
       <SectionWithTitle title="결제 예정 금액" disableDivider>
         <Flex justifyContent="space-between" mt={2} mb={2}>
