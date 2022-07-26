@@ -649,19 +649,10 @@ export class GoodsService {
     const goodsIds = await this.prisma.goods.findMany({
       where: {
         seller: { id: sellerId },
-        AND: {
-          confirmation: {
-            status: 'confirmed',
-          },
-          goods_status: 'normal',
-        },
+        AND: { goods_status: 'normal', confirmation: { status: { not: 'rejected' } } },
       },
       select: {
-        confirmation: {
-          select: {
-            firstmallGoodsConnectionId: true,
-          },
-        },
+        confirmation: { select: { firstmallGoodsConnectionId: true } },
         goods_name: true,
         id: true,
       },

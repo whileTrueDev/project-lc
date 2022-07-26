@@ -71,7 +71,13 @@ export class LiveShoppingService {
       },
       include: {
         goods: {
-          select: { goods_name: true, summary: true, image: true, options: true },
+          select: {
+            goods_name: true,
+            summary: true,
+            image: true,
+            options: true,
+            confirmation: { select: { status: true } },
+          },
         },
         seller: { select: { sellerShop: true } },
         broadcaster: {
