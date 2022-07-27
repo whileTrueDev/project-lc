@@ -8,7 +8,7 @@ import { useAdminBroadcasterPromotionPage } from '@project-lc/hooks';
 const columns: GridColumns = [
   {
     field: 'id',
-    headerName: '페이지id',
+    headerName: '고유ID',
     width: 120,
     renderCell: ({ row }: GridRowData) => {
       return (
