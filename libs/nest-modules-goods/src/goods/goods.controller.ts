@@ -161,7 +161,7 @@ export class GoodsController {
     return this.goodsService.findAllGoodsIds();
   }
 
-  /** 상품 개별 조회 */
+  /** 카테고리코드 기준 상품 간략 정보 목록 조회 */
   @Get('by-category/:categoryCode')
   getGoodsByCategory(
     @Param('categoryCode') categoryCode: string,
