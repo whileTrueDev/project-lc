@@ -8,6 +8,7 @@ import {
   FindManyDto,
   PromotionPagePromotionGoodsRes,
 } from '@project-lc/shared-types';
+import { getKkshowWebHost } from '@project-lc/utils';
 
 @Injectable()
 export class BroadcasterPromotionPageService {
@@ -80,11 +81,12 @@ export class BroadcasterPromotionPageService {
   public async createPromotionPage(
     dto: BroadcasterPromotionPageDto,
   ): Promise<BroadcasterPromotionPage> {
-    const { url, broadcasterId } = dto;
+    const { comment, broadcasterId } = dto;
     const promotionPage = await this.prisma.broadcasterPromotionPage.create({
       data: {
-        url,
+        url: `${getKkshowWebHost()}/bc/${broadcasterId}`,
         broadcaster: { connect: { id: broadcasterId } },
+        comment,
       },
     });
     return promotionPage;
@@ -97,9 +99,7 @@ export class BroadcasterPromotionPageService {
     const { id, ...updateData } = dto;
     const page = await this.prisma.broadcasterPromotionPage.update({
       where: { id },
-      data: {
-        ...updateData,
-      },
+      data: { ...updateData },
     });
     return page;
   }
