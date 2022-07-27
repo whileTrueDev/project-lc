@@ -91,7 +91,7 @@ export function ExportBundleDialog({
   const exportBundle = useCallback(
     async (dto: ExportManyDto) => {
       const isExportable = dto.exportOrders.every((o) =>
-        o.items.every((i) => !(Number(i.amount) === 0)),
+        o.items.every((i) => !(Number(i.quantity) === 0)),
       );
       if (!isExportable)
         return toast({
@@ -105,7 +105,7 @@ export function ExportBundleDialog({
         ...dto,
         exportOrders: dto.exportOrders.map((order) => ({
           ...order,
-          items: order.items.filter((x) => !!x.amount),
+          items: order.items.filter((x) => !!x.quantity),
         })),
       };
 

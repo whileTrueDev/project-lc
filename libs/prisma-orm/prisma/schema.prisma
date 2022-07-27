@@ -849,7 +849,7 @@ model SellerOrderCancelRequestItem {
   id                       Int                      @id @default(autoincrement())
   orderItemSeq             Int // 주문상품번호 fm_order_item.item_seq
   orderItemOptionSeq       Int // 주문상품옵션번호 fm_order_item_option.item_option_seq
-  amount                   Int // 취소할 주문상품옵션의 개수
+  quantity                 Int // 취소할 주문상품옵션의 개수
   sellerOrderCancelRequest SellerOrderCancelRequest @relation(fields: [orderSeq], references: [id], onDelete: Cascade)
   orderSeq                 Int
 }
@@ -1793,7 +1793,7 @@ model RefundItem {
   orderItem         OrderItem       @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
-  amount            Int // 개수
+  quantity          Int // 개수
 }
 
 // ****************
@@ -1844,7 +1844,7 @@ model ReturnItem {
   orderItem         OrderItem       @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
-  amount            Int // 개수
+  quantity          Int // 개수
   status            ProcessStatus   @default(requested) // 반품처리상태
   getBackFlag       Boolean         @default(false) // 회수(수거) 여부
 }
@@ -1908,7 +1908,7 @@ model ExchangeItem {
   orderItem         OrderItem             @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption       @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
-  amount            Int // 개수
+  quantity          Int // 개수
   status            ExchangeProcessStatus @default(requested) // 교환처리상태
   getBackFlag       Boolean               @default(false) // 회수(수거) 여부
 }
@@ -1943,7 +1943,7 @@ model OrderCancellationItem {
   orderItem           OrderItem         @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId   Int // 주문상품 옵션 고유번호
   orderItemOption     OrderItemOption   @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
-  amount              Int // 개수
+  quantity            Int // 개수
   status              ProcessStatus     @default(requested) // 주문취소 처리상태
 }
 
@@ -1993,7 +1993,7 @@ model ExportItem {
   orderItem         OrderItem        @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption  @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
-  amount            Int // 개수
+  quantity          Int // 개수
   status            OrderProcessStep @default(exportDone) // 출고상태 : 출고준비 | 출고완료(기본값) | 배송중 | 배송완료 -> 모두 OrderProcessStep 에 있어서 그대로 사용함
 }
 
