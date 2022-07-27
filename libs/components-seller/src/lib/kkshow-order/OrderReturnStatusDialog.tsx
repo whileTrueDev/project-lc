@@ -185,7 +185,7 @@ export function OrderReturnStatusDialog({
               <RelatedRefundData
                 refund={returnDetail.refund}
                 estimatedRefundAmount={returnDetail.items
-                  .map((item) => item.price * item.amount) // 환불상품 가격 * 개수
+                  .map((item) => item.price * item.quantity) // 환불상품 가격 * 개수
                   .reduce((sum, price) => sum + price, 0)}
                 // 소비자가 환불요청시 환불요청계좌를 입력했다면, 환불예정계좌료 표시
                 refundAccount={returnDetail.refundAccount || undefined}

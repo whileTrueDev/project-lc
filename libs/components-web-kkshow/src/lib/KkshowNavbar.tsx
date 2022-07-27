@@ -24,11 +24,10 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import { MdAccountCircle } from 'react-icons/md';
+import KkshowSubNavbar from './KkshowSubNavbar';
 import { Searcher } from './search-input/Searcher';
 
-export const kkshowNavHeight = 120;
-
-type KkshowNavbarVariant = 'blue' | 'white';
+export type KkshowNavbarVariant = 'blue' | 'white';
 interface KkshowNavbarProps {
   variant?: KkshowNavbarVariant;
 }
@@ -62,7 +61,6 @@ export function KkshowNavbar({ variant = 'blue' }: KkshowNavbarProps): JSX.Eleme
       bg={palette.bg}
       color={palette.color}
       pt={{ base: 0, md: 6 }}
-      minH={kkshowNavHeight}
       w="100%"
       zIndex="sticky"
     >
@@ -98,6 +96,8 @@ export function KkshowNavbar({ variant = 'blue' }: KkshowNavbarProps): JSX.Eleme
         {/* 우측 */}
         <KkshowNavbarRightButtonSection />
       </Flex>
+      {/* 서브내비 (링크 모음 섹션) */}
+      <KkshowSubNavbar />
     </Box>
   );
 }

@@ -20,7 +20,7 @@ export class BroadcasterPromotionPageContoller {
   findPromotionPage(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: Broadcaster['id'],
   ): Promise<BroadcasterPromotionPage> {
-    return this.broadcasterPromotionPageService.findById(broadcasterId);
+    return this.broadcasterPromotionPageService.findByBroadcasterId(broadcasterId);
   }
 
   @Get('goods')

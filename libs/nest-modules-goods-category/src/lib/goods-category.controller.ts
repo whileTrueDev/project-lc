@@ -3,28 +3,29 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Query,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
+import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CategoryOnGoodsConnectionDto,
   FindGoodsCategoryDto,
   GoodsCategoryRes,
+  GoodsCategoryWithFamily,
 } from '@project-lc/shared-types';
 import { GoodsCategoryService } from './goods-category.service';
 
 @Controller('goods-category')
-@CacheClearKeys('goods')
-@UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
 export class GoodsCategoryController {
   constructor(private readonly goodsCategoryService: GoodsCategoryService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getCategories(
     @Query(new ValidationPipe({ transform: true })) dto: FindGoodsCategoryDto,
@@ -52,5 +53,12 @@ export class GoodsCategoryController {
     @Body(ValidationPipe) dto: CategoryOnGoodsConnectionDto,
   ): Promise<boolean> {
     return this.goodsCategoryService.disconnectCategoryOnGoods(dto);
+  }
+
+  @Get(':categoryCode')
+  public async getOneCategory(
+    @Param('categoryCode') categoryCode: string,
+  ): Promise<GoodsCategoryWithFamily> {
+    return this.goodsCategoryService.findCategory(categoryCode);
   }
 }

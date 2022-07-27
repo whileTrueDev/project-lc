@@ -13,6 +13,7 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
+import { GoodsConfirmationStatuses } from '@prisma/client';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
 import { LiveShoppingWithGoods, LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -57,8 +58,18 @@ export function LiveShoppingDetailDialog(
                 />
               )}
 
-              {type === 'broadcaster' && (
+              {type === 'broadcaster' ? (
                 <GridTableItem title="상품명" value={liveShopping.goods.goods_name} />
+              ) : (
+                <GridTableItem
+                  title="상품명"
+                  value={
+                    (liveShopping.goods.confirmation?.status !==
+                    GoodsConfirmationStatuses.confirmed
+                      ? '(검수미완료) '
+                      : '') + liveShopping.goods.goods_name
+                  }
+                />
               )}
 
               <GridTableItem

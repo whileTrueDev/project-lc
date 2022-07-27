@@ -3,6 +3,7 @@ import {
   BroadcasterChannel,
   BroadcasterPromotionPage,
   Goods,
+  GoodsConfirmation,
   GoodsImages,
   GoodsOptions,
   LiveShopping,
@@ -17,6 +18,7 @@ export interface LiveShoppingWithGoods extends LiveShopping {
     summary: string;
     image: GoodsImages[];
     options: GoodsOptions[];
+    confirmation?: Pick<GoodsConfirmation, 'status'>;
   };
   seller: {
     sellerShop: SellerShop;

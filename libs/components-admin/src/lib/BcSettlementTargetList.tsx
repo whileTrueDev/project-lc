@@ -311,7 +311,7 @@ function BcSettlementTargetDetail({
             <GridItem colSpan={{ base: 4, sm: 3 }}>
               <Text fontWeight="bold">{item.orderItem.goods.goods_name}</Text>
               {item.orderItemOption.name && item.orderItemOption.value && (
-                <Text fontSize="sm">{`${item.orderItemOption.name}: ${item.orderItemOption.value} ${item.amount}개`}</Text>
+                <Text fontSize="sm">{`${item.orderItemOption.name}: ${item.orderItemOption.value} ${item.quantity}개`}</Text>
               )}
               <Text fontSize="sm">
                 총{' '}

@@ -120,7 +120,7 @@ export function ReturnDetailData({ data }: { data: ReturnDetailRes }): JSX.Eleme
       <RelatedRefundData
         refund={data.refund}
         estimatedRefundAmount={data.items
-          .map((item) => item.price * item.amount)
+          .map((item) => item.price * item.quantity)
           .reduce((sum, price) => sum + price, 0)}
         // 소비자가 환불요청시 환불요청계좌를 입력했다면, 환불예정계좌료 표시
         refundAccount={data.refundAccount || undefined}

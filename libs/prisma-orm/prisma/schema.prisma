@@ -38,7 +38,6 @@ model SellerShop {
   sellerId Int    @unique
   shopName String
   seller   Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-
 }
 
 // 관리자가 설정할 마일리지 세팅
@@ -73,6 +72,7 @@ model SellerBusinessRegistration {
   seller                           Seller                            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
   confirmHistory ConfirmHistory[]
+
   @@index(name: "BusinessRegistrationIndex", fields: [id])
 }
 
@@ -158,6 +158,7 @@ model SellerSettlementAccount {
   seller                     Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
   confirmHistory ConfirmHistory[]
+
   @@index([id], name: "SellerSettlementAccountIndex")
 }
 
@@ -280,7 +281,6 @@ model GoodsOptions {
   option_view      YesOrNo_UPPERCASE     @default(Y) // 옵션 노출 여부
   cartItemOptions  CartItemOption[]
   orderItemOptions OrderItemOption[]
-
 
   @@index([goodsId], name: "goodsId")
 }
@@ -550,6 +550,7 @@ model Broadcaster {
   orderItemSupport  OrderItemSupport[] // 주문된 상품의 후원정보 => 방송인이 후원받은 내역 조회시 사용할듯
   followers         CustomerFollowBroadcaster[] // 팔로우하는 소비자
   productPromotions ProductPromotion[] // 홍보중인상품
+
   @@fulltext([userNickname])
 }
 
@@ -611,7 +612,6 @@ model BroadcasterSettlements {
   broadcasterId              Int
   broadcaster                Broadcaster                  @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
   broadcasterSettlementItems BroadcasterSettlementItems[]
-
 
   @@unique([broadcasterId, round])
 }
@@ -849,7 +849,7 @@ model SellerOrderCancelRequestItem {
   id                       Int                      @id @default(autoincrement())
   orderItemSeq             Int // 주문상품번호 fm_order_item.item_seq
   orderItemOptionSeq       Int // 주문상품옵션번호 fm_order_item_option.item_option_seq
-  amount                   Int // 취소할 주문상품옵션의 개수
+  quantity                 Int // 취소할 주문상품옵션의 개수
   sellerOrderCancelRequest SellerOrderCancelRequest @relation(fields: [orderSeq], references: [id], onDelete: Cascade)
   orderSeq                 Int
 }
@@ -1167,6 +1167,20 @@ model KkshowShoppingTab {
   recommendations Json // 쇼핑탭 크크마켓 추천상품 영역 아이템[]
   reviews         Json // 쇼핑탭 생생후기 영역 아이템[]
   keywords        Json // 쇼핑탭 테마별 키워드 영역 아이템[]
+}
+
+model KkshowSubNavLink {
+  id    Int    @id @default(autoincrement())
+  index Int
+  name  String
+  link  String
+}
+
+model KkshowShoppingTabCategory {
+  id Int @id @default(autoincrement())
+
+  category          GoodsCategory @relation(fields: [goodsCategoryCode], references: [categoryCode], onDelete: Cascade)
+  goodsCategoryCode String        @unique
 }
 
 enum UserType {
@@ -1722,7 +1736,6 @@ model OrderItemOption {
   exportItems            ExportItem[] // 출고상품
   orderCancellationItems OrderCancellationItem[] // 주문취소상품
   exchangeItems          ExchangeItem[] // 교환상품
-
 }
 
 // 주문상품후원
@@ -1786,7 +1799,7 @@ model RefundItem {
   orderItem         OrderItem       @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
-  amount            Int // 개수
+  quantity          Int // 개수
 }
 
 // ****************
@@ -1837,7 +1850,7 @@ model ReturnItem {
   orderItem         OrderItem       @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
-  amount            Int // 개수
+  quantity          Int // 개수
   status            ProcessStatus   @default(requested) // 반품처리상태
   getBackFlag       Boolean         @default(false) // 회수(수거) 여부
 }
@@ -1901,7 +1914,7 @@ model ExchangeItem {
   orderItem         OrderItem             @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption       @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
-  amount            Int // 개수
+  quantity          Int // 개수
   status            ExchangeProcessStatus @default(requested) // 교환처리상태
   getBackFlag       Boolean               @default(false) // 회수(수거) 여부
 }
@@ -1936,7 +1949,7 @@ model OrderCancellationItem {
   orderItem           OrderItem         @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId   Int // 주문상품 옵션 고유번호
   orderItemOption     OrderItemOption   @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
-  amount              Int // 개수
+  quantity            Int // 개수
   status              ProcessStatus     @default(requested) // 주문취소 처리상태
 }
 
@@ -1986,7 +1999,7 @@ model ExportItem {
   orderItem         OrderItem        @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption  @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
-  amount            Int // 개수
+  quantity          Int // 개수
   status            OrderProcessStep @default(exportDone) // 출고상태 : 출고준비 | 출고완료(기본값) | 배송중 | 배송완료 -> 모두 OrderProcessStep 에 있어서 그대로 사용함
 }
 
@@ -2015,10 +2028,12 @@ model GoodsInformationNotice {
 // 상품 카테고리
 // ****************
 model GoodsCategory {
-  id                 Int             @id @default(autoincrement())
-  categoryCode       String          @unique // 카테고리 코드
-  name               String          @unique // 카테고리명 
-  mainCategoryFlag   Boolean         @default(false) // 대표카테고리인지 여부 (카테고리 트리의 잎 여부)
+  id               Int     @id @default(autoincrement())
+  categoryCode     String  @unique // 카테고리 코드
+  name             String  @unique // 카테고리명 
+  mainCategoryFlag Boolean @default(false) // 대표카테고리인지 여부 (트리의 root 노드 여부)
+  imageSrc         String? @db.LongText // 카테고리 대표 이미지 주소
+
   parentCategoryId   Int?
   parentCategory     GoodsCategory?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id], onDelete: Cascade) // 상위 부모 카테고리
   childrenCategories GoodsCategory[] @relation("CategoryHierarchy") // 하위 자식카테고리들
@@ -2026,4 +2041,6 @@ model GoodsCategory {
 
   informationSubjectId Int? // 정보제공고시 품목고유번호
   informationSubject   GoodsInformationSubject? @relation(fields: [informationSubjectId], references: [id]) // 해당되는 정보제공고시 품목
+
+  kkshowShoppingTabCategory KkshowShoppingTabCategory?
 }

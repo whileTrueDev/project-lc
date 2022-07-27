@@ -78,7 +78,7 @@ export function DeliveryTracking({ exportData }: DeliveryTrackingProps): JSX.Ele
               <Flex gap={2} fontSize="sm">
                 <Text>{exportItem.title1}:</Text>
                 <Text>{exportItem.option1}</Text>
-                <Text>{exportItem.amount}개</Text>
+                <Text>{exportItem.quantity}개</Text>
               </Flex>
               <Text fontSize="sm">총 {getLocaleNumber(exportItem.price)}원</Text>
             </Box>

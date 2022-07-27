@@ -5,13 +5,13 @@ import { getLocaleNumber } from '@project-lc/utils-frontend';
 
 interface ExchangeReturnCancelRequestGoodsDataProps
   extends ExchangeReturnCancelItemBaseData {
-  amount: number;
+  quantity: number;
 }
 /** 교환,환불,주문취소 상품 & 옵션 & 개수 표시 컴포넌트 */
 export function ExchangeReturnCancelRequestGoodsData(
   props: ExchangeReturnCancelRequestGoodsDataProps,
 ): JSX.Element {
-  const { goodsName, image, optionName, optionValue, amount, price } = props;
+  const { goodsName, image, optionName, optionValue, quantity, price } = props;
   return (
     <Stack direction="row">
       {/* 이미지 */}
@@ -29,9 +29,9 @@ export function ExchangeReturnCancelRequestGoodsData(
             </>
           )}
 
-          <Text>{amount} 개 </Text>
+          <Text>{quantity} 개 </Text>
           <TextDotConnector />
-          <Text>{getLocaleNumber(price * amount)}원</Text>
+          <Text>{getLocaleNumber(price * quantity)}원</Text>
         </Stack>
       </Stack>
     </Stack>

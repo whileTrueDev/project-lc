@@ -13,7 +13,7 @@ export class SellerOrderCancelRequestDto {
 
 export class SellerOrderCancelRequestItemDto {
   @IsNumber()
-  amount: number;
+  quantity: number;
 
   @IsNumber()
   orderItemSeq: number;

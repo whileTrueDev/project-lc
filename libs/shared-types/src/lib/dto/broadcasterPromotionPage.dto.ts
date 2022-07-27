@@ -1,11 +1,8 @@
 import { IsString, IsInt, IsOptional } from 'class-validator';
 
 export class BroadcasterPromotionPageDto {
-  @IsString()
-  url: string;
-
-  @IsInt()
-  broadcasterId: number;
+  @IsInt() broadcasterId: number;
+  @IsOptional() @IsString() comment?: string;
 }
 
 export class BroadcasterPromotionPageUpdateDto {
@@ -15,6 +12,10 @@ export class BroadcasterPromotionPageUpdateDto {
   @IsOptional()
   @IsString()
   url?: string;
+
+  @IsOptional()
+  @IsString()
+  comment?: string;
 
   @IsOptional()
   @IsInt()

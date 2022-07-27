@@ -424,7 +424,7 @@ export function ExportOrderOptionItem({
     if (!orderExp) return 0; // 출고를 찾을 수 없는 경우
     const orderOptExp = orderExp.items.find((i) => i.orderItemOptionId === option.id);
     if (!orderOptExp) return 0; // 출고가 있으나 해당 옵션에 대한 출고는 없는 경우
-    return orderOptExp.amount;
+    return orderOptExp.quantity;
   }, [option.id, order.exports, order.id]);
 
   // 남은 수량
@@ -435,7 +435,7 @@ export function ExportOrderOptionItem({
     if (!orderExp) return option.quantity;
     const orderOptExp = orderExp.items.find((i) => i.orderItemOptionId === option.id);
     if (!orderOptExp) return option.quantity;
-    const _restEa = option.quantity - orderOptExp.amount;
+    const _restEa = option.quantity - orderOptExp.quantity;
     if (_restEa < 0) return 0;
     return _restEa;
   }, [option.id, option.quantity, order.exports, order.id]);
@@ -452,7 +452,7 @@ export function ExportOrderOptionItem({
       setValue(`${orderShippingIndex}.items.${realIndex}.orderItemId`, item.id);
       // 보낼 수량 기본값으로 남은 수량 만큼 설정되어 있도록 처리
       if (restEa > 0) {
-        setValue(`${orderShippingIndex}.items.${realIndex}.amount`, restEa);
+        setValue(`${orderShippingIndex}.items.${realIndex}.quantity`, restEa);
       }
     }
   }, [item.id, option.id, orderShippingIndex, realIndex, restEa, selected, setValue]);
@@ -477,13 +477,13 @@ export function ExportOrderOptionItem({
           isInvalid={
             !!(
               errors[orderShippingIndex]?.items &&
-              errors[orderShippingIndex]?.items?.[realIndex]?.amount
+              errors[orderShippingIndex]?.items?.[realIndex]?.quantity
             )
           }
         >
           <Input
             isDisabled={restEa === 0 || !selected}
-            {...register(`${orderShippingIndex}.items.${realIndex}.amount`, {
+            {...register(`${orderShippingIndex}.items.${realIndex}.quantity`, {
               required: {
                 message: '보낼 수량을 입력해주세요.',
                 value: !!selected && sendedEa !== option.quantity,
@@ -497,8 +497,8 @@ export function ExportOrderOptionItem({
           />
           <FormErrorMessage fontSize="xs">
             {errors[orderShippingIndex]?.items &&
-              errors[orderShippingIndex]?.items?.[realIndex]?.amount &&
-              errors[orderShippingIndex]?.items?.[realIndex]?.amount?.message}
+              errors[orderShippingIndex]?.items?.[realIndex]?.quantity &&
+              errors[orderShippingIndex]?.items?.[realIndex]?.quantity?.message}
           </FormErrorMessage>
         </FormControl>
       </Td>
