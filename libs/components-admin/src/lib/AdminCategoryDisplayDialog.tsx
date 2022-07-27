@@ -97,7 +97,7 @@ export function CategoryDisplayDiaglog({
           <ListItem>
             <Text>
               전시 카테고리의 최소 개수는 {MIN_CATEGORY_NUM}개입니다. 카테고리 제거로 총
-              카테고리 개수가 5개 미만이 되는 경우 삭제가 불가능합니다.
+              카테고리 개수가 {MIN_CATEGORY_NUM}개 미만이 되는 경우 삭제가 불가능합니다.
             </Text>
           </ListItem>
           <ListItem>
