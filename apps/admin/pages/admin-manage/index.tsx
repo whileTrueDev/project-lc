@@ -10,10 +10,7 @@ export function AdminManagePage(): JSX.Element {
   const { data: profile, isLoading: profileIsLoading } = useProfile();
 
   if (!profileIsLoading && profile?.adminClass !== 'super') {
-    toast({
-      title: '권한없는 계정',
-      status: 'error',
-    });
+    toast({ title: '권한없는 계정', status: 'error' });
     router.push('/admin');
   }
 
