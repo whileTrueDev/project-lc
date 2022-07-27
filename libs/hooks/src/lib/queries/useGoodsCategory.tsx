@@ -1,4 +1,8 @@
-import { FindGoodsCategoryDto, GoodsCategoryRes } from '@project-lc/shared-types';
+import {
+  FindGoodsCategoryDto,
+  GoodsCategoryRes,
+  GoodsCategoryWithFamily,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
@@ -19,5 +23,24 @@ export const useGoodsCategory = (
     ['GoodsCategory', dto],
     () => getGoodsCategory(dto),
     options,
+  );
+};
+
+export type useOneGoodsCategoryResult = GoodsCategoryWithFamily | null;
+export const getOneGoodsCategory = async (
+  categoryCode?: string,
+): Promise<useOneGoodsCategoryResult> => {
+  if (!categoryCode) return null;
+  return axios
+    .get<useOneGoodsCategoryResult>(`/goods-category/${categoryCode}`)
+    .then((res) => res.data);
+};
+export const useOneGoodsCategory = (
+  categoryCode?: string,
+): UseQueryResult<useOneGoodsCategoryResult, AxiosError> => {
+  return useQuery<useOneGoodsCategoryResult, AxiosError>(
+    ['OneGoodsCategory', categoryCode],
+    () => getOneGoodsCategory(categoryCode),
+    { enabled: !!categoryCode },
   );
 };

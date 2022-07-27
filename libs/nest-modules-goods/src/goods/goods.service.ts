@@ -12,6 +12,7 @@ import {
   AdminAllLcGoodsList,
   AllGoodsIdsRes,
   ApprovedGoodsNameAndId,
+  DefaultPaginationDto,
   getLiveShoppingProgress,
   GoodsByIdRes,
   GoodsImageDto,
@@ -20,6 +21,7 @@ import {
   GoodsOptionDto,
   GoodsOptionsWithSupplies,
   GoodsOptionWithStockInfo,
+  GoodsOutlineByIdPaginationRes,
   GoodsOutlineByIdRes,
   RegistGoodsDto,
   TotalStockInfo,
@@ -416,6 +418,36 @@ export class GoodsService {
         image: { orderBy: { cut_number: 'asc' } },
       },
     });
+  }
+
+  /** 카테고리 코드를 기준으로 상품 간략 정보 목록 조회 */
+  public async getGoodsOutlineByCategory(
+    categoryCode: string,
+    paginationOpts?: DefaultPaginationDto,
+  ): Promise<GoodsOutlineByIdPaginationRes> {
+    const { skip, take } = paginationOpts;
+    const realTake = take + 1;
+    const result = await this.prisma.goods.findMany({
+      skip,
+      take: realTake,
+      where: { categories: { every: { categoryCode } } },
+      select: {
+        id: true,
+        goods_name: true,
+        summary: true,
+        goods_status: true,
+        options: { include: { supply: true } },
+        confirmation: true,
+        image: { orderBy: { cut_number: 'asc' } },
+      },
+    });
+    const resResult = result.slice(0, take);
+    const hasNextPage = result.length === realTake;
+    return {
+      edges: resResult,
+      hasNextPage,
+      nextCursor: hasNextPage ? take + skip : undefined,
+    };
   }
 
   // 상품 등록

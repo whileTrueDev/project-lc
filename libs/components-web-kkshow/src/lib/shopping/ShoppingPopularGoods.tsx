@@ -60,7 +60,7 @@ export function ShoppingPopularGoods(): JSX.Element {
           centered={false}
           bulletVariant={useBreakpointValue({ base: 'none', md: 'fill' })}
         >
-          <Heading as="p" color="blue.500" fontSize="2xl">
+          <Heading as="p" color="blue.500" fontSize={['xl', '2xl']}>
             {title}
           </Heading>
         </KkshowMainTitle>
