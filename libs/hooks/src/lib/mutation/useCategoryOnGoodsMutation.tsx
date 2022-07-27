@@ -24,7 +24,6 @@ export const useConnectCategoryOnGoodsMutation = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: (data, dto) => {
-        console.log(dto.goodsId);
         queryClient.invalidateQueries('AdminCategory');
         queryClient.invalidateQueries('GoodsById'); // 카테고리 연결된 상품 정보 갱신(연결된 카테고리 다시 불러오기 위해)
         queryClient.invalidateQueries('AdminGoodsById');
