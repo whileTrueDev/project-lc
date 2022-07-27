@@ -9,7 +9,7 @@ export function Live(): JSX.Element {
 
   return (
     <MypageLayout>
-      <Container maxWidth="container.xl" my={12}>
+      <Container maxWidth="container.xl" my={[3, 6, 12]}>
         <Box as="section" mb={10}>
           <Flex direction="row" alignItems="center" justifyContent="space-between">
             <Button

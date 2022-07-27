@@ -13,6 +13,7 @@ import {
   List,
   ListItem,
   Spinner,
+  Text,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useAutocomplete } from '@material-ui/lab';
@@ -65,9 +66,9 @@ export function ChakraAutoComplete<T = any>({
       <Box {...getRootProps()}>
         {label ? (
           <FormLabel {...getInputLabelProps()}>
-            <Heading as="h6" size="sm">
+            <Text as="h6" size="sm" fontWeight="bold">
               {label}
-            </Heading>
+            </Text>
           </FormLabel>
         ) : null}
 

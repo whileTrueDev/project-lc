@@ -16,7 +16,7 @@ export function ShoppingReviews(): JSX.Element {
         bulletPosition="left"
         color="blue.500"
       >
-        <Heading as="p" color="blue.500" fontSize="2xl">
+        <Heading as="p" color="blue.500" fontSize={['xl', '2xl']}>
           생생후기
         </Heading>
       </KkshowMainTitle>

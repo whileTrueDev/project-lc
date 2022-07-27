@@ -3,12 +3,12 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Heading,
   Input,
   InputGroup,
   Radio,
   RadioGroup,
   Stack,
+  Text,
 } from '@chakra-ui/react';
 import { useDefaultContacts, useProfile } from '@project-lc/hooks';
 import { emailRegisterOptions, LiveShoppingInput } from '@project-lc/shared-types';
@@ -56,9 +56,9 @@ export function LiveShoppingManagerContacts(): JSX.Element {
 
   return (
     <Stack spacing={2}>
-      <Heading as="h6" size="sm">
+      <Text as="h6" size="sm" fontWeight="bold">
         담당자 연락처
-      </Heading>
+      </Text>
 
       <Stack spacing={2}>
         {!data ? (

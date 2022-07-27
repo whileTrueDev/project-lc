@@ -27,7 +27,7 @@ import { MdAccountCircle } from 'react-icons/md';
 import KkshowSubNavbar from './KkshowSubNavbar';
 import { Searcher } from './search-input/Searcher';
 
-type KkshowNavbarVariant = 'blue' | 'white';
+export type KkshowNavbarVariant = 'blue' | 'white';
 interface KkshowNavbarProps {
   variant?: KkshowNavbarVariant;
 }
