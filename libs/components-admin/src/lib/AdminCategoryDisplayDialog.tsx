@@ -9,7 +9,7 @@ import { CategoryWithGoodsCount } from '@project-lc/shared-types';
 import { useMemo } from 'react';
 
 const MAX_CATEGORY_NUM = 12;
-const MIN_CATEGORY_NUM = 12;
+const MIN_CATEGORY_NUM = 5;
 export type CategoryItemType = CategoryWithGoodsCount & {
   childrenCategories?: CategoryItemType[];
   depth: number;
