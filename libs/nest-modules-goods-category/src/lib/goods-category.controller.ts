@@ -17,11 +17,11 @@ import {
 import { GoodsCategoryService } from './goods-category.service';
 
 @Controller('goods-category')
-@UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
 export class GoodsCategoryController {
   constructor(private readonly goodsCategoryService: GoodsCategoryService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getCategories(
     @Query(new ValidationPipe({ transform: true })) dto: FindGoodsCategoryDto,
