@@ -72,7 +72,8 @@ export function Discount(): JSX.Element {
 
   const handleUseMaxMileage = (): void => {
     if (customerMileage) {
-      setValue('usedMileageAmount', customerMileage.mileage);
+      const result = setNumberSubstractWithMod(MILEAGE_USE_UNIT, customerMileage.mileage);
+      setValue('usedMileageAmount', result);
     }
   };
 
