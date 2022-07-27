@@ -93,6 +93,7 @@ export function CategoryCreateFormDialog(
       mainCategoryFlag: !parentCategory,
       parentCategoryId: parentCategory?.id,
       informationSubjectId: formData.informationSubjectId,
+      imageSrc: formData.imageSrc,
     };
     if (!parentCategory) {
       // 최상위 카테고리 생성인 경우, 이미지를 등록하지 않으면 안됨
