@@ -49,6 +49,7 @@ import { createGoodsInquiry, createGoodsInquiry2 } from './seedData/goods-inquir
 import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
+import { createKkshowSubNavDummy } from './seedData/kkshowSubNav';
 import { dummyMileage, dummyMileageLog } from './seedData/mileage';
 import { termsData } from './seedData/terms';
 
@@ -481,6 +482,8 @@ async function main(): Promise<void> {
   // 더미 마일리지 로그 생성
   await createDummyCustomerMileageLog();
 
+  // 더미 kkshow subnav link 생성
+  await createKkshowSubNavDummy(prisma);
   // 더미 방송인 생성 2 (promotion page 존재하지 않는 방송인)
   await createDummyBroadcaster(prisma);
 }

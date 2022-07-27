@@ -28,6 +28,7 @@ import { JwtHelperModule } from '@project-lc/nest-modules-jwt-helper';
 import {
   KkshowMainModule,
   KkshowShoppingModule,
+  KkshowSubNavModule,
 } from '@project-lc/nest-modules-kkshow-main';
 import { KkshowSearchModule } from '@project-lc/nest-modules-kkshow-search';
 import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
@@ -74,6 +75,7 @@ import { AppController } from './app.controller';
     ManualModule.withControllers(),
     KkshowSearchModule.withControllers(),
     KkshowShoppingModule.withControllers(),
+    KkshowSubNavModule.withControllers(),
     CustomerModule.withControllers(),
     PaymentModule.withControllers(),
     OrderModule.withControllers(),
