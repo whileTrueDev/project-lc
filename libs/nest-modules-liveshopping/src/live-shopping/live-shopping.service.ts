@@ -40,16 +40,38 @@ export class LiveShoppingService {
 
   /** 라이브쇼핑 삭제 */
   async deleteLiveShopping(liveShoppingId: { liveShoppingId: number }): Promise<boolean> {
-    const doDelete = await this.prisma.liveShopping.delete({
-      where: {
-        id: liveShoppingId.liveShoppingId,
-      },
+    const result = await this.prisma.$transaction(async (transac) => {
+      const deleted = await transac.liveShopping.delete({
+        where: { id: liveShoppingId.liveShoppingId },
+      });
+      // 카트상품 channel 변경
+      await transac.cartItem.updateMany({
+        data: { channel: 'normal' },
+        where: {
+          support: {
+            liveShoppingId: liveShoppingId.liveShoppingId,
+            AND: { productPromotion: { is: null } },
+          },
+        },
+      });
+      // 카트상품 channel 변경
+      await transac.cartItem.updateMany({
+        data: { channel: 'productPromotion' },
+        where: {
+          support: {
+            liveShoppingId: liveShoppingId.liveShoppingId,
+            AND: { productPromotion: { isNot: null } },
+          },
+        },
+      });
+      // 해당 라이브쇼핑이 연결된 카트 응원메시지 삭제 (상품홍보가 연결되어있다면 pass)
+      await transac.cartItemSupport.deleteMany({
+        where: { liveShoppingId: deleted.id, AND: { productPromotion: { is: null } } },
+      });
+      return true;
     });
-
-    if (!doDelete) {
-      throw new InternalServerErrorException('라이브 쇼핑 삭제 실패');
-    }
-    return true;
+    if (!result) throw new InternalServerErrorException('라이브 쇼핑 삭제 실패');
+    return result;
   }
 
   /** 라이브 쇼핑 목록 조회 */
