@@ -3,18 +3,19 @@ import { AxiosError } from 'axios';
 import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
-export const getProfile = async (): Promise<UserProfileRes> => {
+type ProfileRes = UserProfileRes | null;
+export const getProfile = async (): Promise<ProfileRes> => {
   return axios
-    .get<UserProfileRes>('/auth/profile', {
+    .get<ProfileRes>('/auth/profile', {
       params: { appType: process.env.NEXT_PUBLIC_APP_TYPE },
     })
     .then((res) => res.data);
 };
 
 export const useProfile = (
-  options?: UseQueryOptions<UserProfileRes, AxiosError>,
-): UseQueryResult<UserProfileRes, AxiosError> => {
-  return useQuery<UserProfileRes, AxiosError>('Profile', getProfile, {
+  options?: UseQueryOptions<ProfileRes, AxiosError>,
+): UseQueryResult<ProfileRes, AxiosError> => {
+  return useQuery<ProfileRes, AxiosError>('Profile', getProfile, {
     retry: false,
     ...options,
   });
