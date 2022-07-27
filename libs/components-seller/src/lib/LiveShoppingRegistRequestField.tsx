@@ -1,5 +1,5 @@
 import { WarningIcon } from '@chakra-ui/icons';
-import { Box, Heading, Stack, Text, Textarea } from '@chakra-ui/react';
+import { Box, Stack, Text, Textarea } from '@chakra-ui/react';
 import { LiveShoppingInput } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
 
@@ -19,21 +19,19 @@ export function LiveShoppingRegistRequestField(): JSX.Element {
     <Box w="100%">
       <Stack spacing={2}>
         <Stack direction="row">
-          <Heading as="h6" size="sm">
+          <Text as="h6" size="sm" fontWeight="bold">
             요청사항
-          </Heading>
+          </Text>
           <Text fontSize="xs">(최대 500자)</Text>
         </Stack>
         <Textarea
           placeholder={examplePlaceholder}
           height={300}
           resize="none"
+          size="sm"
           isInvalid={!!errors.requests}
           {...register('requests', {
-            maxLength: {
-              value: 500,
-              message: '500자 이하로 작성해주세요.',
-            },
+            maxLength: { value: 500, message: '500자 이하로 작성해주세요.' },
           })}
         />
         {errors.requests && (

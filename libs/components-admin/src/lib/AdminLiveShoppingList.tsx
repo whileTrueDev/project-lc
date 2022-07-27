@@ -1,3 +1,4 @@
+import NextLink from 'next/link';
 import { Box, Button, Heading, Tooltip, Text, Link } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
@@ -7,6 +8,7 @@ import { useAdminLiveShoppingList, useProfile } from '@project-lc/hooks';
 import { getLiveShoppingProgress, LiveShoppingWithGoods } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { getCustomerWebHost } from '@project-lc/utils';
+import { GoodsConfirmationStatuses } from '@prisma/client';
 
 export function AdminLiveShoppingList({
   onRowClick,
@@ -31,10 +33,12 @@ export function AdminLiveShoppingList({
       flex: 1,
       renderCell: ({ row }) => (
         <Tooltip label="상세페이지로 이동">
-          <Link href={`/live-shopping/${row.id}`} color="blue">
-            {row.liveShoppingName ||
-              '라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록하면 됩니다.'}
-          </Link>
+          <NextLink href={`/live-shopping/${row.id}`} passHref>
+            <Link color="blue">
+              {row.liveShoppingName ||
+                '라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록하면 됩니다.'}
+            </Link>
+          </NextLink>
         </Tooltip>
       ),
     },
@@ -56,7 +60,15 @@ export function AdminLiveShoppingList({
             </Link>
           </Tooltip>
         ) : (
-          <Text>{row.goods.goods_name}</Text>
+          <Text>
+            <Text as="span" color="red" fontSize="xs">
+              {row.goods.confirmation &&
+              row.goods.confirmation?.status !== GoodsConfirmationStatuses.confirmed
+                ? '(검수미완료) '
+                : ''}
+            </Text>
+            {row.goods.goods_name}
+          </Text>
         ),
     },
     {

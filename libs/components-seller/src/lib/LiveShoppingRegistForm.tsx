@@ -1,22 +1,24 @@
 import {
   Alert,
   AlertIcon,
+  Badge,
   Box,
   Button,
   Collapse,
   Flex,
   FormControl,
   FormErrorMessage,
-  Heading,
   Image,
   Input,
   InputGroup,
   InputRightAddon,
+  ListItem,
   Radio,
   RadioGroup,
   Spinner,
   Stack,
   Text,
+  UnorderedList,
   useDisclosure,
   useMergeRefs,
   useToast,
@@ -34,7 +36,6 @@ import {
   ApprovedGoodsListItem,
   LiveShoppingInput,
   LiveShoppingRegistDTO,
-  LIVE_SHOPPING_PROGRESS,
 } from '@project-lc/shared-types';
 import { liveShoppingRegist } from '@project-lc/stores';
 import dayjs from 'dayjs';
@@ -99,9 +100,7 @@ export function LiveShoppingRegistForm(): JSX.Element {
       desiredPeriod: data.desiredPeriod,
     };
 
-    if (contacts.data) {
-      dto.contactId = contacts.data.id;
-    }
+    if (contacts.data) dto.contactId = contacts.data.id;
     dto.requests = data.requests;
 
     const goodsId = watch('goods_id');
@@ -159,7 +158,6 @@ export function LiveShoppingRegistForm(): JSX.Element {
                     }
                   }}
                 />
-
                 {selectedGoods && (
                   <Box mt={2}>
                     <GoodsSummary goodsId={selectedGoods.id} />
@@ -215,9 +213,9 @@ function LiveShoppingDesiredPeriod(): JSX.Element {
   }, [isOpen]);
   return (
     <Stack>
-      <Heading as="h6" size="sm">
+      <Text as="h6" size="sm" fontWeight="bold">
         희망 진행 기간
-      </Heading>
+      </Text>
       <RadioGroup
         value={watch('desiredPeriod')}
         onChange={(newV) => {
@@ -270,9 +268,9 @@ function LiveShoppingDesiredCommission(): JSX.Element {
 
   return (
     <FormControl isInvalid={!!errors.desiredCommission}>
-      <Heading as="h6" size="sm">
+      <Text as="h6" size="sm" fontWeight="bold">
         희망 판매 수수료
-      </Heading>
+      </Text>
       <Text color="gray.500" fontSize="sm">
         판매수수료가 높을수록 방송인 매칭 조율이 원만하며, 진행이 빠를 수 있습니다.
       </Text>
@@ -302,29 +300,50 @@ interface GoodsSummaryProps {
 }
 function GoodsSummary({ goodsId }: GoodsSummaryProps): JSX.Element | null {
   const goods = useGoodsById(goodsId);
-
-  const goodsFirstImage = useMemo(
-    () => goods.data?.image.find((i) => i.cut_number === 1),
-    [goods.data?.image],
+  const goodsFirstImage = useMemo(() => goods.data?.image?.[0], [goods.data?.image]);
+  const isConfirmRequired = useMemo(
+    () => goods.data?.confirmation.status !== 'confirmed',
+    [goods.data?.confirmation.status],
   );
-
   if (goods.isLoading) return <Spinner />;
-  if (!goods.data) return null;
   if (goods.isError) return null;
+  if (!goods.data) return null;
 
   return (
-    <Flex maxW="300px" alignItems="center">
+    <Flex gap={2}>
+      {goodsFirstImage && (
+        <Image
+          rounded="md"
+          width={50}
+          height={50}
+          alt={goods.data.goods_name}
+          objectFit="cover"
+          src={goodsFirstImage.image}
+        />
+      )}
+
       <Box>
-        {goodsFirstImage && <Image width={50} height={50} src={goodsFirstImage.image} />}
-      </Box>
-      <Box ml={2}>
-        <Text fontWeight="bold" isTruncated>
-          {goods.data.goods_name}
+        {isConfirmRequired && (
+          <Badge variant="subtle" colorScheme="red">
+            검수 미완료 상태
+          </Badge>
+        )}
+        <Text fontWeight="bold">{goods.data.goods_name}</Text>
+        <Text>{goods.data.summary}</Text>
+        <Text color="gray" fontSize="sm">
+          {dayjs(goods.data.regist_date).format('YYYY년 MM월 DD일 HH:mm:ss')} 등록
         </Text>
-        <Text isTruncated>{goods.data.summary}</Text>
-        <Text isTruncated>
-          {dayjs(goods.data.regist_date).format('YYYY년 MM월 DD일 HH:mm:ss')}
-        </Text>
+
+        {isConfirmRequired && (
+          <UnorderedList mt={2}>
+            <ListItem color="gray" fontSize="sm">
+              <Text>
+                검수 미완료 상태의 상품은 상품 검수가 거절되는 경우 라이브쇼핑도 함께
+                거절될 수 있습니다.
+              </Text>
+            </ListItem>
+          </UnorderedList>
+        )}
       </Box>
     </Flex>
   );

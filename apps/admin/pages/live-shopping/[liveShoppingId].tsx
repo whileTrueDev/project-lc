@@ -5,6 +5,9 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Box,
   Button,
   Divider,
@@ -48,6 +51,7 @@ import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { GoodsConfirmationStatuses } from '@prisma/client';
 
 function getDuration(startDate: Date, endDate: Date): string {
   if (startDate && startDate) {
@@ -173,14 +177,36 @@ export function LiveShoppingDetail(): JSX.Element {
         )}
         <Grid templateColumns="repeat(2, 1fr)" justifyItems="start" gap={4}>
           <Stack spacing={5}>
-            <Stack direction="row">
-              <Text as="span">상품명 :</Text>
-              <Text color="blue">
-                {liveShopping[0].broadcaster
-                  ? `${liveShopping[0].goods.goods_name} + ${liveShopping[0].broadcaster.userNickname}`
-                  : `${liveShopping[0].goods.goods_name}`}
-              </Text>
-            </Stack>
+            <Box>
+              <Stack direction="row">
+                <Text as="span">상품명 :</Text>
+                <Text color="blue">
+                  <Text as="span" color="red">
+                    {liveShopping[0].goods.confirmation?.status !==
+                    GoodsConfirmationStatuses.confirmed
+                      ? `(검수미완료) `
+                      : ''}
+                  </Text>
+                  {liveShopping[0].broadcaster
+                    ? `${liveShopping[0].goods.goods_name} + ${liveShopping[0].broadcaster.userNickname}`
+                    : `${liveShopping[0].goods.goods_name}`}
+                </Text>
+              </Stack>
+              {liveShopping[0].goods.confirmation?.status !==
+                GoodsConfirmationStatuses.confirmed && (
+                <Alert status="info" variant="left-accent" rounded="md">
+                  <AlertDescription>
+                    검수 미완료 상태이므로 상품 검수부터 진행해야 합니다.
+                    <Button
+                      size="xs"
+                      onClick={() => router.push(`/goods/${liveShopping[0].goodsId}`)}
+                    >
+                      상품 검수 이동하기
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
+            </Box>
             <Stack direction="row">
               <Text as="span">판매자 :</Text>
               <Text color="blue">
@@ -375,7 +401,7 @@ export function LiveShoppingDetail(): JSX.Element {
 
               <Stack>
                 <Text>
-                  영상 URL (https://youtu.be/4pIuCJTMXQU 와 같은 형태로 입력해주세요)
+                  영상 URL ( https://youtu.be/4pIuCJTMXQU 와 같은 형태로 입력해주세요 )
                 </Text>
                 <Input
                   placeholder="https://youtu.be/4pIuCJTMXQU"

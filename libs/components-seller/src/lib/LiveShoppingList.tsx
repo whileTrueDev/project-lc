@@ -106,12 +106,35 @@ export function LiveShoppingList(): JSX.Element {
   };
   const columns: GridColumns = [
     {
+      headerName: '',
+      field: '',
+      width: 140,
+      sortable: false,
+      disableColumnMenu: true,
+      renderCell: ({ row }: GridRowData) => (
+        <Stack direction="row">
+          <Button size="xs" colorScheme="blue" onClick={() => handleDetailOnOpen(row)}>
+            상세보기
+          </Button>
+          {row.progress === 'registered' ? (
+            <Button
+              size="xs"
+              colorScheme="orange"
+              onClick={() => handleDeleteClick(row.id)}
+            >
+              삭제
+            </Button>
+          ) : null}
+        </Stack>
+      ),
+    },
+    {
       field: 'liveShoppingName',
       headerName: '라이브 쇼핑명',
       minWidth: 250,
       flex: 1,
       valueFormatter: ({ row }) =>
-        row.liveShoppingName || '(라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록됩니다.)',
+        row.liveShoppingName || '(라이브쇼핑 진행 확정 후 등록예정)',
     },
     {
       field: 'goods_name',
@@ -122,7 +145,13 @@ export function LiveShoppingList(): JSX.Element {
         return (
           <Tooltip label="상품페이지로 이동">
             <Link href={`${getCustomerWebHost()}/goods/${row.goodsId}`} isExternal>
-              {row.goods.goods_name} <ExternalLinkIcon mx="2px" />
+              <Text as="span" fontSize="xs">
+                {row.goods?.confirmation &&
+                row.goods?.confirmation?.status !== 'confirmed'
+                  ? '(검수미완료) '
+                  : ''}
+              </Text>
+              {row.goods.goods_name} <ExternalLinkIcon mx="2px" />{' '}
             </Link>
           </Tooltip>
         );
@@ -218,29 +247,6 @@ export function LiveShoppingList(): JSX.Element {
         }
         return <Text>업로드대기</Text>;
       },
-    },
-    {
-      headerName: '',
-      field: '',
-      width: 100,
-      sortable: false,
-      disableColumnMenu: true,
-      renderCell: ({ row }: GridRowData) => (
-        <Stack direction="row">
-          <Button size="xs" colorScheme="blue" onClick={() => handleDetailOnOpen(row)}>
-            상세보기
-          </Button>
-          {row.progress === 'registered' ? (
-            <Button
-              size="xs"
-              colorScheme="orange"
-              onClick={() => handleDeleteClick(row.id)}
-            >
-              삭제
-            </Button>
-          ) : null}
-        </Stack>
-      ),
     },
   ];
 
