@@ -1064,7 +1064,7 @@ export class OrderService {
 
     // * ---- 구매확정된 상품에 대한 마일리지 적립 ----
     if (order.customerId) {
-      // 기본마일리지 설정값(적립룰 가져오기 위해)
+      // 기본마일리지 설정값 => 전역 마일리지 설정값에 따라 적립률, 적립여부가 달라짐
       const defaultMileageSetting = await this.mileageSettingService.getMileageSetting();
       // 적립예정금액
       let earnMileage = 0;
@@ -1083,14 +1083,34 @@ export class OrderService {
         batchExportedOrderOptions.length > 1
           ? `외 ${batchExportedOrderOptions.length} 개`
           : ''
-      }) `;
-      await this.mileageService.upsertMileage({
-        customerId: order.customerId,
-        actionType: MileageActionType.earn,
-        orderId: order.id,
-        mileage: earnMileage,
-        reason,
+      }, 적립금액 : ${earnMileage}) `;
+
+      const mileageUsedOnOrder = await this.prisma.customerMileageLog.findMany({
+        where: {
+          actionType: 'consume',
+          orderId: order.id,
+        },
       });
+
+      // 적립예정 마일리지가 0원이상이고
+      // 전역 마일리지설정에서 마일리지 기능이 사용중인경우 (useMileageFeature === true) 마일리지 적립함
+      if (
+        earnMileage > 0 &&
+        defaultMileageSetting.useMileageFeature === true &&
+        // (전역 마일리지설정에서 마일리지 적립방식이 noMileage이면서 주문시 마일리지 사용한 경우)는 제외
+        !(
+          defaultMileageSetting.mileageStrategy === 'noMileage' &&
+          mileageUsedOnOrder.length > 0
+        )
+      ) {
+        await this.mileageService.upsertMileage({
+          customerId: order.customerId,
+          actionType: MileageActionType.earn,
+          orderId: order.id,
+          mileage: earnMileage,
+          reason,
+        });
+      }
     }
 
     return true;
