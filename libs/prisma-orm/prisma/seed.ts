@@ -13,6 +13,7 @@ import {
 } from '@prisma/client';
 import { cartSample, tempUserCartItemSample } from './seedData/cart';
 import { dummyCustomer } from './seedData/customer';
+import { createDummyBroadcaster } from './seedData/dummyBc';
 import {
   dummyCoupon,
   dummyCustomerCoupon,
@@ -130,17 +131,13 @@ async function createCustomer(): Promise<Customer> {
 }
 
 /** 방송인홍보페이지 생성 */
-let kkmarketCatalogCode = 11;
 async function createBroadcasterPromotionPage(
   broadcasterId: number,
 ): Promise<BroadcasterPromotionPage> {
-  const tempCatalogUrl = `https://k-kmarket.com/goods/catalog?code=00${kkmarketCatalogCode}`;
-  kkmarketCatalogCode += 1;
   return prisma.broadcasterPromotionPage.create({
     data: {
       broadcasterId,
-      url: tempCatalogUrl, // 임시로 크크마켓 카테고리 링크
-      comment: `✍️Senior 2D Artist 
+      comment: `✍️Senior 2D Artist
 @SecondDinnerGames
 🎨Illustrator for Hearthstone and MtG
 Past: Blur, Blizzard, Gearbox, Disney, Valve, Bethesda, etc.
@@ -487,6 +484,8 @@ async function main(): Promise<void> {
 
   // 더미 kkshow subnav link 생성
   await createKkshowSubNavDummy(prisma);
+  // 더미 방송인 생성 2 (promotion page 존재하지 않는 방송인)
+  await createDummyBroadcaster(prisma);
 }
 
 main()
