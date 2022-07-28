@@ -7,7 +7,6 @@ import {
   AccordionPanel,
   Alert,
   AlertDescription,
-  AlertTitle,
   Box,
   Button,
   Divider,
@@ -21,6 +20,8 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
+import { GoodsConfirmationStatuses } from '@prisma/client';
+import { AdminLiveShoppingBroadcasterName } from '@project-lc/components-admin/AdminLiveShoppingBroadcasterName';
 import { AdminLiveShoppingUpdateConfirmModal } from '@project-lc/components-admin/AdminLiveShoppingUpdateConfirmModal';
 import { AdminOverlayImageUploadDialog } from '@project-lc/components-admin/AdminOverlayImageUploadDialog';
 import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
@@ -36,7 +37,6 @@ import { GoodsDetailOptionsInfo } from '@project-lc/components-seller/goods-deta
 import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailPurchaseLimitInfo';
 import { GoodsDetailShippingInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailShippingInfo';
 import { GoodsDetailSummary } from '@project-lc/components-seller/goods-detail/GoodsDetailSummary';
-import { AdminLiveShoppingBroadcasterName } from '@project-lc/components-admin/AdminLiveShoppingBroadcasterName';
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
 import {
   LiveShoppingManage,
@@ -51,7 +51,6 @@ import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { GoodsConfirmationStatuses } from '@prisma/client';
 
 function getDuration(startDate: Date, endDate: Date): string {
   if (startDate && startDate) {
@@ -182,10 +181,13 @@ export function LiveShoppingDetail(): JSX.Element {
                 <Text as="span">상품명 :</Text>
                 <Text color="blue">
                   <Text as="span" color="red">
-                    {liveShopping[0].goods.confirmation?.status !==
-                    GoodsConfirmationStatuses.confirmed
-                      ? `(검수미완료) `
-                      : ''}
+                    {liveShopping[0].goods.confirmation?.status ===
+                      GoodsConfirmationStatuses.waiting ||
+                      (liveShopping[0].goods.confirmation?.status ===
+                        GoodsConfirmationStatuses.needReconfirmation &&
+                        `(검수미완료) `)}
+                    {liveShopping[0].goods.confirmation?.status ===
+                      GoodsConfirmationStatuses.rejected && `(검수거절상품) `}
                   </Text>
                   {liveShopping[0].broadcaster
                     ? `${liveShopping[0].goods.goods_name} + ${liveShopping[0].broadcaster.userNickname}`
@@ -196,7 +198,10 @@ export function LiveShoppingDetail(): JSX.Element {
                 GoodsConfirmationStatuses.confirmed && (
                 <Alert status="info" variant="left-accent" rounded="md">
                   <AlertDescription>
-                    검수 미완료 상태이므로 상품 검수부터 진행해야 합니다.
+                    {liveShopping[0].goods.confirmation?.status ===
+                    GoodsConfirmationStatuses.rejected
+                      ? '해당 상품은 검수 거절된 상품입니다. (라이브쇼핑을 취소하세요.)'
+                      : '검수 미완료 상태이므로 상품 검수부터 진행해야 합니다.'}
                     <Button
                       size="xs"
                       onClick={() => router.push(`/goods/${liveShopping[0].goodsId}`)}

@@ -16,6 +16,10 @@ export const useGoodRejectionMutation = (): UseMutationResult<
     {
       onSuccess: () => {
         queryClient.invalidateQueries('AdminGoodsList', { refetchInactive: true });
+        queryClient.invalidateQueries('AdminLiveShoppingList', { refetchInactive: true });
+        queryClient.invalidateQueries('AdminLiveShoppingGiftOrderList', {
+          refetchInactive: true,
+        });
       },
     },
   );
