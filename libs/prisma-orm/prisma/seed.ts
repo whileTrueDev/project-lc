@@ -174,12 +174,12 @@ const generateDefaultSellCommission = async (): Promise<void> => {
 const generateDefaultMileageSetting = async (): Promise<void> => {
   await prisma.mileageSetting.upsert({
     create: {
-      mileageStrategy: 'noMileage',
+      mileageStrategy: 'onPaymentWithoutMileageUse',
       defaultMileagePercent: 1,
       useMileageFeature: false,
     },
     update: {
-      mileageStrategy: 'noMileage',
+      mileageStrategy: 'onPaymentWithoutMileageUse',
       defaultMileagePercent: 1,
       useMileageFeature: false,
     },
