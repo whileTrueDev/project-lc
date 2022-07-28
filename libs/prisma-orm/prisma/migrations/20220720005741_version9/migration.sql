@@ -1,5 +1,24 @@
 
 -- AlterTable
+ALTER TABLE `ExchangeItem` RENAME COLUMN `amount` TO `quantity`;
+
+-- AlterTable
+ALTER TABLE `ExportItem` RENAME COLUMN `amount` TO `quantity`;
+
+-- AlterTable
+ALTER TABLE `OrderCancellationItem` RENAME COLUMN `amount` TO `quantity`;
+
+-- AlterTable
+ALTER TABLE `RefundItem` RENAME COLUMN `amount` TO `quantity`;
+
+-- AlterTable
+ALTER TABLE `ReturnItem` RENAME COLUMN `amount` TO `quantity`;
+
+-- AlterTable
+ALTER TABLE `SellerOrderCancelRequestItem` RENAME COLUMN `amount` TO `quantity`;
+
+
+-- AlterTable
 ALTER TABLE `GoodsCategory` ADD COLUMN `imageSrc` LONGTEXT NULL;
 
 -- CreateTable
@@ -13,6 +32,33 @@ CREATE TABLE `KkshowShoppingTabCategory` (
 
 -- AddForeignKey
 ALTER TABLE `KkshowShoppingTabCategory` ADD CONSTRAINT `KkshowShoppingTabCategory_goodsCategoryCode_fkey` FOREIGN KEY (`goodsCategoryCode`) REFERENCES `GoodsCategory`(`categoryCode`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- CreateTable
+CREATE TABLE `KkshowSubNavLink` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `index` INTEGER NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `link` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `KkshowSubNavLink_name_key`(`name`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+/*
+  Warnings:
+
+  - You are about to alter the column `mileageStrategy` on the `MileageSetting` table. The data in that column could be lost. The data in that column will be cast from `Enum("MileageSetting_mileageStrategy")` to `Enum("MileageSetting_mileageStrategy")`.
+
+*/
+-- AlterTable
+ALTER TABLE `MileageSetting` ADD COLUMN `useMileageFeature` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `mileageStrategy` ENUM('onPaymentPriceExceptMileageUsage', 'onPaymentPrice', 'onPaymentWithoutMileageUse') NOT NULL DEFAULT 'onPaymentWithoutMileageUse';
+
+
+-- 전역 마일리지 설정 초기값 저장(마일리지 적립기능 사용안함으로 설정해둠)
+INSERT INTO `MileageSetting` (`id`, `defaultMileagePercent`, `mileageStrategy`, `useMileageFeature`)
+VALUES
+	(1, 1, 'onPaymentWithoutMileageUse', 0);
 
 
 -- 최초 카테고리 이미지 데이터 추가
