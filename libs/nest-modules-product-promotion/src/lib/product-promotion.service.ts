@@ -60,8 +60,29 @@ export class ProductPromotionService {
 
   /** 상품홍보 삭제 */
   public async deleteProductPromotion(id: number): Promise<boolean> {
-    await this.prisma.productPromotion.delete({ where: { id } });
-    return true;
+    const result = await this.prisma.$transaction(async (transac) => {
+      const deleted = await transac.productPromotion.delete({ where: { id } });
+      // 카트상품 channel 변경
+      await transac.cartItem.updateMany({
+        data: { channel: 'normal' },
+        where: {
+          support: { productPromotionId: id, AND: { liveShopping: { is: null } } },
+        },
+      });
+      // 카트상품 channel 변경
+      await transac.cartItem.updateMany({
+        data: { channel: 'productPromotion' },
+        where: {
+          support: { productPromotionId: id, AND: { liveShopping: { isNot: null } } },
+        },
+      });
+      // 해당 상품홍보가 연결된 카트 응원메시지 삭제 (라이브쇼핑이 연결되어있다면 pass)
+      await transac.cartItemSupport.deleteMany({
+        where: { productPromotionId: deleted.id, AND: { liveShopping: { is: null } } },
+      });
+      return true;
+    });
+    return result;
   }
 
   /** 특정 방송인홍보페이지에 등록된 상품홍보목록 조회

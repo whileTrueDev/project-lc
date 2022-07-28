@@ -86,10 +86,10 @@ export function ExportManyDialog({
         const realDto = {
           ...dto,
           items: dto.items.filter((v) => !!v),
-          exportOptions: dto.items.filter((x) => !!x.amount),
+          exportOptions: dto.items.filter((x) => !!x.quantity),
         };
 
-        if (dto.items.every((o) => Number(o.amount) === 0)) {
+        if (dto.items.every((o) => Number(o.quantity) === 0)) {
           toast({
             status: 'warning',
             description:
@@ -110,7 +110,7 @@ export function ExportManyDialog({
     const dto: CreateKkshowExportDto[] = [];
     selectedKeys.forEach((k) => {
       const data = formData[Number(k)];
-      const realData = { ...data, items: data.items.filter((x) => !!x.amount) };
+      const realData = { ...data, items: data.items.filter((x) => !!x.quantity) };
       dto.push(realData);
     });
 

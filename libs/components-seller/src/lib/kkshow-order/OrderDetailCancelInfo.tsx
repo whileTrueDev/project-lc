@@ -24,7 +24,9 @@ export function OrderDetailCancelInfo({
         />
         <TextDotConnector />
         <Text isTruncated>
-          {cancelData.items.map((item) => item.amount).reduce((sum, cur) => sum + cur, 0)}
+          {cancelData.items
+            .map((item) => item.quantity)
+            .reduce((sum, cur) => sum + cur, 0)}
           개
         </Text>
       </Stack>

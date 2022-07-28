@@ -25,11 +25,13 @@ import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   AllGoodsIdsRes,
   ChangeGoodsViewDto,
+  DefaultPaginationDto,
   DeleteGoodsDto,
   GoodsByIdRes,
   GoodsImageDto,
   GoodsListRes,
   GoodsOptionWithStockInfo,
+  GoodsOutlineByIdPaginationRes,
   GoodsOutlineByIdRes,
   RegistGoodsDto,
   SellerGoodsSortColumn,
@@ -157,6 +159,15 @@ export class GoodsController {
   @Get('all-ids')
   getAllGoodsIds(): Promise<AllGoodsIdsRes> {
     return this.goodsService.findAllGoodsIds();
+  }
+
+  /** 카테고리코드 기준 상품 간략 정보 목록 조회 */
+  @Get('by-category/:categoryCode')
+  getGoodsByCategory(
+    @Param('categoryCode') categoryCode: string,
+    @Query(new ValidationPipe({ transform: true })) dto?: DefaultPaginationDto,
+  ): Promise<GoodsOutlineByIdPaginationRes> {
+    return this.goodsService.getGoodsOutlineByCategory(categoryCode, dto);
   }
 
   /** 상품 개별 조회 */

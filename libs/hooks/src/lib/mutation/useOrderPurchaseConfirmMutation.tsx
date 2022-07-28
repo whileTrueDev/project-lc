@@ -19,7 +19,13 @@ export const useOrderPurchaseConfirmMutation = (
     (dto: useOrderPurchaseConfirmMutationDto) =>
       axios.post<boolean>(`order/purchase-confirm`, dto).then((res) => res.data),
     {
-      onSuccess: () => queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY),
+      onSuccess: () => {
+        queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
+        queryClient.invalidateQueries('CustomerMileage', { refetchInactive: true });
+        queryClient.invalidateQueries('CustomerMileageHistory', {
+          refetchInactive: true,
+        });
+      },
       ...options,
     },
   );

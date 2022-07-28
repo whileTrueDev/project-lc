@@ -43,7 +43,7 @@ export class ReturnService {
           create: items.map((item) => ({
             orderItem: { connect: { id: item.orderItemId } },
             orderItemOption: { connect: { id: item.orderItemOptionId } },
-            amount: item.amount,
+            quantity: item.quantity,
           })),
         },
         images: {
@@ -108,7 +108,7 @@ export class ReturnService {
 
       const _items = items.map((i) => ({
         id: i.id, // 반품 상품 고유번호
-        amount: i.amount, // 반품 상품 개수
+        quantity: i.quantity, // 반품 상품 개수
         status: i.status, // 반품 상품 처리상태
         goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
         image: i.orderItem.goods.image?.[0]?.image, // 주문 상품 이미지
@@ -189,7 +189,7 @@ export class ReturnService {
 
     const _items = items.map((i) => ({
       id: i.id, // 반품 상품 고유번호
-      amount: i.amount, // 반품 상품 개수
+      quantity: i.quantity, // 반품 상품 개수
       status: i.status, // 반품 상품 처리상태
       goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
       image: i.orderItem.goods.image?.[0]?.image, // 주문 상품 이미지

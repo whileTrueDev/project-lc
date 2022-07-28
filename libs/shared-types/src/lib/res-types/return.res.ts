@@ -21,7 +21,7 @@ export type ReturnItemData = ExchangeReturnCancelItemBaseData & {
   /** 주문취소상품 고유번호 */
   id: ReturnItem['id'];
   /** 주문취소상품 개수 */
-  amount: ReturnItem['amount'];
+  quantity: ReturnItem['quantity'];
   /** 주문취소상품 처리 상태 */
   status: ReturnItem['status'];
 };

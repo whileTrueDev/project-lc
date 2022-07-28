@@ -7,7 +7,7 @@ export type ExchangeItemData = ExchangeReturnCancelItemBaseData & {
   /** 교환상품 고유번호 */
   id: ExchangeItem['id'];
   /** 교환상품 개수 */
-  amount: ExchangeItem['amount'];
+  quantity: ExchangeItem['quantity'];
   /** 교환상품 처리 상태 */
   status: ExchangeItem['status'];
 };

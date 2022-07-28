@@ -66,7 +66,7 @@ export function ReExportDialog({
       items: exchangeData.exchangeItems.map((item) => ({
         orderItemId: item.orderItemId,
         orderItemOptionId: item.orderItemOptionId,
-        amount: item.amount,
+        quantity: item.quantity,
       })),
     },
   });
@@ -171,7 +171,7 @@ export function ReExportDialog({
                             </Text>
                           </Td>
                           <Td>
-                            <Text>{exchangeItem.amount} 개 </Text>
+                            <Text>{exchangeItem.quantity} 개 </Text>
                           </Td>
                         </Tr>
                       );

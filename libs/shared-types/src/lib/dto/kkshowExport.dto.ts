@@ -31,7 +31,7 @@ export class KkshowExportItem {
 
   @IsNumber()
   /**  출고개수 */
-  amount: number;
+  quantity: number;
 }
 
 /** 크크쇼 단일출고처리 생성 dto */

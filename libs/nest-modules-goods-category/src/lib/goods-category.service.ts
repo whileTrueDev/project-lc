@@ -3,13 +3,15 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { GoodsCategory } from '@prisma/client';
+import { GoodsCategory, Prisma } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateGoodsCategoryDto,
   AdminGoodsCategoryRes,
   UpdateGoodsCategoryDto,
   GoodsCategoryRes,
+  CategoryOnGoodsConnectionDto,
+  GoodsCategoryWithFamily,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 
@@ -35,7 +37,7 @@ export class GoodsCategoryService {
       return newCategory;
     } catch (e) {
       if (e.code && e.code === 'P2002') {
-        throw new BadRequestException('중복된 카테고리 코드 입력');
+        throw new BadRequestException('중복된 카테고리');
       }
       throw new InternalServerErrorException(e);
     }
@@ -44,7 +46,7 @@ export class GoodsCategoryService {
   // 카테고리 조회
   async getCategories(): Promise<AdminGoodsCategoryRes> {
     const categories = await this.prisma.goodsCategory.findMany({
-      include: { _count: { select: { goods: true } } },
+      include: { _count: { select: { goods: true } }, kkshowShoppingTabCategory: true },
     });
 
     return categories.map((c) => {
@@ -71,6 +73,64 @@ export class GoodsCategoryService {
     });
   }
 
+  /** 특정 카테고리 조회 */
+  async findCategory(id: number): Promise<GoodsCategoryWithFamily>;
+  async findCategory(categoryCode: string): Promise<GoodsCategoryWithFamily>;
+  async findCategory(findTarget: number | string): Promise<GoodsCategoryWithFamily> {
+    const includeField: Prisma.GoodsCategoryInclude = {
+      // 하위 -> 하위 카테고리까지
+      childrenCategories: { include: { childrenCategories: true } },
+      // 상위 -> 상위 카테고리까지
+      parentCategory: { include: { parentCategory: true } },
+    };
+    if (typeof findTarget === 'number') {
+      return this.prisma.goodsCategory.findUnique({
+        where: { id: findTarget },
+        include: includeField,
+      });
+    }
+    return this.prisma.goodsCategory.findUnique({
+      where: { categoryCode: findTarget },
+      include: includeField,
+    });
+  }
+
+  /** 상위 카테고리정보를 포함하는 특정 카테고리 목록 조회. */
+  async findCategoriesByCodes(
+    categoryCodes: string[],
+    opts?: { withChildren?: boolean },
+  ): Promise<GoodsCategoryWithFamily[]> {
+    const result = await this.prisma.goodsCategory.findMany({
+      where: { categoryCode: { in: categoryCodes } },
+      include: !opts?.withChildren
+        ? { parentCategory: { include: { parentCategory: true } } }
+        : {
+            // 하위 -> 하위 카테고리까지
+            childrenCategories: { include: { childrenCategories: opts?.withChildren } },
+            // 상위 -> 상위 카테고리까지
+            parentCategory: { include: { parentCategory: true } },
+          },
+    });
+
+    // 하위 카테고리가 이미지가 없는 경우 상위카테고리의 이미지로 채워넣는 작업
+    const imageFilledResult = result.map((r) => {
+      const tmp = { ...r };
+      if (tmp.imageSrc) return tmp;
+      if (r.parentCategory) {
+        if (r.parentCategory.imageSrc) tmp.imageSrc = r.parentCategory?.imageSrc;
+        if (
+          !r.parentCategory.imageSrc &&
+          r.parentCategory.parentCategory &&
+          r.parentCategory.parentCategory.imageSrc
+        ) {
+          tmp.imageSrc = r.parentCategory.parentCategory.imageSrc;
+        }
+      }
+      return tmp;
+    });
+    return imageFilledResult;
+  }
+
   // 카테고리 수정
   async updateCategory(id: number, updateDto: UpdateGoodsCategoryDto): Promise<boolean> {
     await this.prisma.goodsCategory.update({
@@ -87,6 +147,30 @@ export class GoodsCategoryService {
       where: { id },
     });
 
+    return true;
+  }
+
+  /**
+   * 특정 상품과 카테고리 연결 생성
+   */
+  async connectCategoryOnGoods(dto: CategoryOnGoodsConnectionDto): Promise<boolean> {
+    const { goodsId, categoryId } = dto;
+    await this.prisma.goodsCategory.update({
+      where: { id: categoryId },
+      data: { goods: { connect: { id: goodsId } } },
+    });
+    return true;
+  }
+
+  /**
+   * 특정 상품과 카테고리 연결 해제
+   */
+  async disconnectCategoryOnGoods(dto: CategoryOnGoodsConnectionDto): Promise<boolean> {
+    const { goodsId, categoryId } = dto;
+    await this.prisma.goodsCategory.update({
+      where: { id: categoryId },
+      data: { goods: { disconnect: { id: goodsId } } },
+    });
     return true;
   }
 }

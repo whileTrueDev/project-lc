@@ -6,7 +6,7 @@ import { OrderItemOptionInfo } from '../orderList/OrderItemOptionInfo';
 export type SelectedOrderItem = {
   orderItemId: number;
   orderItemOptionId: number;
-  amount: number;
+  quantity: number;
 };
 
 export interface ItemSelectSectionProps {
@@ -30,7 +30,7 @@ export function ItemSelectSection({
         item.options.map((opt) => ({
           orderItemId: item.id,
           orderItemOptionId: opt.id,
-          amount: opt.quantity,
+          quantity: opt.quantity,
         })),
       );
       setSelectedItems(all);
@@ -72,7 +72,7 @@ export function ItemSelectSection({
                     {
                       orderItemId: item.id,
                       orderItemOptionId: opt.id,
-                      amount: opt.quantity,
+                      quantity: opt.quantity,
                     },
                   ]);
                 }

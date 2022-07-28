@@ -203,27 +203,53 @@ export class AdminService {
     dto: LiveShoppingUpdateDTO,
     videoId?: number | null,
   ): Promise<boolean> {
-    const liveShoppingUpdate = await this.prisma.liveShopping.update({
-      where: { id: Number(dto.id) },
-      data: {
-        progress: dto.progress || undefined,
-        broadcasterId: dto.broadcasterId || undefined,
-        broadcastStartDate: dto.broadcastStartDate
-          ? new Date(dto.broadcastStartDate)
-          : undefined,
-        broadcastEndDate: dto.broadcastEndDate
-          ? new Date(dto.broadcastEndDate)
-          : undefined,
-        sellStartDate: dto.sellStartDate ? new Date(dto.sellStartDate) : undefined,
-        sellEndDate: dto.sellEndDate ? new Date(dto.sellEndDate) : undefined,
-        rejectionReason: dto.rejectionReason || undefined,
-        videoId: videoId || undefined,
-        whiletrueCommissionRate: dto.whiletrueCommissionRate || 0,
-        broadcasterCommissionRate: dto.broadcasterCommissionRate || 0,
-        liveShoppingName: dto.liveShoppingName || undefined,
-      },
+    const liveShoppingUpdate = await this.prisma.$transaction(async (transac) => {
+      const result = await transac.liveShopping.update({
+        where: { id: Number(dto.id) },
+        data: {
+          progress: dto.progress || undefined,
+          broadcasterId: dto.broadcasterId || undefined,
+          broadcastStartDate: dto.broadcastStartDate
+            ? new Date(dto.broadcastStartDate)
+            : undefined,
+          broadcastEndDate: dto.broadcastEndDate
+            ? new Date(dto.broadcastEndDate)
+            : undefined,
+          sellStartDate: dto.sellStartDate ? new Date(dto.sellStartDate) : undefined,
+          sellEndDate: dto.sellEndDate ? new Date(dto.sellEndDate) : undefined,
+          rejectionReason: dto.rejectionReason || undefined,
+          videoId: videoId || undefined,
+          whiletrueCommissionRate: dto.whiletrueCommissionRate || 0,
+          broadcasterCommissionRate: dto.broadcasterCommissionRate || 0,
+          liveShoppingName: dto.liveShoppingName || undefined,
+        },
+      });
+      // 취소상태로 변경하는 경우
+      if (dto.progress === 'canceled') {
+        // 카트상품 channel 변경
+        await transac.cartItem.updateMany({
+          data: { channel: 'normal' },
+          where: {
+            support: { liveShoppingId: dto.id, AND: { productPromotion: { is: null } } },
+          },
+        });
+        // 카트상품 channel 변경
+        await transac.cartItem.updateMany({
+          data: { channel: 'productPromotion' },
+          where: {
+            support: {
+              liveShoppingId: dto.id,
+              AND: { productPromotion: { isNot: null } },
+            },
+          },
+        });
+        // 해당 라이브쇼핑이 연결된 카트 응원메시지 삭제 (상품홍보가 연결되어있다면 pass)
+        await transac.cartItemSupport.deleteMany({
+          where: { liveShoppingId: dto.id, AND: { productPromotion: { is: null } } },
+        });
+      }
+      return result;
     });
-
     if (!liveShoppingUpdate) throw new InternalServerErrorException(`업데이트 실패`);
 
     // 방송인을 등록하는 경우 => 해당방송인의 상품홍보페이지에 라이브쇼핑 진행상품 등록

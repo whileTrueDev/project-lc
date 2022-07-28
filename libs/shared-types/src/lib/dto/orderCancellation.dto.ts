@@ -9,6 +9,7 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import { CreateReturnItemDto } from './return.dto';
 
 // *------------ 주문취소 생성 dto ------------------
 /** 주문취소에 포함된 상품 dto */
@@ -23,7 +24,7 @@ export class OrderCancellationItemDto {
 
   /** 주문상품 옵션 취소할 개수 */
   @IsNumber()
-  amount: number;
+  quantity: number;
 }
 
 /** 주문취소생성 dto */

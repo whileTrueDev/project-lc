@@ -77,9 +77,9 @@ export function ExportDialog({
       if (isValid) {
         formMethods.setValue(`${orderShippingIdx}.orderId`, orderId);
         const dto = formMethods.getValues(fieldID);
-        const realDto = { ...dto, items: dto.items.filter((x) => !!x.amount) };
+        const realDto = { ...dto, items: dto.items.filter((x) => !!x.quantity) };
         // 보낼 수량이 0개 인지 체크
-        if (realDto.items.every((o) => Number(o.amount) === 0)) {
+        if (realDto.items.every((o) => Number(o.quantity) === 0)) {
           toast({
             status: 'warning',
             description:

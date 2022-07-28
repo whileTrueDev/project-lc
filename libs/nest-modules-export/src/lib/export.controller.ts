@@ -9,7 +9,12 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
+import {
+  CacheClearKeys,
+  HttpCacheInterceptor,
+  SellerInfo,
+  UserPayload,
+} from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 // import { SellerInfo, UserPayload } from '@project-lc/nest-core';
 import {
@@ -33,27 +38,31 @@ export class ExportController {
   @Post('bundle')
   public exportBundle(
     @Body(ValidationPipe) dto: ExportManyDto,
-    // @SellerInfo() seller: UserPayload,
+    @SellerInfo() seller: UserPayload,
   ): Promise<boolean> {
-    return this.exportService.exportBundle(dto);
+    return this.exportService.exportBundle({
+      exportOrders: dto.exportOrders.map((data) => ({ ...data, sellerId: seller.id })),
+    });
   }
 
   /** 일괄 출고처리 */
   @Post('many')
   public exportMany(
     @Body(ValidationPipe) dto: ExportManyDto,
-    // @SellerInfo() seller: UserPayload,
+    @SellerInfo() seller: UserPayload,
   ): Promise<boolean> {
-    return this.exportService.exportMany(dto);
+    return this.exportService.exportMany({
+      exportOrders: dto.exportOrders.map((data) => ({ ...data, sellerId: seller.id })),
+    });
   }
 
   /** 단일 출고처리 */
   @Post()
   public exportOne(
     @Body(ValidationPipe) dto: CreateKkshowExportDto,
-    // @SellerInfo() seller: UserPayload,
+    @SellerInfo() seller: UserPayload,
   ): Promise<ExportCreateRes> {
-    return this.exportService.exportOne({ dto });
+    return this.exportService.exportOne({ dto: { ...dto, sellerId: seller.id } });
   }
 
   /** 개별출고정보 조회 */

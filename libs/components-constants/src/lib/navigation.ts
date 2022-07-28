@@ -14,6 +14,7 @@ import {
   FcFaq,
   FcFinePrint,
   FcInspection,
+  FcLink,
   FcList,
   FcMoneyTransfer,
   FcQuestions,
@@ -312,6 +313,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
       { name: '결제취소 요청', href: '/order/order-cancel', icon: FcDislike },
       { name: '주문 목록', href: '/order/list', icon: FcList },
       { name: '환불요청 처리', href: '/order/refund', icon: FcMoneyTransfer },
+      { name: '마일리지 설정', href: '/order/mileage-setting', icon: FcRating },
     ],
   },
   {
@@ -342,6 +344,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '크크쇼 메인',
     href: '/kkshow-main',
     children: [
+      {
+        name: '크크쇼 네비링크관리',
+        href: '/kkshow-main/kkshow-subnav',
+        icon: FcLink,
+      },
       { name: '크크쇼 메인페이지', href: '/kkshow-main', icon: FcList },
       {
         name: '크크쇼 쇼핑페이지',

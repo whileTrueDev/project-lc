@@ -3,14 +3,12 @@ import {
   Box,
   Button,
   Center,
+  Divider,
   Flex,
   FormControl,
-  FormLabel,
-  Grid,
-  GridItem,
   IconButton,
-  Input,
   ListItem,
+  SimpleGrid,
   Spinner,
   Stack,
   Text,
@@ -19,36 +17,49 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
-import { useGoodsCategory, useGoodsInformationSubjectById } from '@project-lc/hooks';
-import { GoodsCategoryItem, RegistGoodsDto } from '@project-lc/shared-types';
+import { useGoodsCategory } from '@project-lc/hooks';
+import { GoodsCategoryItem } from '@project-lc/shared-types';
 import { goodsRegistStore } from '@project-lc/stores';
-import { useEffect } from 'react';
-import { useFormContext } from 'react-hook-form';
 
 export function GoodsRegistCategory(): JSX.Element {
-  const selectedCategory = goodsRegistStore((s) => s.selectedCategory);
-  const handleCaregorySelect = goodsRegistStore((s) => s.handleCaregorySelect);
-  const { setValue } = useFormContext<RegistGoodsDto>();
+  const selectedCategories = goodsRegistStore((s) => s.selectedCategories);
+  const addToSelectedCategories = goodsRegistStore((s) => s.addToSelectedCategories);
+  const removeFromSelectedCategories = goodsRegistStore(
+    (s) => s.removeFromSelectedCategories,
+  );
+
   const handleClick = (category: GoodsCategoryItem): void => {
-    setValue('categoryId', category.id);
-    handleCaregorySelect(category);
+    addToSelectedCategories(category);
   };
 
   return (
     <SectionWithTitle title="상품 카테고리" variant="outlined">
-      <FormControl>
-        <Text>선택된 카테고리: {selectedCategory?.name}</Text>
-        <UnorderedList fontSize="xs" color="GrayText">
-          <ListItem>아래 카테고리 트리에서 선택해주세요.</ListItem>
-        </UnorderedList>
-        <Categories onCategoryClick={handleClick} />
-      </FormControl>
+      <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={8}>
+        <FormControl>
+          <Text fontSize="xs" color="GrayText">
+            아래 카테고리 트리에서 선택해주세요.
+          </Text>
+          <Categories onCategoryClick={handleClick} />
+        </FormControl>
 
-      <Box my={2}>
-        <GoodsRegistInformationNotice
-          informationSubjectId={selectedCategory?.informationSubjectId}
-        />
-      </Box>
+        {/* 카테고리 트리에서 선택한 카테고리가 표시되는 목록 */}
+        <Stack spacing={1}>
+          <Text fontSize="xs" color="GrayText">
+            상품에 연결될 카테고리 목록
+          </Text>
+          <Stack spacing={1} fontWeight="normal" fontSize="sm">
+            {selectedCategories.length === 0 && <Text>없음</Text>}
+            {selectedCategories.map((c) => (
+              <Stack direction="row" key={c.id}>
+                <Box>{c.name}</Box>
+                <Button size="xs" onClick={() => removeFromSelectedCategories(c.id)}>
+                  해제
+                </Button>
+              </Stack>
+            ))}
+          </Stack>
+        </Stack>
+      </SimpleGrid>
     </SectionWithTitle>
   );
 }
@@ -58,7 +69,7 @@ export default GoodsRegistCategory;
 interface CategoriesProps {
   onCategoryClick: (category: GoodsCategoryItem) => void;
 }
-function Categories({ onCategoryClick }: CategoriesProps): JSX.Element | null {
+export function Categories({ onCategoryClick }: CategoriesProps): JSX.Element | null {
   const { data, isLoading } = useGoodsCategory({ mainCategoryFlag: true });
   if (isLoading)
     return (
@@ -85,7 +96,7 @@ interface CategoryProps {
   category: GoodsCategoryItem;
   onClick: (category: GoodsCategoryItem) => void;
 }
-function Category({ depth = 0, category, onClick }: CategoryProps): JSX.Element {
+export function Category({ depth = 0, category, onClick }: CategoryProps): JSX.Element {
   const subCategory = useDisclosure();
   const subCategories = useGoodsCategory(
     { parentCategoryId: category.id },
@@ -141,64 +152,6 @@ function Category({ depth = 0, category, onClick }: CategoryProps): JSX.Element 
           ))}
         </Stack>
       )}
-    </Box>
-  );
-}
-
-function GoodsRegistInformationNotice({
-  informationSubjectId,
-}: {
-  informationSubjectId?: GoodsCategoryItem['informationSubjectId'] | null;
-}): JSX.Element | null {
-  const { initializeNotice, informationNotice, handleChange } = goodsRegistStore();
-  const { data } = useGoodsInformationSubjectById(informationSubjectId);
-
-  useEffect(() => {
-    if (data) initializeNotice(data.items);
-  }, [data, initializeNotice]);
-
-  if (!data) return null;
-  return (
-    <Box>
-      <Box mb={2}>
-        <Text fontSize="xl" fontWeight="bold">
-          품목별 필수 정보
-          <Text as="span" fontSize="sm">
-            {` (${data.subject})`}
-          </Text>
-        </Text>
-
-        <UnorderedList fontSize="xs" color="GrayText">
-          <ListItem>
-            항목을 비워두는 경우 상세설명 및 상세이미지 참조로 작성됩니다.
-          </ListItem>
-        </UnorderedList>
-      </Box>
-      {informationNotice &&
-        Object.keys(data.items as object).map((key) => (
-          <FormControl key={key}>
-            <Grid templateColumns="repeat(4, 1fr)" gap={2} mb={2}>
-              <GridItem colSpan={[4, 4, 1]}>
-                <FormLabel fontSize="sm" fontWeight="normal">
-                  {key}
-                </FormLabel>
-              </GridItem>
-              <GridItem colSpan={[4, 4, 3]}>
-                <Input
-                  size="sm"
-                  placeholder="상세설명 및 상세이미지 참조"
-                  value={
-                    key === '소비자상담 관련 전화번호'
-                      ? data.items[key]
-                      : informationNotice[key]
-                  }
-                  isReadOnly={key === '소비자상담 관련 전화번호'}
-                  onChange={(e) => handleChange(key, e.target.value)}
-                />
-              </GridItem>
-            </Grid>
-          </FormControl>
-        ))}
     </Box>
   );
 }

@@ -77,7 +77,7 @@ export function AdminBroadcasterProductPromotionSection({
   );
 }
 
-const commissionRateMinMax = {
+export const percentageRateMinMax = {
   max: { value: 100, message: '최대값은 100입니다' },
   min: { value: 0, message: '최소값은 0입니다' },
 };
@@ -135,7 +135,7 @@ export function AdminProductPromotionForm({
               autoComplete="off"
               {...register('broadcasterCommissionRate', {
                 valueAsNumber: true,
-                ...commissionRateMinMax,
+                ...percentageRateMinMax,
                 required: '방송인 수수료를 작성해주세요.',
               })}
             />
@@ -159,7 +159,7 @@ export function AdminProductPromotionForm({
               autoComplete="off"
               {...register('whiletrueCommissionRate', {
                 valueAsNumber: true,
-                ...commissionRateMinMax,
+                ...percentageRateMinMax,
                 required: '와일트루 수수료를 작성해주세요.',
               })}
             />
@@ -375,7 +375,7 @@ export function AdminProductPromotionUpdateModal({
                     autoComplete="off"
                     {...register('broadcasterCommissionRate', {
                       valueAsNumber: true,
-                      ...commissionRateMinMax,
+                      ...percentageRateMinMax,
                       required: '방송인 수수료를 작성해주세요.',
                     })}
                   />
@@ -400,7 +400,7 @@ export function AdminProductPromotionUpdateModal({
                     autoComplete="off"
                     {...register('whiletrueCommissionRate', {
                       valueAsNumber: true,
-                      ...commissionRateMinMax,
+                      ...percentageRateMinMax,
                       required: '와일트루 수수료를 작성해주세요.',
                     })}
                   />
