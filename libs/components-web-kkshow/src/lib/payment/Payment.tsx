@@ -137,7 +137,6 @@ export function PaymentBox(): JSX.Element {
       ),
     [DISCOUNT, PRODUCT_PRICE, SHIPPING_COST, watch],
   );
-
   return (
     <Box
       px={{ base: 0, lg: 4 }}
