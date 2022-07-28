@@ -430,7 +430,12 @@ export class GoodsService {
     const result = await this.prisma.goods.findMany({
       skip,
       take: realTake,
-      where: { categories: { some: { categoryCode } } },
+      where: {
+        OR: [
+          { categories: { some: { categoryCode } } },
+          { categories: { some: { parentCategory: { categoryCode } } } },
+        ],
+      },
       select: {
         id: true,
         goods_name: true,
