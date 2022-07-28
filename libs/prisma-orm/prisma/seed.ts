@@ -11,7 +11,6 @@ import {
   SellerContacts,
   ShippingGroup,
 } from '@prisma/client';
-import { getWebHost } from '@project-lc/utils';
 import { cartSample, tempUserCartItemSample } from './seedData/cart';
 import { dummyCustomer } from './seedData/customer';
 import { createDummyBroadcaster } from './seedData/dummyBc';
@@ -138,7 +137,7 @@ async function createBroadcasterPromotionPage(
   return prisma.broadcasterPromotionPage.create({
     data: {
       broadcasterId,
-      url: `${getWebHost()}/bc/${broadcasterId}`,
+      url: `https://dev.xn--hp4b17xa.com/bc/${broadcasterId}`,
       comment: `✍️Senior 2D Artist
 @SecondDinnerGames
 🎨Illustrator for Hearthstone and MtG
