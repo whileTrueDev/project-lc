@@ -13,7 +13,7 @@ import {
 import { UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
-import { MileageService } from '@project-lc/nest-modules-mileage';
+import { MileageService, MileageSettingService } from '@project-lc/nest-modules-mileage';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
@@ -34,6 +34,7 @@ import {
   OrderShippingCheckDto,
   OrderStatsRes,
   OrderStatusNumString,
+  purchaseConfirmAbleSteps,
   sellerOrderSteps,
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
@@ -55,6 +56,7 @@ export class OrderService {
     private readonly userPwManager: UserPwManager,
     private readonly customerCouponService: CustomerCouponService,
     private readonly mileageService: MileageService,
+    private readonly mileageSettingService: MileageSettingService,
   ) {}
 
   private async hash(pw: string): Promise<string> {
@@ -984,8 +986,7 @@ export class OrderService {
     return true;
   }
 
-  /** 구매확정 - 모든 주문상품옵션이 배송완료 상태일때 구매확정이 가능
-   */
+  /** 구매확정 & 마일리지 적립 */
   async purchaseConfirm(dto: OrderPurchaseConfirmationDto): Promise<boolean> {
     const { orderItemOptionId } = dto;
     const orderItemOption = await this.prisma.orderItemOption.findUnique({
@@ -998,12 +999,11 @@ export class OrderService {
       );
     }
 
+    // * ---- 출고 Export 에 구매확정일자 저장(구매확정처리) ----
     // 주문상품옵션이 연결된 출고 조회
     const exportData = await this.prisma.export.findFirst({
       where: { items: { some: { orderItemOptionId } } },
-      include: {
-        items: { select: { orderItemOptionId: true } },
-      },
+      include: { items: { include: { orderItemOption: true } } },
     });
     // 해당 출고데이터에 구매확정일자 저장
     if (exportData && !exportData.buyConfirmDate) {
@@ -1016,34 +1016,37 @@ export class OrderService {
       });
     }
 
-    // 해당 출고에 대한 구매확정처리 == 해당 출고에 포함된 주문상품옵션은 모두 구매확정처리
-    // 같이 구매확정 상태로 변경되어야 하는(동일한 출고에 포함된) 주문상품옵션id들
-    const batchExportedOrderOptionIds = exportData
-      ? exportData.items.map((i) => i.orderItemOptionId)
+    // 해당 출고에 대한 구매확정처리 == 해당 출고에 포함된 주문상품옵션 중 구매확정이 가능한 상태의 상품들 구매확정처리
+    const batchExportedItemsWithOrderOptionData = exportData
+      ? exportData.items.filter(
+          (i) => purchaseConfirmAbleSteps.includes(i.orderItemOption.step), // 구매확정 가능한 상태(shippingDone)인 주문상품만
+        )
       : [];
-
-    // 해당 주문상품옵션 & 연결된 출고에 포함된 모든 주문상품옵션을 구매확정으로 상태 변경
+    // 같이 구매확정 상태로 변경되어야 하는(동일한 출고에 포함된) 주문상품옵션id들
+    const batchExportedOrderOptionIds = batchExportedItemsWithOrderOptionData.map(
+      (i) => i.orderItemOptionId,
+    );
+    const buyConfirmTargetIds = batchExportedOrderOptionIds.concat(orderItemOptionId);
+    // 해당 주문상품옵션 & 연결된 출고에 포함된 주문상품옵션을 구매확정으로 상태 변경
     await this.prisma.orderItemOption.updateMany({
-      where: { id: { in: batchExportedOrderOptionIds.concat(orderItemOptionId) } },
+      where: { id: { in: buyConfirmTargetIds } },
       data: {
         step: 'purchaseConfirmed',
       },
     });
 
+    // * ---- 주문상품옵션 상태 변경 이후 주문상태 업데이트 ----
     // 해당 주문상품옵션이 포함된 주문 찾기
     const order = await this.prisma.order.findFirst({
       where: { orderItems: { some: { options: { some: { id: orderItemOptionId } } } } },
       select: {
         id: true,
+        orderCode: true,
+        customerId: true,
         orderItems: { select: { options: true } },
+        shippings: { include: { items: { select: { id: true } } } }, // 주문배송비에 연겨된 주무상품id들(주문상품옵션이 아님)
       },
     });
-
-    if (!order) {
-      throw new BadRequestException(
-        `해당 주문상품옵션이 포함된 주문이 존재하지 않습니다. 주문상품옵션 고유번호 : ${orderItemOptionId}`,
-      );
-    }
 
     // 주문에 포함된 모든 주문상품옵션이 구매확정 되었다면 주문의 상태도 구매확정으로 변경
     const everyOrderItemOptionsPurchaseConfirmed = order.orderItems
@@ -1056,6 +1059,83 @@ export class OrderService {
         where: { id: order.id },
         data: { step: 'purchaseConfirmed' },
       });
+    }
+
+    // * ---- 구매확정된 상품에 대한 마일리지 적립 ----
+    if (order.customerId) {
+      // 기본마일리지 설정값 => 전역 마일리지 설정값에 따라 적립률, 적립여부가 달라짐
+      const defaultMileageSetting = await this.mileageSettingService.getMileageSetting();
+      // 적립예정금액 초기화
+      let earnMileage = 0;
+      // 적립예정금액 구하기
+      // 구매확정한 상품옵션 순회하며 (상품개당가격*주문한개수*마일리지적립률)로 적립예정금액 구한다
+      const itemMileage = batchExportedItemsWithOrderOptionData.reduce((sum, opt) => {
+        const itemPrice =
+          Number(opt.orderItemOption.discountPrice) * opt.orderItemOption.quantity;
+        return (
+          sum + Math.floor(itemPrice * defaultMileageSetting.defaultMileagePercent * 0.01)
+        );
+      }, 0);
+      // + 배송비에 대한 마일리지 적립(주문금액에 배송비가 포함되어 있으므로)
+      // 구매확정된 출고상품이 연결된 주문배송비 정보 찾기
+      const shippingMileage = order.shippings
+        .filter((ship) => {
+          const shippingRelatedOrderItemIds = ship.items.map((item) => item.id); // 해당 주문배송비에 연결된 주문상품id[]
+          // 같이 출고된 주문상품 id[];
+          const exportItemOrderIds = batchExportedItemsWithOrderOptionData.map(
+            (ei) => ei.orderItemId,
+          );
+          return exportItemOrderIds.some((id) =>
+            shippingRelatedOrderItemIds.includes(id),
+          );
+        })
+        .reduce((sum, ship) => {
+          return (
+            sum +
+            Math.floor(
+              Number(ship.shippingCost) *
+                defaultMileageSetting.defaultMileagePercent *
+                0.01,
+            )
+          );
+        }, 0);
+
+      earnMileage = itemMileage + shippingMileage;
+      // 마일리지 적립사유
+      const reason = `주문번호 ${order.orderCode}에 대한 구매확정 (구매확정상품 : ${
+        orderItemOption.goodsName
+      } ${
+        batchExportedItemsWithOrderOptionData.length > 1
+          ? `외 ${batchExportedItemsWithOrderOptionData.length} 개`
+          : ''
+      }, 적립금액 : ${earnMileage}) `;
+
+      const mileageUsedOnOrder = await this.prisma.customerMileageLog.findMany({
+        where: {
+          actionType: 'consume',
+          orderId: order.id,
+        },
+      });
+
+      // 적립예정 마일리지가 0원이상이고
+      // 전역 마일리지설정에서 마일리지 기능이 사용중인경우 (useMileageFeature === true) 마일리지 적립함
+      if (
+        earnMileage > 0 &&
+        defaultMileageSetting.useMileageFeature === true &&
+        // (전역 마일리지설정에서 마일리지 적립방식이 onPaymentWithoutMileageUse이면서 주문시 마일리지 사용한 경우)는 제외
+        !(
+          defaultMileageSetting.mileageStrategy === 'onPaymentWithoutMileageUse' &&
+          mileageUsedOnOrder.length > 0
+        )
+      ) {
+        await this.mileageService.upsertMileage({
+          customerId: order.customerId,
+          actionType: MileageActionType.earn,
+          orderId: order.id,
+          mileage: earnMileage,
+          reason,
+        });
+      }
     }
 
     return true;

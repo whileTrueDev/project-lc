@@ -1,5 +1,6 @@
-import { Box, Button, Center, Divider, Flex, Text } from '@chakra-ui/react';
+import { Box, Button, Center, Divider, Flex, Spinner, Text } from '@chakra-ui/react';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
+import { useDefaultMileageSetting } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
 import { getCustomerWebHost } from '@project-lc/utils';
@@ -8,12 +9,8 @@ import { loadTossPayments } from '@tosspayments/payment-sdk';
 import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
 import { useFormContext } from 'react-hook-form';
+import { useMemo } from 'react';
 import { TermBox } from './TermBox';
-
-const mileageSetting = {
-  defaultMileagePercent: 10,
-  mileageStrategy: 'onPaymentPrice',
-};
 
 export function getOrderPrice(
   originalPrice: number,
@@ -54,34 +51,51 @@ export function MileageBenefit({
   mileage,
 }: {
   productPrice: number;
+  /** 사용한 마일리지 */
   mileage?: number;
 }): JSX.Element {
+  const { data: mileageSettingData, isLoading } = useDefaultMileageSetting();
+  if (isLoading) return <Spinner />;
+  if (
+    !mileageSettingData ||
+    // 전역 마일리지 설정에서 마일리지 기능 사용하지 않거나
+    !mileageSettingData.useMileageFeature ||
+    // 마일리지 기능을 사용하지만, 마일리지 적립방식이 onPaymentWithoutMileageUse(마일리지 사용시 적립x)이고 마일리지를 사용한 경우
+    (mileageSettingData.useMileageFeature &&
+      mileage &&
+      mileageSettingData.mileageStrategy === 'onPaymentWithoutMileageUse')
+  ) {
+    return (
+      <Flex justifyContent="space-between" h="60px" alignItems="center">
+        <Text>적립 혜택이 없습니다</Text>
+      </Flex>
+    );
+  }
   return (
     <Flex justifyContent="space-between" h="60px" alignItems="center">
-      {mileageSetting.mileageStrategy === 'noMileage' ? (
-        <Text>적립 혜택이 없습니다</Text>
-      ) : (
-        <Box>
-          <Text as="span" fontWeight="bold">
-            {mileageSetting.mileageStrategy === 'onPaymentPrice' &&
-              (
-                productPrice *
-                (mileageSetting.defaultMileagePercent * 0.01)
-              ).toLocaleString()}
-            {mileageSetting.mileageStrategy === 'onPaymentPriceExceptMileageUsage' &&
-              (
-                (productPrice - (mileage || 0)) *
-                (mileageSetting.defaultMileagePercent * 0.01)
-              ).toLocaleString()}
-          </Text>
-          <Text as="span">원 적립예정</Text>
-        </Box>
-      )}
+      <Box>
+        <Text as="span" fontWeight="bold">
+          {mileageSettingData.mileageStrategy === 'onPaymentPrice' &&
+            (
+              productPrice *
+              (mileageSettingData.defaultMileagePercent * 0.01)
+            ).toLocaleString()}
+          {(mileageSettingData.mileageStrategy === 'onPaymentPriceExceptMileageUsage' ||
+            (mileageSettingData.mileageStrategy === 'onPaymentWithoutMileageUse' &&
+              !mileage)) &&
+            (
+              (productPrice - (mileage || 0)) *
+              (mileageSettingData.defaultMileagePercent * 0.01)
+            ).toLocaleString()}
+        </Text>
+        <Text as="span">원 적립예정</Text>
+      </Box>
     </Flex>
   );
 }
 
 export function PaymentBox(): JSX.Element {
+  const { data: mileageSettingData } = useDefaultMileageSetting();
   const { order, shipping, shopNames } = useKkshowOrderStore();
 
   const PRODUCT_PRICE =
@@ -109,8 +123,20 @@ export function PaymentBox(): JSX.Element {
     formState: { isSubmitting },
   } = useFormContext<CreateOrderForm>();
 
-  const noMileageBenefit =
-    mileageSetting.mileageStrategy === 'noMileage' || !watch('customerId'); // 로그인 안한경우도 적립안됨
+  const noMileageBenefit = !mileageSettingData?.useMileageFeature || !watch('customerId'); // 로그인 안한경우도 적립안됨
+
+  // 결제버튼에 표시되는 최종 결제금액
+  const orderPrice = useMemo(
+    () =>
+      getOrderPrice(
+        PRODUCT_PRICE,
+        SHIPPING_COST,
+        DISCOUNT,
+        watch('usedCouponAmount') || 0,
+        watch('usedMileageAmount') || 0,
+      ),
+    [DISCOUNT, PRODUCT_PRICE, SHIPPING_COST, watch],
+  );
 
   return (
     <Box
@@ -128,7 +154,7 @@ export function PaymentBox(): JSX.Element {
             <>
               <Box />
               <MileageBenefit
-                productPrice={PRODUCT_PRICE}
+                productPrice={orderPrice}
                 mileage={watch('usedMileageAmount')}
               />
             </>
@@ -201,16 +227,7 @@ export function PaymentBox(): JSX.Element {
           isFullWidth
           isDisabled={isSubmitting}
         >
-          {getLocaleNumber(
-            getOrderPrice(
-              PRODUCT_PRICE,
-              SHIPPING_COST,
-              DISCOUNT,
-              watch('usedCouponAmount') || 0,
-              watch('usedMileageAmount') || 0,
-            ),
-          )}
-          원 결제하기
+          {orderPrice}원 결제하기
         </Button>
       </Center>
 

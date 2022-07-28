@@ -170,6 +170,22 @@ const generateDefaultSellCommission = async (): Promise<void> => {
     where: { id: 1 },
   });
 };
+/** 마일리지 세팅 기본값 설정 */
+const generateDefaultMileageSetting = async (): Promise<void> => {
+  await prisma.mileageSetting.upsert({
+    create: {
+      mileageStrategy: 'onPaymentWithoutMileageUse',
+      defaultMileagePercent: 1,
+      useMileageFeature: false,
+    },
+    update: {
+      mileageStrategy: 'onPaymentWithoutMileageUse',
+      defaultMileagePercent: 1,
+      useMileageFeature: false,
+    },
+    where: { id: 1 },
+  });
+};
 
 /** 더미 상품 데이터 생성 */
 async function createDummyGoods(
@@ -398,6 +414,8 @@ async function main(): Promise<void> {
   await generateInitialKkshowMainData();
   // 크크쇼 쇼핑탭 데이터 저장
   await genereateInitialKkshowShoppingTabData();
+  // 마일리지 세팅 기본값 설정
+  await generateDefaultMileageSetting();
 
   // 판매 수수료 기본값 설정
   await generateDefaultSellCommission();

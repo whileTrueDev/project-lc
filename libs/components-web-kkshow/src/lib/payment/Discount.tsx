@@ -28,6 +28,21 @@ import { CreateOrderForm } from '@project-lc/shared-types';
 import { checkCouponAvailable, getLocaleNumber } from '@project-lc/utils-frontend';
 import { useFormContext } from 'react-hook-form';
 
+/** 적립금 사용시 100원 단위로 변경하기 위한 timeout 이벤트 저장 */
+let debounce: NodeJS.Timeout | null = null;
+
+/** 마일리지 사용 단위 제한(100원 단위로 사용 가능) */
+const MILEAGE_USE_UNIT = 100;
+
+/** unit(단위)에 따라 value를 출력
+ * 예 : 100원 단위로 사용 가능 -> 1450원 입력시 1400원으로 표시 */
+function setNumberSubstractWithMod(unit: number, value: number): number {
+  // unit으로 나눈 나머지
+  const mod = value % unit;
+  const result = value - mod;
+  return result;
+}
+
 export function Discount(): JSX.Element {
   const couponSelectDialog = useDisclosure();
   const discountCodeDialog = useDisclosure();
@@ -41,6 +56,7 @@ export function Discount(): JSX.Element {
     watch,
     register,
     formState: { errors },
+    getValues,
   } = useFormContext<CreateOrderForm>();
 
   const mileageAmount = watch('usedMileageAmount');
@@ -56,7 +72,8 @@ export function Discount(): JSX.Element {
 
   const handleUseMaxMileage = (): void => {
     if (customerMileage) {
-      setValue('usedMileageAmount', customerMileage.mileage);
+      const result = setNumberSubstractWithMod(MILEAGE_USE_UNIT, customerMileage.mileage);
+      setValue('usedMileageAmount', result);
     }
   };
 
@@ -101,7 +118,13 @@ export function Discount(): JSX.Element {
         </Stack>
 
         <Stack>
-          <Text fontWeight="semibold">적립금</Text>
+          <Stack direction="row" alignItems="center">
+            <Text fontWeight="semibold">적립금</Text>
+            <Text fontSize="sm" color="GrayText">
+              * {MILEAGE_USE_UNIT}원 단위로 사용 가능합니다
+            </Text>
+          </Stack>
+
           <FormControl isInvalid={!!errors.usedMileageAmount}>
             <Flex gap={2} alignItems="center">
               <Input
@@ -113,6 +136,18 @@ export function Discount(): JSX.Element {
                 size="sm"
                 onFocus={(e) => e.target.select()}
                 {...register('usedMileageAmount', {
+                  onChange: () => {
+                    // 사용 마일리지 입력시 500ms마다 입력값을 100원 단위로 표시
+                    if (debounce) clearTimeout(debounce);
+                    debounce = setTimeout(() => {
+                      const originText = getValues('usedMileageAmount');
+                      const result = setNumberSubstractWithMod(
+                        MILEAGE_USE_UNIT,
+                        originText || 0,
+                      );
+                      setValue('usedMileageAmount', result);
+                    }, 500);
+                  },
                   valueAsNumber: true,
                   max: customerMileage
                     ? {

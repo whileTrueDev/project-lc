@@ -2,7 +2,8 @@ import { Module, DynamicModule } from '@nestjs/common';
 import { MileageController } from './mileage.controller';
 import { MileageService } from './mileage.service';
 import { MileageLogService } from './mileage-log.service';
-import { MileageSettingService } from './mileage-setting.service';
+import { MileageSettingService } from './mileage-setting/mileage-setting.service';
+import { MileageSettingController } from './mileage-setting/mileage-setting.controller';
 
 @Module({
   controllers: [],
@@ -23,7 +24,7 @@ export class MileageModule {
     MileageSettingService,
   ];
 
-  private static readonly controllers = [MileageController];
+  private static readonly controllers = [MileageController, MileageSettingController];
 
   static withoutControllers(): DynamicModule {
     return {
