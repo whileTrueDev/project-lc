@@ -61,7 +61,6 @@ export function AdminBroadcasterPromotionPageUpdateModal({
   const updateRequest = useAdminBroadcasterPromotionPageUpdateMutation();
 
   const onSubmit: SubmitHandler<BroadcasterPromotionPageUpdateDto> = (data) => {
-    console.log(data);
     if (!data.id) return;
     updateRequest
       .mutateAsync({
@@ -135,7 +134,7 @@ export function AdminBroadcasterPromotionPageUpdateModal({
             <Button
               type="submit"
               colorScheme="blue"
-              disabled={!watch('url') || !isDirty}
+              disabled={!isDirty}
               isLoading={isSubmitting || updateRequest.isLoading}
             >
               수정
