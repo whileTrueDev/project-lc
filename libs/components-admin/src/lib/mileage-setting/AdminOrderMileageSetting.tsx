@@ -39,14 +39,13 @@ export function AdminOrderMileageSetting(): JSX.Element {
   } = useForm<formData>({
     defaultValues: {
       defaultMileagePercent: data?.defaultMileagePercent || 1,
-      mileageStrategy: data?.mileageStrategy || 'noMileage',
+      mileageStrategy: data?.mileageStrategy || 'onPaymentWithoutMileageUse',
       useMileageFeature: data?.useMileageFeature === true ? 'use' : 'notUse',
     },
   });
 
   useEffect(() => {
     if (data) {
-      console.log('effect', data);
       setValue('defaultMileagePercent', data.defaultMileagePercent);
       setValue('mileageStrategy', data.mileageStrategy);
       setValue('useMileageFeature', data.useMileageFeature === true ? 'use' : 'notUse');

@@ -60,10 +60,10 @@ export function MileageBenefit({
     !mileageSettingData ||
     // 전역 마일리지 설정에서 마일리지 기능 사용하지 않거나
     !mileageSettingData.useMileageFeature ||
-    // 마일리지 기능을 사용하지만, 마일리지 적립방식이 noMileage(마일리지 사용시 적립x)이고 마일리지를 사용한 경우
+    // 마일리지 기능을 사용하지만, 마일리지 적립방식이 onPaymentWithoutMileageUse(마일리지 사용시 적립x)이고 마일리지를 사용한 경우
     (mileageSettingData.useMileageFeature &&
       mileage &&
-      mileageSettingData.mileageStrategy === 'noMileage')
+      mileageSettingData.mileageStrategy === 'onPaymentWithoutMileageUse')
   ) {
     return (
       <Flex justifyContent="space-between" h="60px" alignItems="center">
@@ -81,7 +81,8 @@ export function MileageBenefit({
               (mileageSettingData.defaultMileagePercent * 0.01)
             ).toLocaleString()}
           {(mileageSettingData.mileageStrategy === 'onPaymentPriceExceptMileageUsage' ||
-            (mileageSettingData.mileageStrategy === 'noMileage' && !mileage)) &&
+            (mileageSettingData.mileageStrategy === 'onPaymentWithoutMileageUse' &&
+              !mileage)) &&
             (
               (productPrice - (mileage || 0)) *
               (mileageSettingData.defaultMileagePercent * 0.01)

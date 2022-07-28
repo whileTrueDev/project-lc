@@ -1122,9 +1122,9 @@ export class OrderService {
       if (
         earnMileage > 0 &&
         defaultMileageSetting.useMileageFeature === true &&
-        // (전역 마일리지설정에서 마일리지 적립방식이 noMileage이면서 주문시 마일리지 사용한 경우)는 제외
+        // (전역 마일리지설정에서 마일리지 적립방식이 onPaymentWithoutMileageUse이면서 주문시 마일리지 사용한 경우)는 제외
         !(
-          defaultMileageSetting.mileageStrategy === 'noMileage' &&
+          defaultMileageSetting.mileageStrategy === 'onPaymentWithoutMileageUse' &&
           mileageUsedOnOrder.length > 0
         )
       ) {
