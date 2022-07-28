@@ -63,9 +63,14 @@ export function AdminLiveShoppingList({
           <Text>
             <Text as="span" color="red" fontSize="xs">
               {row.goods.confirmation &&
-              row.goods.confirmation?.status !== GoodsConfirmationStatuses.confirmed
+              (row.goods.confirmation?.status === GoodsConfirmationStatuses.waiting ||
+                row.goods.confirmation?.status ===
+                  GoodsConfirmationStatuses.needReconfirmation)
                 ? '(검수미완료) '
                 : ''}
+              {row.goods.confirmation &&
+                row.goods.confirmation?.status === GoodsConfirmationStatuses.rejected &&
+                '(검수거절상품)'}
             </Text>
             {row.goods.goods_name}
           </Text>
