@@ -10,6 +10,7 @@ import {
   AdminGoodsCategoryRes,
   UpdateGoodsCategoryDto,
   GoodsCategoryRes,
+  CategoryOnGoodsConnectionDto,
   GoodsCategoryWithFamily,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
@@ -146,6 +147,30 @@ export class GoodsCategoryService {
       where: { id },
     });
 
+    return true;
+  }
+
+  /**
+   * 특정 상품과 카테고리 연결 생성
+   */
+  async connectCategoryOnGoods(dto: CategoryOnGoodsConnectionDto): Promise<boolean> {
+    const { goodsId, categoryId } = dto;
+    await this.prisma.goodsCategory.update({
+      where: { id: categoryId },
+      data: { goods: { connect: { id: goodsId } } },
+    });
+    return true;
+  }
+
+  /**
+   * 특정 상품과 카테고리 연결 해제
+   */
+  async disconnectCategoryOnGoods(dto: CategoryOnGoodsConnectionDto): Promise<boolean> {
+    const { goodsId, categoryId } = dto;
+    await this.prisma.goodsCategory.update({
+      where: { id: categoryId },
+      data: { goods: { disconnect: { id: goodsId } } },
+    });
     return true;
   }
 }

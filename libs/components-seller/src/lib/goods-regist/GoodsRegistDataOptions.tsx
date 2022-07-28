@@ -19,10 +19,10 @@ import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 import TextWithPopperButton from '@project-lc/components-core/TextWithPopperButton';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { useDisplaySize } from '@project-lc/hooks';
+import { GoodsFormValues, GoodsFormOption } from '@project-lc/shared-types';
 import { useCallback } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { GoodsRegistRadio } from './GoodsRegistDataSales';
-import { GoodsFormOption, GoodsFormValues } from './GoodsRegistForm';
 
 export function GoodsOptionInput({
   label,

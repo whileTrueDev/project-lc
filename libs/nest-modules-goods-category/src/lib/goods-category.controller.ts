@@ -1,7 +1,10 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   Param,
+  Post,
   Query,
   UseGuards,
   UseInterceptors,
@@ -10,6 +13,7 @@ import {
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
+  CategoryOnGoodsConnectionDto,
   FindGoodsCategoryDto,
   GoodsCategoryRes,
   GoodsCategoryWithFamily,
@@ -31,6 +35,24 @@ export class GoodsCategoryController {
     }
     if (dto.mainCategoryFlag) return this.goodsCategoryService.findMainCategories();
     return [];
+  }
+
+  /**
+   * 특정 상품과 카테고리 연결 생성
+   */
+  @Post()
+  async connectCategoryOnGoods(
+    @Body(ValidationPipe) dto: CategoryOnGoodsConnectionDto,
+  ): Promise<boolean> {
+    return this.goodsCategoryService.connectCategoryOnGoods(dto);
+  }
+
+  /** 특정 상품과 카테고리 연결 해제 */
+  @Delete()
+  async disconnectCategoryOnGoods(
+    @Body(ValidationPipe) dto: CategoryOnGoodsConnectionDto,
+  ): Promise<boolean> {
+    return this.goodsCategoryService.disconnectCategoryOnGoods(dto);
   }
 
   @Get(':categoryCode')

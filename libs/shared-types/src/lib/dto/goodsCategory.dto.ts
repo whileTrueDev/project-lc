@@ -1,4 +1,4 @@
-import { GoodsInformationSubject } from '@prisma/client';
+import { Goods, GoodsCategory, GoodsInformationSubject } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
@@ -41,4 +41,13 @@ export class UpdateGoodsCategoryDto {
 export class FindGoodsCategoryDto {
   @IsOptional() @Type(() => Boolean) @IsBoolean() mainCategoryFlag?: boolean = false;
   @IsOptional() @Type(() => Number) @IsNumber() parentCategoryId?: number;
+}
+
+/** 특정상품 - 카테고리 연결 dto */
+export class CategoryOnGoodsConnectionDto {
+  /** 상품 고유번호 */
+  @IsNumber() goodsId: Goods['id'];
+
+  /** 카테고리 고유번호 */
+  @IsNumber() categoryId: GoodsCategory['id'];
 }

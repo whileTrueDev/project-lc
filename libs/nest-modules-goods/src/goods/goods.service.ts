@@ -430,7 +430,7 @@ export class GoodsService {
     const result = await this.prisma.goods.findMany({
       skip,
       take: realTake,
-      where: { categories: { every: { categoryCode } } },
+      where: { categories: { some: { categoryCode } } },
       select: {
         id: true,
         goods_name: true,
@@ -463,9 +463,9 @@ export class GoodsService {
         image,
         shippingGroupId,
         goodsInfoId,
-        categoryId,
         informationNoticeContents,
         searchKeywords,
+        categoryIdList,
         ...goodsData
       } = dto;
       const optionsData = options.map((opt) => {
@@ -484,7 +484,7 @@ export class GoodsService {
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
           confirmation: { create: { status: 'waiting' } },
-          categories: { connect: { id: categoryId } },
+          categories: { connect: categoryIdList.map((id) => ({ id })) },
           informationNotice: {
             create: { contents: JSON.stringify(JSON.parse(informationNoticeContents)) },
           },
@@ -616,8 +616,8 @@ export class GoodsService {
       goodsInfoId,
       informationNoticeId,
       informationNoticeContents,
-      categoryId,
       searchKeywords,
+      categoryIdList,
       ...goodsData
     } = dto;
 
@@ -628,6 +628,19 @@ export class GoodsService {
       where: { goodsId: id },
       select: { status: true },
     });
+
+    // 이전에 연결된 카테고리 목록 조회
+    const currentCategories = await this.prisma.goodsCategory.findMany({
+      where: { goods: { some: { id } } },
+      select: { id: true },
+    });
+
+    const currentCategoryIdList = currentCategories.map((cat) => cat.id);
+
+    // 이전에 연결된 카테고리 목록에는 있으나, 수정dto에 없으면 카테고리 연결을 해제한다
+    const disconnectCategoryIdList = currentCategoryIdList.filter(
+      (currentCatId) => !categoryIdList.includes(currentCatId),
+    );
 
     try {
       await this.prisma.goods.update({
@@ -662,7 +675,12 @@ export class GoodsService {
               contents: JSON.stringify(JSON.parse(informationNoticeContents)),
             },
           },
-          categories: { connect: { id: categoryId } },
+          categories: {
+            connect: categoryIdList.map((_categoryId) => ({ id: _categoryId })),
+            disconnect: disconnectCategoryIdList.map((_categoryId) => ({
+              id: _categoryId,
+            })),
+          },
           confirmation: {
             update: {
               status: prevStatus === 'waiting' ? 'waiting' : 'needReconfirmation',

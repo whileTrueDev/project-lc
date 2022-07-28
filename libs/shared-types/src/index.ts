@@ -117,6 +117,7 @@ export * from './lib/event-types/live-shopping-state.event-type';
 export * from './lib/event-types/notification.event-type';
 export * from './lib/front-type/approvedGoodsListItemType';
 export * from './lib/front-type/exchangeReturnCancelListItemType';
+export * from './lib/front-type/goodsRegistEditFormType';
 export * from './lib/front-type/liveShoppingInputType';
 export * from './lib/front-type/orderFilterFormType';
 export * from './lib/inactive-handler-type/inactive-handler-types';

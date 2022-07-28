@@ -27,6 +27,7 @@ export * from './lib/mutation/useBusinessRegistrationConfirmationMutation';
 export * from './lib/mutation/useBusinessRegistrationMutation';
 export * from './lib/mutation/useBusinessRegistrationRejectionMutation';
 export * from './lib/mutation/useCartMutation';
+export * from './lib/mutation/useCategoryOnGoodsMutation';
 export * from './lib/mutation/useChangeAdminClassMutation';
 export * from './lib/mutation/useChangeGoodsView';
 export * from './lib/mutation/useChangePasswordMutation';
