@@ -98,13 +98,16 @@ export function AdminOrderMileageSetting(): JSX.Element {
 
       <FormControl isInvalid={!!errors.useMileageFeature}>
         <Stack direction="row" alignItems="center">
-          <Text mr={1}>마일리지 기능 사용여부</Text>
+          <Text mr={1}>
+            마일리지 적립 기능 사용여부(이 기능을 사용해야 소비자가 구매확정시 마일리지가
+            적립됩니다)
+          </Text>
           <Controller
             name="useMileageFeature"
             control={control}
             render={({ field }) => (
               <Select
-                placeholder="마일리지 기능 사용여부를 선택하세요"
+                placeholder="마일리지 적립 기능 사용여부를 선택하세요"
                 {...field}
                 w="200px"
               >
@@ -113,7 +116,7 @@ export function AdminOrderMileageSetting(): JSX.Element {
               </Select>
             )}
             rules={{
-              required: '마일리지 기능 사용여부를 선택하세요',
+              required: '마일리지 적립 기능 사용여부를 선택하세요',
             }}
           />
         </Stack>
