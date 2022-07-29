@@ -1,6 +1,6 @@
 import {
+  Avatar,
   Flex,
-  Image,
   LinkBox,
   LinkOverlay,
   SimpleGrid,
@@ -39,12 +39,12 @@ export function ShoppingCategories(): JSX.Element | null {
           .map((category) => (
             <LinkBox key={category.id} role="group">
               <Stack justify="start" align="center">
-                <Image
+                <Avatar
                   draggable={false}
                   rounded="full"
                   objectFit="cover"
-                  maxW={{ base: 40, md: 100 }}
-                  w="100%"
+                  w={{ base: '40px', sm: '60px', md: '100px' }}
+                  h={{ base: '40px', sm: '60px', md: '100px' }}
                   src={category.imageSrc || ''}
                   transition="transform 0.2s"
                   _groupHover={{ shadow: 'lg', transform: 'translateY(2px)' }}
