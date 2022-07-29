@@ -1,21 +1,28 @@
 import {
+  Avatar,
   Flex,
-  Image,
+  Icon,
   LinkBox,
   LinkOverlay,
   SimpleGrid,
   Stack,
   Text,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { useDisplaySize, useKkshowShoppingCategories } from '@project-lc/hooks';
 import Link from 'next/link';
 import { useMemo } from 'react';
+import { IoFastFoodOutline } from 'react-icons/io5';
 
 export function ShoppingCategories(): JSX.Element | null {
   const { isMobileSize } = useDisplaySize();
   const { data: categories, isLoading } = useKkshowShoppingCategories();
   const sliceUnit = useMemo(() => (isMobileSize ? 10 : 12), [isMobileSize]);
 
+  const categoryImagePlaceholderColor = useColorModeValue(
+    'blackAlpha.100',
+    'whiteAlpha.800',
+  );
   if (isLoading) return null;
   if (!categories) return null;
   return (
@@ -39,12 +46,14 @@ export function ShoppingCategories(): JSX.Element | null {
           .map((category) => (
             <LinkBox key={category.id} role="group">
               <Stack justify="start" align="center">
-                <Image
+                <Avatar
+                  icon={<Icon as={IoFastFoodOutline} fontSize={['1rem', '1.75rem']} />}
+                  backgroundColor={categoryImagePlaceholderColor}
                   draggable={false}
                   rounded="full"
                   objectFit="cover"
-                  maxW={{ base: 40, md: 100 }}
-                  w="100%"
+                  w={{ base: '40px', sm: '65px', md: '100px' }}
+                  h={{ base: '40px', sm: '65px', md: '100px' }}
                   src={category.imageSrc || ''}
                   transition="transform 0.2s"
                   _groupHover={{ shadow: 'lg', transform: 'translateY(2px)' }}
@@ -52,7 +61,7 @@ export function ShoppingCategories(): JSX.Element | null {
                 />
                 <Link href={`shopping/category/${category.categoryCode}`} passHref>
                   <LinkOverlay href={`shopping/category/${category.categoryCode}`}>
-                    <Text fontSize={['xs', 'xs', 'md']} noOfLines={2} textAlign="center">
+                    <Text fontSize={['xs', 'sm', 'md']} noOfLines={2} textAlign="center">
                       {category.name}
                     </Text>
                   </LinkOverlay>

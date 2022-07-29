@@ -18,7 +18,9 @@ export function PromotionPageProfile({
   const channels = useBroadcasterChannels(Number(broadcasterId));
   const { data: promotinoPage } = usePromotionPage(broadcasterId);
   const getChannelLinkImage = (channelUrl: string): React.ReactNode => {
-    if (channelUrl.includes('twitch.com')) return <FaTwitch color="purple" />;
+    if (channelUrl.includes('twitch.tv') || channelUrl.includes('twitch.com')) {
+      return <FaTwitch color="purple" />;
+    }
     if (channelUrl.includes('youtube.com')) return <FaYoutube color="red" />;
     if (channelUrl.includes('instagram.com')) return <FaInstagram />;
     if (channelUrl.includes('afreecatv.com'))

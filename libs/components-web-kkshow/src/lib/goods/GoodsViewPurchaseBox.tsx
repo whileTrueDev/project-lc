@@ -375,7 +375,7 @@ function GoodsViewButtonSet({
 }: GoodsViewPurchaseBoxProps): JSX.Element {
   const toast = useToast({ isClosable: true });
   const profile = useProfile();
-  const buttonSize = useBreakpointValue({ base: 'md', md: 'lg' });
+  const buttonSize = useBreakpointValue({ base: 'lg', md: 'lg' });
   const bgColor = useColorModeValue('white', 'gray.700');
   const router = useRouter();
   const cartDoneDialog = useDisclosure();

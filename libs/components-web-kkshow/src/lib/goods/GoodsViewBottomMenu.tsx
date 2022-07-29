@@ -47,10 +47,10 @@ export function GoodsViewBottomMenu(): JSX.Element | null {
       px={2}
       gap={2}
     >
-      <Button isFullWidth variant="solid" colorScheme="blue" onClick={onOpen}>
+      <Button isFullWidth size="lg" variant="solid" colorScheme="blue" onClick={onOpen}>
         구매
       </Button>
-      <Button isFullWidth variant="outline" colorScheme="blue" onClick={onOpen}>
+      <Button isFullWidth size="lg" variant="outline" colorScheme="blue" onClick={onOpen}>
         장바구니담기
       </Button>
 

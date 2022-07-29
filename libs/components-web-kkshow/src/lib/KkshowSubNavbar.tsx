@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 export default function KkshowSubNavbar(): JSX.Element {
   const { data: subNavLinks } = useKkshowSubNav();
   return (
-    <Box maxW="5xl" m="auto" minH="60px" px={4} py={4} gap={4}>
+    <Box maxW="5xl" m="auto" px={4} py={4} gap={4}>
       <Swiper slidesPerView="auto" style={{ margin: 0 }}>
         {subNavLinks?.map((subNavLink) => (
           <SwiperSlide
