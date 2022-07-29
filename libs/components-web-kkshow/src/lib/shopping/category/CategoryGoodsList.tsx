@@ -12,6 +12,7 @@ import {
   SimpleGrid,
   Spinner,
   Text,
+  useBreakpointValue,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useGoodsOutlineByCategoryCode, useOneGoodsCategory } from '@project-lc/hooks';
@@ -26,8 +27,9 @@ export function CategoryGoodsList(): JSX.Element | null {
   const router = useRouter();
   const categoryCode = router.query.categoryCode as string;
   const { data: category } = useOneGoodsCategory(categoryCode);
+  const howManyTake = useBreakpointValue({ base: 4, md: 8 });
   const { data, isLoading, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useGoodsOutlineByCategoryCode(category?.categoryCode, { take: 3 });
+    useGoodsOutlineByCategoryCode(category?.categoryCode, { take: howManyTake });
 
   // ref 전달한 더보기버튼이 화면에 들어왔는지 확인하여 다음목록 요청
   const { ref, inView } = useInView({ threshold: 1 });
