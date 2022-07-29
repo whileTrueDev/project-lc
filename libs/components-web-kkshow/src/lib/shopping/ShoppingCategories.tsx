@@ -1,9 +1,7 @@
-import { IoFastFoodOutline } from 'react-icons/io5';
 import {
   Avatar,
   Flex,
   Icon,
-  Image,
   LinkBox,
   LinkOverlay,
   SimpleGrid,
@@ -14,6 +12,7 @@ import {
 import { useDisplaySize, useKkshowShoppingCategories } from '@project-lc/hooks';
 import Link from 'next/link';
 import { useMemo } from 'react';
+import { IoFastFoodOutline } from 'react-icons/io5';
 
 export function ShoppingCategories(): JSX.Element | null {
   const { isMobileSize } = useDisplaySize();
