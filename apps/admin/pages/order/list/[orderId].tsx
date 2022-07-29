@@ -65,7 +65,7 @@ export function OrderDetail(): JSX.Element {
   return (
     <AdminPageLayout>
       <Center>
-        {data && paymentData && (
+        {data && (
           <Box p={3} w="3xl">
             <Heading mb={3}>{data.orderCode}</Heading>
             <Flex justifyContent="space-between">
@@ -203,40 +203,52 @@ export function OrderDetail(): JSX.Element {
                 <Text>{data.recipientDetailAddress}</Text>
               </Flex>
             </Flex>
-            <Box>
-              <Text>결제정보</Text>
-              <Grid templateColumns="repeat(2, 5fr)" minWidth="300px" border="1px" p={1}>
-                <GridItem>
-                  <Text>결제키</Text>
-                </GridItem>
-                <GridItem>
-                  <Text>{data.payment?.paymentKey}</Text>
-                </GridItem>
-                <GridItem>
-                  <Text>결제수단</Text>
-                </GridItem>
-                <GridItem>
-                  <Text>{paymentData.method}</Text>
-                </GridItem>
-                {paymentData.method === '카드' && (
-                  <CardDetail paymentData={paymentData} />
-                )}
-                {paymentData.method === '가상계좌' && (
-                  <VirtualAccountDetail paymentData={paymentData} />
-                )}
-                {paymentData.method === '계좌이체' && (
-                  <TransferDetail paymentData={paymentData} />
-                )}
-                <GridItem>
-                  <Text>요청일시</Text>
-                </GridItem>
-                <GridItem>
-                  <Text>
-                    {dayjs(paymentData.requestedAt).format('YYYY-MM-DD HH:mm:ss')}
-                  </Text>
-                </GridItem>
-              </Grid>
-            </Box>
+
+            {!paymentData ? (
+              <Box>
+                <Text color="red.500">TossPayments로부터 결제정보를 불러올 수 없음.</Text>
+              </Box>
+            ) : (
+              <Box>
+                <Text>결제정보</Text>
+                <Grid
+                  templateColumns="repeat(2, 5fr)"
+                  minWidth="300px"
+                  border="1px"
+                  p={1}
+                >
+                  <GridItem>
+                    <Text>결제키</Text>
+                  </GridItem>
+                  <GridItem>
+                    <Text>{data.payment?.paymentKey}</Text>
+                  </GridItem>
+                  <GridItem>
+                    <Text>결제수단</Text>
+                  </GridItem>
+                  <GridItem>
+                    <Text>{paymentData.method}</Text>
+                  </GridItem>
+                  {paymentData.method === '카드' && (
+                    <CardDetail paymentData={paymentData} />
+                  )}
+                  {paymentData.method === '가상계좌' && (
+                    <VirtualAccountDetail paymentData={paymentData} />
+                  )}
+                  {paymentData.method === '계좌이체' && (
+                    <TransferDetail paymentData={paymentData} />
+                  )}
+                  <GridItem>
+                    <Text>요청일시</Text>
+                  </GridItem>
+                  <GridItem>
+                    <Text>
+                      {dayjs(paymentData.requestedAt).format('YYYY-MM-DD HH:mm:ss')}
+                    </Text>
+                  </GridItem>
+                </Grid>
+              </Box>
+            )}
           </Box>
         )}
       </Center>
