@@ -3,11 +3,13 @@ import {
   Avatar,
   Flex,
   Icon,
+  Image,
   LinkBox,
   LinkOverlay,
   SimpleGrid,
   Stack,
   Text,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { useDisplaySize, useKkshowShoppingCategories } from '@project-lc/hooks';
 import Link from 'next/link';
@@ -18,6 +20,10 @@ export function ShoppingCategories(): JSX.Element | null {
   const { data: categories, isLoading } = useKkshowShoppingCategories();
   const sliceUnit = useMemo(() => (isMobileSize ? 10 : 12), [isMobileSize]);
 
+  const categoryImagePlaceholderColor = useColorModeValue(
+    'blackAlpha.100',
+    'whiteAlpha.800',
+  );
   if (isLoading) return null;
   if (!categories) return null;
   return (
@@ -43,11 +49,12 @@ export function ShoppingCategories(): JSX.Element | null {
               <Stack justify="start" align="center">
                 <Avatar
                   icon={<Icon as={IoFastFoodOutline} fontSize={['1rem', '1.75rem']} />}
+                  backgroundColor={categoryImagePlaceholderColor}
                   draggable={false}
                   rounded="full"
                   objectFit="cover"
-                  w={{ base: '40px', sm: '60px', md: '100px' }}
-                  h={{ base: '40px', sm: '60px', md: '100px' }}
+                  w={{ base: '40px', sm: '65px', md: '100px' }}
+                  h={{ base: '40px', sm: '65px', md: '100px' }}
                   src={category.imageSrc || ''}
                   transition="transform 0.2s"
                   _groupHover={{ shadow: 'lg', transform: 'translateY(2px)' }}
@@ -55,7 +62,7 @@ export function ShoppingCategories(): JSX.Element | null {
                 />
                 <Link href={`shopping/category/${category.categoryCode}`} passHref>
                   <LinkOverlay href={`shopping/category/${category.categoryCode}`}>
-                    <Text fontSize={['xs', 'xs', 'md']} noOfLines={2} textAlign="center">
+                    <Text fontSize={['xs', 'sm', 'md']} noOfLines={2} textAlign="center">
                       {category.name}
                     </Text>
                   </LinkOverlay>
