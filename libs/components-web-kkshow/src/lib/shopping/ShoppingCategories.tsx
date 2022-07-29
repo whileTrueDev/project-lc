@@ -1,6 +1,7 @@
 import {
+  Avatar,
   Flex,
-  Image,
+  Icon,
   LinkBox,
   LinkOverlay,
   SimpleGrid,
@@ -11,14 +12,13 @@ import {
 import { useDisplaySize, useKkshowShoppingCategories } from '@project-lc/hooks';
 import Link from 'next/link';
 import { useMemo } from 'react';
+import { IoFastFoodOutline } from 'react-icons/io5';
 
 export function ShoppingCategories(): JSX.Element | null {
   const { isMobileSize } = useDisplaySize();
   const { data: categories, isLoading } = useKkshowShoppingCategories();
   const sliceUnit = useMemo(() => (isMobileSize ? 10 : 12), [isMobileSize]);
 
-  const fallbackImageSrc =
-    'https://lc-project.s3.ap-northeast-2.amazonaws.com/goods-category/3OODwX2OsE8nUeu79ca59/220728174835';
   const categoryImagePlaceholderColor = useColorModeValue(
     'blackAlpha.100',
     'whiteAlpha.800',
@@ -46,10 +46,8 @@ export function ShoppingCategories(): JSX.Element | null {
           .map((category) => (
             <LinkBox key={category.id} role="group">
               <Stack justify="start" align="center">
-                <Image
-                  // icon={<Icon as={IoFastFoodOutline} fontSize={['1rem', '1.75rem']} />}
-                  alt={category.name}
-                  fallbackSrc={fallbackImageSrc}
+                <Avatar
+                  icon={<Icon as={IoFastFoodOutline} fontSize={['1rem', '1.75rem']} />}
                   backgroundColor={categoryImagePlaceholderColor}
                   draggable={false}
                   rounded="full"
