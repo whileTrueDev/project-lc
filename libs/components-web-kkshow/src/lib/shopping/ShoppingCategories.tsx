@@ -1,6 +1,8 @@
+import { IoFastFoodOutline } from 'react-icons/io5';
 import {
   Avatar,
   Flex,
+  Icon,
   LinkBox,
   LinkOverlay,
   SimpleGrid,
@@ -40,6 +42,7 @@ export function ShoppingCategories(): JSX.Element | null {
             <LinkBox key={category.id} role="group">
               <Stack justify="start" align="center">
                 <Avatar
+                  icon={<Icon as={IoFastFoodOutline} fontSize={['1rem', '1.75rem']} />}
                   draggable={false}
                   rounded="full"
                   objectFit="cover"
