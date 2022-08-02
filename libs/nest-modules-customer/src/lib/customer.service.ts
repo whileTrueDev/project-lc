@@ -19,16 +19,24 @@ export class CustomerService {
   /** 소비자 생성 (회원가입) */
   public async signUp(dto: SignUpDto): Promise<Customer> {
     const hashedPw = await this.pwManager.hashPassword(dto.password);
-    const created = await this.prisma.customer.create({
-      data: {
-        email: dto.email,
-        password: hashedPw,
-        nickname: '',
-        name: dto.name,
-        agreementFlag: true,
-      },
-    });
-    return created;
+    try {
+      const created = await this.prisma.customer.create({
+        data: {
+          email: dto.email,
+          password: hashedPw,
+          nickname: '',
+          name: dto.name,
+          agreementFlag: true,
+        },
+      });
+      return created;
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2002')
+          throw new BadRequestException('이미 가입한 이메일입니다.');
+      }
+      throw e;
+    }
   }
 
   /** 소비자 1명 정보 조회 */
