@@ -7,10 +7,12 @@ import {
   Modal,
   ModalBody,
   ModalContent,
+  ModalOverlay,
   Stack,
   useBoolean,
   useDisclosure,
 } from '@chakra-ui/react';
+import { useProfile } from '@project-lc/hooks';
 import { getKkshowWebHost } from '@project-lc/utils';
 import { deleteCookie, getCookie, setCookie } from '@project-lc/utils-frontend';
 import { s3 } from '@project-lc/utils-s3';
@@ -23,6 +25,7 @@ const KKSHOW_OPEN_EVENT_IMAGE_KEY = 'public/kks_open_event.jpeg';
 const EVENT_POPUP_COOKIE = 'kkshow-event-popup';
 
 export function EventPopup(): JSX.Element {
+  const { data: profile, isLoading } = useProfile();
   const { isOpen, onClose, onOpen } = useDisclosure();
   const [checked, { toggle }] = useBoolean(false);
 
@@ -37,12 +40,14 @@ export function EventPopup(): JSX.Element {
   };
 
   useEffect(() => {
+    if (isLoading) return;
+    if (profile?.id) return;
     const cookieExist = getCookie(EVENT_POPUP_COOKIE);
     if (!cookieExist) {
       onOpen();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [profile?.id, isLoading]);
 
   return (
     <Modal
@@ -53,6 +58,7 @@ export function EventPopup(): JSX.Element {
       isCentered
       size="lg"
     >
+      <ModalOverlay bg="blackAlpha.400" />
       <ModalContent>
         <ModalBody pt={0} px={0}>
           {/* 이미지배너 링크 */}
