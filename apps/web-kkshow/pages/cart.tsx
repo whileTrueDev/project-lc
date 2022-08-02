@@ -8,7 +8,7 @@ import KkshowLayout from '@project-lc/components-web-kkshow/KkshowLayout';
 export function Cart(): JSX.Element {
   return (
     <Box overflow="hidden" position="relative">
-      <KkshowLayout>
+      <KkshowLayout navbarFirstLink="kkmarket">
         <Box minH="65vh">
           <CartLayout>
             <CartTable />

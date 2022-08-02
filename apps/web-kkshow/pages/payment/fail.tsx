@@ -7,7 +7,7 @@ export function Success(): JSX.Element {
   const failReason = router.query.message;
 
   return (
-    <KkshowLayout>
+    <KkshowLayout navbarFirstLink="kkmarket">
       <Flex direction="column" alignItems="center" justifyContent="center" p={2} mt={10}>
         <Heading>주문에 실패했습니다</Heading>
         <Flex
