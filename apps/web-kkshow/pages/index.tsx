@@ -61,6 +61,7 @@ export default function Index(): JSX.Element {
         zIndex={1}
       />
 
+      {/* 신규가입 이벤트 팝업 */}
       <EventPopup />
 
       <KkshowLayout>
