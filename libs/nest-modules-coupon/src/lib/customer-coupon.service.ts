@@ -52,6 +52,19 @@ export class CustomerCouponService {
     });
   }
 
+  /** 특정 소비자에게 (회원가입)웰컴쿠폰 발급 */
+  async createCustomerWelcomeCoupon(customerId: number): Promise<CustomerCoupon | null> {
+    const welcomeCoupon = await this.prismaService.coupon.findFirst({
+      where: { name: '회원가입 3,000원 할인 쿠폰' },
+    });
+    if (!welcomeCoupon) return null;
+    return this.createCustomerCoupon({
+      couponId: welcomeCoupon.id,
+      customerId,
+      status: 'notUsed',
+    });
+  }
+
   async createAllCustomerCoupon(
     dto: CreateCustomerCouponManyDto,
     customers?: Customer[],
