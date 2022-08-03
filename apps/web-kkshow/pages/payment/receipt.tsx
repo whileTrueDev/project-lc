@@ -62,7 +62,7 @@ export function Receipt(): JSX.Element {
 
   if (orderDetailLoading) {
     return (
-      <KkshowLayout>
+      <KkshowLayout navbarFirstLink="kkmarket">
         <Center minHeight="80vh">
           <Spinner />
         </Center>
@@ -70,7 +70,7 @@ export function Receipt(): JSX.Element {
     );
   }
   return (
-    <KkshowLayout>
+    <KkshowLayout navbarFirstLink="kkmarket">
       <Flex m="auto" alignItems="center" justifyContent="center" direction="column" p={2}>
         {!isLoading && paymentData && (
           <Grid

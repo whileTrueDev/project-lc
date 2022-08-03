@@ -48,7 +48,7 @@ export default function Shopping(): JSX.Element {
       {/* 신규가입 이벤트 팝업 */}
       <EventPopup />
 
-      <KkshowLayout>
+      <KkshowLayout navbarFirstLink="kkmarket">
         <ShoppingCarousel />
         <ShoppingCategories />
         <ShoppingGoodsOfTheWeek />

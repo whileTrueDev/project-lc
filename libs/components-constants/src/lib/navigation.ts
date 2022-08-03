@@ -55,21 +55,6 @@ export const mainNavItems: Array<NavItem> = [
   },
 ];
 
-/** 크크쇼 상단 네비바 링크 */
-export const kkshowNavLinks: Array<NavItem> = [
-  {
-    label: '쇼핑',
-    href: '/shopping',
-  },
-  // {
-  //   label: '방송인',
-  //   href: '/broadcasters',
-  // },
-  // { label: '방송편성표', href: '/' },
-  // { label: '방송인', href: '/' },
-  // { label: 'SNS', href: '/' },
-];
-
 // ************************************************
 // 마이페이지 네비
 // ************************************************

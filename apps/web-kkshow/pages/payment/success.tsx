@@ -148,7 +148,7 @@ export function Success(): JSX.Element {
   }, [orderCode, paymentKey, redirectAmount]);
 
   return (
-    <KkshowLayout>
+    <KkshowLayout navbarFirstLink="kkmarket">
       <Flex m="auto" alignItems="center" justifyContent="center" direction="column" p={2}>
         <Flex alignItems="center" justifyContent="center" direction="column" h="2xl">
           <Spinner mb={10} />
