@@ -1,10 +1,9 @@
-import { Module, DynamicModule } from '@nestjs/common';
-import { CustomerModule } from '@project-lc/nest-modules-customer';
+import { DynamicModule, Module } from '@nestjs/common';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
+import { CouponLogService } from './coupon-log.service';
 import { CouponController } from './coupon.controller';
 import { CouponService } from './coupon.service';
 import { CustomerCouponService } from './customer-coupon.service';
-import { CouponLogService } from './coupon-log.service';
 
 @Module({})
 export class CouponModule {
@@ -22,7 +21,7 @@ export class CouponModule {
 
   private static readonly controllers = [CouponController];
 
-  private static readonly imports = [CustomerModule, GoodsModule.withoutControllers()];
+  private static readonly imports = [GoodsModule.withoutControllers()];
 
   static withoutControllers(): DynamicModule {
     return {

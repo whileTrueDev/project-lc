@@ -1,5 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { UserPwManager } from '@project-lc/nest-core';
+import { CouponModule } from '@project-lc/nest-modules-coupon';
 import { MailVerificationModule } from '@project-lc/nest-modules-mail-verification';
 import { CustomerAddressController } from './address/customer-address.controller';
 import { CustomerAddressService } from './address/customer-address.service';
@@ -18,7 +19,10 @@ export class CustomerModule {
 
   private static readonly controllers = [CustomerController, CustomerAddressController];
 
-  private static readonly imports = [MailVerificationModule];
+  private static readonly imports = [
+    MailVerificationModule,
+    CouponModule.withoutControllers(),
+  ];
 
   static withoutControllers(): DynamicModule {
     return {

@@ -1,4 +1,5 @@
 import { Box } from '@chakra-ui/react';
+import { EventPopup } from '@project-lc/components-web-kkshow/EventPopup';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { KkshowMainBestBroadcaster } from '@project-lc/components-web-kkshow/main/KkshowMainBestBroadcaster';
 import { KkshowMainBestLive } from '@project-lc/components-web-kkshow/main/KkshowMainBestLive';
@@ -59,6 +60,9 @@ export default function Index(): JSX.Element {
         right={{ base: -75, md: -150 }}
         zIndex={1}
       />
+
+      {/* 신규가입 이벤트 팝업 */}
+      <EventPopup />
 
       <KkshowLayout>
         <KkshowMainCarousel />
