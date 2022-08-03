@@ -23,6 +23,7 @@ import {
   UserPayload,
 } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
+import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
 import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
 import {
   CustomerStatusRes,
@@ -39,6 +40,7 @@ export class CustomerController {
   constructor(
     private readonly customerService: CustomerService,
     private readonly mailVerificationService: MailVerificationService,
+    private readonly customerCouponService: CustomerCouponService,
   ) {}
 
   // * 이메일 주소 중복 체크
@@ -65,8 +67,15 @@ export class CustomerController {
       dto.code,
     );
     if (!checkResult) throw new BadRequestException('인증코드가 올바르지 않습니다.');
-    const newCustomer = this.customerService.signUp(dto);
+    const newCustomer = await this.customerService.signUp(dto);
     await this.mailVerificationService.deleteSuccessedMailVerification(dto.email);
+
+    // 회원가입 할인쿠폰 발급
+    try {
+      await this.customerCouponService.createCustomerWelcomeCoupon(newCustomer.id);
+    } catch (err) {
+      console.error(`회원가입 웰컴쿠폰 발급 실패 - ${err}`);
+    }
     return newCustomer;
   }
 
