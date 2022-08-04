@@ -1,5 +1,10 @@
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Box,
   Button,
   Center,
@@ -25,6 +30,7 @@ import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { MB } from '@project-lc/components-core/ImageInput';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
+import { GoodsDefaultCommonInfoText } from '@project-lc/components-shared/goods/GoodsDefaultCommonInfoText';
 import {
   GoodsCommonInfo,
   useDeleteGoodsCommonInfo,
@@ -221,59 +227,87 @@ export function GoodsRegistCommonInfo(): JSX.Element {
   const commonContentsType = watch('common_contents_type');
 
   return (
-    <SectionWithTitle title="상품 공통 정보 *" variant="outlined">
-      <Stack>
-        <RadioGroup
-          onChange={(value) => {
-            if (value === 'new') {
-              clearGoodsInfoForNewInfo();
-            }
-          }}
-          value={commonContentsType}
-        >
-          <Stack direction="row">
-            <Radio {...register('common_contents_type')} value="new">
-              신규 등록
-            </Radio>
-            <Radio {...register('common_contents_type')} value="load">
-              기존 정보 불러오기
-            </Radio>
-          </Stack>
-        </RadioGroup>
-
-        {watch('common_contents_type') === 'new' ? (
-          <Stack>
-            <Text>
-              ** 신규 등록 으로 작성한 상품 공통 정보는 상품 등록을 완료 할 시 기존 정보
-              리스트에 자동 추가됩니다.
-            </Text>
-            <Box>
-              <Button
-                aria-label="Search database"
-                rightIcon={<EditIcon />}
-                onClick={onOpen}
-              >
-                공통정보쓰기
-              </Button>
-            </Box>
-          </Stack>
-        ) : (
-          <GoodsCommonInfoList
-            goodsInfoId={commonInfoId}
-            onCommonInfoChange={onCommonInfoChange}
-            onGoodsInfoDelete={clearGoodsInfoForNewInfo}
-          />
-        )}
-
-        <Box
-          ref={viewer}
-          className="sun-editor-editable"
-          minH="100px"
-          maxHeight="300px"
-          overflowY="auto"
-          {...boxStyle}
-        />
+    <SectionWithTitle title="상품 공통 정보" variant="outlined">
+      <Stack mb={2}>
+        <Text>상품 공통 정보를 등록하지 않는 경우 기본문구가 표시됩니다.</Text>
+        <Text>
+          기본문구 외의 상품 공통 정보를 표시하고 싶으신 경우, 상품 공통정보를
+          등록해주세요
+        </Text>
       </Stack>
+
+      <Accordion allowToggle>
+        {/* 기본문구 */}
+        <AccordionItem>
+          <AccordionButton>
+            <AccordionIcon />
+            <Box textAlign="left">기본문구 확인하기</Box>
+          </AccordionButton>
+          <AccordionPanel pb={4}>
+            <GoodsDefaultCommonInfoText />
+          </AccordionPanel>
+        </AccordionItem>
+
+        {/* 상품 공통정보 등록부분 */}
+        <AccordionItem>
+          <AccordionButton>
+            <AccordionIcon />
+            <Box textAlign="left">상품 공통정보 등록하기</Box>
+          </AccordionButton>
+          <AccordionPanel pb={4}>
+            <RadioGroup
+              onChange={(value) => {
+                if (value === 'new') {
+                  clearGoodsInfoForNewInfo();
+                }
+              }}
+              value={commonContentsType}
+            >
+              <Stack direction="row">
+                <Radio {...register('common_contents_type')} value="new">
+                  신규 등록
+                </Radio>
+                <Radio {...register('common_contents_type')} value="load">
+                  기존 정보 불러오기
+                </Radio>
+              </Stack>
+            </RadioGroup>
+
+            {watch('common_contents_type') === 'new' ? (
+              <Stack>
+                <Text>
+                  ** 신규 등록 으로 작성한 상품 공통 정보는 상품 등록을 완료 할 시 기존
+                  정보 리스트에 자동 추가됩니다.
+                </Text>
+                <Box>
+                  <Button
+                    aria-label="Search database"
+                    rightIcon={<EditIcon />}
+                    onClick={onOpen}
+                  >
+                    공통정보쓰기
+                  </Button>
+                </Box>
+              </Stack>
+            ) : (
+              <GoodsCommonInfoList
+                goodsInfoId={commonInfoId}
+                onCommonInfoChange={onCommonInfoChange}
+                onGoodsInfoDelete={clearGoodsInfoForNewInfo}
+              />
+            )}
+
+            <Box
+              ref={viewer}
+              className="sun-editor-editable"
+              minH="100px"
+              maxHeight="300px"
+              overflowY="auto"
+              {...boxStyle}
+            />
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
 
       <Modal isOpen={isOpen} onClose={onClose} size="6xl">
         <ModalOverlay />
