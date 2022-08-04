@@ -2,7 +2,8 @@ import { Box } from '@chakra-ui/react';
 import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
 import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
 import { BottomQuickMenu } from '@project-lc/components-shared/BottomQuickMenu';
-import { KkshowNavbar, KkshowNavbarProps, KkshowNavbarVariant } from './KkshowNavbar';
+import { KkshowNavbarVariant } from '@project-lc/shared-types';
+import { KkshowNavbar, KkshowNavbarProps } from './KkshowNavbar';
 import { KKshowMainExternLinks } from './main/KKshowMainExternLinks';
 
 interface KkshowLayoutProps {
