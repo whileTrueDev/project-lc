@@ -14,13 +14,15 @@ import {
   Grid,
   Input,
   Link,
+  Radio,
+  RadioGroup,
   Stack,
   Text,
   Textarea,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { GoodsConfirmationStatuses } from '@prisma/client';
+import { GoodsConfirmationStatuses, TtsSetting } from '@prisma/client';
 import { AdminLiveShoppingBroadcasterName } from '@project-lc/components-admin/AdminLiveShoppingBroadcasterName';
 import { AdminLiveShoppingUpdateConfirmModal } from '@project-lc/components-admin/AdminLiveShoppingUpdateConfirmModal';
 import { AdminOverlayImageUploadDialog } from '@project-lc/components-admin/AdminOverlayImageUploadDialog';
@@ -75,7 +77,10 @@ export function LiveShoppingDetail(): JSX.Element {
     refetch,
   } = useAdminLiveShoppingList(
     { id: Number(liveShoppingId) },
-    { enabled: !!profileData?.id },
+    {
+      enabled:
+        !!profileData?.id || !liveShoppingId || !Number.isNaN(Number(liveShoppingId)),
+    },
   );
 
   const goodsId = liveShopping ? liveShopping[0].goodsId : '';
@@ -125,6 +130,11 @@ export function LiveShoppingDetail(): JSX.Element {
       videoUrl: '',
       whiletrueCommissionRate: undefined,
       broadcasterCommissionRate: undefined,
+      messageSetting: {
+        fanNick: '',
+        levelCutOffPoint: undefined,
+        ttsSetting: undefined,
+      },
     });
     toast({ title: '변경 완료', status: 'success' });
     refetch();
@@ -316,6 +326,24 @@ export function LiveShoppingDetail(): JSX.Element {
               </Text>
             </Stack>
 
+            <Box>
+              <Text fontWeight="bold">구매 메시지 설정</Text>
+              <Text>비회원 팬닉: </Text>
+              <Text as="span" fontWeight="bold" color="blue">
+                {liveShopping[0].messageSetting?.fanNick || ''}
+              </Text>
+
+              <Text>1,2단계 구매메시지 기준 금액: </Text>
+              <Text as="span" fontWeight="bold" color="blue">
+                {liveShopping[0].messageSetting?.levelCutOffPoint || ''}
+              </Text>
+
+              <Text>TTS 설정: </Text>
+              <Text as="span" fontWeight="bold" color="blue">
+                {liveShopping[0].messageSetting?.ttsSetting || ''}
+              </Text>
+            </Box>
+
             <Divider />
             <Stack direction="row" alignItems="center">
               <Text as="span">희망 판매 수수료: </Text>
@@ -371,6 +399,67 @@ export function LiveShoppingDetail(): JSX.Element {
                 <Input {...register('liveShoppingName')} />
               </Stack>
               <BroadcasterAutocomplete />
+
+              <Divider />
+              <Box>
+                <Text fontWeight="bold">구매 메시지 설정</Text>
+                <Text>비회원 팬닉: </Text>
+                <Input {...register('messageSetting.fanNick')} placeholder="OOO 팬" />
+
+                <Text>1,2단계 구매메시지 기준 금액: </Text>
+                <Input
+                  type="number"
+                  {...register('messageSetting.levelCutOffPoint')}
+                  placeholder="30000"
+                />
+
+                <Text>TTS 설정: </Text>
+                <RadioGroup
+                  onChange={(value: TtsSetting) => {
+                    methods.setValue('messageSetting.ttsSetting', value);
+                  }}
+                >
+                  <Stack spacing={2} direction="row" flexWrap="wrap">
+                    <Radio
+                      {...register('messageSetting.ttsSetting')}
+                      value={TtsSetting.full}
+                    >
+                      전체
+                    </Radio>
+                    <Radio
+                      {...register('messageSetting.ttsSetting')}
+                      value={TtsSetting.nick_purchase}
+                    >
+                      닉,구매감사
+                    </Radio>
+                    <Radio
+                      {...register('messageSetting.ttsSetting')}
+                      value={TtsSetting.nick_purchase_price}
+                    >
+                      닉,금액,구매감사
+                    </Radio>
+                    <Radio
+                      {...register('messageSetting.ttsSetting')}
+                      value={TtsSetting.only_message}
+                    >
+                      메세지만
+                    </Radio>
+                    <Radio
+                      {...register('messageSetting.ttsSetting')}
+                      value={TtsSetting.no_tts}
+                    >
+                      TTS 없음
+                    </Radio>
+                    <Radio
+                      {...register('messageSetting.ttsSetting')}
+                      value={TtsSetting.no_sound}
+                    >
+                      소리 없음(콤보모드)
+                    </Radio>
+                  </Stack>
+                </RadioGroup>
+              </Box>
+
               <Divider />
 
               <LiveShoppingDatePicker

@@ -1,0 +1,1 @@
+export const MICROSERVICE_OVERLAY_TOKEN = Symbol('OVERLAY_MQ');

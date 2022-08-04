@@ -4,6 +4,7 @@ import {
   ConfirmDialogProps,
 } from '@project-lc/components-core/ConfirmDialog';
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
+import { LiveShoppingUpdateDTO } from '@project-lc/shared-types';
 import { liveShoppingManageStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { useFormContext } from 'react-hook-form';
@@ -12,7 +13,7 @@ export function AdminLiveShoppingUpdateConfirmModal(
   props: Pick<ConfirmDialogProps, 'isOpen' | 'onClose' | 'onConfirm'>,
 ): JSX.Element {
   const { isOpen, onClose, onConfirm } = props;
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<LiveShoppingUpdateDTO>();
   const { selectedBroadcaster } = liveShoppingManageStore();
   return (
     <ConfirmDialog
@@ -28,7 +29,7 @@ export function AdminLiveShoppingUpdateConfirmModal(
           {watch('progress') ? (
             <Text>
               진행상태 :
-              <LiveShoppingProgressBadge progress={watch('progress')} />
+              <LiveShoppingProgressBadge progress={watch('progress')!} />
             </Text>
           ) : null}
           {watch('liveShoppingName') ? (
@@ -78,6 +79,16 @@ export function AdminLiveShoppingUpdateConfirmModal(
           ) : null}
           {watch('broadcasterCommissionRate') ? (
             <Text>방송인 수수료율 : {watch('broadcasterCommissionRate')}</Text>
+          ) : null}
+
+          {watch('messageSetting.fanNick') ? (
+            <Text>테스트팬닉: {watch('messageSetting.fanNick')}</Text>
+          ) : null}
+          {watch('messageSetting.levelCutOffPoint') ? (
+            <Text>테스트팬닉: {watch('messageSetting.levelCutOffPoint')}</Text>
+          ) : null}
+          {watch('messageSetting.ttsSetting') ? (
+            <Text>테스트팬닉: {watch('messageSetting.ttsSetting')}</Text>
           ) : null}
         </Box>
       </Box>

@@ -246,10 +246,10 @@ export function AdminOverlayImageUploadDialog(
         throw new Error('가로배너 이미지는 15개까지 등록가능합니다.');
       }
       if (numberOfSavedFirstDonationImages + firstDonationPreviews.length > 1) {
-        throw new Error('응원메세지 이미지는 단계별 1개까지 등록가능합니다.');
+        throw new Error('후원메세지 이미지는 단계별 1개까지 등록가능합니다.');
       }
       if (numberOfSavedSecondDonationImages + secondDonationPreviews.length > 1) {
-        throw new Error('응원메세지 이미지는 단계별 1개까지 등록가능합니다.');
+        throw new Error('후원메세지 이미지는 단계별 1개까지 등록가능합니다.');
       }
       if (numberOfSavedLogoImages + logoPreviews.length > 1) {
         throw new Error('로고는 1개까지 등록가능합니다.');
@@ -526,7 +526,7 @@ export function AdminOverlayImageUploadDialog(
                     <Stack key={donationImage}>
                       <Heading size="md">{`등록된 ${
                         index + 1
-                      }단계 응원메세지 이미지`}</Heading>
+                      }단계 후원메세지 이미지`}</Heading>
                       <HStack mr={2} mb={2}>
                         {!donationImage && <Text>등록된 이미지가 없습니다</Text>}
                         {donationImage && (
@@ -676,8 +676,8 @@ export function AdminOverlayImageUploadDialog(
               </Stack>
             </Stack>
             <Stack>
-              <Heading size="md">응원메세지 이미지 첨부</Heading>
-              <Text>응원메세지 이미지는 2장까지 등록가능합니다.</Text>
+              <Heading size="md">후원메세지 이미지 첨부</Heading>
+              <Text>후원메세지 이미지는 2장까지 등록가능합니다.</Text>
               <Stack direction="row">
                 <Stack>
                   <Text>1단계 이미지</Text>

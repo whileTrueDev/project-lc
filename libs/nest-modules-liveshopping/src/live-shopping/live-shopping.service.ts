@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { LiveShoppingMessageSetting } from '@prisma/client';
 import { UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -92,6 +93,7 @@ export class LiveShoppingService {
         sellerId: sellerId || undefined,
       },
       include: {
+        messageSetting: true,
         goods: {
           select: {
             goods_name: true,
@@ -203,6 +205,16 @@ export class LiveShoppingService {
       },
       select: { id: true },
       orderBy: { broadcastEndDate: 'asc' },
+    });
+  }
+
+  /** 라이브쇼핑 메시지 세팅 조회 */
+  public async findLiveShoppingMsgSetting(
+    liveShoppingId: number,
+  ): Promise<LiveShoppingMessageSetting> {
+    return this.prisma.liveShoppingMessageSetting.findUnique({
+      where: { liveShoppingId },
+      include: { liveShopping: { select: { goods: { select: { goods_name: true } } } } },
     });
   }
 }

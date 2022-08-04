@@ -439,10 +439,10 @@ function GoodsViewButtonSet({
   const handleCartClick = useCallback((): void => {
     if (!executePurchaseCheck()) return;
 
-    const connectedLiveShopping = goods.LiveShopping?.find(
+    const connectedLiveShoppingId = goods.LiveShopping?.find(
       (ls) => ls.broadcasterId === selectedBc?.id && getLiveShoppingIsNowLive(ls),
     )?.id;
-    const connectedProductPromotion = goods.productPromotion?.find(
+    const connectedProductPromotionId = goods.productPromotion?.find(
       (pp) => pp.broadcasterId === selectedBc?.id,
     )?.id;
     createCartItem
@@ -463,10 +463,10 @@ function GoodsViewButtonSet({
               broadcasterId: selectedBc.id,
               nickname: selectedBc?.userNickname,
               message: supportMessage,
-              liveShoppingId: connectedLiveShopping,
+              liveShoppingId: connectedLiveShoppingId,
               // 라이브쇼핑 후원의 경우 상품홍보 후원으로는 포함시키지 않는다. (수수료 두번 처리될 가능성)
-              productPromotionId: !connectedLiveShopping
-                ? connectedProductPromotion
+              productPromotionId: !connectedLiveShoppingId
+                ? connectedProductPromotionId
                 : undefined,
             }
           : undefined,
@@ -505,6 +505,13 @@ function GoodsViewButtonSet({
       const shopName = goods.seller.sellerShop?.shopName || '';
       setShopNames([shopName]);
 
+      const connectedLiveShoppingId = goods.LiveShopping?.find(
+        (ls) => ls.broadcasterId === selectedBc?.id && getLiveShoppingIsNowLive(ls),
+      )?.id;
+      const connectedProductPromotionId = goods.productPromotion?.find(
+        (pp) => pp.broadcasterId === selectedBc?.id,
+      )?.id;
+
       // 주문정보 저장
       orderPrepare({
         orderPrice: totalInfo.price,
@@ -532,6 +539,11 @@ function GoodsViewButtonSet({
                   message: supportMessage,
                   nickname: selectedBc.userNickname,
                   avatar: selectedBc.avatar,
+                  liveShoppingId: connectedLiveShoppingId,
+                  // 라이브쇼핑 후원의 경우 상품홍보 후원으로는 포함시키지 않는다. (수수료 두번 처리될 가능성)
+                  productPromotionId: !connectedLiveShoppingId
+                    ? connectedProductPromotionId
+                    : undefined,
                 }
               : undefined,
           },
@@ -548,6 +560,8 @@ function GoodsViewButtonSet({
     [
       executePurchaseCheck,
       goods.seller.sellerShop?.shopName,
+      goods.LiveShopping,
+      goods.productPromotion,
       goods.goods_name,
       goods.id,
       goods.shippingGroupId,

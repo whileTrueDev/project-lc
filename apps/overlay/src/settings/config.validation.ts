@@ -18,4 +18,7 @@ export const validationSchema = Joi.object({
 
   // S3 버킷
   S3_BUCKET_NAME: Joi.string().required(),
+
+  // Redis as Message Queue host url
+  MQ_REDIS_URL: Joi.string().required(),
 });

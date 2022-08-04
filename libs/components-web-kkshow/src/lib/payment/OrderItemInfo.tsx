@@ -1,8 +1,8 @@
 /* eslint-disable react/no-array-index-key */
-import { Box, Flex, Image, Spinner, Stack, Text } from '@chakra-ui/react';
+import { Badge, Box, Flex, Image, Spinner, Stack, Text } from '@chakra-ui/react';
 import TextDotConnector from '@project-lc/components-core/TextDotConnector';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
-import { useGoodsById } from '@project-lc/hooks';
+import { useGoodsById, useIsThisGoodsNowOnLive } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useFieldArray, useFormContext } from 'react-hook-form';
@@ -55,6 +55,7 @@ export function OrderItem({
   disableSupportInfo = false,
 }: OrderItemProps): JSX.Element | null {
   const goods = useGoodsById(orderItem.goodsId);
+  const liveShoppingNowOnLive = useIsThisGoodsNowOnLive(goods.data?.id);
   if (goods.isLoading) return <Spinner />;
   if (!goods.data) return null;
   return (
@@ -99,6 +100,15 @@ export function OrderItem({
               </Text>
             </Flex>
           ))}
+
+          {liveShoppingNowOnLive && (
+            <Box>
+              <Badge colorScheme="red" variant="solid">
+                현재 LIVE 판매중
+              </Badge>
+            </Box>
+          )}
+
           <Box fontSize="sm">
             {!disableSupportInfo && (
               <OrderItemSupport

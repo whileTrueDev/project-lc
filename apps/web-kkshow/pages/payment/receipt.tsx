@@ -11,6 +11,7 @@ import {
   Spinner,
   Center,
   useToast,
+  ButtonGroup,
 } from '@chakra-ui/react';
 import { useDisplaySize, usePaymentByOrderCode, useOrderDetail } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
@@ -81,23 +82,22 @@ export function Receipt(): JSX.Element {
           >
             <GridItem colSpan={7}>
               <Flex direction="column" alignItems="center" justifyContent="center" p={2}>
-                {isDesktopSize ? (
-                  <Heading m={10}>주문이 정상적으로 완료되었습니다</Heading>
-                ) : (
-                  <Heading>주문 완료</Heading>
-                )}
+                <Heading>주문 완료</Heading>
               </Flex>
             </GridItem>
             <GridItem colSpan={7}>
-              <Heading>주문코드</Heading>
-              <Flex
-                bg={virtualAccountBoxBgColor}
-                p={5}
-                borderRadius="10px"
-                alignItems="center"
-              >
+              <Text fontSize="lg" fontWeight="bold">
+                주문코드
+              </Text>
+              <Flex bg={virtualAccountBoxBgColor} p={5} rounded="md" alignItems="center">
                 <Text>{orderCode}</Text>
-                <Button size="sm" ml={4} onClick={copyOrderCode}>
+                <Button
+                  size="xs"
+                  variant="outline"
+                  colorScheme="blue"
+                  ml={2}
+                  onClick={copyOrderCode}
+                >
                   복사
                 </Button>
               </Flex>
@@ -106,12 +106,14 @@ export function Receipt(): JSX.Element {
               {paymentData.virtualAccount && (
                 <Flex direction="column">
                   <Flex mb={5} direction="column">
-                    <Heading size="lg">가상계좌 입금정보</Heading>
+                    <Text fontSize="lg" fontWeight="bold">
+                      가상계좌 입금정보
+                    </Text>
                     <Text fontSize="sm">
                       * 입금기한까지 입금되지 않으면, 주문이 취소됩니다.
                     </Text>
                   </Flex>
-                  <Box bg={virtualAccountBoxBgColor} p={5} borderRadius="10px">
+                  <Box bg={virtualAccountBoxBgColor} p={5} rounded="md">
                     <Flex justifyContent="space-between">
                       <Text>입금액</Text>
                       <Text fontWeight="bold">
@@ -141,7 +143,9 @@ export function Receipt(): JSX.Element {
               )}
             </GridItem>
             <GridItem colSpan={4}>
-              <Heading size="lg">배송지 정보</Heading>
+              <Text fontSize="lg" fontWeight="bold">
+                배송지 정보
+              </Text>
               <SuccessDeliveryAddress data={orderDetailData} />
             </GridItem>
             <GridItem
@@ -162,19 +166,19 @@ export function Receipt(): JSX.Element {
                 </Text>
               </Flex>
               <Divider />
-              <Flex justifyContent="space-between" color="gray.500">
+              <Flex justifyContent="space-between" color="gray.500" fontSize="sm">
                 <Text>상품금액</Text>
                 <Text>{productOriginPrice.toLocaleString()}</Text>
               </Flex>
-              <Flex justifyContent="space-between" color="gray.500">
+              <Flex justifyContent="space-between" color="gray.500" fontSize="sm">
                 <Text>할인</Text>
                 <Text>- {discount.toLocaleString()}</Text>
               </Flex>
-              <Flex justifyContent="space-between" color="gray.500">
+              <Flex justifyContent="space-between" color="gray.500" fontSize="sm">
                 <Text>배송비</Text>
                 <Text>+ {totalShippingCost}</Text>
               </Flex>
-              <Flex justifyContent="space-between" color="gray.500">
+              <Flex justifyContent="space-between" color="gray.500" fontSize="sm">
                 <Text>쿠폰사용</Text>
                 <Text>
                   -{' '}
@@ -188,7 +192,10 @@ export function Receipt(): JSX.Element {
                   - {orderDetailData?.mileageLogs[0]?.amount.toLocaleString() || 0}
                 </Text>
               </Flex>
+
               <Divider mt={2} mb={2} />
+
+              {/* 카드결제의 경우 */}
               {paymentData.card && (
                 <Flex justifyContent="space-between">
                   <Box fontSize="xs">
@@ -207,6 +214,7 @@ export function Receipt(): JSX.Element {
                   )}
                 </Flex>
               )}
+              {/* 계좌이체의 경우 */}
               {paymentData.transfer && (
                 <>
                   <Flex justifyContent="space-between">
@@ -227,34 +235,37 @@ export function Receipt(): JSX.Element {
                 <MobileReceiptOrderItemInfo data={orderDetailData?.orderItems} />
               )}
             </GridItem>
-            <GridItem colSpan={7}>
-              <Flex alignContent="center" justifyContent="center" mt="10%" mb="10%">
-                <Flex justifyContent="space-around" w={{ base: '80%', md: '40%' }}>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      if (orderDetailData.nonMemberOrderFlag) {
-                        // 비회원주문인경우 비회원주문조회 페이지로 이동
-                        router.push('/nonmember');
-                      } else {
-                        // 아닌경우 마이페이지-주문상세 로 이동
-                        router.push(`/mypage/orders/${orderCode}`);
-                      }
-                    }}
-                  >
-                    주문 상세보기
-                  </Button>
-                  <Button
-                    variant="outline"
-                    colorScheme="blue"
-                    onClick={() => {
-                      router.push('/shopping');
-                    }}
-                  >
-                    쇼핑 계속하기
-                  </Button>
-                </Flex>
-              </Flex>
+            <GridItem
+              colSpan={7}
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <ButtonGroup>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (orderDetailData.nonMemberOrderFlag) {
+                      // 비회원주문인경우 비회원주문조회 페이지로 이동
+                      router.push('/nonmember');
+                    } else {
+                      // 아닌경우 마이페이지-주문상세 로 이동
+                      router.push(`/mypage/orders/${orderCode}`);
+                    }
+                  }}
+                >
+                  주문 상세보기
+                </Button>
+                <Button
+                  variant="outline"
+                  colorScheme="blue"
+                  onClick={() => {
+                    router.push('/shopping');
+                  }}
+                >
+                  쇼핑 계속하기
+                </Button>
+              </ButtonGroup>
             </GridItem>
           </Grid>
         )}

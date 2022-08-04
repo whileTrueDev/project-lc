@@ -1,20 +1,19 @@
 import {
   Box,
-  Heading,
-  Grid,
-  GridItem,
-  Text,
-  Link,
-  Flex,
   Center,
   Divider,
+  Flex,
+  Grid,
+  GridItem,
   HStack,
+  Link,
+  Text,
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
-import { BsShopWindow } from 'react-icons/bs';
-import { OrderDetailRes } from '@project-lc/shared-types';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
+import { OrderDetailRes } from '@project-lc/shared-types';
 import { getCustomerWebHost } from '@project-lc/utils';
+import { BsShopWindow } from 'react-icons/bs';
 
 export function ReceiptOrderItemInfo({
   data,
@@ -23,7 +22,9 @@ export function ReceiptOrderItemInfo({
 }): JSX.Element {
   return (
     <Box>
-      <Heading size="lg">주문상품</Heading>
+      <Text fontWeight="bold" fontSize="lg">
+        주문상품
+      </Text>
       <Divider m={2} />
 
       {data?.map((item) => (
@@ -93,7 +94,9 @@ export function MobileReceiptOrderItemInfo({
 }): JSX.Element {
   return (
     <Box>
-      <Heading size="lg">주문상품</Heading>
+      <Text fontWeight="bold" fontSize="lg">
+        주문상품
+      </Text>
       <Divider m={2} />
       {data.map((item) => (
         <Box key={item.id}>

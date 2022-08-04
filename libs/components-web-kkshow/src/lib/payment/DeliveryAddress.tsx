@@ -348,7 +348,7 @@ export function SuccessDeliveryAddress(props: SuccessDeliveryAddressProps): JSX.
     if (support) {
       return (
         <Stack>
-          <Text fontWeight="bold">선물하기 주문 🎁</Text>
+          <Text>선물하기 주문 🎁</Text>
           <Stack direction="row" alignItems="center">
             {support.broadcaster.avatar && (
               <Avatar src={support.broadcaster.avatar} mr={2} />

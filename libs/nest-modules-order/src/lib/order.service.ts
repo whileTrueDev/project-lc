@@ -1,4 +1,10 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import {
   CouponStatus,
   Goods,
@@ -9,8 +15,10 @@ import {
   OrderProcessStep,
   OrderShipping,
   Prisma,
+  SellType,
+  TtsSetting,
 } from '@prisma/client';
-import { UserPwManager } from '@project-lc/nest-core';
+import { MICROSERVICE_OVERLAY_TOKEN, UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
 import { MileageService, MileageSettingService } from '@project-lc/nest-modules-mileage';
@@ -35,6 +43,7 @@ import {
   OrderStatsRes,
   OrderStatusNumString,
   purchaseConfirmAbleSteps,
+  PurchaseMessage,
   sellerOrderSteps,
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
@@ -45,11 +54,14 @@ import { calculateShippingCost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
+import { ClientProxy } from '@nestjs/microservices';
+import { PurchaseMessageService } from '@project-lc/nest-modules-liveshopping';
 
 dayjs.extend(isToday);
 
 @Injectable()
 export class OrderService {
+  private logger = new Logger(OrderService.name);
   constructor(
     private readonly prisma: PrismaService,
     private readonly broadcasterService: BroadcasterService,
@@ -57,11 +69,9 @@ export class OrderService {
     private readonly customerCouponService: CustomerCouponService,
     private readonly mileageService: MileageService,
     private readonly mileageSettingService: MileageSettingService,
+    private readonly purchaseMessageService: PurchaseMessageService,
+    @Inject(MICROSERVICE_OVERLAY_TOKEN) private readonly microService: ClientProxy,
   ) {}
-
-  private async hash(pw: string): Promise<string> {
-    return this.userPwManager.hashPassword(pw);
-  }
 
   /** 선물주문생성시 처리 - 방송인 정보(받는사람 주소, 연락처) 리턴, giftFlag: true 설정 */
   private async handleGiftOrder(
@@ -291,6 +301,8 @@ export class OrderService {
                       broadcasterId: support.broadcasterId,
                       message: support.message,
                       nickname: support.nickname,
+                      liveShoppingId: support.liveShoppingId,
+                      productPromotionId: support.productPromotionId,
                     },
                   }
                 : undefined,
@@ -343,6 +355,93 @@ export class OrderService {
     }
 
     return order;
+  }
+
+  /** 주문정보에 따른 구매메시지 송출 함수 (microservice 호출만 합니다. 실제 송출은 overlay에서 진행됨.) */
+  public async triggerPurchaseMessage(order: CreateOrderDto): Promise<void> {
+    const { orderItems, giftFlag, nonMemberOrderFlag } = order;
+    const liveShoppingIds = orderItems
+      .map((oi) => oi.support?.liveShoppingId)
+      .filter((li) => !!li);
+    const liveShoppingMsgSettings = await this.prisma.liveShoppingMessageSetting.findMany(
+      { where: { liveShoppingId: { in: liveShoppingIds } } },
+    );
+    type TempPurchaseMessageAdditional = {
+      broadcasterId: number;
+      liveShoppingId?: number;
+    };
+    type TempPurchaseMessage = Omit<PurchaseMessage, 'roomName'> &
+      TempPurchaseMessageAdditional;
+    // orderItems를 구매메시지 데이터로 전환
+    const messageDataArr = orderItems
+      .filter((x) => x.channel === SellType.liveShopping && x.support)
+      .map<TempPurchaseMessage>((x) => {
+        const setting = liveShoppingMsgSettings.find(
+          (set) => set.liveShoppingId === x.support.liveShoppingId,
+        );
+        const purchaseNum = x.options.reduce(
+          (acc, curr) => acc + curr.discountPrice * curr.quantity,
+          0,
+        );
+        return {
+          broadcasterId: x.support.broadcasterId,
+          productName: x.goodsName,
+          purchaseNum,
+          nickname: nonMemberOrderFlag
+            ? setting?.fanNick || '비회원'
+            : x.support.nickname,
+          message: giftFlag
+            ? `[방송인에게 선물!] ${x.support.message}`
+            : x.support.message,
+          ttsSetting: setting?.ttsSetting || TtsSetting.full,
+          level: setting?.levelCutOffPoint < purchaseNum ? '2' : '1',
+          nonMemberOrderFlag,
+          giftFlag,
+          liveShoppingId: x.support.liveShoppingId,
+        };
+      });
+    // orderItems를 구매메시지 데이터로 전환한 배열의 각 송출 overlay 채널을 조회
+    const bcIds = messageDataArr.map((x) => x.broadcasterId);
+    const bcOverlayUrls = await this.prisma.broadcaster.findMany({
+      where: { id: { in: bcIds } },
+      select: { overlayUrl: true },
+    });
+    // 구매 메시지 데이터 구성
+    const purchaseData = messageDataArr
+      .map<PurchaseMessage & TempPurchaseMessageAdditional>((y) => ({
+        ...y,
+        roomName: bcOverlayUrls.find((b) => b.overlayUrl)?.overlayUrl.replace('/', ''),
+      }))
+      .filter((z) => !!z.roomName);
+
+    // 구매메시지 테이블(LiveShoppingPurchaseMessage)에 데이터 저장
+    await Promise.all(
+      purchaseData.map((purchase) => {
+        return this.purchaseMessageService.uploadPurchaseMessage({
+          email: purchase.roomName,
+          level: purchase.level,
+          liveShoppingId: purchase.liveShoppingId,
+          loginFlag: !purchase.nonMemberOrderFlag,
+          message: purchase.message,
+          nickname: purchase.nickname,
+          productName: purchase.productName,
+          purchaseNum: purchase.purchaseNum,
+          ttsSetting: purchase.ttsSetting,
+          giftFlag: purchase.giftFlag || false,
+          phoneCallEventFlag: false,
+        });
+      }),
+    );
+    // 구매 메시지 송출 요청
+    purchaseData.forEach((data) => {
+      this.logger.debug(
+        `구매 메시지 송출 이벤트 트리거 API -> Overlay - ${data.roomName} - ${data.productName}`,
+      );
+      this.microService.emit<void, PurchaseMessage>(
+        'liveshopping:overlay:purchase-msg',
+        data,
+      );
+    });
   }
 
   /** 주문목록조회시 사용할 where값 리턴

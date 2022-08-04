@@ -721,6 +721,7 @@ model LiveShopping {
   contactId                   Int? // 판매자 등록된 연락처 ID
   requests                    String?                       @db.LongText // 요청사항
   progress                    LiveShopppingProgressType     @default(registered) // 진행상태
+  messageSetting              LiveShoppingMessageSetting?
   broadcastStartDate          DateTime? // 라이브 방송 시작 시간
   broadcastEndDate            DateTime? // 라이브 방송 종료 시간
   sellStartDate               DateTime? // 라이브커머스 상품판매 시작 시간
@@ -743,6 +744,27 @@ model LiveShopping {
   followers                   Customer[]
   orderItemSupport            OrderItemSupport[]
   cartItemSupport             CartItemSupport[]
+}
+
+// 라이브쇼핑 구매 메시지 Text to speech 세팅 enum
+enum TtsSetting {
+  full // 전체
+  nick_purchase // 닉, 구매감사
+  nick_purchase_price // 닉, 금액, 구매감사
+  only_message // 메세지만
+  no_tts // tts 없음
+  no_sound // 소리 없음(콤보모드)
+}
+
+// 라이브쇼핑 구매 메시지 세팅
+model LiveShoppingMessageSetting {
+  id               Int        @id @default(autoincrement())
+  levelCutOffPoint Int        @default(30000)
+  ttsSetting       TtsSetting @default(full)
+  fanNick          String     @default("")
+
+  liveShoppingId Int          @unique
+  liveShopping   LiveShopping @relation(fields: [liveShoppingId], references: [id])
 }
 
 // 라이브 커머스 랭킹 테이블

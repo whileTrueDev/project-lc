@@ -225,6 +225,19 @@ $(document).ready(function ready() {
     // 대시보드 지표 계산
     getPurchaseMessage();
 
+    // 메세지 제어 세팅값 조회
+    $.ajax({
+      type: 'GET',
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/message-setting`,
+      data: { liveShoppingId },
+      success(data) {
+        $('#standard-price').val(data.levelCutOffPoint);
+        $('#fan-nickname').val(data.fanNick);
+        $('#product-name').val(data.liveShopping.goods.goods_name);
+        $(`input[name="tts-type"][value="${data.ttsSetting}"]`).prop('checked', true);
+      },
+    });
+
     if (liveShoppingStateBoardController) {
       liveShoppingStateBoardController.liveShoppingId = liveShoppingId;
     } else {
@@ -531,6 +544,7 @@ $(document).ready(function ready() {
     socket.emit('play virtual video from admin', roomName);
   });
 
+  // 응원메시지 전송 form 핸들러
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
 
@@ -615,6 +629,7 @@ $(document).ready(function ready() {
             productName,
             purchaseNum: soldPrice,
             nickname: customerNickname,
+            nonMemberOrderFlag: true,
             message: '',
           });
         }

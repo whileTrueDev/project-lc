@@ -39,14 +39,14 @@ export function OrderItemSupport({
           }
         >
           <FormLabel mb={0} fontSize="xs">
-            구매응원메시지 (최대 30자)
+            구매후원메시지 (최대 30자)
           </FormLabel>
           <Input
             size="sm"
             {...register(`orderItems.${orderItemIndex}.support.message`, {
               max: {
                 value: 30,
-                message: '응원메시지는 최대 30자까지 작성 가능합니다.',
+                message: '후원메시지는 최대 30자까지 작성 가능합니다.',
               },
             })}
           />

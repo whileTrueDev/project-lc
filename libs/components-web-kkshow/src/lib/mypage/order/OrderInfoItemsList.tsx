@@ -148,8 +148,8 @@ export function OrderInfoGoodsSupport({
         <Avatar src={support.broadcaster.avatar || ''} />
         <Text>{support.broadcaster.userNickname}</Text>
       </Box>
-      <Text>전달 닉네임: {support.nickname}</Text>
-      <Text>전달 메시지: {support.message}</Text>
+      <Text>후원 닉네임: {support.nickname}</Text>
+      <Text>후원 메시지: {support.message}</Text>
     </Box>
   );
 }

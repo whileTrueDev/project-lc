@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   ParseIntPipe,
   Patch,
@@ -12,8 +13,13 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { Order } from '@prisma/client';
-import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
+import {
+  CacheClearKeys,
+  HttpCacheInterceptor,
+  MICROSERVICE_OVERLAY_TOKEN,
+} from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CreateOrderDto,
@@ -39,7 +45,10 @@ import { OrderService } from './order.service';
 @CacheClearKeys('order')
 @Controller('order')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(
+    private readonly orderService: OrderService,
+    @Inject(MICROSERVICE_OVERLAY_TOKEN) private readonly microService: ClientProxy,
+  ) {}
 
   /** 구매확정 */
   @UseGuards(JwtAuthGuard)
@@ -52,11 +61,18 @@ export class OrderController {
 
   /** 주문생성 - 가드 적용하지 않아야 함 */
   @Post()
-  createOrder(
+  async createOrder(
     @Body('order', new ValidationPipe({ transform: true })) order: CreateOrderDto,
     @Body('shipping', ValidationPipe) { shipping }: CreateOrderShippingDto,
   ): Promise<Order> {
-    return this.orderService.createOrder({ orderDto: order, shippingData: shipping });
+    const result = await this.orderService.createOrder({
+      orderDto: order,
+      shippingData: shipping,
+    });
+    if (order.supportOrderIncludeFlag) {
+      this.orderService.triggerPurchaseMessage(order);
+    }
+    return result;
   }
 
   /** 판매자 주문현황 조회 */
