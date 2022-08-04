@@ -10,16 +10,14 @@ import {
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { MouseEvent, useEffect } from 'react';
 
-interface SearchHelpPopoverProps {
+interface RecentSearchedKeywordsProps {
+  bgColor?: BoxProps['bgColor'];
   onItemClick: (item: string) => void;
 }
-interface SearchRecentKeywordsProps extends SearchHelpPopoverProps {
-  bgColor?: BoxProps['bgColor'];
-}
-export function SearchRecentKeywords({
+export function RecentSearchedKeywords({
   onItemClick,
   bgColor,
-}: SearchRecentKeywordsProps): JSX.Element {
+}: RecentSearchedKeywordsProps): JSX.Element {
   const hoverColor = useColorModeValue('gray.100', 'gray.700');
   const defaultBgColor = useColorModeValue('white', 'gray.600');
   const { keywords, deleteKeyword, loadKeywords } = useKkshowSearchStore();
@@ -80,4 +78,4 @@ export function SearchRecentKeywords({
   );
 }
 
-export default SearchRecentKeywords;
+export default RecentSearchedKeywords;

@@ -7,28 +7,46 @@ import {
   DrawerOverlay,
   Flex,
   IconButton,
+  Input,
+  InputGroup,
+  InputRightElement,
   Tooltip,
+  useColorModeValue,
+  useMergeRefs,
 } from '@chakra-ui/react';
+import { useDisplaySize } from '@project-lc/hooks';
 import { useKkshowSearchStore } from '@project-lc/stores';
-import { RefObject } from 'react';
+import { RefObject, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { SearchRecentKeywords } from './SearchHelpPopover';
-import { SearchForm, SearchInputBox, SearchInputBoxProps } from './SearchInputBox';
+import { MdCancel } from 'react-icons/md';
+import { RecentSearchedKeywords } from './RecentSearchedKeywords';
+import {
+  SearchForm,
+  SearchIconButton,
+  SearchInputBoxProps,
+} from './DesktopSearchInputBox';
 
-interface FullPageSearchBoxProps {
-  searchBoxInputRef?: SearchInputBoxProps['inputRef'];
-  onSubmit: () => void;
-}
+type FullPageSearchBoxProps = SearchInputBoxProps;
 export function FullPageSearchBox({
-  searchBoxInputRef,
+  inputRef,
   onSubmit,
 }: FullPageSearchBoxProps): JSX.Element {
   const closeSearchDrawer = useKkshowSearchStore((s) => s.closeSearchDrawer);
-  const { setValue } = useFormContext<SearchForm>();
 
   const onKeywordClick = (item: string): void => {
     setValue('keyword', item);
     onSubmit();
+  };
+
+  const { isMobileSize } = useDisplaySize();
+
+  const initialRef = useRef<HTMLInputElement>(null);
+
+  const { register, watch, setValue } = useFormContext<SearchForm>();
+  const searchInputRegister = register('keyword');
+  const realInputRef = useMergeRefs(inputRef || initialRef, searchInputRegister.ref);
+  const clearSearchInput = (): void => {
+    setValue('keyword', '');
   };
 
   return (
@@ -42,12 +60,43 @@ export function FullPageSearchBox({
           variant="unstyle"
           icon={<ChevronLeftIcon w="30px" h="35px" />}
         />
-        <SearchInputBox inputRef={searchBoxInputRef} onSubmit={onSubmit} autoFocus />
+        <InputGroup>
+          <Input
+            {...searchInputRegister}
+            ref={realInputRef}
+            variant="outline"
+            placeholder="검색어를 입력하세요"
+            rounded="md"
+            type="search"
+            autoComplete="off"
+            bgColor={useColorModeValue('white', 'gray.600')}
+            color={useColorModeValue('blackAlpha.900', 'whiteAlpha.900')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                onSubmit();
+              }
+            }}
+          />
+          {/* 삭제 버튼 */}
+          {isMobileSize && watch('keyword') && (
+            <InputRightElement>
+              <IconButton
+                variant="fill"
+                aria-label="erase-button-icon"
+                icon={<MdCancel color="gray" />}
+                onClick={clearSearchInput}
+              />
+            </InputRightElement>
+          )}
+        </InputGroup>
+
+        {/* 검색 버튼 */}
+        <SearchIconButton handleSubmit={onSubmit} />
       </Flex>
 
       {/* 최근검색어 */}
       <Flex my={4} flexDirection="column">
-        <SearchRecentKeywords bgColor="unset" onItemClick={onKeywordClick} />
+        <RecentSearchedKeywords bgColor="unset" onItemClick={onKeywordClick} />
       </Flex>
     </Box>
   );
@@ -59,7 +108,7 @@ interface FullPageSearchDrawerProps extends FullPageSearchBoxProps {
 }
 export function FullPageSearchDrawer({
   containerRef,
-  searchBoxInputRef,
+  inputRef,
   onSubmit,
 }: FullPageSearchDrawerProps): JSX.Element {
   const { isSearchDrawerOpen, openSearchDrawer, closeSearchDrawer } =
@@ -82,7 +131,7 @@ export function FullPageSearchDrawer({
         onClose={closeSearchDrawer}
         isOpen={isSearchDrawerOpen}
         size="full"
-        initialFocusRef={searchBoxInputRef}
+        initialFocusRef={inputRef}
         closeOnEsc
         trapFocus
         portalProps={{ containerRef }}
@@ -90,10 +139,7 @@ export function FullPageSearchDrawer({
         <DrawerOverlay display={{ base: 'flex', md: 'none' }} />
         <DrawerContent display={{ base: 'flex', md: 'none' }}>
           <DrawerBody p={0}>
-            <FullPageSearchBox
-              searchBoxInputRef={searchBoxInputRef}
-              onSubmit={onSubmit}
-            />
+            <FullPageSearchBox inputRef={inputRef} onSubmit={onSubmit} />
           </DrawerBody>
         </DrawerContent>
       </Drawer>

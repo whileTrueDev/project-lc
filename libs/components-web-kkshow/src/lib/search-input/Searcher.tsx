@@ -1,12 +1,12 @@
 import { Flex, useToast } from '@chakra-ui/react';
-import shallow from 'zustand/shallow';
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { useCallback, useRef } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
+import shallow from 'zustand/shallow';
 import { FullPageSearchDrawer } from './FullPageSearchBox';
-import { SearchInputBox, SEARCH_FORM_ID } from './SearchInputBox';
+import { DesktopSearchInputBox } from './DesktopSearchInputBox';
 
 interface SearchForm {
   keyword: string;
@@ -48,13 +48,16 @@ export function Searcher(): JSX.Element {
     <FormProvider {...methods}>
       {/* 데스크탑 검색 input */}
       <Flex display={{ base: 'none', md: 'flex' }} w={360}>
-        <SearchInputBox inputRef={inputRef} onSubmit={methods.handleSubmit(onSubmit)} />
+        <DesktopSearchInputBox
+          inputRef={inputRef}
+          onSubmit={methods.handleSubmit(onSubmit)}
+        />
       </Flex>
 
       {/* 모바일 검색 full-page drawer */}
       <Flex display={{ base: 'flex', md: 'none' }}>
         <FullPageSearchDrawer
-          searchBoxInputRef={inputRef}
+          inputRef={inputRef}
           onSubmit={methods.handleSubmit(onSubmit)}
         />
       </Flex>
