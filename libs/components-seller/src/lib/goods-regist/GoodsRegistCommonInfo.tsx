@@ -30,6 +30,7 @@ import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { MB } from '@project-lc/components-core/ImageInput';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
+import { GoodsDefaultCommonInfoText } from '@project-lc/components-shared/goods/GoodsDefaultCommonInfoText';
 import {
   GoodsCommonInfo,
   useDeleteGoodsCommonInfo,
@@ -42,7 +43,6 @@ import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
-import { defaultGoodsCommonInfoText } from '@project-lc/components-constants/goodsCommonInfoText';
 import 'suneditor/dist/css/suneditor.min.css';
 import SunEditorCore from 'suneditor/src/lib/core';
 
@@ -244,7 +244,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
             <Box textAlign="left">기본문구 확인하기</Box>
           </AccordionButton>
           <AccordionPanel pb={4}>
-            <Text whiteSpace="pre">{defaultGoodsCommonInfoText}</Text>
+            <GoodsDefaultCommonInfoText />
           </AccordionPanel>
         </AccordionItem>
 
@@ -342,21 +342,3 @@ export function GoodsRegistCommonInfo(): JSX.Element {
 }
 
 export default GoodsRegistCommonInfo;
-
-function DefaultGoodsCommonInfo(): JSX.Element {
-  return (
-    <Accordion allowToggle>
-      <AccordionItem>
-        <h2>
-          <AccordionButton>
-            <AccordionIcon />
-            <Box textAlign="left">기본문구 확인하기</Box>
-          </AccordionButton>
-        </h2>
-        <AccordionPanel pb={4}>
-          <Text whiteSpace="pre">{defaultGoodsCommonInfoText}</Text>
-        </AccordionPanel>
-      </AccordionItem>
-    </Accordion>
-  );
-}
