@@ -100,6 +100,7 @@ export function DesktopSearchInputBox({
             <PopoverBody zIndex="popover">
               {/* 검색 도우미 (최근검색어, 추천검색어) */}
               <RecentSearchedKeywords
+                bgColor="unset"
                 onItemClick={(item) => {
                   setValue('keyword', item);
                   handleSubmit();
