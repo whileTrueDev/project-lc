@@ -1,8 +1,6 @@
 import create from 'zustand';
 
-export type KkshowSearchStore = SearchKeywordStore &
-  SearchDrawerStore &
-  SearchPopoverStore;
+export type KkshowSearchStore = SearchKeywordStore & SearchDrawerStore;
 
 export interface SearchKeywordStore {
   keywords: string[];
@@ -16,12 +14,6 @@ export interface SearchDrawerStore {
   isSearchDrawerOpen: boolean;
   openSearchDrawer: () => void;
   closeSearchDrawer: () => void;
-}
-
-export interface SearchPopoverStore {
-  isSearchPopoverOpen: boolean;
-  openSearchRecommendPopover: () => void;
-  closeSearchRecommendPopover: () => void;
 }
 
 export const KEYWORD_KEY = 'recentSearchKeyword';
@@ -66,9 +58,4 @@ export const useKkshowSearchStore = create<KkshowSearchStore>((set) => ({
   isSearchDrawerOpen: false,
   openSearchDrawer: () => set({ isSearchDrawerOpen: true }),
   closeSearchDrawer: () => set({ isSearchDrawerOpen: false }),
-
-  // 데스크탑 최근검색어, 추천검색어 popover 창
-  isSearchPopoverOpen: false,
-  openSearchRecommendPopover: () => set({ isSearchPopoverOpen: true }),
-  closeSearchRecommendPopover: () => set({ isSearchPopoverOpen: false }),
 }));

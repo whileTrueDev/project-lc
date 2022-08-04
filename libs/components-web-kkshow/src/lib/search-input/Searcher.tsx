@@ -19,7 +19,6 @@ export function Searcher(): JSX.Element {
     (s) => ({
       appendKeyword: s.appendKeyword,
       closeSearchDrawer: s.closeSearchDrawer,
-      closeSearchRecommendPopover: s.closeSearchRecommendPopover,
     }),
     shallow,
   );
@@ -39,7 +38,6 @@ export function Searcher(): JSX.Element {
       router.push({ pathname: '/search', query: { keyword: formData.keyword } });
       queryClient.invalidateQueries('getSearchResults');
       searchStore.closeSearchDrawer();
-      searchStore.closeSearchRecommendPopover();
     } else {
       focusOnInput();
       toast({ title: '검색어를 입력해주세요', status: 'error' });
