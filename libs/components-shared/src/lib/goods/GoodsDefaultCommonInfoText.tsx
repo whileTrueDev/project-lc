@@ -1,8 +1,9 @@
 import { Text } from '@chakra-ui/react';
 
+/** 판매자가 상품공통정보 등록하지 않은 경우 표시할 기본공통정보 */
 export function GoodsDefaultCommonInfoText(): JSX.Element {
   return (
-    <Text whiteSpace="pre">
+    <Text whiteSpace="pre-wrap">
       {`교환 및 반품이 가능한 경우
   - 상품을 공급 받으신 날로부터 7일이내 단, 가전제품의  경우 포장을 개봉하였거나 포장이 훼손되어 상품가치가 상실된 경우에는 교환/반품이 불가능합니다.
   - 공급받으신 상품 및 용역의 내용이 표시.광고 내용과  다르거나 다르게 이행된 경우에는 공급받은 날로부터 3월이내, 그사실을 알게 된 날로부터 30일이내
