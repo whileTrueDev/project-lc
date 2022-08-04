@@ -208,6 +208,7 @@ export class LCDevAppStack extends cdk.Stack {
         AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
         CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
+        MQ_REDIS_URL: ecs.Secret.fromSsmParameter(this.MQ_REDIS_URL),
       },
       environment: {
         S3_BUCKET_NAME: 'project-lc-dev-test',
