@@ -48,7 +48,7 @@ export const getStaticProps: GetStaticProps<
 
 export function ShoppingCategory(): JSX.Element {
   return (
-    <Box overflow="hidden" position="relative">
+    <Box position="relative">
       <KkshowLayout navbarFirstLink="kkmarket">
         <CategoryGoodsList />
       </KkshowLayout>

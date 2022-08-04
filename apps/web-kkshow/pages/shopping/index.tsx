@@ -44,7 +44,7 @@ export const getStaticProps: GetStaticProps<KkshowShippingProps> = async () => {
 
 export default function Shopping(): JSX.Element {
   return (
-    <Box overflow="hidden" position="relative">
+    <Box position="relative">
       {/* 신규가입 이벤트 팝업 */}
       <EventPopup />
 

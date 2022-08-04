@@ -28,38 +28,41 @@ export const getStaticProps: GetStaticProps<KkshowIndexProps> = async () => {
 
 export default function Index(): JSX.Element {
   return (
-    <Box overflow="hidden" position="relative">
-      <Box
-        display={{ base: 'none', md: 'block' }}
-        pos="absolute"
-        backgroundImage="images/main/bg-circle-1.png"
-        backgroundSize="contain"
-        w={450}
-        h={450}
-        top={120}
-        right={0}
-        zIndex={1}
-      />
-      <Box
-        pos="absolute"
-        backgroundImage="images/main/bg-circle-2.png"
-        backgroundSize="contain"
-        w={{ base: 150, md: 250 }}
-        h={{ base: 150, md: 250 }}
-        top={{ base: 300, sm: 470, md: 550 }}
-        left={-75}
-        zIndex={1}
-      />
-      <Box
-        pos="absolute"
-        backgroundImage="images/main/bg-circle-3.png"
-        backgroundSize="contain"
-        w={{ base: 150, md: 300 }}
-        h={{ base: 150, md: 300 }}
-        top={{ base: 440, sm: 600, md: 700 }}
-        right={{ base: -75, md: -150 }}
-        zIndex={1}
-      />
+    <Box position="relative">
+      {/* subnav sticky 적용 위해 동그라미들 감싸는 컨테이너에만 overflow:hidden 적용 */}
+      <Box overflow="hidden" position="absolute" width="100%" minHeight="1000px">
+        <Box
+          display={{ base: 'none', md: 'block' }}
+          pos="absolute"
+          backgroundImage="images/main/bg-circle-1.png"
+          backgroundSize="contain"
+          w={450}
+          h={450}
+          top={120}
+          right={0}
+          zIndex={1}
+        />
+        <Box
+          pos="absolute"
+          backgroundImage="images/main/bg-circle-2.png"
+          backgroundSize="contain"
+          w={{ base: 150, md: 250 }}
+          h={{ base: 150, md: 250 }}
+          top={{ base: 300, sm: 470, md: 550 }}
+          left={-75}
+          zIndex={1}
+        />
+        <Box
+          pos="absolute"
+          backgroundImage="images/main/bg-circle-3.png"
+          backgroundSize="contain"
+          w={{ base: 150, md: 300 }}
+          h={{ base: 150, md: 300 }}
+          top={{ base: 440, sm: 600, md: 700 }}
+          right={{ base: -75, md: -150 }}
+          zIndex={1}
+        />
+      </Box>
 
       {/* 신규가입 이벤트 팝업 */}
       <EventPopup />
