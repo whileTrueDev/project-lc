@@ -369,7 +369,7 @@ export function GoodsRegistForm(): JSX.Element {
             bg="gray.400"
             opacity="0.5"
             flexDirection="column"
-            zIndex={99999}
+            zIndex="sticky"
           >
             <Spinner />
             <Text>상품을 등록중입니다...</Text>
