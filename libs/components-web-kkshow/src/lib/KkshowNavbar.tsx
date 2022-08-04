@@ -1,5 +1,6 @@
 import {
   Box,
+  BoxProps,
   Button,
   Flex,
   Grid,
@@ -15,6 +16,7 @@ import CountBadge from '@project-lc/components-shared/CountBadge';
 import { KkshowLogoVariant, KksLogo } from '@project-lc/components-shared/KksLogo';
 import { PersonalPopoverMenu } from '@project-lc/components-shared/navbar/NavbarRightButtonSection';
 import { useCart, useIsLoggedIn } from '@project-lc/hooks';
+import { KkshowNavbarVariant } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
@@ -22,10 +24,11 @@ import { MdAccountCircle } from 'react-icons/md';
 import KkshowSubNavbar from './KkshowSubNavbar';
 import { Searcher } from './search-input/Searcher';
 
-export type KkshowNavbarVariant = 'blue' | 'white';
 export interface KkshowNavbarProps {
   variant?: KkshowNavbarVariant;
   firstLink?: KkshowNavbarLogoProps['first'];
+  /** 크크쇼메인네비바에 적용할 boxProps */
+  boxProps?: BoxProps;
 }
 /**
  * @param variant 'blue'인 경우 배경색 파랑, 글자색 흰색 고정인 네비바(메인페이지나 쇼핑탭)
@@ -35,6 +38,7 @@ export interface KkshowNavbarProps {
 export function KkshowNavbar({
   variant = 'blue',
   firstLink = 'kkshow',
+  boxProps,
 }: KkshowNavbarProps): JSX.Element {
   const palette = {
     bg: useColorModeValue('white', 'gray.800'),
@@ -56,51 +60,58 @@ export function KkshowNavbar({
   };
 
   return (
-    <Box
-      bg={palette.bg}
-      color={palette.color}
-      pt={{ base: 0, md: 6 }}
-      w="100%"
-      zIndex="sticky"
-    >
-      {/* 모바일인 경우 */}
-      <Box display={{ base: 'block', md: 'none' }}>
-        <Grid
-          {...commonNavConatinerStyle}
-          templateColumns="repeat(3, 1fr)"
-          gap={[2, 4, 6]}
-          alignItems="center"
-        >
-          <GridItem colSpan={2}>
-            <KkshowNavbarLogo
-              variant={palette.logoVariant as KkshowLogoVariant}
-              first={firstLink}
-            />
-          </GridItem>
-          <Flex justifyContent="flex-end">
-            <KkshowNavbarRightButtonSection />
-          </Flex>
-        </Grid>
-      </Box>
-
-      {/* 데스크탑인 경우 */}
-      <Flex
-        display={{ base: 'none', md: 'flex' }}
-        {...commonNavConatinerStyle}
-        py={4}
-        justify="space-between"
+    <>
+      {/* 메인네비바 Box 컴포넌트 
+        (SubNavbar를 position: sticky로 사용하기 위해서는 부모컴포넌트가 KkshowNavbar가 되면 안됨
+      그러나 동일한 variant 사용하기 위해 Fragment로 묶음) 
+    */}
+      <Box
+        bg={palette.bg}
+        color={palette.color}
+        pt={{ base: 0, md: 6 }}
+        w="100%"
+        zIndex="sticky"
+        {...boxProps}
       >
-        <KkshowNavbarLogo
-          variant={palette.logoVariant as KkshowLogoVariant}
-          first={firstLink}
-        />
+        {/* 모바일인 경우 */}
+        <Box display={{ base: 'block', md: 'none' }}>
+          <Grid
+            {...commonNavConatinerStyle}
+            templateColumns="repeat(3, 1fr)"
+            gap={[2, 4, 6]}
+            alignItems="center"
+          >
+            <GridItem colSpan={2}>
+              <KkshowNavbarLogo
+                variant={palette.logoVariant as KkshowLogoVariant}
+                first={firstLink}
+              />
+            </GridItem>
+            <Flex justifyContent="flex-end">
+              <KkshowNavbarRightButtonSection />
+            </Flex>
+          </Grid>
+        </Box>
 
-        {/* 우측 */}
-        <KkshowNavbarRightButtonSection />
-      </Flex>
+        {/* 데스크탑인 경우 */}
+        <Flex
+          display={{ base: 'none', md: 'flex' }}
+          {...commonNavConatinerStyle}
+          py={4}
+          justify="space-between"
+        >
+          <KkshowNavbarLogo
+            variant={palette.logoVariant as KkshowLogoVariant}
+            first={firstLink}
+          />
+
+          {/* 우측 */}
+          <KkshowNavbarRightButtonSection />
+        </Flex>
+      </Box>
       {/* 서브내비 (링크 모음 섹션) */}
-      <KkshowSubNavbar />
-    </Box>
+      <KkshowSubNavbar variant={variant} />
+    </>
   );
 }
 
