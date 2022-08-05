@@ -39,6 +39,7 @@ import { SellType } from '@prisma/client';
 import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUnderlinedText';
 import {
   useCartMutation,
+  useCustomerInfo,
   useIsThisGoodsNowOnLive,
   useLiveShoppingNowOnLive,
   useProfile,
@@ -375,6 +376,7 @@ function GoodsViewButtonSet({
 }: GoodsViewPurchaseBoxProps): JSX.Element {
   const toast = useToast({ isClosable: true });
   const profile = useProfile();
+  const { data: customer } = useCustomerInfo(profile.data?.id);
   const buttonSize = useBreakpointValue({ base: 'lg', md: 'lg' });
   const bgColor = useColorModeValue('white', 'gray.700');
   const router = useRouter();
@@ -439,10 +441,10 @@ function GoodsViewButtonSet({
   const handleCartClick = useCallback((): void => {
     if (!executePurchaseCheck()) return;
 
-    const connectedLiveShopping = goods.LiveShopping?.find(
+    const connectedLiveShoppingId = goods.LiveShopping?.find(
       (ls) => ls.broadcasterId === selectedBc?.id && getLiveShoppingIsNowLive(ls),
     )?.id;
-    const connectedProductPromotion = goods.productPromotion?.find(
+    const connectedProductPromotionId = goods.productPromotion?.find(
       (pp) => pp.broadcasterId === selectedBc?.id,
     )?.id;
     createCartItem
@@ -461,12 +463,12 @@ function GoodsViewButtonSet({
         support: selectedBc
           ? {
               broadcasterId: selectedBc.id,
-              nickname: selectedBc?.userNickname,
+              nickname: customer?.nickname || '', // 소비자 닉네임, 비회원의 경우 빈값처리
               message: supportMessage,
-              liveShoppingId: connectedLiveShopping,
+              liveShoppingId: connectedLiveShoppingId,
               // 라이브쇼핑 후원의 경우 상품홍보 후원으로는 포함시키지 않는다. (수수료 두번 처리될 가능성)
-              productPromotionId: !connectedLiveShopping
-                ? connectedProductPromotion
+              productPromotionId: !connectedLiveShoppingId
+                ? connectedProductPromotionId
                 : undefined,
             }
           : undefined,
@@ -481,6 +483,7 @@ function GoodsViewButtonSet({
   }, [
     cartDoneDialog,
     createCartItem,
+    customer?.nickname,
     executePurchaseCheck,
     goods.LiveShopping,
     goods.id,
@@ -504,6 +507,13 @@ function GoodsViewButtonSet({
       // 상점명 저장
       const shopName = goods.seller.sellerShop?.shopName || '';
       setShopNames([shopName]);
+
+      const connectedLiveShoppingId = goods.LiveShopping?.find(
+        (ls) => ls.broadcasterId === selectedBc?.id && getLiveShoppingIsNowLive(ls),
+      )?.id;
+      const connectedProductPromotionId = goods.productPromotion?.find(
+        (pp) => pp.broadcasterId === selectedBc?.id,
+      )?.id;
 
       // 주문정보 저장
       orderPrepare({
@@ -530,8 +540,13 @@ function GoodsViewButtonSet({
               ? {
                   broadcasterId: selectedBc.id,
                   message: supportMessage,
-                  nickname: selectedBc.userNickname,
+                  nickname: customer?.nickname || '', // 소비자 닉네임, 비회원의 경우 빈값처리
                   avatar: selectedBc.avatar,
+                  liveShoppingId: connectedLiveShoppingId,
+                  // 라이브쇼핑 후원의 경우 상품홍보 후원으로는 포함시키지 않는다. (수수료 두번 처리될 가능성)
+                  productPromotionId: !connectedLiveShoppingId
+                    ? connectedProductPromotionId
+                    : undefined,
                 }
               : undefined,
           },
@@ -548,6 +563,8 @@ function GoodsViewButtonSet({
     [
       executePurchaseCheck,
       goods.seller.sellerShop?.shopName,
+      goods.LiveShopping,
+      goods.productPromotion,
       goods.goods_name,
       goods.id,
       goods.shippingGroupId,
@@ -559,6 +576,7 @@ function GoodsViewButtonSet({
       selectedOpts,
       sellType,
       supportMessage,
+      customer?.nickname,
       router,
     ],
   );

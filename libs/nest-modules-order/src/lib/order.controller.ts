@@ -52,11 +52,18 @@ export class OrderController {
 
   /** 주문생성 - 가드 적용하지 않아야 함 */
   @Post()
-  createOrder(
+  async createOrder(
     @Body('order', new ValidationPipe({ transform: true })) order: CreateOrderDto,
     @Body('shipping', ValidationPipe) { shipping }: CreateOrderShippingDto,
   ): Promise<Order> {
-    return this.orderService.createOrder({ orderDto: order, shippingData: shipping });
+    const result = await this.orderService.createOrder({
+      orderDto: order,
+      shippingData: shipping,
+    });
+    if (order.supportOrderIncludeFlag) {
+      this.orderService.triggerPurchaseMessage(order);
+    }
+    return result;
   }
 
   /** 판매자 주문현황 조회 */

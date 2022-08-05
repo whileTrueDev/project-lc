@@ -1,8 +1,10 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { UserPwManager } from '@project-lc/nest-core';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { MICROSERVICE_OVERLAY_TOKEN, UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { CouponModule } from '@project-lc/nest-modules-coupon';
+import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { MileageModule } from '@project-lc/nest-modules-mileage';
 import { OrderCancellationController } from './order-cancellation/order-cancellation.controller';
 import { OrderCancellationService } from './order-cancellation/order-cancellation.service';
@@ -28,9 +30,17 @@ export class OrderModule {
   ];
 
   private static readonly imports = [
+    ClientsModule.register([
+      {
+        name: MICROSERVICE_OVERLAY_TOKEN,
+        transport: Transport.REDIS,
+        options: { url: process.env.MQ_REDIS_URL || 'redis://localhost:6399' },
+      },
+    ]),
     BroadcasterModule.withoutControllers(),
     CouponModule.withoutControllers(),
     MileageModule.withoutControllers(),
+    LiveShoppingModule.withoutControllers(),
     CipherModule,
   ];
 

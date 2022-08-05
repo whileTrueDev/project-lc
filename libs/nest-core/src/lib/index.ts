@@ -19,3 +19,4 @@ export * from './settings/csrf.config';
 export * from './settings/jwt.setting';
 export * from './settings/mailer.config';
 export * from './token/mailer';
+export * from './token/overlay';

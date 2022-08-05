@@ -20,14 +20,14 @@ import {
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
-export class AppGateway
+export class OverlayGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
   server: Server;
 
   socketInfo: SocketInfo = {};
-  private logger: Logger = new Logger('AppGateway');
+  private logger: Logger = new Logger('OverlayGateway');
 
   afterInit(): void {
     this.logger.log('Initialized!');

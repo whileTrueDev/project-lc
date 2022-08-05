@@ -82,6 +82,7 @@ import {
   SellerSettlementTargetRes,
   AdminReturnRes,
   AdminRefundRes,
+  LiveShoppingWithGoods,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
@@ -254,9 +255,9 @@ export class AdminController {
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/live-shoppings')
-  getLiveShoppings(
+  async getLiveShoppings(
     @Query(new ValidationPipe({ transform: true })) dto: FindLiveShoppingDto,
-  ): Promise<LiveShopping[]> {
+  ): Promise<LiveShoppingWithGoods[]> {
     return this.liveShoppingService.findLiveShoppings(dto);
   }
 

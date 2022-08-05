@@ -374,7 +374,7 @@ export function CartItemDisplay({
                 </Text>
                 {isNowLive && (
                   <Badge variant="solid" colorScheme="red">
-                    현재 LIVE판매중
+                    현재 LIVE 판매중
                   </Badge>
                 )}
               </Flex>

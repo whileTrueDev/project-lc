@@ -226,7 +226,7 @@ export function PaymentBox(): JSX.Element {
           isFullWidth
           isDisabled={isSubmitting}
         >
-          {orderPrice}원 결제하기
+          {getLocaleNumber(orderPrice)}원 결제하기
         </Button>
       </Center>
 

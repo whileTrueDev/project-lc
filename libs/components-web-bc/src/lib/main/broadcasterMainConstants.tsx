@@ -53,7 +53,7 @@ export const howToUseItems: HowToUseItem[] = [
   },
   {
     title: '수익금 적립',
-    contents: '판매수익금, 응원메시지를 확인할 수 있습니다.',
+    contents: '판매수익금, 후원메시지를 확인할 수 있습니다.',
     image: '/images/main/bc_htu_gif3.gif',
   },
   {

@@ -7,9 +7,11 @@ import {
   Post,
   Query,
   Render,
-  UseGuards,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
+import { LiveShoppingMessageSetting } from '@prisma/client';
+import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   LiveShoppingService,
   PurchaseMessageService,
@@ -25,7 +27,6 @@ import {
   getOverlayHost,
   getRealtimeApiHost,
 } from '@project-lc/utils';
-import { JwtAuthGuard, AdminGuard } from '@project-lc/nest-modules-authguard';
 import { ViewAuthFilter } from './forbidden.exception';
 
 @Controller()
@@ -88,5 +89,12 @@ export class AppController {
     @Body('messageId', ParseIntPipe) messageId: number,
   ): Promise<boolean> {
     return this.overlayControllerService.deletePurchaseMessage(messageId);
+  }
+
+  @Get('message-setting')
+  async getMessageSetting(
+    @Query('liveShoppingId', ParseIntPipe) liveShoppingId: number,
+  ): Promise<LiveShoppingMessageSetting> {
+    return this.liveShoppingService.findLiveShoppingMsgSetting(liveShoppingId);
   }
 }

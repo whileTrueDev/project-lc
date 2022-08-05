@@ -170,8 +170,9 @@ export function CartActions(): JSX.Element {
           support:
             // 현재(주문시점) 진행중인 라이브쇼핑이 있거나
             (ls.data?.find(
-              (x) =>
-                x.goodsId === i.goodsId && x.broadcasterId === i.support?.broadcasterId,
+              (_ls) =>
+                _ls.goodsId === i.goodsId &&
+                _ls.broadcasterId === i.support?.broadcasterId,
             ) ||
               // 현재(주문시점) 진행중인 상품홍보가 있는 경우
               pp.data?.find((p) => p.broadcasterId === i.support?.broadcasterId)) &&
@@ -180,7 +181,7 @@ export function CartActions(): JSX.Element {
               ? {
                   broadcasterId: i.support?.broadcasterId,
                   message: i.support.message || '',
-                  nickname: i.support.broadcaster.userNickname,
+                  nickname: i.support.nickname,
                   avatar: i.support.broadcaster.avatar,
                   liveShoppingId: i.support.liveShoppingId || undefined,
                   productPromotionId: i.support.productPromotionId || undefined,

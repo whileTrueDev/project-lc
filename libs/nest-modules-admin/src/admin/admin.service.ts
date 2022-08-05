@@ -222,6 +222,13 @@ export class AdminService {
           whiletrueCommissionRate: dto.whiletrueCommissionRate || 0,
           broadcasterCommissionRate: dto.broadcasterCommissionRate || 0,
           liveShoppingName: dto.liveShoppingName || undefined,
+          messageSetting: {
+            update: {
+              fanNick: dto.messageSetting.fanNick || undefined,
+              levelCutOffPoint: dto.messageSetting.levelCutOffPoint || undefined,
+              ttsSetting: dto.messageSetting.ttsSetting || undefined,
+            },
+          },
         },
       });
       // 취소상태로 변경하는 경우

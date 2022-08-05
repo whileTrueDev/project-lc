@@ -8,11 +8,13 @@ import {
   GoodsOptions,
   LiveShopping,
   LiveShoppingImage,
+  LiveShoppingMessageSetting,
   OrderItemOption,
   SellerShop,
 } from '@prisma/client';
 
 export interface LiveShoppingWithGoods extends LiveShopping {
+  messageSetting?: LiveShoppingMessageSetting;
   goods: {
     goods_name: string;
     summary: string;
