@@ -6,6 +6,7 @@ import {
   Button,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   Spinner,
@@ -68,6 +69,9 @@ export function OrderItemSupport({
               },
             })}
           />
+          <FormErrorMessage>
+            {errors?.orderItems?.[orderItemIndex]?.support?.message}
+          </FormErrorMessage>
         </FormControl>
       </Box>
     </Flex>

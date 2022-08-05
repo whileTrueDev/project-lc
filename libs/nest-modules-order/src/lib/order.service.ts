@@ -404,13 +404,15 @@ export class OrderService {
     const bcIds = messageDataArr.map((x) => x.broadcasterId);
     const bcOverlayUrls = await this.prisma.broadcaster.findMany({
       where: { id: { in: bcIds } },
-      select: { overlayUrl: true },
+      select: { overlayUrl: true, id: true },
     });
     // 구매 메시지 데이터 구성
     const purchaseData = messageDataArr
       .map<PurchaseMessage & TempPurchaseMessageAdditional>((y) => ({
         ...y,
-        roomName: bcOverlayUrls.find((b) => b.overlayUrl)?.overlayUrl.replace('/', ''),
+        roomName: bcOverlayUrls
+          .find((b) => b.id === y.broadcasterId)
+          ?.overlayUrl.replace('/', ''),
       }))
       .filter((z) => !!z.roomName);
 
