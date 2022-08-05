@@ -80,11 +80,13 @@ export function OrderPaymentForm(): JSX.Element | null {
       nonMemberOrderFlag: !profile?.id,
       orderItems: orderItems.map((oi) => ({
         ...oi,
-        support: {
-          ...oi.support,
-          broadcasterId: oi.support?.broadcasterId || null,
-          nickname: customer?.nickname || '',
-        },
+        support: oi.support
+          ? {
+              ...oi.support,
+              broadcasterId: oi.support?.broadcasterId || null,
+              nickname: customer?.nickname || '',
+            }
+          : undefined,
       })),
     });
     const amount = getOrderPrice(
