@@ -435,7 +435,7 @@ export class OrderService {
     // 구매 메시지 송출 요청
     purchaseData.forEach((data) => {
       this.logger.debug(
-        `구매 메시지 송출 이벤트 트리거 API -> Overlay - ${data.roomName} - ${data.productName}`,
+        `구매 메시지 송출 이벤트 트리거 API -> Overlay - ${data.roomName} - ${data.productName} ${data.nickname}::${data.message}`,
       );
       this.microService.emit<void, PurchaseMessage>(
         'liveshopping:overlay:purchase-msg',

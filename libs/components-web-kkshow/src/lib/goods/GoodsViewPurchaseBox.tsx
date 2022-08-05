@@ -39,6 +39,7 @@ import { SellType } from '@prisma/client';
 import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUnderlinedText';
 import {
   useCartMutation,
+  useCustomerInfo,
   useIsThisGoodsNowOnLive,
   useLiveShoppingNowOnLive,
   useProfile,
@@ -375,6 +376,7 @@ function GoodsViewButtonSet({
 }: GoodsViewPurchaseBoxProps): JSX.Element {
   const toast = useToast({ isClosable: true });
   const profile = useProfile();
+  const { data: customer } = useCustomerInfo(profile.data?.id);
   const buttonSize = useBreakpointValue({ base: 'lg', md: 'lg' });
   const bgColor = useColorModeValue('white', 'gray.700');
   const router = useRouter();
@@ -461,7 +463,7 @@ function GoodsViewButtonSet({
         support: selectedBc
           ? {
               broadcasterId: selectedBc.id,
-              nickname: selectedBc?.userNickname,
+              nickname: customer?.nickname || '', // 소비자 닉네임, 비회원의 경우 빈값처리
               message: supportMessage,
               liveShoppingId: connectedLiveShoppingId,
               // 라이브쇼핑 후원의 경우 상품홍보 후원으로는 포함시키지 않는다. (수수료 두번 처리될 가능성)
@@ -481,6 +483,7 @@ function GoodsViewButtonSet({
   }, [
     cartDoneDialog,
     createCartItem,
+    customer?.nickname,
     executePurchaseCheck,
     goods.LiveShopping,
     goods.id,
@@ -537,7 +540,7 @@ function GoodsViewButtonSet({
               ? {
                   broadcasterId: selectedBc.id,
                   message: supportMessage,
-                  nickname: selectedBc.userNickname,
+                  nickname: customer?.nickname || '', // 소비자 닉네임, 비회원의 경우 빈값처리
                   avatar: selectedBc.avatar,
                   liveShoppingId: connectedLiveShoppingId,
                   // 라이브쇼핑 후원의 경우 상품홍보 후원으로는 포함시키지 않는다. (수수료 두번 처리될 가능성)
@@ -573,6 +576,7 @@ function GoodsViewButtonSet({
       selectedOpts,
       sellType,
       supportMessage,
+      customer?.nickname,
       router,
     ],
   );

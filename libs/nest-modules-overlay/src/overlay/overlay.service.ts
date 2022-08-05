@@ -121,8 +121,16 @@ export class OverlayService {
     purchase: PurchaseMessage,
     socketServer: Server,
   ): Promise<void> {
-    const { roomName: overlayUrl, ttsSetting, productName, message } = purchase;
-    this.logger.debug(`Purchase Message - ${overlayUrl} - ${productName} ${message}`);
+    const {
+      roomName: overlayUrl,
+      ttsSetting,
+      productName,
+      message,
+      nickname: _nickname,
+    } = purchase;
+    this.logger.debug(
+      `Purchase Message - ${overlayUrl} - ${productName} ${_nickname}::${message}`,
+    );
     // 하단 띠배너 응원메세지 띄울 때 사용
     // const bottomAreaTextAndNickname: string[] = [];
     const rankings = await this.getRanking(overlayUrl);
