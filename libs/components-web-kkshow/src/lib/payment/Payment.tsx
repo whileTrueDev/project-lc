@@ -11,6 +11,7 @@ import { nanoid } from 'nanoid';
 import { useFormContext } from 'react-hook-form';
 import { useMemo } from 'react';
 import { TermBox } from './TermBox';
+import { KkshowSubNavbarHeight } from '../KkshowSubNavbar';
 
 export function getOrderPrice(
   originalPrice: number,
@@ -141,7 +142,7 @@ export function PaymentBox(): JSX.Element {
     <Box
       px={{ base: 0, lg: 4 }}
       position={{ base: 'static', lg: 'sticky' }}
-      top="0px"
+      top={`${KkshowSubNavbarHeight}px`}
       left="0px"
       right="0px"
     >
