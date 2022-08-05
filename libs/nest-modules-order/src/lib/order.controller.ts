@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Inject,
   Param,
   ParseIntPipe,
   Patch,
@@ -13,13 +12,8 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
 import { Order } from '@prisma/client';
-import {
-  CacheClearKeys,
-  HttpCacheInterceptor,
-  MICROSERVICE_OVERLAY_TOKEN,
-} from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CreateOrderDto,
@@ -45,10 +39,7 @@ import { OrderService } from './order.service';
 @CacheClearKeys('order')
 @Controller('order')
 export class OrderController {
-  constructor(
-    private readonly orderService: OrderService,
-    @Inject(MICROSERVICE_OVERLAY_TOKEN) private readonly microService: ClientProxy,
-  ) {}
+  constructor(private readonly orderService: OrderService) {}
 
   /** 구매확정 */
   @UseGuards(JwtAuthGuard)
