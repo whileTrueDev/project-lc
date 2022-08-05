@@ -112,8 +112,7 @@ export function OrderItem({
           <Box fontSize="sm">
             {!disableSupportInfo && (
               <OrderItemSupport
-                avatar={orderItem.support?.avatar}
-                nickname={orderItem.support?.nickname}
+                broadcasterId={orderItem.support?.broadcasterId}
                 orderItemIndex={index}
                 avatarSize="sm"
               />
