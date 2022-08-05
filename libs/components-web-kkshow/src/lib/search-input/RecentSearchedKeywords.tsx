@@ -10,37 +10,14 @@ import {
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { MouseEvent, useEffect } from 'react';
 
-interface SearchHelpPopoverProps {
+interface RecentSearchedKeywordsProps {
+  bgColor?: BoxProps['bgColor'];
   onItemClick: (item: string) => void;
 }
-export function SearchHelpPopover({ onItemClick }: SearchHelpPopoverProps): JSX.Element {
-  const { isSearchPopoverOpen } = useKkshowSearchStore();
-  return (
-    <Box
-      display={{ base: 'none', md: isSearchPopoverOpen ? 'block' : 'none' }}
-      position="absolute"
-      width="100%"
-      height="fit-content"
-      insetY={12}
-      flex={1}
-      bgColor={useColorModeValue('white', 'gray.600')}
-      color={useColorModeValue('black', 'white')}
-      zIndex="docked"
-      rounded="md"
-      boxShadow="md"
-    >
-      <SearchRecentKeywords onItemClick={onItemClick} />
-    </Box>
-  );
-}
-
-interface SearchRecentKeywordsProps extends SearchHelpPopoverProps {
-  bgColor?: BoxProps['bgColor'];
-}
-export function SearchRecentKeywords({
+export function RecentSearchedKeywords({
   onItemClick,
   bgColor,
-}: SearchRecentKeywordsProps): JSX.Element {
+}: RecentSearchedKeywordsProps): JSX.Element {
   const hoverColor = useColorModeValue('gray.100', 'gray.700');
   const defaultBgColor = useColorModeValue('white', 'gray.600');
   const { keywords, deleteKeyword, loadKeywords } = useKkshowSearchStore();
@@ -49,7 +26,7 @@ export function SearchRecentKeywords({
     loadKeywords();
   }, [loadKeywords]);
   return (
-    <Box p={{ base: 2, md: 0 }} my={3} bgColor={bgColor || defaultBgColor}>
+    <Box p={{ base: 2, md: 0 }} bgColor={bgColor || defaultBgColor}>
       <Text
         ml={2}
         as="sup"
@@ -101,4 +78,4 @@ export function SearchRecentKeywords({
   );
 }
 
-export default SearchHelpPopover;
+export default RecentSearchedKeywords;

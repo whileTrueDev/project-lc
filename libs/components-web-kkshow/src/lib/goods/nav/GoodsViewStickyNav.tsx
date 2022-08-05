@@ -3,6 +3,7 @@ import { useGoodsReviewCount } from '@project-lc/hooks';
 import { useGoodsViewStore } from '@project-lc/stores';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
+import { KkshowSubNavbarHeight } from '../../KkshowSubNavbar';
 import { GoodsViewNavBarHeight } from './GoodsViewNavBar';
 
 const navs = [
@@ -33,7 +34,10 @@ export function GoodsViewStickyNav(): JSX.Element {
       position="sticky"
       bgColor={bgColor}
       h={{ base: '50px', md: '60px' }}
-      top={{ base: GoodsViewNavBarHeight, md: 0 }}
+      top={{
+        base: GoodsViewNavBarHeight,
+        md: `${KkshowSubNavbarHeight}px`,
+      }}
       zIndex="sticky"
     >
       <HStack maxW="5xl" mx="auto" w="100%" justify="space-between" spacing={0}>

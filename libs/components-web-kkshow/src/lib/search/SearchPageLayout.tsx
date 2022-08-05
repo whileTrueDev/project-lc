@@ -15,7 +15,8 @@ export interface SearchPageLayoutProps {
 /** search 페이지 기본 레이아웃(네비바, 하단 퀵메뉴, 푸터) */
 export function SearchPageLayout({ children }: SearchPageLayoutProps): JSX.Element {
   return (
-    <Flex direction="column" overflow="hidden" minHeight="100vh">
+    // subNavbar sticky 적용위해 overflow: hidden 삭제함
+    <Flex direction="column" minHeight="100vh">
       {/* 검색페이지 네비바는 라이트모드에서 흰색배경이라 variant="white" 적용함 */}
       <KkshowNavbar variant="white" />
       <Box minH="80vh" flexGrow={1}>
