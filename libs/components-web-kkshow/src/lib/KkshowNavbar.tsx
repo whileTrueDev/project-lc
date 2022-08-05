@@ -71,6 +71,7 @@ export function KkshowNavbar({
         pt={{ base: 0, md: 6 }}
         w="100%"
         zIndex="sticky"
+        position="relative" // zIndex 적용하기 위해 설정
         {...boxProps}
       >
         {/* 모바일인 경우 */}
