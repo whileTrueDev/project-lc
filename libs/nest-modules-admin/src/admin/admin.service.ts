@@ -223,10 +223,17 @@ export class AdminService {
           broadcasterCommissionRate: dto.broadcasterCommissionRate || 0,
           liveShoppingName: dto.liveShoppingName || undefined,
           messageSetting: {
-            update: {
-              fanNick: dto.messageSetting.fanNick || undefined,
-              levelCutOffPoint: dto.messageSetting.levelCutOffPoint || undefined,
-              ttsSetting: dto.messageSetting.ttsSetting || undefined,
+            upsert: {
+              create: {
+                fanNick: dto.messageSetting.fanNick || undefined,
+                levelCutOffPoint: dto.messageSetting.levelCutOffPoint || undefined,
+                ttsSetting: dto.messageSetting.ttsSetting || undefined,
+              },
+              update: {
+                fanNick: dto.messageSetting.fanNick || undefined,
+                levelCutOffPoint: dto.messageSetting.levelCutOffPoint || undefined,
+                ttsSetting: dto.messageSetting.ttsSetting || undefined,
+              },
             },
           },
         },
