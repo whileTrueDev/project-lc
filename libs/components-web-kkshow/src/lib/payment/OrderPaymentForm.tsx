@@ -1,5 +1,5 @@
 import { Grid, GridItem, Heading, Stack } from '@chakra-ui/react';
-import { useProfile } from '@project-lc/hooks';
+import { useCustomerInfo, useProfile } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useCartStore, useKkshowOrderStore } from '@project-lc/stores';
 import { setCookie } from '@project-lc/utils-frontend';
@@ -16,6 +16,7 @@ import { PaymentSelection } from './PaymentSelection';
 
 export function OrderPaymentForm(): JSX.Element | null {
   const { data: profile } = useProfile();
+  const { data: customer } = useCustomerInfo(profile?.id);
   const orderPrepareData = useKkshowOrderStore((s) => s.order);
 
   const methods = useForm<CreateOrderForm>({
@@ -66,9 +67,9 @@ export function OrderPaymentForm(): JSX.Element | null {
       recipientPhone1,
       recipientPhone2,
       recipientPhone3,
+      orderItems,
       ...rest
     } = submitData;
-    //
     // * 주문 생성에 필요한 데이터를 formState에서 가져와 store에 저장
     handleOrderPrepare({
       ...rest,
@@ -76,6 +77,15 @@ export function OrderPaymentForm(): JSX.Element | null {
       customerId: profile?.id,
       recipientPhone: [recipientPhone1, recipientPhone2, recipientPhone3].join('-'),
       ordererPhone: [ordererPhone1, ordererPhone2, ordererPhone3].join('-'),
+      nonMemberOrderFlag: !profile?.id,
+      orderItems: orderItems.map((oi) => ({
+        ...oi,
+        support: {
+          ...oi.support,
+          broadcasterId: oi.support?.broadcasterId || null,
+          nickname: customer?.nickname || '',
+        },
+      })),
     });
     const amount = getOrderPrice(
       PRODUCT_PRICE,
