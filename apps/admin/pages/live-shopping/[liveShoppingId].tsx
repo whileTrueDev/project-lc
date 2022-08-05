@@ -409,7 +409,9 @@ export function LiveShoppingDetail(): JSX.Element {
                 <Text>1,2단계 구매메시지 기준 금액: </Text>
                 <Input
                   type="number"
-                  {...register('messageSetting.levelCutOffPoint')}
+                  {...register('messageSetting.levelCutOffPoint', {
+                    valueAsNumber: true,
+                  })}
                   placeholder="30000"
                 />
 

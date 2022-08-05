@@ -85,10 +85,12 @@ export function AdminLiveShoppingUpdateConfirmModal(
             <Text>테스트팬닉: {watch('messageSetting.fanNick')}</Text>
           ) : null}
           {watch('messageSetting.levelCutOffPoint') ? (
-            <Text>테스트팬닉: {watch('messageSetting.levelCutOffPoint')}</Text>
+            <Text>
+              1,2단계 구매메시지 기준금액: {watch('messageSetting.levelCutOffPoint')}
+            </Text>
           ) : null}
           {watch('messageSetting.ttsSetting') ? (
-            <Text>테스트팬닉: {watch('messageSetting.ttsSetting')}</Text>
+            <Text>TTS 설정: {watch('messageSetting.ttsSetting')}</Text>
           ) : null}
         </Box>
       </Box>
