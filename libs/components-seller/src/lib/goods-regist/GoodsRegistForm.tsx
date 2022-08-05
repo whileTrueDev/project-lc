@@ -254,13 +254,6 @@ export function GoodsRegistForm(): JSX.Element {
         ...goodsDto,
         goodsInfoId: res.id,
       };
-    } else if (!data.goodsInfoId) {
-      // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함)
-      toast({
-        description: '상품 공통 정보를 입력하거나 기존 정보를 불러와서 등록해주세요',
-        status: 'warning',
-      });
-      return;
     }
 
     if (!shippingGroupId) {
@@ -369,7 +362,7 @@ export function GoodsRegistForm(): JSX.Element {
             bg="gray.400"
             opacity="0.5"
             flexDirection="column"
-            zIndex={99999}
+            zIndex="sticky"
           >
             <Spinner />
             <Text>상품을 등록중입니다...</Text>

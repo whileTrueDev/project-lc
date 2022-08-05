@@ -16,10 +16,13 @@ export const sellerDarkLogo = 'kkshow-seller-darkmode.png';
 // 방송인 로고
 export const broadcasterLogo = 'kkshow-broadcaster-lightmode.png';
 export const broadcasterDarkLogo = 'kkshow-broadcaster-darkmode.png';
+// 크크마켓 로고
+export const marketLogo = 'kkshow-market-lightmode.png';
+export const marketDarkLogo = 'kkshow-market-darkmode.png';
 
 export type KkshowLogoVariant = 'white' | 'dark' | 'light';
 export interface KksLogoProps extends ImageProps {
-  appType?: UserType;
+  appType?: UserType | 'kkmarket';
   variant?: KkshowLogoVariant;
 }
 
@@ -33,6 +36,12 @@ function getCorrectLogoInfo({
   colorMode,
   variant,
 }: GetCorrectLogoOption): string {
+  if (appType === 'kkmarket') {
+    if (colorMode === 'dark' || variant === 'white') {
+      return LOGO_S3_PREFIX + marketDarkLogo;
+    }
+    return LOGO_S3_PREFIX + marketLogo;
+  }
   if (variant === 'white') return LOGO_S3_PREFIX + whiteLogo;
   if (variant === 'light') return LOGO_S3_PREFIX + lightLogo;
   if (variant === 'dark') return LOGO_S3_PREFIX + darkLogo;

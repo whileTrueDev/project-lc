@@ -83,13 +83,13 @@ export function BroadcasterPurchaseList(): JSX.Element | null {
                       <Text fontSize="sm" fontWeight="bold">
                         닉네임
                       </Text>
-                      <Text>{item.support.nickname}</Text>
+                      <Text>{item.support?.nickname}</Text>
                     </Box>
                     <Box>
                       <Text fontSize="sm" fontWeight="bold">
-                        응원메시지
+                        후원메시지
                       </Text>
-                      <Text>{item.support.message}</Text>
+                      <Text>{item.support?.message}</Text>
                     </Box>
                   </Stack>
                 </Box>

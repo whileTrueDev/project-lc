@@ -25,7 +25,7 @@ export function LiveShoppingCurrentStateBoard({
   title,
 }: LiveShoppingCurrentStateBoardProps): JSX.Element {
   const { message, alert, setAlert } = useLiveShoppingStateSubscription(liveShoppingId);
-  // * 응원메시지 데이터
+  // * 후원메시지 데이터
   const { data, status, error } = usePurchaseMessages({
     liveShoppingId,
   });
@@ -102,8 +102,8 @@ export function LiveShoppingCurrentStateBoard({
           </Stack>
         </SectionWithTitle>
 
-        {/* 응원메시지 목록 */}
-        <SectionWithTitle variant="outlined" title="응원메시지">
+        {/* 후원메시지 목록 */}
+        <SectionWithTitle variant="outlined" title="후원메시지">
           <Box maxH="400px" overflowY="auto">
             <MessageItemLayout
               bg="blue.500"
@@ -111,7 +111,7 @@ export function LiveShoppingCurrentStateBoard({
               item={{
                 index: '순서',
                 nickname: '닉네임',
-                message: '응원메시지',
+                message: '후원메시지',
                 price: '주문금액',
               }}
             />

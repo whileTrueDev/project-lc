@@ -1,5 +1,5 @@
 import * as textToSpeech from '@google-cloud/text-to-speech';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AudioEncoding,
@@ -15,11 +15,21 @@ import {
 } from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
 import { s3 } from '@project-lc/utils-s3';
+import { Server } from 'socket.io';
+import { TtsSetting } from '@prisma/client';
 
 @Injectable()
 export class OverlayService {
   privateKey: string;
   options: GoogleTTSCredentials;
+  private logger = new Logger(OverlayService.name);
+
+  private readonly ENABLE_TTS_TYPES: TtsSetting[] = [
+    'full',
+    'nick_purchase',
+    'nick_purchase_price',
+    'only_message',
+  ];
 
   constructor(private readonly prisma: PrismaService) {
     this.privateKey =
@@ -54,21 +64,21 @@ export class OverlayService {
         </speak>
         `;
         break;
-      case 'nick-purchase':
+      case 'nick_purchase':
         messageWithAppreciate = `
         <speak>
           ${nickname}님 구매 감사합니다 <break time='500ms'/>
         </speak>
         `;
         break;
-      case 'nick-purchase-price':
+      case 'nick_purchase_price':
         messageWithAppreciate = `
         <speak>
           ${nickname}님 ${price}원 구매 감사합니다 <break time='500ms'/>
         </speak>
         `;
         break;
-      case 'only-message':
+      case 'only_message':
         messageWithAppreciate = `
         <speak>
           ${message}
@@ -104,6 +114,89 @@ export class OverlayService {
       return response.audioContent;
     }
     return false;
+  }
+
+  /** 구매 메시지 송출 핸들러 (overlay client 화면으로 송출 이벤트 전달) */
+  public async handlePurchaseMessage(
+    purchase: PurchaseMessage,
+    socketServer: Server,
+  ): Promise<void> {
+    const {
+      roomName: overlayUrl,
+      ttsSetting,
+      productName,
+      message,
+      nickname: _nickname,
+    } = purchase;
+    this.logger.debug(
+      `Purchase Message - ${overlayUrl} - ${productName} ${_nickname}::${message}`,
+    );
+    // 하단 띠배너 응원메세지 띄울 때 사용
+    // const bottomAreaTextAndNickname: string[] = [];
+    const rankings = await this.getRanking(overlayUrl);
+    const nicknameAndPrice = rankings
+      .map(({ nickname, _sum: { price } }) => ({ nickname, price }))
+      .sort((a, b) => b.price - a.price);
+
+    let audioBuffer: string | false | Uint8Array;
+    if (this.ENABLE_TTS_TYPES.includes(ttsSetting)) {
+      audioBuffer = await this.googleTextToSpeech(purchase);
+    }
+
+    /** 총 금액 오버레이에 띄울 때 필요 현재는 사용안함 
+    const totalSold = await this.overlayService.getTotalSoldPrice();
+    */
+
+    /** 하단 띠배너 영역에 닉네임과 메세지 띄울 때 사용 현재는 사용안함
+    const messageAndNickname = await this.overlayService.getMessageAndNickname(overlayUrl);
+      messageAndNickname.forEach((d: { nickname: string; text: string }) => {
+        bottomAreaTextAndNickname.push(`${d.text} - [${d.nickname}]`);
+      });
+     */
+
+    if (ttsSetting === 'no_sound') {
+      // 콤보모드 (콤보모드는 응원메세지 이미지 대신 콤보를 사용해서 기존과 다른 이벤트를 사용한다)
+      // 콤보모드 구매 메시지 송출 이벤트 트리거
+      socketServer
+        .to(overlayUrl)
+        .emit('get right-top pop purchase message', { purchase });
+    } else {
+      // TTS 구매 메시지 송출 이벤트 트리거
+      socketServer
+        .to(overlayUrl)
+        .emit('get right-top purchase message', { purchase, audioBuffer });
+    }
+
+    // 랭킹화면 업데이트 이벤트 트리거
+    socketServer.to(overlayUrl).emit('get top-left ranking', nicknameAndPrice);
+
+    /** 총 판매금액 오버레이에 띄울 때 사용
+      socketServer.to(overlayUrl).emit('get current quantity', totalSold);
+     */
+    /** 하단 띠배너 응원메세지 띄울 때 사용
+    socketServer
+      .to(overlayUrl)
+      .emit('get bottom purchase message', bottomAreaTextAndNickname);
+    */
+
+    // 네쇼라 이벤트
+    socketServer.to(overlayUrl).emit('get nsl donation message from server', {
+      nickname: purchase.nickname,
+      price: purchase.purchaseNum,
+    });
+  }
+
+  /** 구매 메시지(비회원) 송출 핸들러 (overlay client 화면으로 송출 이벤트 전달) */
+  public async handlePurchaseMessageNonMember(
+    purchase: PurchaseMessage,
+    socketServer: Server,
+  ): Promise<void> {
+    const { roomName } = purchase;
+    socketServer.to(roomName).emit('get non client purchase message', purchase);
+    socketServer.to(roomName).emit('get nsl donation message from server', {
+      nickname: purchase.nickname,
+      price: purchase.purchaseNum,
+    });
   }
 
   // 방송 시작 알림

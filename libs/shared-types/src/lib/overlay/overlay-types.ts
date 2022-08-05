@@ -1,3 +1,5 @@
+import { TtsSetting } from '@prisma/client';
+
 /** client의 소켓 아이디와 device os */
 export interface SocketIdandDevice {
   /** 소켓 아이디 */
@@ -38,6 +40,9 @@ export interface RoomAndVideoType {
   /** 비디오 인트로 / 아웃트로 */
   type: 'intro' | 'outro';
 }
+
+/** 응원메시지 Text To Speech 타입 */
+
 /** 응원 메세지를 위한 정보들 */
 export interface PurchaseMessage {
   /** 룸이름 */
@@ -53,13 +58,11 @@ export interface PurchaseMessage {
   /** 구매물품 가격 또는 수량 */
   purchaseNum: number;
   /** tts 세팅 */
-  ttsSetting:
-    | 'full'
-    | 'nick-purchase'
-    | 'nick-purchase-price'
-    | 'only-message'
-    | 'no-tts'
-    | 'no-sound';
+  ttsSetting: TtsSetting;
+  /** 비회원 메시지 여부 */
+  nonMemberOrderFlag?: boolean;
+  /** 선물 구매 여부 */
+  giftFlag?: boolean;
 }
 /** 시청자 닉네임과 닉네임별 구매금액 총액 */
 export interface NicknameAndPrice {

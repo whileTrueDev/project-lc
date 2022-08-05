@@ -5,6 +5,7 @@ import {
   LiveShoppingImageType,
   LiveShopppingProgressType,
   Seller,
+  TtsSetting,
 } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
@@ -13,12 +14,21 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   ValidateIf,
+  ValidateNested,
 } from 'class-validator';
 import { LiveShoppingInput } from '../..';
 import { LIVE_SHOPPING_PROGRESS } from '../constants/liveShoppingProgress';
+
+/** 라이브쇼핑 메시지 설정 업데이트 DTO */
+export class LiveShoppingMessageSettingUpdateDTO {
+  @IsOptional() @IsString() fanNick?: string;
+  @IsOptional() @IsEnum(TtsSetting) ttsSetting?: TtsSetting;
+  @IsOptional() @Type(() => Number) @IsNumber() levelCutOffPoint?: number;
+}
 
 /** 라이브쇼핑 업데이트 dto */
 export class LiveShoppingUpdateDTO {
@@ -88,6 +98,12 @@ export class LiveShoppingUpdateDTO {
   @IsOptional()
   @IsString()
   liveShoppingImage?: Pick<LiveShoppingImage, 'imageUrl' | 'type'>;
+
+  @IsOptional()
+  @ValidateNested()
+  @IsObject()
+  @Type(() => LiveShoppingMessageSettingUpdateDTO)
+  messageSetting?: LiveShoppingMessageSettingUpdateDTO;
 }
 
 /** 라이브쇼핑 등록 dto */

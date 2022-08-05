@@ -188,6 +188,13 @@ export const dummyLiveShoppingData: Omit<
   whiletrueCommissionRate: '5',
   broadcasterCommissionRate: '10',
   progress: 'confirmed',
+  messageSetting: {
+    create: {
+      fanNick: '테스트팬닉',
+      levelCutOffPoint: 30000,
+      ttsSetting: 'full',
+    },
+  },
 };
 
 export const dummyBroadcasterAddress: Prisma.BroadcasterAddressCreateInput = {

@@ -38,9 +38,10 @@ export default function GoodsView(): JSX.Element {
     );
   return (
     <Box>
-      <Box display={{ base: 'none', md: 'block' }}>
-        <KkshowNavbar />
-      </Box>
+      <KkshowNavbar
+        firstLink="kkmarket"
+        boxProps={{ display: { base: 'none', md: 'block' } }}
+      />
       <GoodsViewNavBar />
       <GoodsViewBreadCrumb />
       <GoodsViewMeta />

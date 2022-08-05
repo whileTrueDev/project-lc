@@ -52,8 +52,7 @@ export function GiftBox(): JSX.Element {
     <SectionWithTitle title="선물 방송인">
       {fields.map((orderItem, idx) => (
         <OrderItemSupport
-          avatar={orderItem.support?.avatar}
-          nickname={orderItem.support?.nickname}
+          broadcasterId={orderItem.support?.broadcasterId}
           key={orderItem.id}
           orderItemIndex={idx}
         />
@@ -66,9 +65,6 @@ export function GiftBox(): JSX.Element {
 export function GiftOrderPolicy(): JSX.Element {
   return (
     <UnorderedList fontSize="xs" mt={3}>
-      <ListItem>
-        <Text>구매 응원 메시지를 입력하지 않으면 구매 메시지가 전송되지 않습니다.</Text>
-      </ListItem>
       <ListItem>
         <Text>배송지를 입력하지 않아도 주문상품이 방송인에게 올바르게 배송됩니다.</Text>
       </ListItem>

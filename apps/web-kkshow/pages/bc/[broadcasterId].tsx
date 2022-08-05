@@ -39,7 +39,7 @@ export function BroadcasterPromotionPage(): JSX.Element {
   if (bc.isLoading) {
     return (
       <Box>
-        <KkshowLayout>
+        <KkshowLayout navbarFirstLink="kkmarket">
           <Center minH="90vh">
             <Spinner />
           </Center>
@@ -52,7 +52,7 @@ export function BroadcasterPromotionPage(): JSX.Element {
   if ((bc.data && !bc.data.userNickname) || !promotionPage.data)
     return (
       <Box>
-        <KkshowLayout>
+        <KkshowLayout navbarFirstLink="kkmarket">
           <Center minH="90vh">
             <Box textAlign="center">
               <Text>해당하는 방송인이 없거나, 아직 홍보중인 상품이 없습니다</Text>
@@ -70,7 +70,7 @@ export function BroadcasterPromotionPage(): JSX.Element {
       {/* 신규가입 이벤트 팝업 */}
       <EventPopup />
 
-      <KkshowLayout>
+      <KkshowLayout navbarFirstLink="kkmarket">
         <Box m="auto" maxW="5xl" p={2} minH="80vh" mt={[5, 10, 20]}>
           <PromotionPageProfile broadcasterId={broadcasterId} />
 

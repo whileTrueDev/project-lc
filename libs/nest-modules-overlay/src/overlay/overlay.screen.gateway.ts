@@ -18,20 +18,17 @@ import {
   ObjectiveMessage,
   NewsMessage,
 } from '@project-lc/shared-types';
-import { OverlayService } from '@project-lc/nest-modules-overlay';
+import { OverlayService } from './overlay.service';
 
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
-export class AppScreenGateway
+export class OverlayScreenGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  @WebSocketServer()
-  server: Server;
-
-  socketInfo: SocketInfo = {};
-
+  private logger: Logger = new Logger('OverlayScreenGateway');
   constructor(private readonly overlayService: OverlayService) {}
 
-  private logger: Logger = new Logger('AppGateway');
+  @WebSocketServer() server: Server;
+  socketInfo: SocketInfo = {};
 
   afterInit(): void {
     this.logger.log('Initialized!');

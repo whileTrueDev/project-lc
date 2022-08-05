@@ -3,7 +3,7 @@ import { OrderPaymentForm } from '@project-lc/components-web-kkshow/payment/Orde
 
 export function Payment(): JSX.Element {
   return (
-    <KkshowLayout>
+    <KkshowLayout navbarFirstLink="kkmarket">
       <OrderPaymentForm />
     </KkshowLayout>
   );

@@ -211,6 +211,7 @@ export class LCProdAppStack extends cdk.Stack {
         AWS_S3_ACCESS_KEY_ID: Secret.fromSsmParameter(p.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: Secret.fromSsmParameter(p.S3_ACCESS_KEY_SECRET),
         CACHE_REDIS_URL: Secret.fromSsmParameter(p.CACHE_REDIS_URL_KEY),
+        MQ_REDIS_URL: Secret.fromSsmParameter(p.MQ_REDIS_URL_KEY),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
