@@ -1,38 +1,56 @@
+import { RepeatIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   AvatarProps,
   Box,
+  Button,
   Flex,
   FormControl,
   FormLabel,
   Input,
+  Spinner,
   Text,
 } from '@chakra-ui/react';
+import { useBroadcaster } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
 
 export interface OrderItemSupportProps {
   orderItemIndex: number;
   avatarSize?: AvatarProps['size'];
-  avatar?: string | null;
-  nickname?: string | null;
+  broadcasterId?: number | null;
 }
 export function OrderItemSupport({
   orderItemIndex,
   avatarSize,
-  avatar,
-  nickname,
-}: OrderItemSupportProps): JSX.Element {
+  broadcasterId,
+}: OrderItemSupportProps): JSX.Element | null {
+  const {
+    data: broadcaster,
+    isLoading,
+    refetch,
+  } = useBroadcaster({ id: broadcasterId || undefined });
   const {
     register,
     formState: { errors },
   } = useFormContext<CreateOrderForm>();
 
+  if (isLoading) return <Spinner />;
+  if (!isLoading && !broadcaster) {
+    return (
+      <Box>
+        <Text>선물 방송인 정보를 불러올 수 없습니다.</Text>
+        <Button leftIcon={<RepeatIcon />} onClick={() => refetch()}>
+          새로고침
+        </Button>
+      </Box>
+    );
+  }
   return (
     <Flex>
-      <Avatar size={avatarSize} src={avatar || ''} mr={2} />
+      <Avatar size={avatarSize} src={broadcaster?.avatar || ''} mr={2} />
       <Box>
-        <Text fontWeight="semibold">{nickname}</Text>
+        <Text fontWeight="semibold">{broadcaster?.userNickname}</Text>
         <FormControl
           isInvalid={
             !!(errors.orderItems && errors.orderItems[orderItemIndex].support?.message)
