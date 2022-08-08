@@ -125,7 +125,7 @@ export function GoodsRegistForm(): JSX.Element {
       cancel_type: '0', // 청약철회, 기본 - 청약철회가능 0
       // 판매옵션
       option_use: '1', // 옵션사용여부, 기본 - 옵션사용 1
-      common_contents_type: 'new',
+      common_contents_type: 'load', // 상품 공통 정보 - '기존정보 불러오기'를 기본값으로
       option_title: '',
       option_values: '',
       image: [],
