@@ -245,6 +245,13 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
         ...goodsDto,
         goodsInfoId: res.id,
       };
+    } else if (!data.goodsInfoId) {
+      // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함)
+      toast({
+        description: '상품 공통 정보를 입력하거나 기존 정보를 불러와서 등록해주세요',
+        status: 'warning',
+      });
+      return;
     }
 
     if (!shippingGroupId) {
