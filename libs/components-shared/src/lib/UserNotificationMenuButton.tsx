@@ -162,7 +162,7 @@ export function UserNotificationMenuButton(): JSX.Element {
       </Tooltip>
 
       <MenuList
-        zIndex="dropdown"
+        zIndex="banner" // sticky < banner < overlay
         w={{ base: 280, sm: 400 }}
         overflow="auto"
         cursor="default"
