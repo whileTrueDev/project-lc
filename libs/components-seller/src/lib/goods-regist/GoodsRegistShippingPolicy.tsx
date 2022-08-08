@@ -352,7 +352,7 @@ export function GoodsRegistShippingPolicy({
       {/* 배송비 정책 목록 */}
       <ShippingGroupContainerBox maxWidth="lg">
         <RadioGroup
-          value={watch('shippingGroupId')?.toString()}
+          value={watch('shippingGroupId')?.toString() || data?.[0].id.toString()} // 배송비정책 선택된 값 없는경우 배송그룹목록중 첫번째를 선택
           maxHeight="150px"
           overflowY="auto"
         >
