@@ -365,12 +365,12 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
             left="0px"
             right="0px"
             bg="gray.400"
-            opacity="0.5"
+            opacity="0.8"
             flexDirection="column"
-            zIndex={99999}
+            zIndex="overlay"
           >
             <Spinner />
-            <Text>상품 정보를 수정중입니다...</Text>
+            <Text fontWeight="bold">상품 정보를 수정중입니다...</Text>
           </Center>
         )}
       </Stack>
