@@ -352,11 +352,11 @@ export function GoodsRegistShippingPolicy({
       {/* 배송비 정책 목록 */}
       <ShippingGroupContainerBox maxWidth="lg">
         <RadioGroup
-          value={watch('shippingGroupId')?.toString() || data?.[0].id.toString()} // 배송비정책 선택된 값 없는경우 배송그룹목록중 첫번째를 선택
+          value={watch('shippingGroupId')?.toString() || data?.[0]?.id.toString()} // 배송비정책 선택된 값 없는경우 배송그룹목록중 첫번째를 선택
           maxHeight="150px"
           overflowY="auto"
         >
-          {data &&
+          {data && data.length > 0 ? (
             data.map((g) => (
               <ShippingGroupListItem
                 key={g.id}
@@ -365,7 +365,10 @@ export function GoodsRegistShippingPolicy({
                 countHandler={groupItemCountHandler}
                 deleteHandler={groupItemDeleteHandler}
               />
-            ))}
+            ))
+          ) : (
+            <Text align="center">생성하기 버튼을 눌러 배송비 정책을 생성해주세요</Text>
+          )}
         </RadioGroup>
       </ShippingGroupContainerBox>
 
