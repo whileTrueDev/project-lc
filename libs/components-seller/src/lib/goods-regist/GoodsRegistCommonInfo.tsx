@@ -79,7 +79,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
     setValue('goodsInfoId', undefined);
     setViewerContents('');
   };
-  const commonInfoId = watch('goodsInfoId');
+
   const commonContentsType = watch('common_contents_type');
 
   return (
@@ -123,7 +123,6 @@ export function GoodsRegistCommonInfo(): JSX.Element {
       ) : (
         // 기존정보 불러오기 컴포넌트
         <GoodsCommonInfoList
-          goodsInfoId={commonInfoId}
           onCommonInfoChange={onCommonInfoChange}
           onGoodsInfoDelete={clearGoodsInfoForNewInfo}
           getSunEditorInstance={getSunEditorInstance}

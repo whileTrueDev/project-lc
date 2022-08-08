@@ -32,14 +32,12 @@ import GoodsCommonInfoModal from './GoodsCommonInfoModal';
 /** 상품공통정보목록 셀렉트박스 *********************** */
 export function GoodsCommonInfoList({
   onCommonInfoChange,
-  goodsInfoId,
   onGoodsInfoDelete,
   getSunEditorInstance,
   getEditorContents,
   setViewerContents,
 }: {
   onCommonInfoChange: (data: GoodsInfo) => void;
-  goodsInfoId?: number;
   onGoodsInfoDelete: () => void;
   getSunEditorInstance: (sunEditor: SunEditorCore) => void;
   getEditorContents: () => string;
@@ -49,7 +47,10 @@ export function GoodsCommonInfoList({
   const deleteDialog = useDisclosure();
   const editDialog = useDisclosure();
   const toast = useToast();
-  const { setValue, getValues } = useFormContext<GoodsFormValues>();
+  const { setValue, getValues, watch } = useFormContext<GoodsFormValues>();
+
+  // formProvider에 저장된 goodsInfoId. number | undefined
+  const goodsInfoId = watch('goodsInfoId');
 
   // 불러온 특정 공통정보 id 저장
   const [_goodsInfoId, setGoodsInfoId] = useState<number | undefined>(goodsInfoId);
@@ -59,16 +60,19 @@ export function GoodsCommonInfoList({
     sellerId: profileData?.id,
     enabled: !!profileData?.id,
     onSuccess: (data: GoodsCommonInfo[]) => {
-      // 공통정보 불러온 후 goodsIdInfo 값이 있으면(수정) 해당 goodsInfo를 기본값으로 설정
-      if (goodsInfoId) {
-        setGoodsInfoId(goodsInfoId);
-      } else if (data.length > 0) {
+      // 공통정보 불러온 후 goodsIdInfo 값이 없으면 첫번째 공통정보를 선택
+      if (!goodsInfoId && data.length > 0) {
         setGoodsInfoId(data[0].id);
       }
     },
   });
 
-  // 공통정보 선택시 해당 공통정보 id의 내용 가져옴
+  // watch('goodsInfoId') 가 변경되는 경우 => 이 컴포넌트 내부에서 사용하는 _goodsInfoId 값도 업데이트
+  useEffect(() => {
+    setGoodsInfoId(goodsInfoId);
+  }, [goodsInfoId]);
+
+  // 공통정보 선택시(이 컴포넌트 내부에서 사용하는 _goodsInfoId 값 변경시) 해당 공통정보 id의 내용 가져옴
   useEffect(() => {
     if (_goodsInfoId) {
       getGoodsCommonInfoItem(_goodsInfoId)
@@ -79,10 +83,12 @@ export function GoodsCommonInfoList({
           console.error(e);
           toast({ title: '공통정보 내용을 불러오는 중 오류가 발생했습니다.' });
         });
+    } else if (infoList && infoList.length > 0) {
+      setGoodsInfoId(infoList[0].id);
     }
     // 다른 dep 값은 추가하지 않는다
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [_goodsInfoId]);
+  }, [_goodsInfoId, infoList]);
 
   /** 공통정보 삭제 요청 */
   const { mutateAsync: deleteCommonInfoItem } = useDeleteGoodsCommonInfo();
