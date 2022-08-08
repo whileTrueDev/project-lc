@@ -32,7 +32,7 @@ import GoodsCommonInfoModal from './GoodsCommonInfoModal';
 /** 상품공통정보목록 셀렉트박스 *********************** */
 export function GoodsCommonInfoList({
   onCommonInfoChange,
-  goodsInfoId = 1, // 판매자 생성시 기본 상품정보가 id:1 로 생성됨
+  goodsInfoId,
   onGoodsInfoDelete,
   getSunEditorInstance,
   getEditorContents,
