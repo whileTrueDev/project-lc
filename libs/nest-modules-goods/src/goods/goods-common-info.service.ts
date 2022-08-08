@@ -110,4 +110,19 @@ export class GoodsCommonInfoService {
       );
     }
   }
+
+  /** 상품 공통정보 수정 */
+  async updateGoodsCommonInfo(id: number, dto: GoodsInfoDto): Promise<GoodsInfo> {
+    try {
+      const item = await this.prisma.goodsInfo.update({
+        where: { id },
+        data: dto,
+      });
+      console.log(item);
+      return item;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error, 'error in updateGoodsCommonInfo');
+    }
+  }
 }

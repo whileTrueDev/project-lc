@@ -88,6 +88,7 @@ export * from './lib/mutation/useSignupMutation';
 export * from './lib/mutation/useSubNavMutation';
 export * from './lib/mutation/useUnlinkSocialAccountMutation';
 export * from './lib/mutation/useUpdateBroadcasterContactsMutation';
+export * from './lib/mutation/useUpdateGoodsCommonInfo';
 export * from './lib/mutation/useUpdateLiveShoppingManageMutation';
 export * from './lib/mutation/useUpdateNicknameMutation';
 export * from './lib/mutation/useUpdateSellCommissionMutation';

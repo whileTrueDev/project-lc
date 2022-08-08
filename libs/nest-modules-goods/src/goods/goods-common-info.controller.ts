@@ -3,7 +3,9 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -59,5 +61,14 @@ export class GoodsCommonInfoController {
   @Delete()
   deleteCommonInfo(@Body('id', ParseIntPipe) id: number): Promise<boolean> {
     return this.commonInfoService.deleteGoodsCommonInfo(id);
+  }
+
+  /** 공통정보 수정 */
+  @Patch('/:id')
+  updateGoodsCommonInfo(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidationPipe) dto: GoodsInfoDto,
+  ): Promise<GoodsInfo> {
+    return this.commonInfoService.updateGoodsCommonInfo(id, dto);
   }
 }
