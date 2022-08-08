@@ -81,7 +81,10 @@ export function GoodsCommonInfoList({
         })
         .catch((e) => {
           console.error(e);
-          toast({ title: '공통정보 내용을 불러오는 중 오류가 발생했습니다.' });
+          toast({
+            title: '공통정보 내용을 불러오는 중 오류가 발생했습니다.',
+            status: 'error',
+          });
         });
     } else if (infoList && infoList.length > 0) {
       setGoodsInfoId(infoList[0].id);
@@ -93,7 +96,17 @@ export function GoodsCommonInfoList({
   /** 공통정보 삭제 요청 */
   const { mutateAsync: deleteCommonInfoItem } = useDeleteGoodsCommonInfo();
   const deleteCommonInfo = async (): Promise<void> => {
-    if (!_goodsInfoId) throw new Error('공통정보가 없습니다');
+    if (!_goodsInfoId || !infoList) {
+      toast({ title: '공통정보가 없습니다', status: 'error' });
+      return;
+    }
+
+    if (infoList.length <= 1) {
+      // 남아있는 공통정보가 1개 이하인 경우 삭제못하도록
+      toast({ title: '최소 하나의 공통정보가 남아있어야 합니다', status: 'error' });
+      return;
+    }
+
     deleteCommonInfoItem({ id: Number(_goodsInfoId) })
       .then(() => {
         onGoodsInfoDelete();
