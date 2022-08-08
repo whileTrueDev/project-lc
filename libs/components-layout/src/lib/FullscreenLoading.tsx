@@ -13,6 +13,7 @@ export function FullscreenLoading(): JSX.Element {
       height="100vh"
       opacity="0.5"
       bg="gray"
+      zIndex="overlay" // sticky보다 큰 값
     >
       <Spinner />
     </Center>
