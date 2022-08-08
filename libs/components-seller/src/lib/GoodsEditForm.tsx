@@ -22,6 +22,7 @@ import {
   RegistGoodsDto,
 } from '@project-lc/shared-types';
 import { goodsRegistStore } from '@project-lc/stores';
+import { saveContentsImageToS3 } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -32,10 +33,7 @@ import GoodsRegistDataOptions from './goods-regist/GoodsRegistDataOptions';
 import GoodsRegistDataSales from './goods-regist/GoodsRegistDataSales';
 import GoodsRegistDescription from './goods-regist/GoodsRegistDescription';
 import GoodsRegistExtraInfo from './goods-regist/GoodsRegistExtraInfo';
-import {
-  addGoodsOptionInfo,
-  saveContentsImageToS3,
-} from './goods-regist/GoodsRegistForm';
+import { addGoodsOptionInfo } from './goods-regist/GoodsRegistForm';
 import { GoodsRegistInformationNotice } from './goods-regist/GoodsRegistInformationNotice';
 import GoodsRegistKeywords from './goods-regist/GoodsRegistKeywords';
 import GoodsRegistMemo from './goods-regist/GoodsRegistMemo';
