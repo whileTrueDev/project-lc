@@ -21,7 +21,10 @@ import {
   useProfile,
   useUpdateGoodsCommonInfo,
 } from '@project-lc/hooks';
+import { GoodsFormValues } from '@project-lc/shared-types';
+import { saveContentsImageToS3 } from '@project-lc/utils-frontend';
 import { useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import 'suneditor/dist/css/suneditor.min.css';
 import SunEditorCore from 'suneditor/src/lib/core';
 import GoodsCommonInfoModal from './GoodsCommonInfoModal';
@@ -32,22 +35,27 @@ export function GoodsCommonInfoList({
   goodsInfoId = 1, // 판매자 생성시 기본 상품정보가 id:1 로 생성됨
   onGoodsInfoDelete,
   getSunEditorInstance,
+  getEditorContents,
+  setViewerContents,
 }: {
   onCommonInfoChange: (data: GoodsInfo) => void;
   goodsInfoId?: number;
   onGoodsInfoDelete: () => void;
   getSunEditorInstance: (sunEditor: SunEditorCore) => void;
+  getEditorContents: () => string;
+  setViewerContents: (contents: string) => void;
 }): JSX.Element {
   const { data: profileData } = useProfile();
   const deleteDialog = useDisclosure();
   const editDialog = useDisclosure();
   const toast = useToast();
+  const { setValue, getValues } = useFormContext<GoodsFormValues>();
 
   // 불러온 특정 공통정보 id 저장
   const [_goodsInfoId, setGoodsInfoId] = useState<number | undefined>(goodsInfoId);
 
   // 공통정보 목록 불러오기
-  const { data: infoList, isLoading } = useGoodsCommonInfoList({
+  const { data: infoList, isLoading: infoListLoading } = useGoodsCommonInfoList({
     sellerId: profileData?.id,
     enabled: !!profileData?.id,
     onSuccess: (data: GoodsCommonInfo[]) => {
@@ -95,16 +103,58 @@ export function GoodsCommonInfoList({
   };
 
   /** db에 저장된 공통정보 수정 요청 */
-  const {mutateAsync: updateCommonInfoItem} = useUpdateGoodsCommonInfo();
-  
-  const updateCommonInfo = async (): Promise<void> {
-    if (!_goodsInfoId) throw new Error('공통정보가 없습니다');
-    // s3에 저장되지 않은 이미지 저장처리 필요
+  const { mutateAsync: updateCommonInfoItem, isLoading: updateLoading } =
+    useUpdateGoodsCommonInfo();
 
-  }
+  const updateCommonInfo = async (): Promise<void> => {
+    // 유저가 수정한 상품공통정보명, 내용 가져오기
+    const newGoodsCommonInfoName = getValues('common_contents_name');
+    const newGoodsCommonInfoContents = getEditorContents().trim();
+
+    if (!profileData?.email) return;
+    if (!_goodsInfoId) throw new Error('공통정보가 없습니다');
+
+    if (!newGoodsCommonInfoContents || newGoodsCommonInfoContents === '<p><br></p>') {
+      toast({ title: '수정된 공통정보 내용을 입력해주세요', status: 'warning' });
+      return;
+    }
+    // s3에 저장되지 않은 이미지 저장처리
+    const commonInfoBody = await saveContentsImageToS3(
+      newGoodsCommonInfoContents,
+      profileData.email,
+    );
+
+    // 업데이트 요청 => 새로 변경된 내용으로 표시
+    await updateCommonInfoItem(
+      {
+        id: _goodsInfoId,
+        dto: {
+          info_name: newGoodsCommonInfoName || '',
+          info_value: commonInfoBody,
+        },
+      },
+      {
+        onSuccess: (data) => {
+          toast({ title: '공통정보를 수정하였습니다', status: 'success' });
+          // => 새로 변경된 내용으로 표시
+          setValue('common_contents', data.info_value);
+          setViewerContents(data.info_value);
+          editDialog.onClose();
+        },
+        onError: (e) => {
+          console.error(e);
+          toast({
+            title: '공통정보를 수정하는 중 오류가 발생했습니다',
+            status: 'error',
+            description: e?.response?.data?.messsage,
+          });
+        },
+      },
+    );
+  };
 
   // 로딩중인 경우
-  if (isLoading)
+  if (infoListLoading)
     return (
       <Center>
         <Spinner />
@@ -159,8 +209,9 @@ export function GoodsCommonInfoList({
       <GoodsCommonInfoModal
         isOpen={editDialog.isOpen}
         onClose={editDialog.onClose}
-        onButtonClick={() => {
-          console.log('buttonClick');
+        buttonProps={{
+          onClick: updateCommonInfo,
+          isLoading: updateLoading,
         }}
         getSunEditorInstance={getSunEditorInstance}
       />
