@@ -13,14 +13,13 @@ import {
 import { GoodsInfo } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import {
+  getGoodsCommonInfoItem,
   GoodsCommonInfo,
   useDeleteGoodsCommonInfo,
-  useGoodsCommonInfoItem,
   useGoodsCommonInfoList,
   useProfile,
 } from '@project-lc/hooks';
 import { useEffect, useState } from 'react';
-import { useQueryClient } from 'react-query';
 import 'suneditor/dist/css/suneditor.min.css';
 
 /** 상품공통정보목록 셀렉트박스 *********************** */
@@ -39,51 +38,43 @@ export function GoodsCommonInfoList({
 
   // 공통정보 목록 불러오기
   const { data: infoList, isLoading } = useGoodsCommonInfoList({
-    sellerId: profileData?.id || 0,
-    enabled: !!profileData?.id && !!goodsInfoId,
+    sellerId: profileData?.id,
+    enabled: !!profileData?.id,
     onSuccess: (data: GoodsCommonInfo[]) => {
       // 공통정보 불러온 후 goodsIdInfo 값이 있으면(수정) 해당 goodsInfo를 기본값으로 설정
       if (goodsInfoId) {
-        setValue(goodsInfoId.toString());
+        setGoodsInfoId(goodsInfoId);
       } else if (data.length > 0) {
-        setValue(data[0].id.toString());
+        setGoodsInfoId(data[0].id);
       }
     },
   });
 
-  // 특정 공통정보 내용 불러오기
-  const [value, setValue] = useState<string | undefined>(
-    goodsInfoId ? goodsInfoId.toString() : undefined,
-  );
-  useGoodsCommonInfoItem({
-    id: Number(value),
-    enabled: !!value,
-    onSuccess: (data: GoodsInfo) => {
-      onCommonInfoChange(data);
-    },
-  });
+  // 불러온 특정 공통정보 id 저장
+  const [_goodsInfoId, setGoodsInfoId] = useState<number | undefined>(goodsInfoId);
 
-  // goodsInfoId 가 undefined인 경우 공통정보 목록의 첫번째 데이터 표시처리
-  const queryClient = useQueryClient();
+  // 공통정보 선택시 해당 공통정보 id의 내용 가져옴
   useEffect(() => {
-    if (goodsInfoId || !profileData) return;
-    const list = queryClient.getQueryData<GoodsCommonInfo[]>([
-      'GoodsCommonInfoList',
-      profileData.id,
-    ]);
-
-    if (list && list.length > 0) {
-      setValue(list[0].id.toString());
+    if (_goodsInfoId) {
+      getGoodsCommonInfoItem(_goodsInfoId)
+        .then((res) => {
+          onCommonInfoChange(res);
+        })
+        .catch((e) => {
+          console.error(e);
+          toast({ title: '공통정보 내용을 불러오는 중 오류가 발생했습니다.' });
+        });
     }
-  }, [goodsInfoId, profileData, queryClient]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [_goodsInfoId]);
 
   // 공통정보 삭제 요청
   const { mutateAsync: deleteCommonInfoItem } = useDeleteGoodsCommonInfo();
 
   const deleteCommonInfo = async (): Promise<void> => {
-    if (!value) throw new Error('공통정보가 없습니다');
-    deleteCommonInfoItem({ id: Number(value) })
-      .then((res) => {
+    if (!_goodsInfoId) throw new Error('공통정보가 없습니다');
+    deleteCommonInfoItem({ id: Number(_goodsInfoId) })
+      .then(() => {
         onGoodsInfoDelete();
         toast({ title: '해당 상품 공통 정보를 삭제하였습니다.', status: 'success' });
       })
@@ -108,7 +99,10 @@ export function GoodsCommonInfoList({
       {infoList && infoList.length > 0 ? (
         // {/* 공통정보 목록이 존재하는 경우 */}
         <Stack direction="row">
-          <Select value={value} onChange={(e) => setValue(e.currentTarget.value)}>
+          <Select
+            value={_goodsInfoId}
+            onChange={(e) => setGoodsInfoId(Number(e.currentTarget.value))}
+          >
             {infoList &&
               infoList.length > 0 &&
               infoList.map((info) => {
@@ -135,7 +129,7 @@ export function GoodsCommonInfoList({
         onConfirm={deleteCommonInfo}
       >
         <Text>
-          ( 고유번호 : {value} ) 상품 공통 정보를 삭제하시겠습니까? 삭제 후 복구가
+          ( 고유번호 : {_goodsInfoId} ) 상품 공통 정보를 삭제하시겠습니까? 삭제 후 복구가
           불가능합니다
         </Text>
       </ConfirmDialog>

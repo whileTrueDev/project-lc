@@ -43,6 +43,7 @@ export const SunEditor = dynamic(() => import('suneditor-react'), {
 export function GoodsRegistCommonInfo(): JSX.Element {
   const { watch, setValue, register, getValues } = useFormContext<GoodsFormValues>();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const prevGoodsInfoId = useRef<number | undefined>(getValues('goodsInfoId')); // 상품 수정시 기존공통정보 id 저장
   const editor = useRef<SunEditorCore>();
   const viewer = useRef<any>();
   const getSunEditorInstance = (sunEditor: SunEditorCore): void => {
@@ -76,6 +77,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
   const onCommonInfoChange = (data: GoodsInfo): void => {
     const { id, info_value } = data;
     setViewerContents(info_value || '');
+    setValue('common_contents', info_value);
     setValue('goodsInfoId', id);
   };
 
@@ -96,6 +98,8 @@ export function GoodsRegistCommonInfo(): JSX.Element {
         onChange={(value) => {
           if (value === 'new') {
             clearGoodsInfoForNewInfo();
+          } else {
+            setValue('goodsInfoId', prevGoodsInfoId.current);
           }
         }}
         value={commonContentsType}
@@ -127,6 +131,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
           </Box>
         </Stack>
       ) : (
+        // 기존정보 불러오기 컴포넌트
         <GoodsCommonInfoList
           goodsInfoId={commonInfoId}
           onCommonInfoChange={onCommonInfoChange}
