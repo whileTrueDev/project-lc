@@ -32,10 +32,18 @@ export function GoodsRegistCommonInfo(): JSX.Element {
   };
 
   const toast = useToast();
+  /** 뷰어에 공통정보 내용 표시 */
   const setViewerContents = (contents: string): void => {
     if (viewer.current) {
       viewer.current.innerHTML = contents;
     }
+  };
+  /**  에디터에 입력된 공통정보 값 가져오기 */
+  const getEditorContents = (): string => {
+    if (editor.current) {
+      return editor.current.getContents(false);
+    }
+    return '';
   };
 
   // 공통정보 신규 등록
@@ -46,7 +54,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
     }
     if (!editor.current) return;
 
-    const textWithImages = editor.current.getContents(false);
+    const textWithImages = getEditorContents();
     setViewerContents(textWithImages);
     setValue('common_contents', textWithImages);
 
@@ -119,6 +127,8 @@ export function GoodsRegistCommonInfo(): JSX.Element {
           onCommonInfoChange={onCommonInfoChange}
           onGoodsInfoDelete={clearGoodsInfoForNewInfo}
           getSunEditorInstance={getSunEditorInstance}
+          getEditorContents={getEditorContents}
+          setViewerContents={setViewerContents}
         />
       )}
 
@@ -136,7 +146,9 @@ export function GoodsRegistCommonInfo(): JSX.Element {
         isOpen={isOpen}
         onClose={onClose}
         getSunEditorInstance={getSunEditorInstance}
-        onButtonClick={registGoodsCommonInfo}
+        buttonProps={{
+          onClick: registGoodsCommonInfo,
+        }}
       />
     </SectionWithTitle>
   );

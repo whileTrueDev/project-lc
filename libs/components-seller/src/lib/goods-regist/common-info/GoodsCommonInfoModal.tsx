@@ -1,5 +1,6 @@
 import {
   Button,
+  ButtonProps,
   Center,
   Input,
   Modal,
@@ -31,13 +32,13 @@ export const SunEditor = dynamic(() => import('suneditor-react'), {
 export interface GoodsCommonInfoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onButtonClick: () => void | Promise<void>;
+  buttonProps: ButtonProps;
   getSunEditorInstance: (sunEditor: SunEditorCore) => void;
 }
 export function GoodsCommonInfoModal({
   isOpen,
   onClose,
-  onButtonClick,
+  buttonProps,
   getSunEditorInstance,
 }: GoodsCommonInfoModalProps): JSX.Element {
   const { watch, register } = useFormContext<GoodsFormValues>();
@@ -68,7 +69,7 @@ export function GoodsCommonInfoModal({
               }}
               defaultValue={watch('common_contents')}
             />
-            <Button onClick={onButtonClick}>{isEditMode ? '수정' : '등록'}</Button>
+            <Button {...buttonProps}>{isEditMode ? '수정' : '등록'}</Button>
           </Stack>
         </ModalBody>
       </ModalContent>

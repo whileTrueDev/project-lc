@@ -7,7 +7,6 @@ import axios from '../../axios';
 export interface useUpdateGoodsCommonInfoDto {
   id: number; // 공통정보 고유번호(id)
   dto: GoodsInfoDto; // 수정할 데이터
-  onSuccess?: (updatedGoodsInfo: GoodsInfo) => void;
 }
 export type useUpdateGoodsCommonInfoRes = GoodsInfo;
 
@@ -28,11 +27,8 @@ export const useUpdateGoodsCommonInfo = (): UseMutationResult<
         .patch<useUpdateGoodsCommonInfoRes>(`goods/common-info/${dto.id}`, dto.dto)
         .then((res) => res.data),
     {
-      onSuccess: (data, { onSuccess }) => {
+      onSuccess: (data) => {
         queryClient.invalidateQueries('GoodsCommonInfoList');
-        if (onSuccess) {
-          onSuccess(data);
-        }
       },
     },
   );
