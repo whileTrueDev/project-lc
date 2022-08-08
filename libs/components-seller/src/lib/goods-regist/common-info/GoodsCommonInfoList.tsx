@@ -218,10 +218,15 @@ export function GoodsCommonInfoList({
         onClose={deleteDialog.onClose}
         onConfirm={deleteCommonInfo}
       >
-        <Text>
-          ( 고유번호 : {_goodsInfoId} ) 상품 공통 정보를 삭제하시겠습니까? 삭제 후 복구가
-          불가능합니다
-        </Text>
+        <Stack>
+          <Text>( 고유번호 : {_goodsInfoId} ) 상품 공통 정보를 삭제하시겠습니까?</Text>
+          <Text>삭제 후 복구가 불가능합니다</Text>
+          <Text>연결된 공통 정보가 없는 상품에는 기본 내용이 표시됩니다</Text>
+          <Text>
+            다른 상품 공통 정보를 표시하고 싶으시면 다른 상품 공통정보를 선택하거나 새로
+            작성해주세요
+          </Text>
+        </Stack>
       </ConfirmDialog>
 
       {/* 공통정보 수정 모달 => onButtonClick에 이미 저장된 공통정보 수정 핸들러 전달 */}
