@@ -300,7 +300,7 @@ export class ReturnService {
     if (dto.searchDateType === 'requestDate') {
       where.requestDate = {
         gte: dto.searchStartDate ? new Date(dto.searchStartDate) : undefined,
-        lte: dto.searchEndDate ? new Date(dto.searchEndDate) : undefined,
+        lt: dto.searchEndDate ? new Date(dto.searchEndDate) : undefined,
       };
     }
 
