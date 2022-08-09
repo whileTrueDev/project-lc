@@ -39,6 +39,7 @@ export class KkshowSearchService {
           { summary: { contains: SEARCH_KEYWORD } },
           { seller: { name: SEARCH_KEYWORD } },
           { seller: { sellerShop: { shopName: { contains: SEARCH_KEYWORD } } } },
+          { searchKeyword: { contains: SEARCH_KEYWORD } },
         ],
       },
       select: {
