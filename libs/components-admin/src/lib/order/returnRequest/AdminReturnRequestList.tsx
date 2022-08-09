@@ -1,20 +1,20 @@
 import {
-  Stack,
-  Text,
-  Box,
-  Spinner,
-  ModalBody,
-  useDisclosure,
   Modal,
+  ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Spinner,
+  Stack,
+  Text,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { GridColumns, GridRowParams } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useAdminReturnList } from '@project-lc/hooks';
 import { AdminReturnData } from '@project-lc/shared-types';
+import { useAdminReturnFilterStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import AdminReturnRequestDetail from './AdminReturnRequestDetail';
@@ -79,7 +79,12 @@ const columns: GridColumns = [
  * 해당 요청, 주문 내용 확인 가능 */
 export function AdminReturnRequestList(): JSX.Element {
   const dialog = useDisclosure();
-  const { data, isLoading } = useAdminReturnList();
+  const filterStore = useAdminReturnFilterStore();
+  const { data, isLoading } = useAdminReturnList({
+    searchDateType: filterStore.searchDateType,
+    searchStartDate: filterStore.searchStartDate,
+    searchEndDate: filterStore.searchEndDate,
+  });
 
   const [selectedRequest, setSelectedRequest] = useState<AdminReturnData | null>(null);
 
