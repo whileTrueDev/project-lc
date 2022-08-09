@@ -13,11 +13,17 @@ import {
   useBoolean,
   Collapse,
 } from '@chakra-ui/react';
-import { DataGridProps, GridColumns, GridRowParams } from '@material-ui/data-grid';
+import {
+  DataGridProps,
+  GridColumns,
+  GridRowData,
+  GridRowParams,
+} from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useAdminReturnList } from '@project-lc/hooks';
 import { AdminReturnData, AdminReturnRes } from '@project-lc/shared-types';
 import { useAdminReturnFilterStore } from '@project-lc/stores';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import AdminReturnRequestDetail from './AdminReturnRequestDetail';
@@ -162,9 +168,27 @@ const columns: GridColumns = [
     },
   },
   {
-    field: 'reason',
-    headerName: '사유',
+    field: 'refundAmount',
+    headerName: '환불액',
     minWidth: 200,
+    renderCell: ({ row }: GridRowData) => (
+      <Text>
+        {row?.refund?.refundAmount
+          ? `${getLocaleNumber(row?.refund?.refundAmount)}원`
+          : ''}
+      </Text>
+    ),
+  },
+  {
+    field: 'completeDate',
+    headerName: '완료일시',
+    minWidth: 200,
+    valueFormatter: (params) => {
+      if (params.value) {
+        return dayjs(params.value as Date).format('YYYY/MM/DD HH:mm');
+      }
+      return '';
+    },
   },
 ];
 
@@ -181,7 +205,7 @@ function AdminReturnListComponent({
   const [isOpen, { toggle }] = useBoolean(true);
   return (
     <Stack>
-      <Stack direction="row" alignItems="center">
+      <Stack direction="row" alignItems="center" justifyContent="center">
         <Text fontWeight="bold" fontSize="lg">
           {title}
         </Text>

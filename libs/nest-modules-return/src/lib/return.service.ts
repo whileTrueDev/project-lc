@@ -333,6 +333,8 @@ export class ReturnService {
             orderItemOption: true,
           },
         },
+        images: true,
+        refund: true,
       },
     });
 

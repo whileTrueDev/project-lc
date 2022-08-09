@@ -69,6 +69,8 @@ export type ReturnItemWithOriginOrderItemInfo = ReturnItem & {
 export type AdminReturnData = Return & {
   order: OrderWithPaymentData;
   items: ReturnItemWithOriginOrderItemInfo[];
+  images: ReturnImage[];
+  refund: Refund | null;
 };
 /** 관리자페이지에서 환불처리 위해 필요한 교환요청(Return) 데이터와 기타 연관 정보 */
 export type AdminReturnRes = AdminReturnData[];
