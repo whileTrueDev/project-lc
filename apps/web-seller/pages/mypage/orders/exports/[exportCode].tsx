@@ -52,19 +52,21 @@ export default function ExportsDetail(): JSX.Element {
           <ExportDetailSummary exportData={exp.data} />
         </Box>
 
-        <SectionWithTitle title="합포장 출고 정보">
-          <Stack>
-            {exp.data.bundleExports.map((bundle) => (
-              <Box key={bundle.exportCode}>
-                <NextLink passHref href={`/mypage/orders/exports/${bundle.exportCode}`}>
-                  <Link color="blue.500" fontSize="sm">
-                    {bundle.exportCode}
-                  </Link>
-                </NextLink>
-              </Box>
-            ))}
-          </Stack>
-        </SectionWithTitle>
+        {exp.data.bundleExportCode && (
+          <SectionWithTitle title="합포장 출고 정보">
+            <Stack>
+              {exp.data.bundleExports.map((bundle) => (
+                <Box key={bundle.exportCode}>
+                  <NextLink passHref href={`/mypage/orders/exports/${bundle.exportCode}`}>
+                    <Link color="blue.500" fontSize="sm">
+                      {bundle.exportCode}
+                    </Link>
+                  </NextLink>
+                </Box>
+              ))}
+            </Stack>
+          </SectionWithTitle>
+        )}
 
         <SectionWithTitle title="출고 주문 정보">
           <Stack spacing={4}>
