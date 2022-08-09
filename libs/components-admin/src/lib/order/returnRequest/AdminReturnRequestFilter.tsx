@@ -1,12 +1,13 @@
 import { Stack, Text, Input, Select, Button, ButtonGroup } from '@chakra-ui/react';
-import { AdminReturnFilterData, useAdminReturnFilterStore } from '@project-lc/stores';
+import { AdminReturnListDto } from '@project-lc/shared-types';
+import { useAdminReturnFilterStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 export function AdminReturnRequestFilter(): JSX.Element {
   const filterStore = useAdminReturnFilterStore();
-  const { register, setValue, handleSubmit, getValues } = useForm<AdminReturnFilterData>({
+  const { register, setValue, handleSubmit, getValues } = useForm<AdminReturnListDto>({
     defaultValues: {
       searchDateType: 'requestDate',
       searchStartDate: dayjs().format('YYYY-MM-DD'),
@@ -34,7 +35,7 @@ export function AdminReturnRequestFilter(): JSX.Element {
     }
   };
 
-  const onSubmit = (formData: AdminReturnFilterData): void => {
+  const onSubmit = (formData: AdminReturnListDto): void => {
     console.log(formData);
     filterStore.setReturnFilter(formData);
   };

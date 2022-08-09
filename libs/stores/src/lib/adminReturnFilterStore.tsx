@@ -1,14 +1,8 @@
-import { Return } from '@prisma/client';
+import { AdminReturnListDto } from '@project-lc/shared-types';
 import create from 'zustand';
 
-export interface AdminReturnFilterData {
-  searchDateType: keyof Return;
-  searchStartDate?: string | Date;
-  searchEndDate?: string | Date;
-}
-
-export interface AdminReturnFilterStore extends AdminReturnFilterData {
-  setReturnFilter: (data: AdminReturnFilterData) => void;
+export interface AdminReturnFilterStore extends AdminReturnListDto {
+  setReturnFilter: (data: AdminReturnListDto) => void;
 }
 
 export const useAdminReturnFilterStore = create<AdminReturnFilterStore>((set) => ({

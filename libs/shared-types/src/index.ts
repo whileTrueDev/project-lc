@@ -20,6 +20,7 @@ export * from './lib/constants/signupRegisterOptions';
 export * from './lib/constants/socialLoginUserTypeKey';
 export * from './lib/dto/adminClassChangeHistory.dto';
 export * from './lib/dto/adminClassDto.dto';
+export * from './lib/dto/adminReturnList.dto';
 export * from './lib/dto/adminSettlementInfo.dto';
 export * from './lib/dto/adminSignUpDto.dto';
 export * from './lib/dto/broadcaster.dto';
