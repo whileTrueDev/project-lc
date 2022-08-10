@@ -126,6 +126,9 @@ export function PaymentBox(): JSX.Element {
 
   const noMileageBenefit = !mileageSettingData?.useMileageFeature || !watch('customerId'); // 로그인 안한경우도 적립안됨
 
+  const usedCouponAmount = watch('usedCouponAmount') || 0;
+  const usedMileageAmount = watch('usedMileageAmount') || 0;
+
   // 결제버튼에 표시되는 최종 결제금액
   const orderPrice = useMemo(
     () =>
@@ -133,10 +136,10 @@ export function PaymentBox(): JSX.Element {
         PRODUCT_PRICE,
         SHIPPING_COST,
         DISCOUNT,
-        watch('usedCouponAmount') || 0,
-        watch('usedMileageAmount') || 0,
+        usedCouponAmount,
+        usedMileageAmount,
       ),
-    [DISCOUNT, PRODUCT_PRICE, SHIPPING_COST, watch],
+    [DISCOUNT, PRODUCT_PRICE, SHIPPING_COST, usedCouponAmount, usedMileageAmount],
   );
   return (
     <Box
