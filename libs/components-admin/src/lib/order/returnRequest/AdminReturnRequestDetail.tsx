@@ -18,6 +18,8 @@ import {
   Thead,
   Tr,
   useToast,
+  Image,
+  useBoolean,
 } from '@chakra-ui/react';
 import { CustomerMileageLog } from '@prisma/client';
 import { CardDetail } from '@project-lc/components-shared/payment/CardDetail';
@@ -65,6 +67,7 @@ export function AdminReturnRequestDetail({
 }: AdminReturnRequestDetailProps): JSX.Element {
   const { data: paymentData } = usePaymentByOrderCode(data?.order.orderCode || '');
   const toast = useToast();
+  const [isImageOpen, { toggle }] = useBoolean();
   const defaultTotalRefundAmount = data?.items
     ? data?.items.reduce((sum: number, i) => {
         return (
@@ -161,6 +164,21 @@ export function AdminReturnRequestDetail({
           </NextLink>
         </Text>
         <Text>환불(반품)요청코드 {data.returnCode}</Text>
+        <Stack direction="row">
+          <Text>소비자의 환불 요청 사유 : {data.reason}</Text>
+          {data.images.length > 0 && (
+            <Button size="xs" onClick={toggle}>
+              사진 {isImageOpen ? '숨기기' : '확인하기'}
+            </Button>
+          )}
+        </Stack>
+        {isImageOpen && (
+          <Box>
+            {data.images.map((img) => (
+              <Image key={img.imageUrl} src={img.imageUrl} />
+            ))}
+          </Box>
+        )}
 
         {/* 주문 결제정보 표시 */}
         <OrderPaymentDataDisplay order={data.order} payment={paymentData} />
@@ -180,7 +198,6 @@ export function AdminReturnRequestDetail({
               </Stack>
             </Box>
           ))}
-
         <Stack as="form" onSubmit={handleSubmit(submitHandler)}>
           <RefundRequestItemsDisplayTable
             returnItems={data?.items || []}
