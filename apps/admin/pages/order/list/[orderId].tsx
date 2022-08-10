@@ -1,3 +1,4 @@
+import NextLink from 'next/link';
 import {
   Avatar,
   Box,
@@ -7,6 +8,7 @@ import {
   Grid,
   GridItem,
   Heading,
+  Link,
   Select,
   Text,
   useColorModeValue,
@@ -249,6 +251,19 @@ export function OrderDetail(): JSX.Element {
                 </Grid>
               </Box>
             )}
+
+            <Box mt={6}>
+              <Text fontWeight="bold">출고정보</Text>
+              {data.exports.map((e, i) => (
+                <Box key={e.exportCode}>
+                  <NextLink href={`/order/exports/${e.exportCode}`}>
+                    <Link color="blue">
+                      {i + 1}. {e.exportCode}: {e.deliveryCompany} {e.deliveryNumber}
+                    </Link>
+                  </NextLink>
+                </Box>
+              ))}
+            </Box>
           </Box>
         )}
       </Center>
