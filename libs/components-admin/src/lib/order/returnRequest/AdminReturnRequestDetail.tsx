@@ -155,49 +155,50 @@ export function AdminReturnRequestDetail({
   if (!data) return <Spinner />;
 
   return (
-    <FormProvider {...methods}>
-      <Stack>
-        <Text>
-          주문코드
-          <NextLink passHref href={`${getAdminHost()}/order/list/${data.order.id}`}>
-            <Link color="blue.500"> {data.order.orderCode}</Link>
-          </NextLink>
-        </Text>
-        <Text>환불(반품)요청코드 {data.returnCode}</Text>
-        <Stack direction="row">
-          <Text>소비자의 환불 요청 사유 : {data.reason}</Text>
-          {data.images.length > 0 && (
-            <Button size="xs" onClick={toggle}>
-              사진 {isImageOpen ? '숨기기' : '확인하기'}
-            </Button>
-          )}
-        </Stack>
-        {isImageOpen && (
-          <Box>
-            {data.images.map((img) => (
-              <Image key={img.imageUrl} src={img.imageUrl} />
-            ))}
-          </Box>
+    <Stack>
+      <Text>
+        주문코드
+        <NextLink passHref href={`${getAdminHost()}/order/list/${data.order.id}`}>
+          <Link color="blue.500"> {data.order.orderCode}</Link>
+        </NextLink>
+      </Text>
+      <Text>환불(반품)요청코드 {data.returnCode}</Text>
+      <Stack direction="row">
+        <Text>소비자의 환불 요청 사유 : {data.reason}</Text>
+        {data.images.length > 0 && (
+          <Button size="xs" onClick={toggle}>
+            사진 {isImageOpen ? '숨기기' : '확인하기'}
+          </Button>
         )}
-
-        {/* 주문 결제정보 표시 */}
-        <OrderPaymentDataDisplay order={data.order} payment={paymentData} />
-
-        {/* 마일리지, 쿠폰 사용내역 있는 경우에만 표시 */}
-        {data.order.mileageLogs.length > 0 ||
-          (data.order.customerCouponLogs.length > 0 && (
-            <Box>
-              <Text>마일리지, 쿠폰 사용 내역</Text>
-              <Stack border="1px" spacing={2}>
-                {data.order.mileageLogs.length > 0 && (
-                  <MileageUsageTable mileageLogs={data.order.mileageLogs} />
-                )}
-                {data.order.customerCouponLogs.length > 0 && (
-                  <CouponUsageTable couponLogs={data.order.customerCouponLogs} />
-                )}
-              </Stack>
-            </Box>
+      </Stack>
+      {isImageOpen && (
+        <Box>
+          {data.images.map((img) => (
+            <Image key={img.imageUrl} src={img.imageUrl} />
           ))}
+        </Box>
+      )}
+
+      {/* 주문 결제정보 표시 */}
+      <OrderPaymentDataDisplay order={data.order} payment={paymentData} />
+
+      {/* 마일리지, 쿠폰 사용내역 있는 경우에만 표시 */}
+      {data.order.mileageLogs.length > 0 ||
+        (data.order.customerCouponLogs.length > 0 && (
+          <Box>
+            <Text>마일리지, 쿠폰 사용 내역</Text>
+            <Stack border="1px" spacing={2}>
+              {data.order.mileageLogs.length > 0 && (
+                <MileageUsageTable mileageLogs={data.order.mileageLogs} />
+              )}
+              {data.order.customerCouponLogs.length > 0 && (
+                <CouponUsageTable couponLogs={data.order.customerCouponLogs} />
+              )}
+            </Stack>
+          </Box>
+        ))}
+
+      <FormProvider {...methods}>
         <Stack as="form" onSubmit={handleSubmit(submitHandler)}>
           <RefundRequestItemsDisplayTable
             returnItems={data?.items || []}
@@ -255,8 +256,8 @@ export function AdminReturnRequestDetail({
             <Button onClick={onCancel}>닫기</Button>
           </Stack>
         </Stack>
-      </Stack>
-    </FormProvider>
+      </FormProvider>
+    </Stack>
   );
 }
 
