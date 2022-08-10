@@ -45,7 +45,7 @@ export class OrderController {
   @UseGuards(JwtAuthGuard)
   @Post('purchase-confirm')
   purchaseConfirm(
-    @Body(ValidationPipe) dto: OrderPurchaseConfirmationDto,
+    @Body(new ValidationPipe({ transform: true })) dto: OrderPurchaseConfirmationDto,
   ): Promise<boolean> {
     return this.orderService.purchaseConfirm(dto);
   }

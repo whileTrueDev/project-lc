@@ -14,19 +14,23 @@ export function AdminExportActions({ exportData }: AdminExportActionsProps): JSX
   );
   return (
     <Box>
-      <Button
-        variant="outline"
-        colorScheme="red"
-        size="sm"
-        onClick={purchaseConfirmDialog.onOpen}
-      >
-        관리자권한으로 구매확정
-      </Button>
-      <PurchaseConfirmDialog
-        isOpen={purchaseConfirmDialog.isOpen}
-        onClose={purchaseConfirmDialog.onClose}
-        orderItemOptionId={orderItemOptionId}
-      />
+      {exportData.status === 'shippingDone' && !exportData.buyConfirmDate && (
+        <>
+          <Button
+            variant="outline"
+            colorScheme="red"
+            size="sm"
+            onClick={purchaseConfirmDialog.onOpen}
+          >
+            관리자권한으로 구매확정
+          </Button>
+          <PurchaseConfirmDialog
+            isOpen={purchaseConfirmDialog.isOpen}
+            onClose={purchaseConfirmDialog.onClose}
+            orderItemOptionId={orderItemOptionId}
+          />
+        </>
+      )}
     </Box>
   );
 }

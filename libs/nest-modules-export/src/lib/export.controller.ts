@@ -60,9 +60,8 @@ export class ExportController {
   @Post()
   public exportOne(
     @Body(ValidationPipe) dto: CreateKkshowExportDto,
-    @SellerInfo() seller: UserPayload,
   ): Promise<ExportCreateRes> {
-    return this.exportService.exportOne({ dto: { ...dto, sellerId: seller.id } });
+    return this.exportService.exportOne({ dto: { ...dto } });
   }
 
   /** 개별출고정보 조회 */

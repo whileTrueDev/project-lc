@@ -21,6 +21,7 @@ import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatu
 import { CardDetail } from '@project-lc/components-shared/payment/CardDetail';
 import { TransferDetail } from '@project-lc/components-shared/payment/TransferDetail';
 import { VirtualAccountDetail } from '@project-lc/components-shared/payment/VirtualAccountDetail';
+import { ExportDialog } from '@project-lc/components-seller/ExportDialog';
 import {
   useAdminOrder,
   useAdminOrderPatchMutation,
@@ -53,6 +54,11 @@ export function OrderDetail(): JSX.Element {
             'partialShippingDone',
             'shippingDone',
             'purchaseConfirmed',
+            // 출고상태
+            'exportReady',
+            'partialExportReady',
+            'exportDone',
+            'partialExportDone',
           ].includes(k),
       ) as OrderProcessStep[],
     [],
@@ -80,6 +86,7 @@ export function OrderDetail(): JSX.Element {
       });
   };
 
+  const exportDialog = useDisclosure();
   return (
     <AdminPageLayout>
       <Center>
@@ -128,8 +135,11 @@ export function OrderDetail(): JSX.Element {
                       ))}
                     </Select>
                     <Text fontSize="xs" px={2}>
-                      배송중,배송완료,구매확정 상태로의 변경은 출고상태를 변경하여
+                      - 배송중,배송완료,구매확정 상태로의 변경은 출고상태를 변경하여
                       진행해주세요.
+                    </Text>
+                    <Text fontSize="xs" px={2}>
+                      - 출고상태로의 변경은 출고처리를 통해 진행해주세요
                     </Text>
                   </Box>
                 )}
@@ -141,7 +151,16 @@ export function OrderDetail(): JSX.Element {
             <Box>
               <Text>주문상품</Text>
               {data.orderItems.map((item) => (
-                <Grid templateColumns="repeat(6,2fr)" key={item.id} mt={3} mb={3} gap={1}>
+                <Grid
+                  templateColumns="repeat(6,2fr)"
+                  key={item.id}
+                  mt={3}
+                  mb={3}
+                  gap={1}
+                  rounded="md"
+                  p={2}
+                  borderWidth="thin"
+                >
                   <GridItem bgColor={backgroundColor}>
                     <Center>
                       <Text>상품명</Text>
@@ -159,38 +178,58 @@ export function OrderDetail(): JSX.Element {
                   <GridItem>
                     <Text>{item.goods.seller.sellerShop.shopName}</Text>
                   </GridItem>
-                  <GridItem bgColor={backgroundColor}>
-                    <Center>
-                      <Text>{item.options[0]?.name}</Text>
-                    </Center>
-                  </GridItem>
-                  <GridItem>
-                    <Text>{item.options[0]?.value}</Text>
-                  </GridItem>
-                  <GridItem bgColor={backgroundColor}>
-                    <Center>
-                      <Text>정가</Text>
-                    </Center>
-                  </GridItem>
-                  <GridItem>
-                    <Text>{item.options[0]?.normalPrice}</Text>
-                  </GridItem>
-                  <GridItem bgColor={backgroundColor}>
-                    <Center>
-                      <Text>할인가</Text>
-                    </Center>
-                  </GridItem>
-                  <GridItem>
-                    <Text>{item.options[0]?.discountPrice}</Text>
-                  </GridItem>
-                  <GridItem bgColor={backgroundColor}>
-                    <Center>
-                      <Text>수량</Text>
-                    </Center>
-                  </GridItem>
-                  <GridItem>
-                    <Text>{item.options[0]?.quantity}</Text>
-                  </GridItem>
+                  {item.options.map((option) => (
+                    <GridItem
+                      key={option.id}
+                      colSpan={6}
+                      p={1}
+                      rounded="md"
+                      borderWidth="thin"
+                    >
+                      <Grid templateColumns="repeat(10,1fr)" gap={1}>
+                        <GridItem bgColor={backgroundColor}>
+                          <Center>
+                            <Text>{option?.name}</Text>
+                          </Center>
+                        </GridItem>
+                        <GridItem>
+                          <Text>{option?.value}</Text>
+                        </GridItem>
+                        <GridItem bgColor={backgroundColor}>
+                          <Center>
+                            <Text>정가</Text>
+                          </Center>
+                        </GridItem>
+                        <GridItem>
+                          <Text>{option?.normalPrice}</Text>
+                        </GridItem>
+                        <GridItem bgColor={backgroundColor}>
+                          <Center>
+                            <Text>할인가</Text>
+                          </Center>
+                        </GridItem>
+                        <GridItem>
+                          <Text>{option?.discountPrice}</Text>
+                        </GridItem>
+                        <GridItem bgColor={backgroundColor}>
+                          <Center>
+                            <Text>수량</Text>
+                          </Center>
+                        </GridItem>
+                        <GridItem>
+                          <Text>{option?.quantity}</Text>
+                        </GridItem>
+                        <GridItem bgColor={backgroundColor}>
+                          <Center>
+                            <Text>상태</Text>
+                          </Center>
+                        </GridItem>
+                        <GridItem>
+                          <OrderStatusBadge step={option?.step} />
+                        </GridItem>
+                      </Grid>
+                    </GridItem>
+                  ))}
                   {item.support && (
                     <>
                       <GridItem bgColor={backgroundColor}>
@@ -220,10 +259,17 @@ export function OrderDetail(): JSX.Element {
             </Flex>
             <Flex justifyContent="space-between">
               <Text>배송지</Text>
-              <Flex direction="column" alignItems="flex-end" border="1px" p={1}>
+              <Flex
+                direction="column"
+                alignItems="flex-end"
+                border="1px"
+                p={1}
+                rounded="md"
+              >
                 <Text>({data.recipientPostalCode})</Text>
                 <Text>{data.recipientAddress}</Text>
                 <Text>{data.recipientDetailAddress}</Text>
+                <Text>배송메시지: {data.memo}</Text>
               </Flex>
             </Flex>
 
@@ -284,6 +330,19 @@ export function OrderDetail(): JSX.Element {
                   </NextLink>
                 </Box>
               ))}
+            </Box>
+            <Box mt={6}>
+              <Text fontWeight="bold">출고관리</Text>
+              <Box>
+                <Button size="sm" onClick={exportDialog.onOpen}>
+                  출고처리
+                </Button>
+                <ExportDialog
+                  isOpen={exportDialog.isOpen}
+                  onClose={exportDialog.onClose}
+                  order={data}
+                />
+              </Box>
             </Box>
           </Box>
         )}

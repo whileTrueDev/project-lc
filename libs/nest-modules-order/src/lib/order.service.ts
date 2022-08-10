@@ -6,6 +6,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import {
+  BuyConfirmSubject,
   CouponStatus,
   Goods,
   GoodsOptions,
@@ -1089,7 +1090,7 @@ export class OrderService {
 
   /** 구매확정 & 마일리지 적립 */
   async purchaseConfirm(dto: OrderPurchaseConfirmationDto): Promise<boolean> {
-    const { orderItemOptionId } = dto;
+    const { orderItemOptionId, buyConfirmSubject } = dto;
     const orderItemOption = await this.prisma.orderItemOption.findUnique({
       where: { id: orderItemOptionId },
     });
@@ -1110,7 +1111,10 @@ export class OrderService {
     if (exportData && !exportData.buyConfirmDate) {
       await this.prisma.export.update({
         where: { id: exportData.id },
-        data: { buyConfirmDate: new Date(), buyConfirmSubject: 'customer' },
+        data: {
+          buyConfirmDate: new Date(),
+          buyConfirmSubject,
+        },
       });
     }
 

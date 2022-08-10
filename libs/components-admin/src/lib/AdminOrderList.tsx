@@ -56,10 +56,19 @@ const columns: GridColumns = [
     ),
   },
   {
+    width: 120,
     field: 'broadcaster',
     headerName: '방송인',
-    valueGetter: ({ row }: GridRowData) =>
-      row.sellerSettlementItems[0]?.liveShopping.broadcaster.userNickname,
+    valueGetter: ({ row }: GridRowData) => {
+      if (row.orderItems.length > 1) {
+        return `${`${row.orderItems[0]?.support?.broadcaster?.userNickname || ''} 외 ${
+          row.orderItems.length - 1
+        }`}명`;
+      }
+      return row.orderItems[0]?.support
+        ? row.orderItems[0]?.support?.broadcaster?.userNickname || ''
+        : '후원X';
+    },
   },
   {
     field: 'createDate',

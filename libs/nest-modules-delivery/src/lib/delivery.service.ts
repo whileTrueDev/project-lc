@@ -20,7 +20,7 @@ export class DeliveryService {
     // 출고 상태 변경
     const exp = await this.prisma.export.update({
       where: { exportCode },
-      data: { status },
+      data: { status, shippingDoneDate: new Date() },
       include: { items: true },
     });
     // 출고 아이템 상태 변경

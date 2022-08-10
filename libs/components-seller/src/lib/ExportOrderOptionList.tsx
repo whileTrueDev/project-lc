@@ -55,7 +55,10 @@ export function ExportOrderOptionList({
 }: ExportOrderOptionListProps): JSX.Element | null {
   const { data: profileData } = useProfile();
   // 주문 조회시 해당 판매자의 고유번호도 같이 전송하여, 주문상품 중에서 해당 판매자의 상품 & 배송비정책에 연결된 상품만 가져온다
-  const order = useOrderDetail({ orderCode, sellerId: profileData?.id });
+  const order = useOrderDetail({
+    orderCode,
+    sellerId: profileData?.type === 'seller' ? profileData?.id : undefined,
+  });
   // 주문 출고가능한 지 체크
   const { isDone, isExportable } = useOrderExportableCheck(order.data);
   if (isDone) return null;
