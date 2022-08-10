@@ -89,13 +89,26 @@ export function UpdateReturnRequestStatusSection({
           >
             <option value="requested">요청됨(초기 상태, 담당자 확인전)</option>
             <option value="processing">요청승인</option>
-            <option value="complete">처리완료</option>
             <option value="canceled">취소(거절)</option>
+            <option value="complete">처리완료</option>
           </Select>
           <Button colorScheme="blue" type="submit">
             요청 상태 변경하기
           </Button>
         </Stack>
+        {/* 처리완료 상태로 변경시 경고문구 */}
+        {watch('status') === 'complete' && (
+          <Stack>
+            <Text color="red">
+              * 환불처리하기 버튼을 눌러 환불처리 시 자동으로 처리완료 상태로 변경됩니다.
+            </Text>
+            <Text color="red">
+              임의로 상태를 처리완료로 변경하는 경우에는 토스페이먼츠 결제취소 처리가
+              진행되지 않으므로 주의해주세요
+            </Text>
+          </Stack>
+        )}
+
         {/* 거절사유 */}
         {watch('status') === 'canceled' && (
           <FormControl isInvalid={!!errors.rejectReason}>
@@ -108,12 +121,6 @@ export function UpdateReturnRequestStatusSection({
               <FormErrorMessage>{errors.rejectReason.message}</FormErrorMessage>
             )}
           </FormControl>
-        )}
-        {data.status === 'complete' && (
-          <Text color="GrayText">
-            * 토스페이먼츠 결제취소처리가 완료된 경우, 상태를 변경해도 토스페이먼츠
-            결제취소 처리는 변경되지 않습니다
-          </Text>
         )}
 
         {errors.status && <FormErrorMessage>{errors.status.message}</FormErrorMessage>}

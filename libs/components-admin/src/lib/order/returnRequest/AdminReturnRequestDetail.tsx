@@ -242,7 +242,15 @@ export function AdminReturnRequestDetail({
             }
           />
 
-          {paymentData && paymentData.method === '가상계좌' && <RefundAccountForm />}
+          {paymentData && paymentData.method === '가상계좌' && (
+            <Box>
+              <Text>
+                * 소비자가 입력한 환불계좌 정보입니다. 가상계좌 결제 취소시 해당 계좌로
+                결제금액이 환불됩니다.
+              </Text>
+              <RefundAccountForm />
+            </Box>
+          )}
 
           {data.refund && paymentData?.cancels && (
             <CancelDataDisplayTable cancels={paymentData?.cancels} />
