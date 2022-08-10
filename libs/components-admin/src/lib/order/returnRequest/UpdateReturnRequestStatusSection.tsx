@@ -111,8 +111,8 @@ export function UpdateReturnRequestStatusSection({
         )}
         {data.status === 'complete' && (
           <Text color="GrayText">
-            * 토스페이먼츠 결제취소처리가 완료된 경우, 환불요청의 상태를 변경해도
-            토스페이먼츠 결제취소 처리는 변경되지 않습니다
+            * 토스페이먼츠 결제취소처리가 완료된 경우, 상태를 변경해도 토스페이먼츠
+            결제취소 처리는 변경되지 않습니다
           </Text>
         )}
 

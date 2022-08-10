@@ -209,7 +209,8 @@ export function AdminReturnRequestDetail({
           <RefundRequestItemsDisplayTable
             returnItems={data?.items || []}
             tableFooter={
-              !data.refund ? (
+              // 환불처리내역이 없고, 상태가 '처리중'인 경우에만 환불금액 입력창 노출
+              !data.refund && data.status === 'processing' ? (
                 <Tfoot>
                   <Tr>
                     <Th colSpan={2}>환불할 금액을 입력해주세요</Th>
@@ -248,8 +249,8 @@ export function AdminReturnRequestDetail({
           )}
 
           <Stack spacing={4} direction="row-reverse">
-            {/* 환불처리완료인 경우 환불처리 버튼 노출하지 않는다 */}
-            {!data.refund && (
+            {/* 환불처리내역이 없고, 상태가 '처리중'인 경우에만 환불처리 버튼 노출 */}
+            {!data.refund && data.status === 'processing' && (
               <Button
                 type="submit"
                 colorScheme="red"
