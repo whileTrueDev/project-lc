@@ -5,6 +5,7 @@ import {
   FormErrorMessage,
   Grid,
   GridItem,
+  Image,
   Input,
   Link,
   Spinner,
@@ -17,9 +18,8 @@ import {
   Th,
   Thead,
   Tr,
-  useToast,
-  Image,
   useBoolean,
+  useToast,
 } from '@chakra-ui/react';
 import { CustomerMileageLog } from '@prisma/client';
 import { CardDetail } from '@project-lc/components-shared/payment/CardDetail';
@@ -42,12 +42,12 @@ import {
   ReturnItemWithOriginOrderItemInfo,
   TossPaymentCancel,
 } from '@project-lc/shared-types';
-import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { getAdminHost } from '@project-lc/utils';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { FormProvider, useForm } from 'react-hook-form';
-import React from 'react';
+import { UpdateReturnRequestStatusSection } from './UpdateReturnRequestStatusSection';
 
 interface AdminRefundCreateFormData extends RefundAccountDto {
   refundAmount: number;
@@ -76,6 +76,8 @@ export function AdminReturnRequestDetail({
         );
       }, 0)
     : 0;
+
+  // 환불생성(환불처리) 폼
   const methods = useForm<AdminRefundCreateFormData>({
     defaultValues: {
       refundAmount: defaultTotalRefundAmount,
@@ -178,6 +180,10 @@ export function AdminReturnRequestDetail({
           ))}
         </Box>
       )}
+      {data.rejectReason && <Text>환불 요청 거절 사유 : {data.rejectReason}</Text>}
+      {data.memo && <Text>메모 : {data.memo}</Text>}
+      {/* successHandler로 onCancel(다이얼로그 닫기) 전달 */}
+      <UpdateReturnRequestStatusSection data={data} successHandler={onCancel} />
 
       {/* 주문 결제정보 표시 */}
       <OrderPaymentDataDisplay order={data.order} payment={paymentData} />

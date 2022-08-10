@@ -149,7 +149,7 @@ const columns: GridColumns = [
         case 'requested':
           return '요청됨';
         case 'processing':
-          return '처리중(판매자가 환불 승인함)';
+          return '처리중(승인됨)';
         case 'canceled':
           return '거절됨';
         case 'complete':
