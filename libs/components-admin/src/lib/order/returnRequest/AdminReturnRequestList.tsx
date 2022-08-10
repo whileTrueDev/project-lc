@@ -98,7 +98,7 @@ export function AdminReturnRequestList(): JSX.Element {
         onRowClick={handleRowClick}
       />
 
-      <Modal isOpen={dialog.isOpen} onClose={handleClose} size="3xl">
+      <Modal isOpen={dialog.isOpen} onClose={handleClose} size="5xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>환불처리</ModalHeader>
