@@ -39,6 +39,7 @@ import {
   RefundAccountDto,
   ReturnItemWithOriginOrderItemInfo,
 } from '@project-lc/shared-types';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { getAdminHost } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
@@ -162,59 +163,83 @@ export function AdminReturnRequestDetail({
         {/* 주문 결제정보 표시 */}
         <OrderPaymentDataDisplay order={data.order} payment={paymentData} />
 
-        <Box>
-          <Text>마일리지, 쿠폰 사용 내역</Text>
-          <Stack border="1px" spacing={2}>
-            <MileageUsageTable mileageLogs={data.order.mileageLogs} />
-            <CouponUsageTable couponLogs={data.order.customerCouponLogs} />
+        {/* 마일리지, 쿠폰 사용내역 있는 경우에만 표시 */}
+        {data.order.mileageLogs.length > 0 ||
+          (data.order.customerCouponLogs.length > 0 && (
+            <Box>
+              <Text>마일리지, 쿠폰 사용 내역</Text>
+              <Stack border="1px" spacing={2}>
+                {data.order.mileageLogs.length > 0 && (
+                  <MileageUsageTable mileageLogs={data.order.mileageLogs} />
+                )}
+                {data.order.customerCouponLogs.length > 0 && (
+                  <CouponUsageTable couponLogs={data.order.customerCouponLogs} />
+                )}
+              </Stack>
+            </Box>
+          ))}
+
+        {/* 환불금액 입력하는 폼, 환불처리 완료되었을 경우 환불완료일시와 환불금액을 표시한다 */}
+        <Stack as="form" onSubmit={handleSubmit(submitHandler)}>
+          <RefundRequestItemsDisplayTable
+            returnItems={data?.items || []}
+            tableFooter={
+              <Tfoot>
+                <Tr>
+                  <Th colSpan={2}>
+                    {data.refund
+                      ? `환불 처리 완료일시 : ${dayjs(data.refund.completeDate).format(
+                          'YYYY/MM/DD HH:mm',
+                        )}`
+                      : '환불할 금액을 입력해주세요'}
+                  </Th>
+                  <Th>총 환불금액</Th>
+                  <Th>
+                    {data.refund ? (
+                      <Text>{getLocaleNumber(data.refund.refundAmount)}원</Text>
+                    ) : (
+                      <FormControl isInvalid={!!errors.refundAmount}>
+                        <Input
+                          type="number"
+                          {...register('refundAmount', {
+                            valueAsNumber: true,
+                            required: '총 환불금액을 입력해주세요',
+                            max: {
+                              value: defaultTotalRefundAmount,
+                              message:
+                                '총 환불금액이 환불신청상품 금액의 총 합계보다 큽니다',
+                            },
+                          })}
+                          defaultValue={defaultTotalRefundAmount}
+                        />
+
+                        <FormErrorMessage>
+                          {errors.refundAmount && errors.refundAmount.message}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Th>
+                </Tr>
+              </Tfoot>
+            }
+          />
+
+          {paymentData && paymentData.method === '가상계좌' && <RefundAccountForm />}
+
+          <Stack spacing={4} direction="row-reverse">
+            {/* 환불처리완료인 경우 환불처리 버튼 노출하지 않는다 */}
+            {!data.refund && (
+              <Button
+                type="submit"
+                colorScheme="red"
+                isLoading={createRefund.isLoading || updateReturnStatus.isLoading}
+              >
+                환불처리하기
+              </Button>
+            )}
+
+            <Button onClick={onCancel}>닫기</Button>
           </Stack>
-        </Box>
-      </Stack>
-
-      <Stack as="form" onSubmit={handleSubmit(submitHandler)}>
-        <RefundRequestItemsDisplayTable
-          returnItems={data?.items || []}
-          tableFooter={
-            <Tfoot>
-              <Tr>
-                <Th colSpan={2}>환불할 금액을 입력해주세요</Th>
-                <Th>총 환불금액</Th>
-                <Th>
-                  <FormControl isInvalid={!!errors.refundAmount}>
-                    <Input
-                      type="number"
-                      {...register('refundAmount', {
-                        valueAsNumber: true,
-                        required: '총 환불금액을 입력해주세요',
-                        max: {
-                          value: defaultTotalRefundAmount,
-                          message: '총 환불금액이 환불신청상품 금액의 총 합계보다 큽니다',
-                        },
-                      })}
-                      defaultValue={defaultTotalRefundAmount}
-                    />
-
-                    <FormErrorMessage>
-                      {errors.refundAmount && errors.refundAmount.message}
-                    </FormErrorMessage>
-                  </FormControl>
-                </Th>
-              </Tr>
-            </Tfoot>
-          }
-        />
-
-        {paymentData && paymentData.method === '가상계좌' && <RefundAccountForm />}
-
-        <Stack spacing={4} direction="row-reverse">
-          <Button
-            type="submit"
-            colorScheme="red"
-            isLoading={createRefund.isLoading || updateReturnStatus.isLoading}
-          >
-            환불처리하기
-          </Button>
-          <Button onClick={onCancel}>취소</Button>
         </Stack>
       </Stack>
     </FormProvider>
