@@ -159,6 +159,11 @@ export function AdminReturnRequestDetail({
 
   return (
     <Stack>
+      {data.refund && data.refund.completeDate && (
+        <Text fontWeight="bold" color="red">
+          *** 토스페이먼츠 결제취소 완료된 환불요청입니다 ***
+        </Text>
+      )}
       <Text>
         주문코드
         <NextLink passHref href={`${getAdminHost()}/order/list/${data.order.id}`}>
