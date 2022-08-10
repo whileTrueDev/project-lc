@@ -1,8 +1,5 @@
-import { Button, SimpleGrid, Text, useDisclosure, useToast } from '@chakra-ui/react';
-import { ExchangeProcessStatus } from '@prisma/client';
-import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import { Button, SimpleGrid, useDisclosure } from '@chakra-ui/react';
 import { ReviewCreateDialog } from '@project-lc/components-shared/goods-review/ReviewCreateDialog';
-import { useOrderPurchaseConfirmMutation } from '@project-lc/hooks';
 import {
   deliveryTrackingAbleSteps,
   exchangeReturnAbleSteps,
@@ -15,6 +12,7 @@ import { useRouter } from 'next/router';
 import { GoodsInquiryFormDialog } from '../../goods/GoodsInquiryFormDialog';
 import { OrderCancelDialog } from './OrderCancelDialog';
 import { OrderItemOptionInfoProps } from './OrderItemOptionInfo';
+import PurchaseConfirmDialog from './PurchaseConfirmDialog';
 
 export function OrderItemActionButtons({
   option,
@@ -127,23 +125,6 @@ export function OrderItemActionButtons({
     },
   ];
 
-  const toast = useToast();
-  const orderPurchaseMutation = useOrderPurchaseConfirmMutation();
-  // 구매확정 요청
-  const purchaseConfirmRequest = async (): Promise<void> => {
-    orderPurchaseMutation
-      .mutateAsync({ orderItemOptionId: option.id })
-      .then(() => {
-        toast({ title: '구매 확정 완료', status: 'success' });
-      })
-      .catch((e) => {
-        toast({
-          title: '구매 확정 중 오류가 발생하였습니다.',
-          status: 'error',
-          description: e.code,
-        });
-      });
-  };
   return (
     <SimpleGrid columns={{ base: 2, sm: 1 }} spacing={2}>
       {buttonSet.map(
@@ -162,17 +143,11 @@ export function OrderItemActionButtons({
       )}
 
       {/* 구매확정 다이얼로그 */}
-      <ConfirmDialog
-        title="구매확정하기"
+      <PurchaseConfirmDialog
         isOpen={purchaseConfirmDialog.isOpen}
         onClose={purchaseConfirmDialog.onClose}
-        onConfirm={purchaseConfirmRequest}
-      >
-        <Text>
-          구매확정시 후원방송인에게 후원금이 적립되며 <br />
-          교환 및 환불이 어렵습니다.
-        </Text>
-      </ConfirmDialog>
+        orderItemOptionId={option.id}
+      />
 
       {/* 주문취소 다이얼로그 */}
       <OrderCancelDialog

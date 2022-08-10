@@ -29,7 +29,8 @@ import {
 import { orderProcessStepKoreanDict, UpdateOrderDto } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { OrderProcessStep } from '@prisma/client';
 
 export function OrderDetail(): JSX.Element {
   const router = useRouter();
@@ -41,6 +42,21 @@ export function OrderDetail(): JSX.Element {
   const [orderStep, setOrderStep] = useState<UpdateOrderDto['step']>('orderReceived');
   const backgroundColor = useColorModeValue('gray.200', 'gray.600');
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const changableStatuses = useMemo<OrderProcessStep[]>(
+    () =>
+      Object.keys(orderProcessStepKoreanDict).filter(
+        (k) =>
+          ![
+            'partialShipping',
+            'shipping',
+            'partialShippingDone',
+            'shippingDone',
+            'purchaseConfirmed',
+          ].includes(k),
+      ) as OrderProcessStep[],
+    [],
+  );
 
   const toast = useToast();
 
@@ -96,22 +112,27 @@ export function OrderDetail(): JSX.Element {
                 {!isEdit ? (
                   <OrderStatusBadge step={data.step} />
                 ) : (
-                  <Select
-                    placeholder="Select option"
-                    size="xs"
-                    defaultValue={data.step}
-                    onChange={(e) =>
-                      onSelectChange(e.target.value as UpdateOrderDto['step'])
-                    }
-                  >
-                    {Object.keys(orderProcessStepKoreanDict).map((key, index) => (
-                      <option value={key} key={key}>
-                        {Object.values(orderProcessStepKoreanDict)[index]}
-                      </option>
-                    ))}
-                  </Select>
+                  <Box>
+                    <Select
+                      placeholder="Select option"
+                      size="xs"
+                      defaultValue={data.step}
+                      onChange={(e) =>
+                        onSelectChange(e.target.value as UpdateOrderDto['step'])
+                      }
+                    >
+                      {changableStatuses.map((key) => (
+                        <option value={key} key={key}>
+                          {orderProcessStepKoreanDict[key]}
+                        </option>
+                      ))}
+                    </Select>
+                    <Text fontSize="xs" px={2}>
+                      배송중,배송완료,구매확정 상태로의 변경은 출고상태를 변경하여
+                      진행해주세요.
+                    </Text>
+                  </Box>
                 )}
-
                 <Button size="xs" onClick={handleButtonClick}>
                   {!isEdit ? '변경' : '취소'}
                 </Button>

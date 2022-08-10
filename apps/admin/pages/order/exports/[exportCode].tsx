@@ -4,6 +4,8 @@ import { ExportDetailSummary } from '@project-lc/components-seller/ExportDetailS
 import { ExportDetailTitle } from '@project-lc/components-seller/ExportDetailTitle';
 import { ExportDetailActions } from '@project-lc/components-seller/ExportDetailActions';
 import { DeliveryTrackingList } from '@project-lc/components-shared/delivery-tracking/DeliveryTracking';
+import { AdminExportActions } from '@project-lc/components-admin/AdminExportActions';
+
 import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
 import { useExportByCode } from '@project-lc/hooks';
 import NextLink from 'next/link';
@@ -52,6 +54,11 @@ export default function ExportsDetail(): JSX.Element {
 
         <Box as="section">
           <ExportDetailActions exportData={exp.data} />
+        </Box>
+
+        {/* 관리자 전용 */}
+        <Box as="section">
+          <AdminExportActions exportData={exp.data} />
         </Box>
 
         <Box as="section">
