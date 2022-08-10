@@ -38,12 +38,14 @@ import {
   Payment,
   RefundAccountDto,
   ReturnItemWithOriginOrderItemInfo,
+  TossPaymentCancel,
 } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { getAdminHost } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { FormProvider, useForm } from 'react-hook-form';
+import React from 'react';
 
 interface AdminRefundCreateFormData extends RefundAccountDto {
   refundAmount: number;
@@ -179,25 +181,16 @@ export function AdminReturnRequestDetail({
             </Box>
           ))}
 
-        {/* 환불금액 입력하는 폼, 환불처리 완료되었을 경우 환불완료일시와 환불금액을 표시한다 */}
         <Stack as="form" onSubmit={handleSubmit(submitHandler)}>
           <RefundRequestItemsDisplayTable
             returnItems={data?.items || []}
             tableFooter={
-              <Tfoot>
-                <Tr>
-                  <Th colSpan={2}>
-                    {data.refund
-                      ? `환불 처리 완료일시 : ${dayjs(data.refund.completeDate).format(
-                          'YYYY/MM/DD HH:mm',
-                        )}`
-                      : '환불할 금액을 입력해주세요'}
-                  </Th>
-                  <Th>총 환불금액</Th>
-                  <Th>
-                    {data.refund ? (
-                      <Text>{getLocaleNumber(data.refund.refundAmount)}원</Text>
-                    ) : (
+              !data.refund ? (
+                <Tfoot>
+                  <Tr>
+                    <Th colSpan={2}>환불할 금액을 입력해주세요</Th>
+                    <Th>총 환불금액</Th>
+                    <Th>
                       <FormControl isInvalid={!!errors.refundAmount}>
                         <Input
                           type="number"
@@ -217,14 +210,18 @@ export function AdminReturnRequestDetail({
                           {errors.refundAmount && errors.refundAmount.message}
                         </FormErrorMessage>
                       </FormControl>
-                    )}
-                  </Th>
-                </Tr>
-              </Tfoot>
+                    </Th>
+                  </Tr>
+                </Tfoot>
+              ) : undefined
             }
           />
 
           {paymentData && paymentData.method === '가상계좌' && <RefundAccountForm />}
+
+          {data.refund && paymentData?.cancels && (
+            <CancelDataDisplayTable cancels={paymentData?.cancels} />
+          )}
 
           <Stack spacing={4} direction="row-reverse">
             {/* 환불처리완료인 경우 환불처리 버튼 노출하지 않는다 */}
@@ -254,7 +251,7 @@ function RefundRequestItemsDisplayTable({
   tableFooter,
 }: {
   returnItems: ReturnItemWithOriginOrderItemInfo[];
-  tableFooter: JSX.Element;
+  tableFooter?: JSX.Element;
 }): JSX.Element {
   return (
     <Table>
@@ -405,6 +402,37 @@ function CouponUsageTable({
               </Tr>
             );
           })}
+      </Tbody>
+    </Table>
+  );
+}
+
+/** 환불처리완료 정보 표시 테이블 */
+export function CancelDataDisplayTable({
+  cancels,
+}: {
+  cancels: TossPaymentCancel[];
+}): JSX.Element {
+  return (
+    <Table>
+      <Thead>
+        <Tr>
+          <Th>환불 이유</Th>
+          <Th>환불완료 일시</Th>
+          <Th>결제취소키(토스 결제 취소 건에 대한 고유키)</Th>
+          <Th>환불한 금액</Th>
+        </Tr>
+      </Thead>
+
+      <Tbody>
+        {cancels.map((cancel) => (
+          <Tr key={cancel.transactionKey}>
+            <Td>{cancel.cancelReason}</Td>
+            <Td>{dayjs(cancel.canceledAt).format('YYYY-MM-DD HH:mm:ss')}</Td>
+            <Td>{cancel.transactionKey}</Td>
+            <Td>{getLocaleNumber(cancel.cancelAmount)} 원</Td>
+          </Tr>
+        ))}
       </Tbody>
     </Table>
   );
