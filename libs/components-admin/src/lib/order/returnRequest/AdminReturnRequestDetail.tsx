@@ -68,7 +68,7 @@ export function AdminReturnRequestDetail({
   const { data: paymentData } = usePaymentByOrderCode(data?.order.orderCode || '');
   const toast = useToast();
   const [isImageOpen, { toggle }] = useBoolean();
-  const defaultTotalRefundAmount = data?.items
+  const refundItemsTotalAmount = data?.items
     ? data?.items.reduce((sum: number, i) => {
         return (
           sum +
@@ -80,7 +80,7 @@ export function AdminReturnRequestDetail({
   // 환불생성(환불처리) 폼
   const methods = useForm<AdminRefundCreateFormData>({
     defaultValues: {
-      refundAmount: defaultTotalRefundAmount,
+      refundAmount: refundItemsTotalAmount,
       refundBank: data?.refundBank || undefined,
       refundAccount: data?.refundAccount || undefined,
       refundAccountHolder: data?.refundAccountHolder || undefined,
@@ -89,6 +89,7 @@ export function AdminReturnRequestDetail({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = methods;
 
@@ -230,18 +231,19 @@ export function AdminReturnRequestDetail({
                           {...register('refundAmount', {
                             valueAsNumber: true,
                             required: '총 환불금액을 입력해주세요',
-                            max: {
-                              value: defaultTotalRefundAmount,
-                              message:
-                                '총 환불금액이 환불신청상품 금액의 총 합계보다 큽니다',
-                            },
                           })}
-                          defaultValue={defaultTotalRefundAmount}
+                          defaultValue={refundItemsTotalAmount}
                         />
 
                         <FormErrorMessage>
                           {errors.refundAmount && errors.refundAmount.message}
                         </FormErrorMessage>
+                        {watch('refundAmount') > refundItemsTotalAmount && (
+                          <Text color="red">
+                            총 환불금액이 환불신청상품 금액의 총 합계보다 큽니다.
+                            환불하려는 금액이 올바른지 확인해주세요.
+                          </Text>
+                        )}
                       </FormControl>
                     </Th>
                   </Tr>
@@ -251,7 +253,7 @@ export function AdminReturnRequestDetail({
           />
 
           {paymentData && paymentData.method === '가상계좌' && (
-            <Box>
+            <Box p={4}>
               <Text>
                 * 소비자가 입력한 환불계좌 정보입니다. 가상계좌 결제 취소시 해당 계좌로
                 결제금액이 환불됩니다.
@@ -264,7 +266,7 @@ export function AdminReturnRequestDetail({
             <CancelDataDisplayTable cancels={paymentData?.cancels} />
           )}
 
-          <Stack spacing={4} direction="row-reverse">
+          <Stack p={4} spacing={4} direction="row-reverse">
             {/* 환불처리내역이 없고, 상태가 '처리중'인 경우에만 환불처리 버튼 노출 */}
             {!data.refund && data.status === 'processing' && (
               <Button
