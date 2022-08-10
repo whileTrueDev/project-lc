@@ -1,6 +1,5 @@
 import { Divider, Heading, Stack } from '@chakra-ui/react';
 import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
-import { AdminOrderRefundList } from '@project-lc/components-admin/order/refund/AdminOrderRefundList';
 import { AdminReturnRequestList } from '@project-lc/components-admin/order/returnRequest/AdminReturnRequestList';
 import { AdminReturnRequestFilter } from '@project-lc/components-admin/order/returnRequest/AdminReturnRequestFilter';
 
@@ -12,8 +11,6 @@ export default function OrderRefundIndex(): JSX.Element {
         <AdminReturnRequestFilter />
         <Divider />
         <AdminReturnRequestList />
-        <Divider />
-        <AdminOrderRefundList />
       </Stack>
     </AdminPageLayout>
   );
