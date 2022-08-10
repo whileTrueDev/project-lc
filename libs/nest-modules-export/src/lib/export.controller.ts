@@ -30,7 +30,7 @@ import { ExportService } from './export.service';
 @UseGuards(JwtAuthGuard)
 @Controller('export')
 @UseInterceptors(HttpCacheInterceptor)
-@CacheClearKeys('order')
+@CacheClearKeys('order', 'export')
 export class ExportController {
   constructor(private readonly exportService: ExportService) {}
 

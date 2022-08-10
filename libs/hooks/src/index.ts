@@ -55,6 +55,7 @@ export * from './lib/mutation/useDeleteNoticeMutation';
 export * from './lib/mutation/useDeleteSellerGoods';
 export * from './lib/mutation/useDeleteSellerMutation';
 export * from './lib/mutation/useDeleteShippingGroup';
+export * from './lib/mutation/useDelieveryMutation';
 export * from './lib/mutation/useExportBundledOrdersMutation';
 export * from './lib/mutation/useExportOrderMutation';
 export * from './lib/mutation/useExportOrdersMutation';

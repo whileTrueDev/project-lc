@@ -99,21 +99,24 @@ export class ExportService {
   }
 
   /** 연결된 주문상품옵션 상태변경 */
-  async updateOrderItemOptionsStatus(dto: CreateKkshowExportDto): Promise<boolean> {
+  async updateOrderItemOptionsStatus(
+    exportItems: CreateKkshowExportDto['items'],
+  ): Promise<boolean> {
     // 주문상품옵션
     const orderItemOptions = await this.prisma.orderItemOption.findMany({
-      where: { id: { in: dto.items.map((item) => item.orderItemOptionId) } },
+      where: { id: { in: exportItems.map((item) => item.orderItemOptionId) } },
       select: { id: true, quantity: true, exportItems: true },
     });
     // 주문상품옵션.quantity 가 총합(주문상품옵션.출고상품옵션.quantity)보다 작으면 부분출고
     // 아니면 전체출고로 주문상품옵션의 상태 업데이트
     const updateDataList = await Promise.all(
       orderItemOptions.map(async (orderItemOption) => {
-        const { quantity: originOrderAmount, exportItems, id } = orderItemOption; // 주문상품옵션 원래 주문개수
-        const totalExportedAmount = exportItems.reduce(
-          (sum, cur) => sum + cur.quantity,
-          0,
-        ); // 주문상품옵션에 연결된 출고상품의 출고개수 합
+        const {
+          quantity: originOrderAmount,
+          exportItems: _expItems,
+          id,
+        } = orderItemOption; // 주문상품옵션 원래 주문개수
+        const totalExportedAmount = _expItems.reduce((sum, cur) => sum + cur.quantity, 0); // 주문상품옵션에 연결된 출고상품의 출고개수 합
         const newOrderItemOptionStepAfterExport: OrderProcessStep =
           originOrderAmount <= totalExportedAmount ? 'exportDone' : 'partialExportDone';
         return { id, step: newOrderItemOptionStepAfterExport };
@@ -121,10 +124,7 @@ export class ExportService {
     );
     await this.prisma.$transaction(
       updateDataList.map(({ id, step }) => {
-        return this.prisma.orderItemOption.update({
-          where: { id },
-          data: { step },
-        });
+        return this.prisma.orderItemOption.update({ where: { id }, data: { step } });
       }),
     );
     return true;
@@ -158,7 +158,7 @@ export class ExportService {
     /** 재고차감 */
     await this.updateGoodsSupplies(dto);
     /** 주문상품옵션의 상태변경 -> 주문상태변경보다 먼저 진행 */
-    await this.updateOrderItemOptionsStatus(dto);
+    await this.updateOrderItemOptionsStatus(dto.items);
     /** 주문의 상태변경 -> 주문상품옵션 상태변경 후 진행 */
     const order = await this.updateOrderStatus(dto);
 
