@@ -21,7 +21,7 @@ import {
   useBoolean,
   useToast,
 } from '@chakra-ui/react';
-import { CustomerMileageLog } from '@prisma/client';
+import { CustomerMileageLog, OrderShipping } from '@prisma/client';
 import { CardDetail } from '@project-lc/components-shared/payment/CardDetail';
 import { RefundAccountForm } from '@project-lc/components-shared/payment/RefundAccountForm';
 import { TransferDetail } from '@project-lc/components-shared/payment/TransferDetail';
@@ -189,23 +189,31 @@ export function AdminReturnRequestDetail({
       <OrderPaymentDataDisplay order={data.order} payment={paymentData} />
 
       {/* 마일리지, 쿠폰 사용내역 있는 경우에만 표시 */}
-      {data.order.mileageLogs.length > 0 ||
-        (data.order.customerCouponLogs.length > 0 && (
-          <Box>
-            <Text>마일리지, 쿠폰 사용 내역</Text>
-            <Stack border="1px" spacing={2}>
-              {data.order.mileageLogs.length > 0 && (
-                <MileageUsageTable mileageLogs={data.order.mileageLogs} />
-              )}
-              {data.order.customerCouponLogs.length > 0 && (
-                <CouponUsageTable couponLogs={data.order.customerCouponLogs} />
-              )}
-            </Stack>
-          </Box>
-        ))}
+      {(data.order.mileageLogs.length > 0 ||
+        data.order.customerCouponLogs.length > 0) && (
+        <Stack spacing={2}>
+          {data.order.mileageLogs.length > 0 && (
+            <MileageUsageTable mileageLogs={data.order.mileageLogs} />
+          )}
+          {data.order.customerCouponLogs.length > 0 && (
+            <CouponUsageTable couponLogs={data.order.customerCouponLogs} />
+          )}
+        </Stack>
+      )}
+
+      {/* 환불요청 상품에 해당하는 배송비 표시 테이블 */}
+      <ReturnRequestItemShippingCostTable
+        returnItems={data?.items || []}
+        orderShippings={data.order.shippings}
+      />
 
       <FormProvider {...methods}>
-        <Stack as="form" onSubmit={handleSubmit(submitHandler)}>
+        <Stack
+          as="form"
+          onSubmit={handleSubmit(submitHandler)}
+          outline="auto"
+          outlineColor="blue.300"
+        >
           <RefundRequestItemsDisplayTable
             returnItems={data?.items || []}
             tableFooter={
@@ -315,6 +323,7 @@ function RefundRequestItemsDisplayTable({
           );
         })}
       </Tbody>
+
       {tableFooter}
     </Table>
   );
@@ -435,6 +444,55 @@ function CouponUsageTable({
               </Tr>
             );
           })}
+      </Tbody>
+    </Table>
+  );
+}
+
+function ReturnRequestItemShippingCostTable({
+  returnItems,
+  orderShippings,
+}: {
+  returnItems: ReturnItemWithOriginOrderItemInfo[];
+  orderShippings: OrderShipping[];
+}): JSX.Element {
+  return (
+    <Table>
+      <Thead>
+        <Tr>
+          <Th>환불 신청 상품에 대한 배송비 정보를 확인합니다</Th>
+          <Th>상점명</Th>
+          <Th>배송비</Th>
+        </Tr>
+      </Thead>
+
+      <Tbody>
+        {orderShippings.map((ship) => {
+          // 이 주문배송비에 포함된 환불요청상품
+          const returnRequestedItemsInThisOrderShipping = returnItems.filter(
+            (ri) => ri.orderItem.orderShippingId === ship.id,
+          );
+          return returnRequestedItemsInThisOrderShipping.map((ri, index) => {
+            return (
+              <Tr key={ri.id}>
+                <Td>
+                  {ri?.orderItemOption?.goodsName}, {ri?.orderItemOption?.name} :{' '}
+                  {ri?.orderItemOption?.value}
+                </Td>
+                {index === 0 && (
+                  <>
+                    <Td rowSpan={returnRequestedItemsInThisOrderShipping.length}>
+                      {ri.orderItem.goods.seller.sellerShop.shopName}
+                    </Td>
+                    <Td rowSpan={returnRequestedItemsInThisOrderShipping.length}>
+                      {ship.shippingCost}원
+                    </Td>
+                  </>
+                )}
+              </Tr>
+            );
+          });
+        })}
       </Tbody>
     </Table>
   );

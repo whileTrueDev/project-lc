@@ -320,6 +320,7 @@ export class ReturnService {
               include: { customerCoupon: { include: { coupon: true } } },
             },
             mileageLogs: true,
+            shippings: true,
           },
         },
         items: {
@@ -328,6 +329,7 @@ export class ReturnService {
               select: {
                 id: true,
                 goods: { select: { seller: { select: { sellerShop: true } } } },
+                orderShippingId: true,
               },
             },
             orderItemOption: true,
