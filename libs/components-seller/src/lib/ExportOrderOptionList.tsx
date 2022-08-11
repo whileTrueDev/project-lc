@@ -110,7 +110,7 @@ function ExportOrderShippingListItem({
   const handleSelect = sellerExportStore((s) => s.handleOrderShippingSelect);
   const selected = useMemo(() => {
     if (disableSelection) return true;
-    return selectedOrderShippings.includes(shipping.id);
+    return !!selectedOrderShippings.find((x) => x.shippingId === shipping.id);
   }, [disableSelection, selectedOrderShippings, shipping.id]);
 
   // 현재 주문 상품배송 출고가능한 지 체크
@@ -121,11 +121,18 @@ function ExportOrderShippingListItem({
     [isDone, isExportable, selected],
   );
 
+  const onShippingSelect = (): void =>
+    handleSelect({ shippingId: shipping.id, orderId: order.id });
+
   // 첫 렌더링시, 해당 상품 선택
   useEffect(() => {
-    if (!isDone && isExportable && !selectedOrderShippings.includes(shipping.id)) {
+    if (
+      !isDone &&
+      isExportable &&
+      !selectedOrderShippings.find((x) => x.shippingId === shipping.id)
+    ) {
       setValue(`${orderIndex * 2 + shippingIndex * 3}.orderId`, order.id);
-      handleSelect(shipping.id);
+      onShippingSelect();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -143,7 +150,7 @@ function ExportOrderShippingListItem({
         order={order}
         disableSelection={disableSelection}
         selected={selected}
-        onSelect={() => handleSelect(shipping.id)}
+        onSelect={onShippingSelect}
       />
 
       {isDone && <OrderStatusBadge step="exportDone" />}
@@ -227,7 +234,7 @@ function ExportOrderSummary({
       order.ordererPhone === order.recipientPhone ? null : (
         <HStack>
           <Text fontSize="sm">
-            {order.ordererName} {order.ordererPhone}
+            (주문인) {order.ordererName} {order.ordererPhone}
           </Text>
         </HStack>
       )}

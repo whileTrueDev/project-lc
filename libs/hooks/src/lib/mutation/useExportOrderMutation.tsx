@@ -22,6 +22,7 @@ export const useExportOrderMutation = (): UseMutationResult<
           queryClient.invalidateQueries('SellerOrderList');
           queryClient.invalidateQueries('OrderDetail');
           queryClient.invalidateQueries('getAdminOrder');
+          queryClient.invalidateQueries('AdminOrderList');
           queryClient.invalidateQueries('Exports');
           queryClient.invalidateQueries(['Exports'], { refetchInactive: true });
         }

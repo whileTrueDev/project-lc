@@ -48,7 +48,8 @@ export function ExportManyDialog({
   const closeAndResetShippings = useCallback(() => {
     onClose();
     resetSelectedOrderShippings();
-  }, [onClose, resetSelectedOrderShippings]);
+    formMethods.reset();
+  }, [formMethods, onClose, resetSelectedOrderShippings]);
 
   // mutations
   const exportOrder = useExportOrderMutation();
@@ -113,8 +114,10 @@ export function ExportManyDialog({
       const realData = { ...data, items: data.items.filter((x) => !!x.quantity) };
       dto.push(realData);
     });
-
-    if (dto.length === 0) {
+    const realDto = dto.filter((d) =>
+      selectedOrderShippings.find((x) => x.orderId === d.orderId),
+    );
+    if (realDto.length === 0) {
       toast({
         status: 'warning',
         description:
@@ -122,9 +125,8 @@ export function ExportManyDialog({
       });
       return;
     }
-
     // 일괄 출고처리 요청
-    await exportAll({ exportOrders: dto });
+    await exportAll({ exportOrders: realDto });
   }
 
   return (

@@ -1,14 +1,18 @@
-import { Box, Link, Text } from '@chakra-ui/react';
+import { Box, Icon, Link, Text, useDisclosure } from '@chakra-ui/react';
 import { GridColumns, GridRowData, GridRowId, GridToolbar } from '@material-ui/data-grid';
 import { OrderProcessStep } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
+import { OrderToolbar } from '@project-lc/components-seller/kkshow-order/OrderList';
 import { useAdminOrderList } from '@project-lc/hooks';
 import { convertPaymentMethodToKrString } from '@project-lc/shared-types';
 import { useSellerOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { FaTruck } from 'react-icons/fa';
+import { DownloadIcon } from '@chakra-ui/icons';
+import ExportManyDialog from '@project-lc/components-seller/ExportManyDialog';
 
 const columns: GridColumns = [
   {
@@ -80,6 +84,7 @@ const columns: GridColumns = [
 ];
 
 export function AdminOrderList(): JSX.Element {
+  const exportManyDialog = useDisclosure();
   // 페이지당 행 select
   const rowsPerPageOptions = useRef<number[]>([10, 20, 50, 100]);
   const mapPageToNextCursor = useRef<{ [page: number]: GridRowId }>({});
@@ -128,25 +133,53 @@ export function AdminOrderList(): JSX.Element {
     );
   }, [data, setRowCountState]);
   return (
-    <ChakraDataGrid
-      components={{
-        Toolbar: GridToolbar,
-      }}
-      columns={columns}
-      page={page}
-      rowsPerPageOptions={rowsPerPageOptions.current}
-      onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-      rows={data?.orders || []}
-      minH={500}
-      autoHeight
-      loading={isLoading}
-      disableSelectionOnClick
-      pageSize={pageSize}
-      pagination
-      rowCount={rowCountState}
-      density="compact"
-      paginationMode="server"
-      onPageChange={handlePageChange}
-    />
+    <>
+      <ChakraDataGrid
+        checkboxSelection
+        selectionModel={sellerOrderStates.selectedOrders}
+        onSelectionModelChange={sellerOrderStates.handleOrderSelected}
+        components={{
+          Toolbar: () => (
+            <>
+              <GridToolbar />
+              <OrderToolbar
+                options={[
+                  {
+                    name: '출고 처리',
+                    onClick: () => exportManyDialog.onOpen(),
+                    icon: <Icon as={FaTruck} />,
+                    emphasize: true,
+                    // isDisabled: !isExportable,
+                    disableMessage: '출고가능한 주문이 없습니다.',
+                  },
+                ]}
+              />
+            </>
+          ),
+          ExportIcon: DownloadIcon,
+        }}
+        columns={columns}
+        page={page}
+        rowsPerPageOptions={rowsPerPageOptions.current}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        rows={data?.orders || []}
+        minH={500}
+        autoHeight
+        loading={isLoading}
+        disableSelectionOnClick
+        pageSize={pageSize}
+        pagination
+        rowCount={rowCountState}
+        density="compact"
+        paginationMode="server"
+        onPageChange={handlePageChange}
+      />
+
+      <ExportManyDialog
+        isOpen={exportManyDialog.isOpen}
+        onClose={exportManyDialog.onClose}
+        orders={data?.orders || []}
+      />
+    </>
   );
 }
