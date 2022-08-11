@@ -5,7 +5,10 @@ import {
   GoodsImages,
   Order,
   OrderItemOption,
+  Seller,
+  SellerShop,
 } from '@prisma/client';
+import { PaginationResult } from '../core/paginationResult';
 
 /** ExportItemOption 형태로 바꾸기 전 출고상세조회시 출고상품 형태 */
 export type findExportItemData = ExportItem & {
@@ -43,14 +46,14 @@ export type ExportRes = Export & {
   items: ExportItemOption[];
   order: Order;
   bundleExports: Export[];
+  seller?: Seller & { sellerShop?: SellerShop };
 }; // order의 주문자정보, 받는사람정보, 배송메모 필요
 
 export type ExportListItem = Omit<ExportRes, 'bundleExports'>;
 /** 출고 목록 조회 리턴값 */
-export type ExportListRes = {
-  list: ExportListItem[];
+export interface ExportListRes extends PaginationResult<ExportListItem> {
   totalCount: number;
-};
+}
 
 /** 출고 생성 리턴값 */
 export type ExportCreateRes = {
