@@ -1,4 +1,4 @@
-import { Stack } from '@chakra-ui/react';
+import { Stack, Text } from '@chakra-ui/react';
 import GoodsDefaultCommonInfoText from '@project-lc/components-shared/goods/GoodsDefaultCommonInfoText';
 import { TextViewerWithDetailModal } from '@project-lc/components-shared/TextViewerWithDetailModal';
 import { GoodsByIdRes } from '@project-lc/shared-types';
@@ -19,7 +19,12 @@ export function GoodsDetailCommonInfo({
         />
       ) : (
         // 상품공통정보를 입력하지 않거나 연결된 상품공통정보가 없는경우 기본공통정보 표시
-        <GoodsDefaultCommonInfoText />
+        <Stack>
+          <Text color="GrayText">
+            연결된 상품 공통 정보가 없어 아래 기본 문구가 표시됩니다
+          </Text>
+          <GoodsDefaultCommonInfoText />
+        </Stack>
       )}
     </Stack>
   );

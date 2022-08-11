@@ -5,6 +5,7 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminSellerListRes,
   FindSellerRes,
+  sellerCommonInfoDefaultText,
   SellerContractionAgreementDto,
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
@@ -27,6 +28,12 @@ export class SellerService {
         name: signUpInput.name,
         password: hashedPw,
         agreementFlag: true,
+        goodsCommonInfo: {
+          create: {
+            info_name: '기본',
+            info_value: sellerCommonInfoDefaultText,
+          },
+        },
       },
     });
     return seller;

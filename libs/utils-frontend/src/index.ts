@@ -1,4 +1,3 @@
-export * from './lib/getFilteredCustomerOrderItems';
 export * from './lib/asteriskify';
 export * from './lib/checkCouponAvailable';
 export * from './lib/checkGoodsPurchasable';
@@ -10,8 +9,10 @@ export * from './lib/crop-image';
 export * from './lib/deliveryCompanies';
 export * from './lib/getCartKey';
 export * from './lib/getDiscountedRate';
+export * from './lib/getFilteredCustomerOrderItems';
 export * from './lib/getLocaleNumber';
 export * from './lib/getShippingOptionLabel';
 export * from './lib/getStandardShippingCost';
+export * from './lib/goodsRegistImageContent';
 export * from './lib/openKakaoChannel';
 export * from './lib/parseErrorObject';

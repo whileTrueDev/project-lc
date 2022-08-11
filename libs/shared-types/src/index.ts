@@ -14,6 +14,7 @@ export * from './lib/constants/payment';
 export * from './lib/constants/processStatuses';
 export * from './lib/constants/publicImageS3Key';
 export * from './lib/constants/remoteAreaPostalcode';
+export * from './lib/constants/sellerCommonInfoDefaultText';
 export * from './lib/constants/sellType';
 export * from './lib/constants/shippingTypes';
 export * from './lib/constants/signupRegisterOptions';
