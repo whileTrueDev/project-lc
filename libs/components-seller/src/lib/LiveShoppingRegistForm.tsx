@@ -34,23 +34,38 @@ import {
 } from '@project-lc/hooks';
 import {
   ApprovedGoodsListItem,
+  GoodsByIdRes,
   LiveShoppingInput,
   LiveShoppingRegistDTO,
+  LiveShoppingSpecialPriceDiscountType,
+  LiveShoppingSpecialPricesValue,
 } from '@project-lc/shared-types';
 import { liveShoppingRegist } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useRef } from 'react';
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { Goods } from '.prisma/client';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Control,
+  FormProvider,
+  useFieldArray,
+  useForm,
+  useFormContext,
+} from 'react-hook-form';
+import { LiveShoppingSpecialPriceDiscountTypeAndRate } from '@project-lc/components-shared/live-shopping/LiveShoppingSpecialPriceDiscountTypeAndRate';
+import { LiveShoppingSpecialPriceOptions } from '@project-lc/components-shared/live-shopping/LiveShoppingSpecialPriceOptions';
+import { AmountUnit, Goods } from '.prisma/client';
 import LiveShoppingRegistManagerContacts from './LiveShoppingRegistManagerContacts';
 import LiveShoppingRegistRequestField from './LiveShoppingRegistRequestField';
 
 export function LiveShoppingRegistForm(): JSX.Element {
   const { selectedGoods, handleGoodsSelect, setDefault } = liveShoppingRegist();
+  const [lsSpecialPriceSetting, setLsSpecialPriceSetting] = useState('origin'); // origin || special
+
   const { data: profileData } = useProfile();
   const { mutateAsync, isLoading } = useCreateLiveShoppingMutation();
   const { mutateAsync: createSellerContacts } = useCreateSellerContactsMutation();
+
+  const goods = useGoodsById(selectedGoods?.id || null);
 
   const toast = useToast();
   const router = useRouter();
@@ -60,6 +75,7 @@ export function LiveShoppingRegistForm(): JSX.Element {
   const contacts = useDefaultContacts({ email: profileData?.email });
 
   const methods = useForm<LiveShoppingInput>({
+    mode: 'all',
     defaultValues: {
       goods_id: null,
       useContact: '',
@@ -67,10 +83,17 @@ export function LiveShoppingRegistForm(): JSX.Element {
       email: '',
       requests: '',
       desiredPeriod: '무관',
+      discountType: 'W', // 할인액 | 할인율 선택
+      discountRate: null,
     },
   });
 
-  const { handleSubmit, setValue, watch } = methods;
+  const { replace } = useFieldArray({
+    control: methods.control,
+    name: 'specialPrices',
+  });
+
+  const { handleSubmit, setValue } = methods;
 
   const onSuccess = (): void => {
     toast({
@@ -89,41 +112,63 @@ export function LiveShoppingRegistForm(): JSX.Element {
   };
 
   const regist = async (data: LiveShoppingInput): Promise<void> => {
-    const { firstNumber, secondNumber, thirdNumber, useContact, email } = data;
-    const phoneNumber = `${firstNumber}${secondNumber}${thirdNumber}`;
-    const dto: LiveShoppingRegistDTO = {
-      requests: '',
-      goodsId: 0,
-      contactId: 0,
-      // streamId: '',
-      desiredCommission: data.desiredCommission,
-      desiredPeriod: data.desiredPeriod,
-    };
+    console.log(data);
 
-    if (contacts.data) dto.contactId = contacts.data.id;
-    dto.requests = data.requests;
+    // const { firstNumber, secondNumber, thirdNumber, useContact, email } = data;
+    // const phoneNumber = `${firstNumber}${secondNumber}${thirdNumber}`;
+    // const dto: LiveShoppingRegistDTO = {
+    //   requests: '',
+    //   goodsId: 0,
+    //   contactId: 0,
+    //   desiredCommission: data.desiredCommission,
+    //   desiredPeriod: data.desiredPeriod,
+    // };
 
-    const goodsId = watch('goods_id');
-    if (!goodsId) {
-      toast({ title: '상품을 올바르게 선택해주세요.', status: 'error' });
-      return;
-    }
-    dto.goodsId = goodsId;
-    if (useContact === 'old') {
-      mutateAsync(dto).then(onSuccess).catch(onFail);
-    } else {
-      await createSellerContacts({
-        email,
-        phoneNumber,
-        isDefault: setDefault,
-      })
-        .then((value) => {
-          dto.contactId = Number(Object.values(value));
-        })
-        .catch(onFail);
-      mutateAsync(dto).then(onSuccess).catch(onFail);
-    }
+    // if (contacts.data) dto.contactId = contacts.data.id;
+    // dto.requests = data.requests;
+
+    // const goodsId = watch('goods_id');
+    // if (!goodsId) {
+    //   toast({ title: '상품을 올바르게 선택해주세요.', status: 'error' });
+    //   return;
+    // }
+    // dto.goodsId = goodsId;
+    // if (useContact === 'old') {
+    //   mutateAsync(dto).then(onSuccess).catch(onFail);
+    // } else {
+    //   await createSellerContacts({
+    //     email,
+    //     phoneNumber,
+    //     isDefault: setDefault,
+    //   })
+    //     .then((value) => {
+    //       dto.contactId = Number(Object.values(value));
+    //     })
+    //     .catch(onFail);
+    //   mutateAsync(dto).then(onSuccess).catch(onFail);
+    // }
   };
+
+  useEffect(() => {
+    if (lsSpecialPriceSetting === 'origin' && goods.data) {
+      // 기존가격으로 라이브특가 설정(원래상품옵션 판매가로 설정)
+      const prevLieShoppingSpecialPrices = methods.getValues('specialPrices');
+      if (prevLieShoppingSpecialPrices) {
+        replace(
+          prevLieShoppingSpecialPrices.map((prev) => {
+            const originGoodsOption = goods.data.options.find(
+              (opt) => opt.id === prev.goodsOptionId,
+            );
+
+            return {
+              ...prev,
+              specialPrice: Number(originGoodsOption?.price),
+            };
+          }),
+        );
+      }
+    }
+  }, [goods.data, lsSpecialPriceSetting, methods, replace]);
 
   return (
     <>
@@ -158,10 +203,26 @@ export function LiveShoppingRegistForm(): JSX.Element {
                     }
                   }}
                 />
-                {selectedGoods && (
-                  <Box mt={2}>
-                    <GoodsSummary goodsId={selectedGoods.id} />
-                  </Box>
+
+                {/* 라이브 특가 설정 */}
+                {goods.isLoading && <Spinner />}
+                {selectedGoods && goods.data && (
+                  <Stack mt={2} spacing={8}>
+                    <GoodsSummary goods={goods.data} />
+                    <LiveShoppingSpecialPriceSetting
+                      value={lsSpecialPriceSetting}
+                      onChange={setLsSpecialPriceSetting}
+                    />
+                    {/* '라이브특가' 설정시에만 표시 */}
+                    {lsSpecialPriceSetting === 'special' && (
+                      <Stack pl={5}>
+                        <LiveShoppingSpecialPriceDiscountTypeAndRate />
+                        <LiveShoppingSpecialPriceOptions
+                          goodsOptions={goods.data.options}
+                        />
+                      </Stack>
+                    )}
+                  </Stack>
                 )}
               </Stack>
               {/* 담당자 연락처 */}
@@ -296,18 +357,16 @@ function LiveShoppingDesiredCommission(): JSX.Element {
 }
 
 interface GoodsSummaryProps {
-  goodsId: Goods['id'];
+  goods?: GoodsByIdRes;
 }
-function GoodsSummary({ goodsId }: GoodsSummaryProps): JSX.Element | null {
-  const goods = useGoodsById(goodsId);
-  const goodsFirstImage = useMemo(() => goods.data?.image?.[0], [goods.data?.image]);
+function GoodsSummary({ goods }: GoodsSummaryProps): JSX.Element | null {
+  const goodsFirstImage = useMemo(() => goods?.image?.[0], [goods?.image]);
   const isConfirmRequired = useMemo(
-    () => goods.data?.confirmation.status !== 'confirmed',
-    [goods.data?.confirmation.status],
+    () => goods?.confirmation.status !== 'confirmed',
+    [goods?.confirmation.status],
   );
-  if (goods.isLoading) return <Spinner />;
-  if (goods.isError) return null;
-  if (!goods.data) return null;
+
+  if (!goods) return null;
 
   return (
     <Flex gap={2}>
@@ -316,7 +375,7 @@ function GoodsSummary({ goodsId }: GoodsSummaryProps): JSX.Element | null {
           rounded="md"
           width={50}
           height={50}
-          alt={goods.data.goods_name}
+          alt={goods.goods_name}
           objectFit="cover"
           src={goodsFirstImage.image}
         />
@@ -328,10 +387,10 @@ function GoodsSummary({ goodsId }: GoodsSummaryProps): JSX.Element | null {
             검수 미완료 상태
           </Badge>
         )}
-        <Text fontWeight="bold">{goods.data.goods_name}</Text>
-        <Text>{goods.data.summary}</Text>
+        <Text fontWeight="bold">{goods.goods_name}</Text>
+        <Text>{goods.summary}</Text>
         <Text color="gray" fontSize="sm">
-          {dayjs(goods.data.regist_date).format('YYYY년 MM월 DD일 HH:mm:ss')} 등록
+          {dayjs(goods.regist_date).format('YYYY년 MM월 DD일 HH:mm:ss')} 등록
         </Text>
 
         {isConfirmRequired && (
@@ -346,6 +405,28 @@ function GoodsSummary({ goodsId }: GoodsSummaryProps): JSX.Element | null {
         )}
       </Box>
     </Flex>
+  );
+}
+
+function LiveShoppingSpecialPriceSetting({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}): JSX.Element {
+  return (
+    <Stack>
+      <Text as="h6" size="sm" fontWeight="bold">
+        라이브 특가 설정
+      </Text>
+      <RadioGroup value={value} onChange={onChange}>
+        <Stack direction="row">
+          <Radio value="origin">기존 가격</Radio>
+          <Radio value="special">라이브 특가</Radio>
+        </Stack>
+      </RadioGroup>
+    </Stack>
   );
 }
 export default LiveShoppingRegistForm;
