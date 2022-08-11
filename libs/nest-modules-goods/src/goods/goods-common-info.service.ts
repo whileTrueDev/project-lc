@@ -118,7 +118,6 @@ export class GoodsCommonInfoService {
         where: { id },
         data: dto,
       });
-      console.log(item);
       return item;
     } catch (error) {
       console.error(error);
