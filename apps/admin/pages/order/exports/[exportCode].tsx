@@ -58,7 +58,7 @@ export default function ExportsDetail(): JSX.Element {
             <Stack>
               {exp.data.bundleExports.map((bundle) => (
                 <Box key={bundle.exportCode}>
-                  <NextLink passHref href={`/mypage/orders/exports/${bundle.exportCode}`}>
+                  <NextLink passHref href={`/orders/exports/${bundle.exportCode}`}>
                     <Link color="blue.500" fontSize="sm">
                       {bundle.exportCode}
                     </Link>
