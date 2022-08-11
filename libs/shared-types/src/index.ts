@@ -80,6 +80,7 @@ export * from './lib/dto/kkshowShoppingTabCategory.dto';
 export * from './lib/dto/kkshowSubNav.dto';
 export * from './lib/dto/liveShopping.dto';
 export * from './lib/dto/liveShoppingPurchaseMessage.dto';
+export * from './lib/dto/liveShoppingSpecialPrice.dto';
 export * from './lib/dto/loginUser.dto';
 export * from './lib/dto/mail/mail-verifications.dto';
 export * from './lib/dto/manual.dto';
