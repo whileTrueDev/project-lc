@@ -266,22 +266,23 @@ model GoodsConfirmation {
 }
 
 model GoodsOptions {
-  id               Int                   @id @default(autoincrement())
-  goods            Goods                 @relation(fields: [goodsId], references: [id], onDelete: Cascade)
-  goodsId          Int
-  supply           GoodsOptionsSupplies?
+  id                        Int                        @id @default(autoincrement())
+  goods                     Goods                      @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  goodsId                   Int
+  supply                    GoodsOptionsSupplies?
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
-  default_option   YesOrNo               @default(n) // 옵션 필수 �������부
-  option_type      String                @default("direct") // 기본값인듯? 설명도 direct
-  option_title     String? // 옵션명 fm_goods_options.option_title
-  option1          String? // 옵션값 fm_goods_options.option1
-  option_code      String? // 옵션코드
-  consumer_price   Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
-  price            Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
-  weight           Float? //옵션 개당 무게 (단위 kg)
-  option_view      YesOrNo_UPPERCASE     @default(Y) // 옵션 노출 여부
-  cartItemOptions  CartItemOption[]
-  orderItemOptions OrderItemOption[]
+  default_option            YesOrNo                    @default(n) // 옵션 필수 �������부
+  option_type               String                     @default("direct") // 기본값인듯? 설명도 direct
+  option_title              String? // 옵션명 fm_goods_options.option_title
+  option1                   String? // 옵션값 fm_goods_options.option1
+  option_code               String? // 옵션코드
+  consumer_price            Decimal                    @db.Decimal(10, 2) // 소비자가 (미할인가)
+  price                     Decimal                    @db.Decimal(10, 2) // 판매가 (할인가)
+  weight                    Float? //옵션 개당 무게 (단위 kg)
+  option_view               YesOrNo_UPPERCASE          @default(Y) // 옵션 노출 여부
+  cartItemOptions           CartItemOption[]
+  orderItemOptions          OrderItemOption[]
+  liveShoppingSpecialPrices LiveShoppingSpecialPrice[] // 이 상품옵션에 연결된 라이브쇼핑 특가 정보들
 
   @@index([goodsId], name: "goodsId")
 }
@@ -744,6 +745,7 @@ model LiveShopping {
   followers                   Customer[]
   orderItemSupport            OrderItemSupport[]
   cartItemSupport             CartItemSupport[]
+  liveShoppingSpecialPrices   LiveShoppingSpecialPrice[] // 라이브쇼핑에 적용되는 특가정보
 }
 
 // 라이브쇼핑 구매 메시지 Text to speech 세팅 enum
@@ -809,6 +811,20 @@ model LiveShoppingImage {
   createDate     DateTime              @default(now())
   liveShopping   LiveShopping          @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
   liveShoppingId Int
+}
+
+// 라이브쇼핑 특가 테이블
+model LiveShoppingSpecialPrice {
+  id               Int               @id @default(autoincrement())
+  specialPrice     Decimal           @db.Decimal(10, 2) // 라이브쇼핑 특가
+  goodsId          Int // 라이브쇼핑에 연결된 goodsId와 비교하기 위해 저장(Goods와 연결하지는 않음)
+  goodsOptionId    Int // 연결된 상품옵션(특가는 반드시 특정 상품옵션과 연결되어야함)
+  goodsOption      GoodsOptions      @relation(fields: [goodsOptionId], references: [id], onDelete: Cascade)
+  liveShoppingId   Int // 연결된 라이브쇼핑
+  liveShopping     LiveShopping      @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
+  orderItemOptions OrderItemOption[] // 이 특가로 주문한 주문상품옵션
+  discountType     AmountUnit        @default(W) // W : 특가(원단위) 직접 입력 || P : 할인율(%) 입력
+  discountRate     Int? // discountType 이 P 인 경우 할인율 저장
 }
 
 // 판매 수수료
@@ -1740,25 +1756,27 @@ model OrderItem {
 
 // 주문상품옵션
 model OrderItemOption {
-  id                     Int                     @id @default(autoincrement()) // 주문 상품 옵션 고유번호
-  orderItemId            Int // 옵션이 연결된 주문 상품 고유번호
-  orderItem              OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
-  goodsOptionId          Int? // 참조하는 상품옵션 고유번호
-  goodsOption            GoodsOptions?           @relation(fields: [goodsOptionId], references: [id], onDelete: SetNull) // 주문상품옵션이 연결된 상품옵션
-  goodsName              String? // 주문당시 상품명
-  imageUrl               String? // 상품대표이미지 url
-  name                   String? // 주문했을 당시 옵션명
-  value                  String? // 주문했을 당시 옵션값
-  quantity               Int // 옵션 선택 수량(개수)
-  normalPrice            Decimal                 @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
-  discountPrice          Decimal                 @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
-  weight                 Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
-  step                   OrderProcessStep        @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
-  refundItems            RefundItem[] // 환불상품
-  returnItems            ReturnItem[] // 반품상품
-  exportItems            ExportItem[] // 출고상품
-  orderCancellationItems OrderCancellationItem[] // 주문취소상품
-  exchangeItems          ExchangeItem[] // 교환상품
+  id                         Int                       @id @default(autoincrement()) // 주문 상품 옵션 고유번호
+  orderItemId                Int // 옵션이 연결된 주문 상품 고유번호
+  orderItem                  OrderItem                 @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
+  goodsOptionId              Int? // 참조하는 상품옵션 고유번호
+  goodsOption                GoodsOptions?             @relation(fields: [goodsOptionId], references: [id], onDelete: SetNull) // 주문상품옵션이 연결된 상품옵션
+  goodsName                  String? // 주문당시 상품명
+  imageUrl                   String? // 상품대표이미지 url
+  name                       String? // 주문했을 당시 옵션명
+  value                      String? // 주문했을 당시 옵션값
+  quantity                   Int // 옵션 선택 수량(개수)
+  normalPrice                Decimal                   @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
+  discountPrice              Decimal                   @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
+  weight                     Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
+  step                       OrderProcessStep          @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
+  refundItems                RefundItem[] // 환불상품
+  returnItems                ReturnItem[] // 반품상품
+  exportItems                ExportItem[] // 출고상품
+  orderCancellationItems     OrderCancellationItem[] // 주문취소상품
+  exchangeItems              ExchangeItem[] // 교환상품
+  liveShoppingSpecialPriceId Int? // 참조하는 라이브쇼핑 특가정보(라이브쇼핑중인 상품을 주문한 경우 특가정보가 연결됨) 
+  liveShoppingSpecialPrice   LiveShoppingSpecialPrice? @relation(fields: [liveShoppingSpecialPriceId], references: [id], onDelete: SetNull)
 }
 
 // 주문상품후원
