@@ -1,200 +1,167 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@project-lc/prisma-orm';
 import {
-  ProductSearch,
-  BroadcasterSearch,
-  SearchResult,
-  SearchKeyword,
-} from '@project-lc/shared-types';
+  GoodsConfirmationStatuses,
+  GoodsStatus,
+  GoodsView,
+  LiveShopppingProgressType,
+} from '@prisma/client';
+import { PrismaService } from '@project-lc/prisma-orm';
+import { BroadcasterSearch, ProductSearch, SearchResult } from '@project-lc/shared-types';
 import { getKkshowWebHost } from '@project-lc/utils';
 
 @Injectable()
 export class KkshowSearchService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async search(keyword: string): Promise<{
-    productSearch: ProductSearch[];
-    broadcasterSearch: BroadcasterSearch[];
-  }> {
+  public async search(keyword: string): Promise<SearchResult> {
+    const SEARCH_KEYWORD = keyword.trim();
+
+    const goodsSelect = {
+      id: true,
+      goods_name: true,
+      confirmation: { select: { firstmallGoodsConnectionId: true } },
+      image: { select: { image: true } },
+    };
+
+    const broadcasterSelect = {
+      userNickname: true,
+      avatar: true,
+      BroadcasterPromotionPage: true,
+    };
+
     const productSearch = await this.prisma.goods.findMany({
       where: {
-        goods_name: {
-          search: keyword.trim(),
-        },
+        goods_status: { notIn: [GoodsStatus.runout, GoodsStatus.unsold] },
+        goods_view: GoodsView.look,
+        confirmation: { status: GoodsConfirmationStatuses.confirmed },
+        OR: [
+          { goods_name: { search: SEARCH_KEYWORD } },
+          { summary: { contains: SEARCH_KEYWORD } },
+          { seller: { name: SEARCH_KEYWORD } },
+          { seller: { sellerShop: { shopName: { contains: SEARCH_KEYWORD } } } },
+          { searchKeyword: { contains: SEARCH_KEYWORD } },
+        ],
       },
       select: {
-        id: true,
-        goods_name: true,
-        confirmation: {
-          select: {
-            firstmallGoodsConnectionId: true,
-          },
-        },
-        image: {
-          select: {
-            image: true,
-          },
-        },
+        ...goodsSelect,
         LiveShopping: {
           select: {
-            broadcaster: {
-              select: {
-                userNickname: true,
-                avatar: true,
-                channels: {
-                  select: {
-                    url: true,
-                  },
-                },
-              },
-            },
-            liveShoppingVideo: {
-              select: {
-                youtubeUrl: true,
-              },
-            },
+            broadcaster: { select: broadcasterSelect },
+            liveShoppingVideo: { select: { youtubeUrl: true } },
           },
         },
       },
     });
     const broadcasterSearch = await this.prisma.liveShopping.findMany({
       where: {
+        progress: LiveShopppingProgressType.confirmed,
         broadcaster: {
-          userNickname: {
-            search: keyword.trim(),
-          },
+          userNickname: { search: SEARCH_KEYWORD },
+          agreementFlag: true,
+          BroadcasterPromotionPage: { url: { not: null } },
         },
       },
       select: {
-        broadcaster: {
-          select: {
-            userNickname: true,
-            avatar: true,
-            channels: {
-              select: {
-                url: true,
-              },
-            },
-          },
-        },
-        goods: {
-          select: {
-            id: true,
-            goods_name: true,
-            confirmation: {
-              select: {
-                firstmallGoodsConnectionId: true,
-              },
-            },
-            image: {
-              select: {
-                image: true,
-              },
-            },
-          },
-        },
-        liveShoppingVideo: {
-          select: {
-            youtubeUrl: true,
-          },
-        },
+        broadcaster: { select: broadcasterSelect },
+        goods: { select: goodsSelect },
+        liveShoppingVideo: { select: { youtubeUrl: true } },
       },
     });
-    return { productSearch, broadcasterSearch };
+    return this.searchResultPreprocessing({ productSearch, broadcasterSearch });
   }
 
-  async searchResultPreprocessing(keyword: SearchKeyword): Promise<SearchResult> {
-    const data = await this.search(keyword.keyword);
-
+  /** 검색 결과 전처리 함수 */
+  private async searchResultPreprocessing({
+    productSearch,
+    broadcasterSearch,
+  }: {
+    productSearch: ProductSearch[];
+    broadcasterSearch: BroadcasterSearch[];
+  }): Promise<SearchResult> {
     const goods = [];
     const broadcasters = [];
     const liveContents = [];
 
-    await data.productSearch.forEach((row) => {
-      const getCorrectLinkUrl = (): string => {
-        if (row.confirmation?.firstmallGoodsConnectionId) {
-          return `https://k-kmarket.com/goods/view?no=${row.confirmation.firstmallGoodsConnectionId}`;
-        }
-        return `${getKkshowWebHost()}/goods/${row.id}`;
-      };
-      if (row.LiveShopping.length !== 0) {
+    // 중복 방지 처리를 위한 Set 구성
+    const ID_SET = new Set<string>();
+    productSearch.forEach((_goods) => {
+      if (!ID_SET.has(`goods:${_goods.goods_name}`)) {
         goods.push({
-          title: row.goods_name,
-          linkUrl: getCorrectLinkUrl(),
-          imageUrl: row.image[0]?.image,
+          title: _goods.goods_name,
+          linkUrl: this.getGoodsLinkUrl(_goods),
+          imageUrl: _goods.image[0]?.image,
         });
+        ID_SET.add(`goods:${_goods.goods_name}`);
+      }
+      if (_goods.LiveShopping.length > 0) {
+        _goods.LiveShopping.forEach((liveShopping) => {
+          if (
+            liveShopping.broadcaster?.userNickname &&
+            !ID_SET.has(`bc:${liveShopping.broadcaster.userNickname}`)
+          ) {
+            broadcasters.push({
+              title: liveShopping.broadcaster.userNickname,
+              linkUrl: liveShopping.broadcaster.BroadcasterPromotionPage.url,
+              imageUrl: liveShopping.broadcaster.avatar,
+            });
+            ID_SET.add(`bc:${liveShopping.broadcaster.userNickname}`);
+          }
+          if (liveShopping.liveShoppingVideo && !ID_SET.has(`lsv:${_goods.goods_name}`)) {
+            liveContents.push({
+              title: _goods.goods_name,
+              linkUrl: liveShopping.liveShoppingVideo.youtubeUrl,
+              imageUrl: liveShopping.broadcaster.avatar,
+            });
+            ID_SET.add(`lsv:${_goods.goods_name}`);
+          }
+        });
+      }
+    });
+
+    broadcasterSearch.forEach(({ broadcaster, goods: _goods, liveShoppingVideo }) => {
+      if (!ID_SET.has(`goods:${_goods.goods_name}`)) {
+        goods.push({
+          title: _goods.goods_name,
+          linkUrl: this.getGoodsLinkUrl(_goods),
+          imageUrl: _goods.image[0]?.image,
+        });
+        ID_SET.add(`goods:${_goods.goods_name}`);
+      }
+
+      if (broadcaster?.userNickname && !ID_SET.has(`bc:${broadcaster.userNickname}`)) {
         broadcasters.push({
-          title: row.LiveShopping[0].broadcaster.userNickname,
-          linkUrl: row.LiveShopping[0].broadcaster.channels[0]?.url,
-          imageUrl: row.LiveShopping[0].broadcaster.avatar,
+          title: broadcaster?.userNickname,
+          linkUrl: broadcaster.BroadcasterPromotionPage?.url,
+          imageUrl: broadcaster.avatar,
         });
-
-        if (row.LiveShopping[0].liveShoppingVideo) {
-          liveContents.push({
-            title: row.goods_name,
-            linkUrl: row.LiveShopping[0].liveShoppingVideo.youtubeUrl,
-            imageUrl: row.LiveShopping[0].broadcaster.avatar,
-          });
-        }
-      } else {
-        goods.push({
-          title: row.goods_name,
-          linkUrl: getCorrectLinkUrl(),
-          imageUrl: row.image[0].image,
-        });
+        ID_SET.add(`bc:${broadcaster.userNickname}`);
       }
-    });
 
-    await data.broadcasterSearch.forEach((row) => {
-      goods.push({
-        title: row.goods.goods_name,
-        linkUrl: row.goods?.confirmation?.firstmallGoodsConnectionId
-          ? `https://k-kmarket.com/goods/view?no=${row.goods.confirmation.firstmallGoodsConnectionId}`
-          : `${getKkshowWebHost()}/goods/${row.goods.id}`,
-        imageUrl: row.goods.image[0].image,
-      });
-
-      broadcasters.push({
-        title: row.broadcaster.userNickname,
-        linkUrl: row.broadcaster.channels[0]?.url, // 향후 상품홍보페이지로 이동하도록 변경
-        imageUrl: row.broadcaster.avatar,
-      });
-
-      if (row.liveShoppingVideo) {
+      if (liveShoppingVideo && !ID_SET.has(`lsv:${_goods.goods_name}`)) {
         liveContents.push({
-          title: row.goods.goods_name,
-          linkUrl: row.liveShoppingVideo.youtubeUrl,
-          imageUrl: row.broadcaster.avatar,
+          title: _goods.goods_name,
+          linkUrl: liveShoppingVideo.youtubeUrl,
+          imageUrl: broadcaster.avatar,
         });
+        ID_SET.add(`lsv:${_goods.goods_name}`);
       }
     });
 
-    const uniqueGoods = goods.filter((row, idx, arr) => {
-      return (
-        arr.findIndex(
-          (item) => item.title === row.title && item.linkUrl === row.linkUrl,
-        ) === idx
-      );
-    });
-    const uniqueBroadcasters = broadcasters.filter((row, idx, arr) => {
-      return (
-        arr.findIndex(
-          (item) => item.title === row.title && item.linkUrl === row.linkUrl,
-        ) === idx
-      );
-    });
-    const uniqueLiveContents = liveContents.filter((row, idx, arr) => {
-      return (
-        arr.findIndex(
-          (item) => item.title === row.title && item.linkUrl === row.linkUrl,
-        ) === idx
-      );
-    });
-
-    return {
-      goods: uniqueGoods,
-      broadcasters: uniqueBroadcasters,
-      liveContents: uniqueLiveContents,
-    };
+    return { goods, broadcasters, liveContents };
   }
+
+  /**
+   * 올바른 상품상세 링크 URL을 반환합니다. (Firstmall 사용하던 때의 상품 데이터의 경우 firstmall 링크를 반환)
+   * @param goods 검수 정ㅈ보가 포함된 상품 정보
+   * @returns 올바른 상품상세 링크 URL
+   */
+  private getGoodsLinkUrl = (goods: {
+    id: number;
+    confirmation?: { firstmallGoodsConnectionId?: number };
+  }): string => {
+    if (goods.confirmation?.firstmallGoodsConnectionId) {
+      return `https://k-kmarket.com/goods/view?no=${goods.confirmation.firstmallGoodsConnectionId}`;
+    }
+    return `${getKkshowWebHost()}/goods/${goods.id}`;
+  };
 }

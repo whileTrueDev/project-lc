@@ -22,7 +22,7 @@ import {
 import { GoodsFormValues, GoodsImageDto } from '@project-lc/shared-types';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { uploadGoodsImageToS3 } from './GoodsRegistForm';
+import { uploadGoodsImageToS3 } from '@project-lc/utils-frontend';
 import { GoodsRegistPictureOrderChangeDialog } from './GoodsRegistPictureOrderChangeDialog';
 import { GoodsRegistPictureDialog } from './GoodsRegistPictureDialog';
 

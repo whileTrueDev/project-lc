@@ -191,7 +191,7 @@ async function createDummyGoods(
   seller: SellerAccountType,
   goods: DummyGoodsDataType,
 ): Promise<Goods> {
-  const { goods_name, summary, confirmation, contents } = goods;
+  const { goods_name, summary, confirmation, contents, searchKeyword } = goods;
   const sellerDefaultShippingGroup = seller.shippingGroups[0];
   const sellerDefaultCommonInfo = seller.goodsCommonInfo[0];
   const createdGoods = await prisma.goods.create({
@@ -213,6 +213,7 @@ async function createDummyGoods(
       },
       options: { create: [defaultOption, secondOption] },
       confirmation: { create: confirmation },
+      searchKeyword,
       contents,
       categories: { connect: { id: 1 } },
       informationNotice: {

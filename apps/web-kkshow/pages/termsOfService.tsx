@@ -1,5 +1,7 @@
+import { Container } from '@chakra-ui/react';
 import { Policy, PolicyCategory, PolicyTarget } from '@prisma/client';
-import PolicyWrapper from '@project-lc/components-shared/PolicyWrapper';
+import { HtmlStringBox } from '@project-lc/components-core/TermBox';
+import KkshowLayout from '@project-lc/components-web-kkshow/KkshowLayout';
 import { getPolicy, usePolicy } from '@project-lc/hooks';
 import {
   GetServerSideProps,
@@ -31,7 +33,13 @@ export function Termsofservice({
     },
     policy,
   );
-  return <PolicyWrapper appType={PolicyTarget.customer} content={data.content} />;
+  return (
+    <KkshowLayout>
+      <Container maxW="container.lg">
+        <HtmlStringBox htmlString={data.content} p={10} />
+      </Container>
+    </KkshowLayout>
+  );
 }
 
 export default Termsofservice;

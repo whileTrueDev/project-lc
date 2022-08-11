@@ -8,6 +8,7 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  Image,
   Input,
   List,
   ListIcon,
@@ -25,23 +26,16 @@ import {
   Stack,
   Text,
   useToast,
-  Image,
 } from '@chakra-ui/react';
-import { Return } from '@prisma/client';
-import { ExchangeReturnCancelRequestStatusBadge } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestStatusBadge';
 import { ExchangeReturnCancelRequestGoodsData } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestGoodsData';
+import { ExchangeReturnCancelRequestStatusBadge } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestStatusBadge';
 import { RelatedRefundData } from '@project-lc/components-shared/order/RelatedRefundData';
 import { useReturnDetail, useUpdateReturnMutation } from '@project-lc/hooks';
-import { ReturnDataWithImages } from '@project-lc/shared-types';
+import { OrderRetusnStatusForm, ReturnDataWithImages } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useForm } from 'react-hook-form';
 import { AiFillWarning } from 'react-icons/ai';
 import { RiErrorWarningFill } from 'react-icons/ri';
-
-interface OrderRetusnStatusForm {
-  status: Return['status'];
-  rejectReason?: Return['rejectReason'];
-}
 
 export interface OrderReturnStatusDialogProps {
   isOpen: boolean;

@@ -7,6 +7,7 @@ import {
   OrderItem,
   OrderItemOption,
   OrderPayment,
+  OrderShipping,
   Refund,
   Return,
   ReturnImage,
@@ -49,7 +50,7 @@ export type CustomerCouponLogWithCouponInfo = CustomerCouponLog & {
   customerCoupon: CustomerCoupon & { coupon: Coupon };
 };
 
-/** 관리자페이지에서 환불처리 위해 필요한 주문 데이터와 마일리지, 쿠폰사용로그 */
+/** 관리자페이지에서 환불처리 위해 필요한 주문 데이터와 마일리지, 쿠폰사용로그 등 정보 */
 export type OrderWithPaymentData = {
   id: Order['id'];
   orderCode: Order['orderCode'];
@@ -59,16 +60,23 @@ export type OrderWithPaymentData = {
   ordererName: Order['ordererName'];
   customerCouponLogs: CustomerCouponLogWithCouponInfo[];
   mileageLogs: CustomerMileageLog[];
+  shippings: OrderShipping[];
 };
 
 export type ReturnItemWithOriginOrderItemInfo = ReturnItem & {
-  orderItem: { id: OrderItem['id']; goods: { seller: { sellerShop: SellerShop } } };
+  orderItem: {
+    id: OrderItem['id'];
+    goods: { seller: { sellerShop: SellerShop } };
+    orderShippingId: OrderItem['orderShippingId'];
+  };
   orderItemOption: OrderItemOption;
 };
 
 export type AdminReturnData = Return & {
   order: OrderWithPaymentData;
   items: ReturnItemWithOriginOrderItemInfo[];
+  images: ReturnImage[];
+  refund: Refund | null;
 };
 /** 관리자페이지에서 환불처리 위해 필요한 교환요청(Return) 데이터와 기타 연관 정보 */
 export type AdminReturnRes = AdminReturnData[];
