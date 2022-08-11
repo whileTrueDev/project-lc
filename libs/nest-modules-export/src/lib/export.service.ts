@@ -132,7 +132,7 @@ export class ExportService {
 
   /** 연결된 주문 상태변경
    */
-  async updateOrderStatus(dto: CreateKkshowExportDto): Promise<Order> {
+  async updateOrderStatus(dto: Pick<CreateKkshowExportDto, 'orderId'>): Promise<Order> {
     return this.orderService.updateOrderStepByOrderItemOptionsSteps({
       orderId: dto.orderId,
     });

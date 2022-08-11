@@ -1114,6 +1114,7 @@ export class OrderService {
         data: {
           buyConfirmDate: new Date(),
           buyConfirmSubject,
+          status: 'purchaseConfirmed',
         },
       });
     }
@@ -1133,6 +1134,11 @@ export class OrderService {
     await this.prisma.orderItemOption.updateMany({
       where: { id: { in: buyConfirmTargetIds } },
       data: { step: 'purchaseConfirmed' },
+    });
+    // 해당 주문상품에 연결된 출고상품
+    await this.prisma.exportItem.updateMany({
+      where: { id: { in: batchExportedItemsWithOrderOptionData.map((x) => x.id) } },
+      data: { status: 'purchaseConfirmed' },
     });
 
     // * ---- 주문상품옵션 상태 변경 이후 주문상태 업데이트 ----

@@ -36,7 +36,7 @@ import {
 import { OrderService } from './order.service';
 
 @UseInterceptors(HttpCacheInterceptor)
-@CacheClearKeys('order')
+@CacheClearKeys('order', 'export')
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}

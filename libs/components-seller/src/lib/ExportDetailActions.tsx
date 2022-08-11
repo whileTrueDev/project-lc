@@ -21,7 +21,7 @@ export function ExportDetailActions({
     <>
       {['exportDone', 'partialExportDone'].includes(exportData.status) ? (
         <>
-          <Button onClick={shippingStartDialog.onOpen} colorScheme="purple">
+          <Button size="sm" onClick={shippingStartDialog.onOpen} colorScheme="purple">
             배송중처리
           </Button>
           <ExportShippingStartConfirmDialog
@@ -34,7 +34,7 @@ export function ExportDetailActions({
 
       {['shipping', 'partialShipping'].includes(exportData.status) ? (
         <>
-          <Button onClick={shippingDoneDialog.onOpen} colorScheme="messenger">
+          <Button size="sm" onClick={shippingDoneDialog.onOpen} colorScheme="messenger">
             배송완료처리
           </Button>
           <ExportShippinDoneConfirmDialog
