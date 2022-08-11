@@ -64,7 +64,7 @@ export function ExportBundleDialog({
   const isAbleToBundle = useMemo(() => {
     const targetOrders = orders.filter((order) => {
       return order.shippings?.some((shipp) => {
-        return selectedOrderShippings.includes(shipp.id);
+        return !!selectedOrderShippings.find((x) => x.shippingId === shipp.id);
       });
     });
 

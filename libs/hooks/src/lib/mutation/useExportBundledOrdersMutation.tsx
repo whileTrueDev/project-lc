@@ -19,6 +19,8 @@ export const useExportBundledOrdersMutation = (): UseMutationResult<
           queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
           queryClient.invalidateQueries('SellerOrderList');
           queryClient.invalidateQueries('OrderDetail');
+          queryClient.invalidateQueries('getAdminOrder');
+          queryClient.invalidateQueries('AdminOrderList');
         }
       },
     },
