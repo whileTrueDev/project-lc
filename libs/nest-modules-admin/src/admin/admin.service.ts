@@ -238,6 +238,23 @@ export class AdminService {
           },
         },
       });
+      // 라이브쇼핑 특가정보를 변경하는 경우
+      if (dto.specialPrices) {
+        await Promise.all(
+          dto.specialPrices.map((sp) => {
+            return transac.liveShoppingSpecialPrice.update({
+              where: { id: sp.id },
+              data: {
+                specialPrice: sp.specialPrice,
+                goodsId: sp.goodsId,
+                goodsOptionId: sp.goodsOptionId,
+                discountType: sp.discountType,
+                discountRate: sp.discountRate,
+              },
+            });
+          }),
+        );
+      }
       // 취소상태로 변경하는 경우
       if (dto.progress === 'canceled') {
         // 카트상품 channel 변경

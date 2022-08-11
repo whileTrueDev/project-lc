@@ -22,9 +22,8 @@ export class LiveShoppingSpecialPriceRegistDto {
 
 /** 라이브쇼핑 특가 수정 dto */
 export class LiveShoppingSpecialPriceUpdateDto {
-  @IsOptional()
   @IsNumber()
-  id?: number;
+  id: number;
 
   @IsOptional()
   @IsNumber()
