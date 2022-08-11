@@ -766,7 +766,7 @@ model LiveShoppingMessageSetting {
   fanNick          String     @default("")
 
   liveShoppingId Int          @unique
-  liveShopping   LiveShopping @relation(fields: [liveShoppingId], references: [id])
+  liveShopping   LiveShopping @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
 }
 
 // 라이브 커머스 랭킹 테이블
