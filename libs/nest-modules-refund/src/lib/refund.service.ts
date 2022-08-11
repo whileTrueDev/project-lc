@@ -4,7 +4,6 @@ import { CipherService } from '@project-lc/nest-modules-cipher';
 import { PaymentService } from '@project-lc/nest-modules-payment';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
-  AdminRefundRes,
   banks,
   CreateRefundDto,
   CreateRefundRes,
@@ -255,30 +254,5 @@ export class RefundService {
       virtualAccount,
       transfer,
     };
-  }
-
-  /** 관리자 반품요청에 의해 처리한 환불 내역 조회 */
-  async getAdminRefundList(): Promise<AdminRefundRes> {
-    const data = await this.prisma.refund.findMany({
-      where: { return: { some: {} } },
-      include: {
-        return: { include: { items: { include: { orderItemOption: true } } } },
-        order: {
-          select: {
-            id: true,
-            orderCode: true,
-            payment: true,
-            ordererName: true,
-          },
-        },
-      },
-    });
-
-    return data.map((d) => {
-      const { refundAccount } = d;
-      return Object.assign(d, {
-        refundAccount: this.cipherService.getDecryptedText(refundAccount),
-      });
-    });
   }
 }

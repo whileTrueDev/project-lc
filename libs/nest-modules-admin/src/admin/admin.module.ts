@@ -83,7 +83,6 @@ export class AdminModule {
     LiveShoppingModule.withoutControllers(),
     OrderModule.withoutControllers(),
     ReturnModule.withoutControllers(),
-    RefundModule.withoutControllers(),
     CipherModule,
   ];
 

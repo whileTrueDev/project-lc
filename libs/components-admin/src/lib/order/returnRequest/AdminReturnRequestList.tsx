@@ -1,23 +1,122 @@
 import {
-  Stack,
-  Text,
-  Box,
-  Spinner,
-  ModalBody,
-  useDisclosure,
   Modal,
+  ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Spinner,
+  Stack,
+  Text,
+  useDisclosure,
+  Button,
+  useBoolean,
+  Collapse,
 } from '@chakra-ui/react';
-import { GridColumns, GridRowParams } from '@material-ui/data-grid';
+import {
+  DataGridProps,
+  GridColumns,
+  GridRowData,
+  GridRowParams,
+} from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useAdminReturnList } from '@project-lc/hooks';
-import { AdminReturnData } from '@project-lc/shared-types';
+import { AdminReturnData, AdminReturnRes } from '@project-lc/shared-types';
+import { useAdminReturnFilterStore } from '@project-lc/stores';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import AdminReturnRequestDetail from './AdminReturnRequestDetail';
+
+/** 판매자에 의해 승인된 소비자의 환불요청 목록
+ * 해당 요청, 주문 내용 확인 가능 */
+export function AdminReturnRequestList(): JSX.Element {
+  const dialog = useDisclosure();
+  const filterStore = useAdminReturnFilterStore();
+  const { data, isLoading } = useAdminReturnList({
+    searchDateType: filterStore.searchDateType,
+    searchStartDate: filterStore.searchStartDate,
+    searchEndDate: filterStore.searchEndDate,
+  });
+
+  const [selectedRequest, setSelectedRequest] = useState<AdminReturnData | null>(null);
+
+  const handleRowClick = (param: GridRowParams): void => {
+    setSelectedRequest(param.row as AdminReturnData);
+    dialog.onOpen();
+  };
+
+  const handleClose = (): void => {
+    dialog.onClose();
+    setSelectedRequest(null);
+  };
+
+  const {
+    notConfirmed,
+    confirmed,
+    finished,
+  }: {
+    notConfirmed: AdminReturnRes;
+    confirmed: AdminReturnRes;
+    finished: AdminReturnRes;
+  } = useMemo(() => {
+    if (!data) {
+      return { notConfirmed: [], confirmed: [], finished: [] };
+    }
+    return {
+      // 요청됨, 거절됨 목록
+      notConfirmed: data.filter((d) => ['requested', 'canceled'].includes(d.status)),
+      // 처리중(승인됨) 목록
+      confirmed: data.filter((d) => d.status === 'processing'),
+      // 환불처리 완료됨(관리자가 환불처리 함) 목록
+      finished: data.filter((d) => d.status === 'complete'),
+    };
+  }, [data]);
+
+  if (isLoading) return <Spinner />;
+  if (!data) return <Text>환불요청이 없습니다</Text>;
+  return (
+    <Stack spacing={10}>
+      {/* 미승인 목록(요청됨, 거절됨) */}
+      <AdminReturnListComponent
+        title="미승인 목록(요청됨, 거절됨)"
+        rows={notConfirmed}
+        onRowClick={handleRowClick}
+      />
+
+      {/* 승인됨 */}
+      <AdminReturnListComponent
+        title="판매자가 승인한 소비자 환불요청 목록(환불처리 해야 할 목록)"
+        rows={confirmed}
+        onRowClick={handleRowClick}
+      />
+
+      {/* 완료됨(환불완료) */}
+      <AdminReturnListComponent
+        title="완료됨(관리자가 환불 처리 완료)"
+        rows={finished}
+        onRowClick={handleRowClick}
+      />
+
+      <Modal isOpen={dialog.isOpen} onClose={handleClose} size="5xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>환불처리</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <AdminReturnRequestDetail
+              data={selectedRequest}
+              onSubmit={handleClose}
+              onCancel={handleClose}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </Stack>
+  );
+}
+
+export default AdminReturnRequestList;
 
 const columns: GridColumns = [
   {
@@ -50,7 +149,7 @@ const columns: GridColumns = [
         case 'requested':
           return '요청됨';
         case 'processing':
-          return '처리중(판매자가 환불 승인함)';
+          return '처리중(승인됨)';
         case 'canceled':
           return '거절됨';
         case 'complete':
@@ -69,67 +168,69 @@ const columns: GridColumns = [
     },
   },
   {
-    field: 'reason',
-    headerName: '사유',
+    field: 'refundAmount',
+    headerName: '환불액',
     minWidth: 200,
+    renderCell: ({ row }: GridRowData) => (
+      <Text>
+        {row?.refund?.refundAmount
+          ? `${getLocaleNumber(row?.refund?.refundAmount)}원`
+          : ''}
+      </Text>
+    ),
+  },
+  {
+    field: 'completeDate',
+    headerName: '완료일시',
+    minWidth: 200,
+    valueFormatter: (params) => {
+      if (params.value) {
+        return dayjs(params.value as Date).format('YYYY/MM/DD HH:mm');
+      }
+      return '';
+    },
   },
 ];
 
-/** 판매자에 의해 승인된 소비자의 환불요청 목록
- * 해당 요청, 주문 내용 확인 가능 */
-export function AdminReturnRequestList(): JSX.Element {
-  const dialog = useDisclosure();
-  const { data, isLoading } = useAdminReturnList();
-
-  const [selectedRequest, setSelectedRequest] = useState<AdminReturnData | null>(null);
-
-  const handleRowClick = (param: GridRowParams): void => {
-    setSelectedRequest(param.row as AdminReturnData);
-    dialog.onOpen();
-  };
-
-  const handleClose = (): void => {
-    dialog.onClose();
-    setSelectedRequest(null);
-  };
-
-  if (isLoading) return <Spinner />;
-  if (!data) return <Text>환불요청이 없습니다</Text>;
+/** 환불요청 목록 표시 컴포넌트 */
+function AdminReturnListComponent({
+  title,
+  rows,
+  onRowClick,
+}: {
+  title: string;
+  rows: DataGridProps['rows'];
+  onRowClick: DataGridProps['onRowClick'];
+}): JSX.Element {
+  const [isOpen, { toggle }] = useBoolean(true);
   return (
     <Stack>
-      <Text>판매자가 승인한 소비자 환불요청 목록(환불처리 해야 할 목록) </Text>
-      <ChakraDataGrid
-        borderWidth={0}
-        hideFooter
-        headerHeight={50}
-        minH={300}
-        density="compact"
-        rows={data}
-        columns={columns}
-        rowCount={5}
-        rowsPerPageOptions={[25, 50]}
-        disableColumnMenu
-        disableColumnFilter
-        disableSelectionOnClick
-        onRowClick={handleRowClick}
-      />
+      <Stack direction="row" alignItems="center" justifyContent="center">
+        <Text fontWeight="bold" fontSize="lg">
+          {title}
+        </Text>
+        <Button onClick={toggle} size="xs">
+          {isOpen ? '닫기' : '열기'}
+        </Button>
+      </Stack>
 
-      <Modal isOpen={dialog.isOpen} onClose={handleClose} size="3xl">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>환불처리</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <AdminReturnRequestDetail
-              data={selectedRequest}
-              onSubmit={handleClose}
-              onCancel={handleClose}
-            />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <Collapse in={isOpen} animateOpacity>
+        <ChakraDataGrid
+          borderWidth={0}
+          hideFooter
+          headerHeight={50}
+          autoHeight
+          density="compact"
+          rows={rows}
+          columns={columns}
+          rowCount={5}
+          rowsPerPageOptions={[25, 50]}
+          disableColumnMenu
+          disableColumnFilter
+          disableSelectionOnClick
+          onRowClick={onRowClick}
+        />
+      </Collapse>
     </Stack>
   );
 }
-
-export default AdminReturnRequestList;
