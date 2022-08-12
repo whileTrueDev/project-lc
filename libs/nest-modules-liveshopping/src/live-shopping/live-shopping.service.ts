@@ -143,6 +143,7 @@ export class LiveShoppingService {
             },
           },
         },
+        liveShoppingSpecialPrices: true,
       },
     });
   }

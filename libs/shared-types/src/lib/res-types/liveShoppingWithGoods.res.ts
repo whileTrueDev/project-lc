@@ -9,6 +9,7 @@ import {
   LiveShopping,
   LiveShoppingImage,
   LiveShoppingMessageSetting,
+  LiveShoppingSpecialPrice,
   OrderItemOption,
   SellerShop,
 } from '@prisma/client';
@@ -39,6 +40,7 @@ export interface LiveShoppingWithGoods extends LiveShopping {
       options: Pick<OrderItemOption, 'discountPrice' | 'quantity'>[];
     };
   }[];
+  liveShoppingSpecialPrices?: LiveShoppingSpecialPrice[];
 }
 
 export type LiveShoppingOutline = Pick<
