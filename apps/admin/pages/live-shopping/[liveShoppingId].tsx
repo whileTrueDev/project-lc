@@ -378,6 +378,34 @@ export function LiveShoppingDetail(): JSX.Element {
               </Text>
             </Stack>
 
+            <Divider />
+
+            <Box>
+              <Text mb={4}>라이브쇼핑 특가</Text>
+              <Stack>
+                {liveShopping[0].goods.options.map((opt) => {
+                  const specialPriceData =
+                    liveShopping[0].liveShoppingSpecialPrices?.find(
+                      (sp) => sp.goodsOptionId === opt.id,
+                    );
+                  return (
+                    <Stack direction="row" key={opt.id}>
+                      <Text as="span">
+                        {opt.option_title} : {opt.option1}
+                      </Text>
+                      {specialPriceData && (
+                        <Text as="span" fontWeight="bold" color="blue">
+                          {specialPriceData?.specialPrice} 원
+                        </Text>
+                      )}
+                    </Stack>
+                  );
+                })}
+              </Stack>
+            </Box>
+
+            <Divider />
+
             <Box>
               <Text>요청사항</Text>
               <Textarea
