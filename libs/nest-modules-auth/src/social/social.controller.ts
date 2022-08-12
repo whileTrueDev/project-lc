@@ -12,18 +12,17 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { SocialAccounts, UserType, USER_TYPE_KEY } from '@project-lc/shared-types';
-import { getBroadcasterWebHost, getWebHost, getCustomerWebHost } from '@project-lc/utils';
+import { getBroadcasterWebHost, getCustomerWebHost, getWebHost } from '@project-lc/utils';
 import { getUserTypeFromRequest } from '@project-lc/utils-backend';
 import { Request, Response } from 'express';
-import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
-import { join } from 'path';
 import {
   LoginHistoryService,
   LoginMethods,
 } from '../auth/login-history/login-history.service';
-import { SocialService } from './social.service';
 import { SocialLoginExceptionFilter } from './social-login-exception.filter';
+import { SocialService } from './social.service';
 
 @Controller('social')
 @UseFilters(SocialLoginExceptionFilter)
@@ -127,7 +126,7 @@ export class SocialController {
 
     res.clearCookie(USER_TYPE_KEY);
     if (userType === 'customer') return res.redirect(hostUrl);
-    return res.redirect(join(hostUrl, 'mypage'));
+    return res.redirect(`${hostUrl}/mypage`);
   }
 
   /** 소셜로그인 userType에 따른 마이페이지 주소 리턴 */
