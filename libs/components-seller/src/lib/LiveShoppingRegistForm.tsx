@@ -93,7 +93,7 @@ export function LiveShoppingRegistForm(): JSX.Element {
     name: 'specialPrices',
   });
 
-  const { handleSubmit, setValue } = methods;
+  const { handleSubmit, setValue, watch } = methods;
 
   const onSuccess = (): void => {
     toast({
@@ -112,41 +112,40 @@ export function LiveShoppingRegistForm(): JSX.Element {
   };
 
   const regist = async (data: LiveShoppingInput): Promise<void> => {
-    console.log(data);
+    const { firstNumber, secondNumber, thirdNumber, useContact, email } = data;
+    const phoneNumber = `${firstNumber}${secondNumber}${thirdNumber}`;
+    const dto: LiveShoppingRegistDTO = {
+      requests: '',
+      goodsId: 0,
+      contactId: 0,
+      desiredCommission: data.desiredCommission,
+      desiredPeriod: data.desiredPeriod,
+      specialPrices: data.specialPrices,
+    };
 
-    // const { firstNumber, secondNumber, thirdNumber, useContact, email } = data;
-    // const phoneNumber = `${firstNumber}${secondNumber}${thirdNumber}`;
-    // const dto: LiveShoppingRegistDTO = {
-    //   requests: '',
-    //   goodsId: 0,
-    //   contactId: 0,
-    //   desiredCommission: data.desiredCommission,
-    //   desiredPeriod: data.desiredPeriod,
-    // };
+    if (contacts.data) dto.contactId = contacts.data.id;
+    dto.requests = data.requests;
 
-    // if (contacts.data) dto.contactId = contacts.data.id;
-    // dto.requests = data.requests;
-
-    // const goodsId = watch('goods_id');
-    // if (!goodsId) {
-    //   toast({ title: '상품을 올바르게 선택해주세요.', status: 'error' });
-    //   return;
-    // }
-    // dto.goodsId = goodsId;
-    // if (useContact === 'old') {
-    //   mutateAsync(dto).then(onSuccess).catch(onFail);
-    // } else {
-    //   await createSellerContacts({
-    //     email,
-    //     phoneNumber,
-    //     isDefault: setDefault,
-    //   })
-    //     .then((value) => {
-    //       dto.contactId = Number(Object.values(value));
-    //     })
-    //     .catch(onFail);
-    //   mutateAsync(dto).then(onSuccess).catch(onFail);
-    // }
+    const goodsId = watch('goods_id');
+    if (!goodsId) {
+      toast({ title: '상품을 올바르게 선택해주세요.', status: 'error' });
+      return;
+    }
+    dto.goodsId = goodsId;
+    if (useContact === 'old') {
+      mutateAsync(dto).then(onSuccess).catch(onFail);
+    } else {
+      await createSellerContacts({
+        email,
+        phoneNumber,
+        isDefault: setDefault,
+      })
+        .then((value) => {
+          dto.contactId = Number(Object.values(value));
+        })
+        .catch(onFail);
+      mutateAsync(dto).then(onSuccess).catch(onFail);
+    }
   };
 
   useEffect(() => {

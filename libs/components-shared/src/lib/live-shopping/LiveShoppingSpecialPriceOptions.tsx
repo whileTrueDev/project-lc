@@ -1,11 +1,11 @@
-import { Stack, Text, Input, FormControl, FormErrorMessage } from '@chakra-ui/react';
+import { FormControl, FormErrorMessage, Input, Stack, Text } from '@chakra-ui/react';
 import { GoodsOptions } from '@prisma/client';
 import {
   LiveShoppingSpecialPriceDiscountType,
   LiveShoppingSpecialPricesValue,
 } from '@project-lc/shared-types';
 import { useEffect } from 'react';
-import { useFormContext, useFieldArray } from 'react-hook-form';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 
 export interface LiveShoppingSpecialPriceOptionsProps {
   goodsOptions: GoodsOptions[];
@@ -98,16 +98,28 @@ export function LiveShoppingSpecialPriceOptions({
         );
         if (!originGoodsOption) return null;
         return (
-          <Stack direction="row" key={field.id}>
-            {originGoodsOption.option_title && originGoodsOption.option1 && (
-              <Text>
-                {originGoodsOption.option_title} : {originGoodsOption.option1}
-              </Text>
-            )}
+          <Stack
+            key={field.id}
+            flexWrap="wrap"
+            direction="row"
+            alignItems="center"
+            height={10}
+          >
+            <Stack direction="row" mr={1} flexGrow={0} flexShrink={0} width="250px">
+              {originGoodsOption.option_title && originGoodsOption.option1 && (
+                <Text>
+                  {originGoodsOption.option_title} : {originGoodsOption.option1}
+                </Text>
+              )}
+            </Stack>
 
-            <Text>정가 : {originGoodsOption.consumer_price}</Text>
-            <Stack direction="row">
-              <Text>라이브쇼핑 특가 :</Text>
+            <Stack direction="row" mb={1} flexGrow={0} flexShrink={0} width="200px">
+              <Text minWidth="40px">정가 : </Text>
+              <Text>{originGoodsOption.consumer_price}</Text>
+            </Stack>
+
+            <Stack direction="row" mb={1} flexGrow={1} alignItems="center">
+              <Text minWidth="40px">라이브쇼핑 특가 :</Text>
               {discountType === 'P' && <Text>{field.specialPrice}</Text>}
               {discountType === 'W' && (
                 <FormControl
@@ -115,6 +127,7 @@ export function LiveShoppingSpecialPriceOptions({
                   width="auto"
                 >
                   <Input
+                    size="sm"
                     type="number"
                     {...register(`specialPrices.${index}.specialPrice`, {
                       valueAsNumber: true,

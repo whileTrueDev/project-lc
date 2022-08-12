@@ -20,7 +20,7 @@ export function LiveShoppingSpecialPriceDiscountTypeAndRate(): JSX.Element {
     watch,
   } = useFormContext<LiveShoppingSpecialPriceDiscountType>();
   return (
-    <Stack direction="row">
+    <Stack direction="row" height={10}>
       <RadioGroup
         onChange={(value) => {
           setValue('discountType', value as AmountUnit);
