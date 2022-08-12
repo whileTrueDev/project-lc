@@ -22,10 +22,7 @@ import {
 } from 'class-validator';
 import { LiveShoppingInput } from '../..';
 import { LIVE_SHOPPING_PROGRESS } from '../constants/liveShoppingProgress';
-import {
-  LiveShoppingSpecialPriceRegistDto,
-  LiveShoppingSpecialPriceUpdateDto,
-} from './liveShoppingSpecialPrice.dto';
+import { LiveShoppingSpecialPriceRegistDto } from './liveShoppingSpecialPrice.dto';
 
 /** 라이브쇼핑 메시지 설정 업데이트 DTO */
 export class LiveShoppingMessageSettingUpdateDTO {
@@ -108,11 +105,6 @@ export class LiveShoppingUpdateDTO {
   @IsObject()
   @Type(() => LiveShoppingMessageSettingUpdateDTO)
   messageSetting?: LiveShoppingMessageSettingUpdateDTO;
-
-  @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => LiveShoppingSpecialPriceUpdateDto)
-  specialPrices?: LiveShoppingSpecialPriceUpdateDto[];
 }
 
 /** 라이브쇼핑 등록 dto */
