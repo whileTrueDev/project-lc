@@ -43,6 +43,11 @@ export interface LiveShoppingWithGoods extends LiveShopping {
   liveShoppingSpecialPrices?: LiveShoppingSpecialPrice[];
 }
 
+export type SpecialPriceItem = Pick<
+  LiveShoppingSpecialPrice,
+  'id' | 'specialPrice' | 'goodsId' | 'goodsOptionId'
+>;
+
 export type LiveShoppingOutline = Pick<
   LiveShopping,
   | 'id'
@@ -61,4 +66,6 @@ export type LiveShoppingOutline = Pick<
     image: GoodsImages[];
     options: GoodsOptions[];
   };
+} & {
+  liveShoppingSpecialPrices: SpecialPriceItem[];
 };

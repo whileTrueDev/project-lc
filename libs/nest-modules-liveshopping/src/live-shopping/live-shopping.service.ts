@@ -180,6 +180,9 @@ export class LiveShoppingService {
         progress: true,
         images: true,
         liveShoppingName: true,
+        liveShoppingSpecialPrices: {
+          select: { id: true, specialPrice: true, goodsId: true, goodsOptionId: true },
+        },
       },
     });
 

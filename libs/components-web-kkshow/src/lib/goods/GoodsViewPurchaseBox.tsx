@@ -48,6 +48,7 @@ import {
   getLiveShoppingIsNowLive,
   GoodsByIdRes,
   GoodsRelatedBroadcaster,
+  SpecialPriceItem,
 } from '@project-lc/shared-types';
 import { useGoodsViewStore, useKkshowOrderStore } from '@project-lc/stores';
 import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
@@ -55,7 +56,97 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GoGift } from 'react-icons/go';
 import shallow from 'zustand/shallow';
+
 import OptionQuantity from '../OptionQuantity';
+
+export function findMatchingSpecialPriceByGoodsOptionId({
+  specialPriceList,
+  goodsOptionId,
+}: {
+  specialPriceList: SpecialPriceItem[];
+  goodsOptionId: number;
+}): number | null {
+  const matching = specialPriceList.find((sp) => sp.goodsOptionId === goodsOptionId);
+  if (!matching) return null;
+  return Number(matching.specialPrice);
+}
+
+/** 후원방송인 선택시, 해당 방송인이 현재 진행중인 라이브쇼핑의 특가가격정보를 리턴 */
+export function useNowOnLiveSpecialPriceOptionList(goods: GoodsByIdRes): {
+  goodsOptionsWithSpecialPrice: (GoodsByIdRes['options'][number] & {
+    specialPrice?: number;
+  })[];
+} {
+  const selectedBc = useGoodsViewStore((s) => s.selectedBc);
+  const selectedOpts = useGoodsViewStore((s) => s.selectedOpts);
+  const replaceSelectedOpts = useGoodsViewStore((s) => s.replaceSelectedOpts);
+
+  // 현재상품 & 선택된 방송인이 현재 진행중인 라이브쇼핑(목록형태로 리턴됨. 동일 방송인이 동시에 같은 상품을 라이브방송하지는 않으므로 첫번째 값을 사용함)
+  const nowOnliveLsListBySelectedBc = useLiveShoppingNowOnLive({
+    goodsId: goods.id,
+    broadcasterId: selectedBc?.id,
+  });
+
+  // 선택된 방송인이 진행중인 라이브쇼핑 특가 옵션가격들
+  const specialPriceList = useMemo(() => {
+    if (
+      selectedBc &&
+      nowOnliveLsListBySelectedBc.data &&
+      nowOnliveLsListBySelectedBc.data[0]
+    ) {
+      return nowOnliveLsListBySelectedBc.data[0].liveShoppingSpecialPrices;
+    }
+    return undefined;
+  }, [nowOnliveLsListBySelectedBc.data, selectedBc]);
+
+  // 방송인 변경 && 라이브쇼핑 특가 정보 변경시 선택된 옵션의 가격 수정
+  useEffect(() => {
+    // 선택된 방송인이 없거나, 라이브쇼핑 특가 정보가 없다면 => 선택된 옵션의 특가정보를 삭제한다
+    if (!selectedBc || !specialPriceList) {
+      replaceSelectedOpts(
+        selectedOpts.map((prevOpt) => {
+          const { specialPrice, ...restOpt } = prevOpt;
+          return restOpt;
+        }),
+      );
+    }
+    // 라이브쇼핑 특가 정보가 있으면 선택된 옵션에 특가정보를 추가한다
+    if (specialPriceList) {
+      replaceSelectedOpts(
+        selectedOpts.map((prevOpt) => {
+          const specialPriceData = specialPriceList.find(
+            (sp) => sp.goodsOptionId === prevOpt.id,
+          );
+          return {
+            ...prevOpt,
+            specialPrice: specialPriceData?.specialPrice
+              ? Number(specialPriceData?.specialPrice)
+              : undefined,
+          };
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBc, specialPriceList]);
+
+  const goodsOptions: (GoodsByIdRes['options'][number] & { specialPrice?: number })[] =
+    useMemo(() => {
+      // 특가정보가 없으면 상품옵션 그대로 표시
+      if (!specialPriceList || !specialPriceList.length) return goods.options;
+      // 특가정보가 있으면 특가정보 추가
+      return goods.options.map((opt) => {
+        const matchingSpecialPrice = findMatchingSpecialPriceByGoodsOptionId({
+          specialPriceList,
+          goodsOptionId: opt.id,
+        });
+        if (matchingSpecialPrice) return { ...opt, specialPrice: matchingSpecialPrice };
+        return opt;
+      });
+    }, [goods.options, specialPriceList]);
+  return {
+    goodsOptionsWithSpecialPrice: goodsOptions,
+  };
+}
 
 interface GoodsViewPurchaseBoxProps {
   goods: GoodsByIdRes;
@@ -72,6 +163,10 @@ export function GoodsViewPurchaseBox({
   const handleDecreaseOptQuantity = useGoodsViewStore((s) => s.handleDecreaseOptQuantity);
   const handleIncreaseOptQuantity = useGoodsViewStore((s) => s.handleIncreaseOptQuantity);
   const handleRemoveOpt = useGoodsViewStore((s) => s.handleRemoveOpt);
+
+  // 드롭다운 select에 표시될 옵션목록 데이터 (라이브쇼핑 특가정보가 있는경우 specialPrice 값을 가짐)
+  const { goodsOptionsWithSpecialPrice: goodsOptions } =
+    useNowOnLiveSpecialPriceOptionList(goods);
 
   // 기본 옵션 1개만 존재하는 상품 인지 판단
   const isOnlyDefaultOption = useMemo(
@@ -99,20 +194,33 @@ export function GoodsViewPurchaseBox({
               size="sm"
               placeholder="상품 옵션을 선택해주세요."
               onChange={(e): void => {
-                const targetopt = goods.options.find(
+                const targetopt = goodsOptions.find(
                   (o) => o.id === Number(e.target.value),
                 );
                 if (!targetopt) return;
+
                 handleSelectOpt({ ...targetopt, quantity: 1 }, () => {
                   toast({ title: '이미 선택된 옵션입니다.', status: 'warning' });
                 });
               }}
             >
-              {goods.options.map((opt) => (
-                <option key={opt.id} value={opt.id}>
-                  {opt.option_title}: {opt.option1} ({opt.price})
-                </option>
-              ))}
+              {/* <option> 태그 내에 다른 태그를 넣을 수 없다  */}
+              {goodsOptions.map((opt) => {
+                // 특가없으면 옵션 가격 그대로 표시
+                if (!opt.specialPrice) {
+                  return (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.option_title}: {opt.option1} ({opt.price})
+                    </option>
+                  );
+                }
+                // 특가 있으면 원개 옵션가격 대신 라이브쇼핑 특가 표시
+                return (
+                  <option key={opt.id} value={opt.id}>
+                    {opt.option_title}: {opt.option1} ({opt.specialPrice})
+                  </option>
+                );
+              })}
             </Select>
           </GridItem>
         </>
@@ -391,7 +499,15 @@ function GoodsViewButtonSet({
       (prev, curr) => {
         let { quantity, price } = prev;
         if (curr.quantity) quantity += curr.quantity;
-        if (curr.price) price += Number(curr.price) * curr.quantity;
+
+        // 라이브쇼핑중인 방송인 선택하여 라이브특가 정보가 있는 경우 - 특가로 계산
+        if (curr.specialPrice) {
+          price += curr.specialPrice * curr.quantity;
+        } else if (curr.price) {
+          // 특가정보 없는경우 - 기존 옵션의 가격으로 계산
+          price += Number(curr.price) * curr.quantity;
+        }
+
         return { quantity, price };
       },
       { quantity: 0, price: 0 },
