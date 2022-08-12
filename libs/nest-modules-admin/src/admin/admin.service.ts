@@ -16,6 +16,7 @@ import {
   GoodsRejectionDto,
   LiveShoppingUpdateDTO,
   LiveShoppingImageDto,
+  LiveShoppingSpecialPriceUpdateDto,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -238,23 +239,7 @@ export class AdminService {
           },
         },
       });
-      // 라이브쇼핑 특가정보를 변경하는 경우
-      if (dto.specialPrices) {
-        await Promise.all(
-          dto.specialPrices.map((sp) => {
-            return transac.liveShoppingSpecialPrice.update({
-              where: { id: sp.id },
-              data: {
-                specialPrice: sp.specialPrice,
-                goodsId: sp.goodsId,
-                goodsOptionId: sp.goodsOptionId,
-                discountType: sp.discountType,
-                discountRate: sp.discountRate,
-              },
-            });
-          }),
-        );
-      }
+
       // 취소상태로 변경하는 경우
       if (dto.progress === 'canceled') {
         // 카트상품 channel 변경
@@ -350,6 +335,20 @@ export class AdminService {
       data: { liveShoppingVideo: { delete: true } },
     });
     if (!videoUrl) throw new InternalServerErrorException(`비디오 삭제 실패`);
+    return true;
+  }
+
+  /** 라이브쇼핑 특가정보 수정 */
+  public async updateLiveShoppingSpecialPrice({
+    id,
+    specialPrice,
+  }: { id: number } & LiveShoppingSpecialPriceUpdateDto): Promise<boolean> {
+    await this.prisma.liveShoppingSpecialPrice.update({
+      where: { id },
+      data: {
+        specialPrice,
+      },
+    });
     return true;
   }
 

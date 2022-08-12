@@ -83,6 +83,7 @@ import {
   AdminReturnRes,
   AdminRefundRes,
   LiveShoppingWithGoods,
+  LiveShoppingSpecialPriceUpdateDto,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
@@ -259,6 +260,18 @@ export class AdminController {
     @Query(new ValidationPipe({ transform: true })) dto: FindLiveShoppingDto,
   ): Promise<LiveShoppingWithGoods[]> {
     return this.liveShoppingService.findLiveShoppings(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch('/live-shopping/special-price/:specialPriceId')
+  async updateLiveShoppingSpecialPriceData(
+    @Param('specialPriceId', ParseIntPipe) specialPriceId: number,
+    @Body() updateDto: LiveShoppingSpecialPriceUpdateDto,
+  ): Promise<boolean> {
+    return this.adminService.updateLiveShoppingSpecialPrice({
+      id: specialPriceId,
+      ...updateDto,
+    });
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
