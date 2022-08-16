@@ -647,7 +647,10 @@ function GoodsViewButtonSet({
               name: o.option_title,
               value: o.option1,
               normalPrice: Number(o.consumer_price),
-              discountPrice: Number(o.price),
+              // 진행중인 라이브쇼핑 존재 && 라이브쇼핑 특가 존재하는 경우 특가로 저장
+              discountPrice: Number(
+                isNowLive && o.specialPrice ? Number(o.specialPrice) : o.price,
+              ),
               weight: o.weight,
             })),
             shippingGroupId: goods.shippingGroupId || 1,
@@ -694,6 +697,7 @@ function GoodsViewButtonSet({
       supportMessage,
       customer?.nickname,
       router,
+      isNowLive,
     ],
   );
 
