@@ -24,6 +24,8 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { ChakraAutoComplete } from '@project-lc/components-core/ChakraAutoComplete';
+import { LiveShoppingSpecialPriceDiscountTypeAndRate } from '@project-lc/components-shared/live-shopping/LiveShoppingSpecialPriceDiscountTypeAndRate';
+import { LiveShoppingSpecialPriceOptions } from '@project-lc/components-shared/live-shopping/LiveShoppingSpecialPriceOptions';
 import {
   useApprovedGoodsList,
   useCreateLiveShoppingMutation,
@@ -37,23 +39,12 @@ import {
   GoodsByIdRes,
   LiveShoppingInput,
   LiveShoppingRegistDTO,
-  LiveShoppingSpecialPriceDiscountType,
-  LiveShoppingSpecialPricesValue,
 } from '@project-lc/shared-types';
 import { liveShoppingRegist } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  Control,
-  FormProvider,
-  useFieldArray,
-  useForm,
-  useFormContext,
-} from 'react-hook-form';
-import { LiveShoppingSpecialPriceDiscountTypeAndRate } from '@project-lc/components-shared/live-shopping/LiveShoppingSpecialPriceDiscountTypeAndRate';
-import { LiveShoppingSpecialPriceOptions } from '@project-lc/components-shared/live-shopping/LiveShoppingSpecialPriceOptions';
-import { AmountUnit, Goods } from '.prisma/client';
+import { FormProvider, useForm, useFormContext, useFieldArray } from 'react-hook-form';
 import LiveShoppingRegistManagerContacts from './LiveShoppingRegistManagerContacts';
 import LiveShoppingRegistRequestField from './LiveShoppingRegistRequestField';
 
@@ -88,12 +79,52 @@ export function LiveShoppingRegistForm(): JSX.Element {
     },
   });
 
-  const { replace } = useFieldArray({
+  const { handleSubmit, setValue, watch } = methods;
+
+  const { replace, append } = useFieldArray({
     control: methods.control,
     name: 'specialPrices',
   });
 
-  const { handleSubmit, setValue, watch } = methods;
+  useEffect(() => {
+    if (lsSpecialPriceSetting === 'origin' && goods.data) {
+      // 기존가격으로 라이브특가 설정(원래상품옵션 판매가로 설정)
+      const prevLiveShoppingSpecialPrices = methods.getValues('specialPrices');
+
+      if (prevLiveShoppingSpecialPrices) {
+        replace(
+          prevLiveShoppingSpecialPrices.map((prev) => {
+            const originGoodsOption = goods.data.options.find(
+              (opt) => opt.id === prev.goodsOptionId,
+            );
+
+            return {
+              ...prev,
+              specialPrice: Number(originGoodsOption?.price),
+            };
+          }),
+        );
+      }
+    }
+  }, [goods.data, lsSpecialPriceSetting, methods, replace]);
+
+  useEffect(() => {
+    // 맨처음 상품기존가격으로 초기화
+    const prevLiveShoppingSpecialPrices = methods.getValues('specialPrices');
+    if (
+      (!prevLiveShoppingSpecialPrices || !prevLiveShoppingSpecialPrices.length) &&
+      goods.data
+    ) {
+      goods.data.options.forEach((opt) => {
+        append({
+          specialPrice: Number(opt?.price),
+          goodsId: opt.goodsId,
+          goodsOptionId: opt.id,
+          discountType: 'W',
+        });
+      });
+    }
+  }, [append, goods.data, methods]);
 
   const onSuccess = (): void => {
     toast({
@@ -147,27 +178,6 @@ export function LiveShoppingRegistForm(): JSX.Element {
       mutateAsync(dto).then(onSuccess).catch(onFail);
     }
   };
-
-  useEffect(() => {
-    if (lsSpecialPriceSetting === 'origin' && goods.data) {
-      // 기존가격으로 라이브특가 설정(원래상품옵션 판매가로 설정)
-      const prevLieShoppingSpecialPrices = methods.getValues('specialPrices');
-      if (prevLieShoppingSpecialPrices) {
-        replace(
-          prevLieShoppingSpecialPrices.map((prev) => {
-            const originGoodsOption = goods.data.options.find(
-              (opt) => opt.id === prev.goodsOptionId,
-            );
-
-            return {
-              ...prev,
-              specialPrice: Number(originGoodsOption?.price),
-            };
-          }),
-        );
-      }
-    }
-  }, [goods.data, lsSpecialPriceSetting, methods, replace]);
 
   return (
     <>
