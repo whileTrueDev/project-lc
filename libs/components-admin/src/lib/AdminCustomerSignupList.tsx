@@ -1,6 +1,6 @@
-import { Heading, Stack, useDisclosure, Button } from '@chakra-ui/react';
-import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
+import { Button, Heading, Stack, useDisclosure } from '@chakra-ui/react';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
+import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useAdminCustomer } from '@project-lc/hooks';
 import { adminCustomerListStore } from '@project-lc/stores';
 import { AdminCustomerSignupListDetailDialog } from './AdminCustomerSignupListDetailDialog';
@@ -10,6 +10,7 @@ export function AdminCustomerSignupList(): JSX.Element {
     orderBy: 'desc',
     orderByColumn: 'createDate',
     includeModels: ['addresses', 'coupons', 'goodsReview', 'mileage'],
+    take: undefined,
   });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { setCustomerDetail } = adminCustomerListStore();
