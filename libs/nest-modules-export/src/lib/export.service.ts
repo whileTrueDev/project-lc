@@ -261,14 +261,14 @@ export class ExportService {
    * @param dto.sellerId 값이 없으면 전체 출고목록 조회
    */
   public async getExportList(dto: FindExportListDto): Promise<ExportListRes> {
-    const { sellerId, orderCode, skip, take } = dto;
+    const { sellerId, orderCode, skip, take, withSellerInfo } = dto;
 
     const where: Prisma.ExportWhereInput = { sellerId, order: { orderCode } };
     const totalCount = await this.prisma.export.count({ where });
     const data = await this.prisma.export.findMany({
       where,
       skip,
-      take,
+      take: take + 1,
       orderBy: { exportDate: 'desc' },
       include: {
         order: true,
@@ -280,6 +280,7 @@ export class ExportService {
             orderItemOption: { select: { name: true, value: true, discountPrice: true } },
           },
         },
+        seller: withSellerInfo ? { include: { sellerShop: true } } : undefined,
       },
     });
 
@@ -288,6 +289,11 @@ export class ExportService {
       const { items, ...rest } = d;
       return { ...rest, items: this.exportItemsToResDataType(items) };
     });
-    return { list, totalCount };
+    return {
+      edges: list,
+      totalCount,
+      nextCursor: list.length > take ? skip + take : undefined,
+      hasNextPage: list.length > take,
+    };
   }
 }

@@ -3,11 +3,11 @@ import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle
 import { ExportDetailSummary } from '@project-lc/components-seller/ExportDetailSummary';
 import { ExportDetailTitle } from '@project-lc/components-seller/ExportDetailTitle';
 import { DeliveryTrackingList } from '@project-lc/components-shared/delivery-tracking/DeliveryTracking';
-import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
 import { useExportByCode } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
 
 export default function ExportsDetail(): JSX.Element {
   const router = useRouter();
@@ -16,15 +16,15 @@ export default function ExportsDetail(): JSX.Element {
 
   if (exp.isLoading) {
     return (
-      <MypageLayout>
+      <AdminPageLayout>
         <OrderDetailLoading />
-      </MypageLayout>
+      </AdminPageLayout>
     );
   }
 
-  if (!exp.isLoading && !exp.data)
+  if (!exp.isLoading && !exp.data) {
     return (
-      <MypageLayout>
+      <AdminPageLayout>
         <Box m="auto" maxW="4xl">
           <Stack spacing={2}>
             <Center>
@@ -34,15 +34,16 @@ export default function ExportsDetail(): JSX.Element {
               <Text>없는 출고이거나 올바르지 못한 출고번호입니다.</Text>
             </Center>
             <Center>
-              <Button onClick={() => router.push('/mypage/orders')}>돌아가기</Button>
+              <Button onClick={() => router.push('/order/exports')}>돌아가기</Button>
             </Center>
           </Stack>
         </Box>
-      </MypageLayout>
+      </AdminPageLayout>
     );
+  }
 
   return (
-    <MypageLayout>
+    <AdminPageLayout>
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={6} p={2}>
         <Box as="section">
           <ExportDetailTitle exportData={exp.data} />
@@ -57,7 +58,7 @@ export default function ExportsDetail(): JSX.Element {
             <Stack>
               {exp.data.bundleExports.map((bundle) => (
                 <Box key={bundle.exportCode}>
-                  <NextLink passHref href={`/mypage/orders/exports/${bundle.exportCode}`}>
+                  <NextLink passHref href={`/order/exports/${bundle.exportCode}`}>
                     <Link color="blue.500" fontSize="sm">
                       {bundle.exportCode}
                     </Link>
@@ -74,6 +75,6 @@ export default function ExportsDetail(): JSX.Element {
           </Stack>
         </SectionWithTitle>
       </Stack>
-    </MypageLayout>
+    </AdminPageLayout>
   );
 }
