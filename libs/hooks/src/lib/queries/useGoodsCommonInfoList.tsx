@@ -16,7 +16,7 @@ export const useGoodsCommonInfoList = ({
   enabled,
   onSuccess,
 }: {
-  sellerId: number;
+  sellerId?: number;
   enabled: boolean;
   onSuccess: (data: GoodsCommonInfo[]) => void;
 }): UseQueryResult<GoodsCommonInfo[], AxiosError> => {

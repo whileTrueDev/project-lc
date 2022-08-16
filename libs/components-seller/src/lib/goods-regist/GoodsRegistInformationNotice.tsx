@@ -75,11 +75,7 @@ export function GoodsRegistInformationNotice(): JSX.Element | null {
           >
             {subjectList &&
               subjectList.map((subject) => (
-                <option
-                  key={subject.id}
-                  value={subject.id}
-                  selected={subject.id === informationSubjectId}
-                >
+                <option key={subject.id} value={subject.id}>
                   {subject.subject}
                 </option>
               ))}

@@ -30,10 +30,8 @@ export class LCProdDatabaseStack extends cdk.Stack {
       credentials: { username: 'admin' },
       allocatedStorage: 20,
       maxAllocatedStorage: 500,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MICRO),
-      vpcSubnets: {
-        subnetType: ec2.SubnetType.ISOLATED,
-      },
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MEDIUM),
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
       multiAz: false,
       autoMinorVersionUpgrade: false,
       securityGroups: [dbSecGrp],

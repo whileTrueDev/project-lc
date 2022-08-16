@@ -5,6 +5,7 @@ import {
   FormErrorMessage,
   Grid,
   GridItem,
+  Image,
   Input,
   Link,
   Spinner,
@@ -17,12 +18,14 @@ import {
   Th,
   Thead,
   Tr,
+  useBoolean,
   useToast,
 } from '@chakra-ui/react';
+import { CustomerMileageLog, OrderShipping } from '@prisma/client';
 import { CardDetail } from '@project-lc/components-shared/payment/CardDetail';
+import { RefundAccountForm } from '@project-lc/components-shared/payment/RefundAccountForm';
 import { TransferDetail } from '@project-lc/components-shared/payment/TransferDetail';
 import { VirtualAccountDetail } from '@project-lc/components-shared/payment/VirtualAccountDetail';
-import { RefundAccountForm } from '@project-lc/components-shared/payment/RefundAccountForm';
 import {
   ReturnMutationDto,
   useCreateRefundMutation,
@@ -32,13 +35,19 @@ import {
 import {
   AdminReturnData,
   CreateRefundDto,
+  CustomerCouponLogWithCouponInfo,
+  OrderWithPaymentData,
+  Payment,
   RefundAccountDto,
   ReturnItemWithOriginOrderItemInfo,
+  TossPaymentCancel,
 } from '@project-lc/shared-types';
 import { getAdminHost } from '@project-lc/utils';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { FormProvider, useForm } from 'react-hook-form';
+import { UpdateReturnRequestStatusSection } from './UpdateReturnRequestStatusSection';
 
 interface AdminRefundCreateFormData extends RefundAccountDto {
   refundAmount: number;
@@ -58,7 +67,8 @@ export function AdminReturnRequestDetail({
 }: AdminReturnRequestDetailProps): JSX.Element {
   const { data: paymentData } = usePaymentByOrderCode(data?.order.orderCode || '');
   const toast = useToast();
-  const defaultTotalRefundAmount = data?.items
+  const [isImageOpen, { toggle }] = useBoolean();
+  const refundItemsTotalAmount = data?.items
     ? data?.items.reduce((sum: number, i) => {
         return (
           sum +
@@ -66,9 +76,11 @@ export function AdminReturnRequestDetail({
         );
       }, 0)
     : 0;
+
+  // 환불생성(환불처리) 폼
   const methods = useForm<AdminRefundCreateFormData>({
     defaultValues: {
-      refundAmount: defaultTotalRefundAmount,
+      refundAmount: refundItemsTotalAmount,
       refundBank: data?.refundBank || undefined,
       refundAccount: data?.refundAccount || undefined,
       refundAccountHolder: data?.refundAccountHolder || undefined,
@@ -77,6 +89,7 @@ export function AdminReturnRequestDetail({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = methods;
 
@@ -123,8 +136,6 @@ export function AdminReturnRequestDetail({
       ...virtualAccountRefundInfo, // 가상계좌 환불수단 정보
     };
 
-    // mutateAsync(dto).then(handleSuccess).catch(handleError);
-
     try {
       // 환불처리 진행
       const refundData = await createRefund.mutateAsync(createRefundDto);
@@ -147,185 +158,380 @@ export function AdminReturnRequestDetail({
   if (!data) return <Spinner />;
 
   return (
-    <FormProvider {...methods}>
-      <Stack as="form" onSubmit={handleSubmit(submitHandler)}>
-        <Text>
-          주문코드
-          <NextLink passHref href={`${getAdminHost()}/order/list/${data.order.id}`}>
-            <Link color="blue.500"> {data.order.orderCode}</Link>
-          </NextLink>
+    <Stack>
+      {data.refund && data.refund.completeDate && (
+        <Text fontWeight="bold" color="red">
+          *** 토스페이먼츠 결제취소 완료된 환불요청입니다 ***
         </Text>
-        <Text>환불(반품)요청코드 {data.returnCode}</Text>
-
-        <Box>
-          <Text>주문 결제정보</Text>
-          <Grid templateColumns="repeat(2, 5fr)" minWidth="300px" border="1px" p={1}>
-            <GridItem>
-              <Text>주문 총 결제금액</Text>
-            </GridItem>
-            <GridItem>
-              <Text>
-                {data.order.paymentPrice && data.order.paymentPrice.toLocaleString()} 원
-              </Text>
-            </GridItem>
-            <GridItem>
-              <Text>결제키</Text>
-            </GridItem>
-            <GridItem>
-              <Text>{data.order.payment?.paymentKey}</Text>
-            </GridItem>
-            {paymentData && (
-              <>
-                <GridItem>
-                  <Text>결제수단</Text>
-                </GridItem>
-                <GridItem>
-                  <Text>{paymentData.method}</Text>
-                </GridItem>
-                {paymentData.method === '카드' && (
-                  <CardDetail paymentData={paymentData} />
-                )}
-                {paymentData.method === '가상계좌' && (
-                  <VirtualAccountDetail paymentData={paymentData} />
-                )}
-                {paymentData.method === '계좌이체' && (
-                  <TransferDetail paymentData={paymentData} />
-                )}
-                <GridItem>
-                  <Text>요청일시</Text>
-                </GridItem>
-                <GridItem>
-                  <Text>
-                    {dayjs(paymentData?.requestedAt).format('YYYY-MM-DD HH:mm:ss')}
-                  </Text>
-                </GridItem>
-              </>
-            )}
-          </Grid>
-        </Box>
-
-        <Box>
-          <Text>마일리지, 쿠폰 사용 내역</Text>
-          <Stack border="1px" spacing={2}>
-            <Table>
-              <Thead>
-                <Tr>
-                  <Th>마일리지 사용 내역</Th>
-                  <Th>마일리지 사용량</Th>
-                </Tr>
-              </Thead>
-
-              <Tbody>
-                {data.order.mileageLogs
-                  .filter((log) => log.actionType === 'consume')
-                  .map((i) => {
-                    return (
-                      <Tr key={i.id}>
-                        <Td>{i?.reason}</Td>
-                        <Td>{i?.amount}</Td>
-                      </Tr>
-                    );
-                  })}
-              </Tbody>
-            </Table>
-            <Table>
-              <Thead>
-                <Tr>
-                  <Th>사용 쿠폰명</Th>
-                  <Th>사용 쿠폰 할인액/할인율</Th>
-                </Tr>
-              </Thead>
-
-              <Tbody>
-                {data.order.customerCouponLogs
-                  .filter((log) => log.type === 'use')
-                  .map((i) => {
-                    return (
-                      <Tr key={i.id}>
-                        <Td>{i?.customerCoupon?.coupon?.name}</Td>
-                        <Td>
-                          {i?.customerCoupon?.coupon?.amount}{' '}
-                          {i?.customerCoupon?.coupon?.unit === 'W' ? '원' : '%'}
-                        </Td>
-                      </Tr>
-                    );
-                  })}
-              </Tbody>
-            </Table>
-          </Stack>
-        </Box>
-
-        <Table>
-          <Thead>
-            <Tr>
-              <Th>환불신청상품</Th>
-              <Th>가격</Th>
-              <Th>수량</Th>
-              <Th>합계</Th>
-            </Tr>
-          </Thead>
-
-          <Tbody>
-            {data?.items.map((i) => {
-              return (
-                <Tr key={i.id}>
-                  <Td>
-                    {i?.orderItemOption?.goodsName}, {i?.orderItemOption?.name} :{' '}
-                    {i?.orderItemOption?.value}
-                  </Td>
-                  <Td>{i?.orderItemOption?.discountPrice}</Td>
-                  <Td>{i?.orderItemOption?.quantity}</Td>
-                  <Td>
-                    {Number(i?.orderItemOption?.quantity) *
-                      Number(i?.orderItemOption?.discountPrice)}
-                  </Td>
-                </Tr>
-              );
-            })}
-          </Tbody>
-          <Tfoot>
-            <Tr>
-              <Th colSpan={2}>환불할 금액을 입력해주세요</Th>
-              <Th>총 환불금액</Th>
-              <Th>
-                <FormControl isInvalid={!!errors.refundAmount}>
-                  <Input
-                    type="number"
-                    {...register('refundAmount', {
-                      valueAsNumber: true,
-                      required: '총 환불금액을 입력해주세요',
-                      max: {
-                        value: defaultTotalRefundAmount,
-                        message: '총 환불금액이 환불신청상품 금액의 총 합계보다 큽니다',
-                      },
-                    })}
-                    defaultValue={defaultTotalRefundAmount}
-                  />
-
-                  <FormErrorMessage>
-                    {errors.refundAmount && errors.refundAmount.message}
-                  </FormErrorMessage>
-                </FormControl>
-              </Th>
-            </Tr>
-          </Tfoot>
-        </Table>
-
-        {paymentData && paymentData.method === '가상계좌' && <RefundAccountForm />}
-
-        <Stack spacing={4} direction="row-reverse">
-          <Button
-            type="submit"
-            colorScheme="red"
-            isLoading={createRefund.isLoading || updateReturnStatus.isLoading}
-          >
-            환불처리하기
+      )}
+      <Text>
+        주문코드
+        <NextLink passHref href={`${getAdminHost()}/order/list/${data.order.id}`}>
+          <Link color="blue.500"> {data.order.orderCode}</Link>
+        </NextLink>
+      </Text>
+      <Text>환불(반품)요청코드 {data.returnCode}</Text>
+      <Stack direction="row">
+        <Text>소비자의 환불 요청 사유 : {data.reason}</Text>
+        {data.images.length > 0 && (
+          <Button size="xs" onClick={toggle}>
+            사진 {isImageOpen ? '숨기기' : '확인하기'}
           </Button>
-          <Button onClick={onCancel}>취소</Button>
-        </Stack>
+        )}
       </Stack>
-    </FormProvider>
+      {isImageOpen && (
+        <Box>
+          {data.images.map((img) => (
+            <Image key={img.imageUrl} src={img.imageUrl} />
+          ))}
+        </Box>
+      )}
+      {data.rejectReason && <Text>환불 요청 거절 사유 : {data.rejectReason}</Text>}
+      {data.memo && <Text>메모 : {data.memo}</Text>}
+      {/* successHandler로 onCancel(다이얼로그 닫기) 전달 */}
+      <UpdateReturnRequestStatusSection data={data} successHandler={onCancel} />
+
+      {/* 주문 결제정보 표시 */}
+      <OrderPaymentDataDisplay order={data.order} payment={paymentData} />
+
+      {/* 마일리지, 쿠폰 사용내역 있는 경우에만 표시 */}
+      {(data.order.mileageLogs.length > 0 ||
+        data.order.customerCouponLogs.length > 0) && (
+        <Stack spacing={2}>
+          {data.order.mileageLogs.length > 0 && (
+            <MileageUsageTable mileageLogs={data.order.mileageLogs} />
+          )}
+          {data.order.customerCouponLogs.length > 0 && (
+            <CouponUsageTable couponLogs={data.order.customerCouponLogs} />
+          )}
+        </Stack>
+      )}
+
+      {/* 환불요청 상품에 해당하는 배송비 표시 테이블 */}
+      <ReturnRequestItemShippingCostTable
+        returnItems={data?.items || []}
+        orderShippings={data.order.shippings}
+      />
+
+      <FormProvider {...methods}>
+        <Stack
+          as="form"
+          onSubmit={handleSubmit(submitHandler)}
+          outline="auto"
+          outlineColor="blue.300"
+        >
+          <RefundRequestItemsDisplayTable
+            returnItems={data?.items || []}
+            tableFooter={
+              // 환불처리내역이 없고, 상태가 '처리중'인 경우에만 환불금액 입력창 노출
+              !data.refund && data.status === 'processing' ? (
+                <Tfoot>
+                  <Tr>
+                    <Th colSpan={2}>환불할 금액을 입력해주세요</Th>
+                    <Th>총 환불금액</Th>
+                    <Th>
+                      <FormControl isInvalid={!!errors.refundAmount}>
+                        <Input
+                          type="number"
+                          {...register('refundAmount', {
+                            valueAsNumber: true,
+                            required: '총 환불금액을 입력해주세요',
+                          })}
+                          defaultValue={refundItemsTotalAmount}
+                        />
+
+                        <FormErrorMessage>
+                          {errors.refundAmount && errors.refundAmount.message}
+                        </FormErrorMessage>
+                        {watch('refundAmount') > refundItemsTotalAmount && (
+                          <Text color="red">
+                            총 환불금액이 환불신청상품 금액의 총 합계보다 큽니다.
+                            환불하려는 금액이 올바른지 확인해주세요.
+                          </Text>
+                        )}
+                      </FormControl>
+                    </Th>
+                  </Tr>
+                </Tfoot>
+              ) : undefined
+            }
+          />
+
+          {paymentData && paymentData.method === '가상계좌' && (
+            <Box p={4}>
+              <Text>
+                * 소비자가 입력한 환불계좌 정보입니다. 가상계좌 결제 취소시 해당 계좌로
+                결제금액이 환불됩니다.
+              </Text>
+              <RefundAccountForm />
+            </Box>
+          )}
+
+          {data.refund && paymentData?.cancels && (
+            <CancelDataDisplayTable cancels={paymentData?.cancels} />
+          )}
+
+          <Stack p={4} spacing={4} direction="row-reverse">
+            {/* 환불처리내역이 없고, 상태가 '처리중'인 경우에만 환불처리 버튼 노출 */}
+            {!data.refund && data.status === 'processing' && (
+              <Button
+                type="submit"
+                colorScheme="red"
+                isLoading={createRefund.isLoading || updateReturnStatus.isLoading}
+              >
+                환불처리하기
+              </Button>
+            )}
+
+            <Button onClick={onCancel}>닫기</Button>
+          </Stack>
+        </Stack>
+      </FormProvider>
+    </Stack>
   );
 }
 
 export default AdminReturnRequestDetail;
+
+/** 환불신청상품들 표시 테이블, tableFooter 에는 <Tfoot> 컴포넌트로 환불금액 입력하는 컴포넌트를 넣는다 */
+function RefundRequestItemsDisplayTable({
+  returnItems,
+  tableFooter,
+}: {
+  returnItems: ReturnItemWithOriginOrderItemInfo[];
+  tableFooter?: JSX.Element;
+}): JSX.Element {
+  return (
+    <Table>
+      <Thead>
+        <Tr>
+          <Th>환불신청상품</Th>
+          <Th>가격</Th>
+          <Th>수량</Th>
+          <Th>합계</Th>
+        </Tr>
+      </Thead>
+
+      <Tbody>
+        {returnItems.map((i) => {
+          return (
+            <Tr key={i.id}>
+              <Td>
+                {i?.orderItemOption?.goodsName}, {i?.orderItemOption?.name} :{' '}
+                {i?.orderItemOption?.value}
+              </Td>
+              <Td>{i?.orderItemOption?.discountPrice}</Td>
+              <Td>{i?.orderItemOption?.quantity}</Td>
+              <Td>
+                {Number(i?.orderItemOption?.quantity) *
+                  Number(i?.orderItemOption?.discountPrice)}
+              </Td>
+            </Tr>
+          );
+        })}
+      </Tbody>
+
+      {tableFooter}
+    </Table>
+  );
+}
+
+/** 토스페이먼츠 결제수단, 결제정보 표시 */
+function PaymentDataDisplay({ paymentData }: { paymentData: Payment }): JSX.Element {
+  return (
+    <>
+      <GridItem>
+        <Text>결제수단</Text>
+      </GridItem>
+      <GridItem>
+        <Text>{paymentData.method}</Text>
+      </GridItem>
+      {paymentData.method === '카드' && <CardDetail paymentData={paymentData} />}
+      {paymentData.method === '가상계좌' && (
+        <VirtualAccountDetail paymentData={paymentData} />
+      )}
+      {paymentData.method === '계좌이체' && <TransferDetail paymentData={paymentData} />}
+      <GridItem>
+        <Text>요청일시</Text>
+      </GridItem>
+      <GridItem>
+        <Text>{dayjs(paymentData?.requestedAt).format('YYYY-MM-DD HH:mm:ss')}</Text>
+      </GridItem>
+    </>
+  );
+}
+
+/** 주문 결제정보 표시 */
+function OrderPaymentDataDisplay({
+  order,
+  payment,
+}: {
+  order: OrderWithPaymentData;
+  payment?: Payment;
+}): JSX.Element {
+  return (
+    <Box>
+      <Text>주문 결제정보</Text>
+      <Grid templateColumns="repeat(2, 5fr)" minWidth="300px" border="1px" p={1}>
+        <GridItem>
+          <Text>주문 총 결제금액</Text>
+        </GridItem>
+        <GridItem>
+          <Text>{order.paymentPrice && order.paymentPrice.toLocaleString()} 원</Text>
+        </GridItem>
+        <GridItem>
+          <Text>결제키</Text>
+        </GridItem>
+        <GridItem>
+          <Text>{order.payment?.paymentKey}</Text>
+        </GridItem>
+        {payment && <PaymentDataDisplay paymentData={payment} />}
+      </Grid>
+    </Box>
+  );
+}
+
+/** 마일리지 사용내역 표시 테이블 */
+function MileageUsageTable({
+  mileageLogs,
+}: {
+  mileageLogs: CustomerMileageLog[];
+}): JSX.Element {
+  return (
+    <Table>
+      <Thead>
+        <Tr>
+          <Th>마일리지 사용 내역</Th>
+          <Th>마일리지 사용량</Th>
+        </Tr>
+      </Thead>
+
+      <Tbody>
+        {mileageLogs
+          .filter((log) => log.actionType === 'consume')
+          .map((i) => {
+            return (
+              <Tr key={i.id}>
+                <Td>{i?.reason}</Td>
+                <Td>{i?.amount}</Td>
+              </Tr>
+            );
+          })}
+      </Tbody>
+    </Table>
+  );
+}
+
+/** 쿠폰사용내역 표시 테이블 */
+function CouponUsageTable({
+  couponLogs,
+}: {
+  couponLogs: CustomerCouponLogWithCouponInfo[];
+}): JSX.Element {
+  return (
+    <Table>
+      <Thead>
+        <Tr>
+          <Th>사용 쿠폰명</Th>
+          <Th>사용 쿠폰 할인액/할인율</Th>
+        </Tr>
+      </Thead>
+
+      <Tbody>
+        {couponLogs
+          .filter((log) => log.type === 'use')
+          .map((i) => {
+            return (
+              <Tr key={i.id}>
+                <Td>{i?.customerCoupon?.coupon?.name}</Td>
+                <Td>
+                  {i?.customerCoupon?.coupon?.amount}{' '}
+                  {i?.customerCoupon?.coupon?.unit === 'W' ? '원' : '%'}
+                </Td>
+              </Tr>
+            );
+          })}
+      </Tbody>
+    </Table>
+  );
+}
+
+function ReturnRequestItemShippingCostTable({
+  returnItems,
+  orderShippings,
+}: {
+  returnItems: ReturnItemWithOriginOrderItemInfo[];
+  orderShippings: OrderShipping[];
+}): JSX.Element {
+  return (
+    <Table>
+      <Thead>
+        <Tr>
+          <Th>환불 신청 상품에 대한 배송비 정보를 확인합니다</Th>
+          <Th>상점명</Th>
+          <Th>배송비</Th>
+        </Tr>
+      </Thead>
+
+      <Tbody>
+        {orderShippings.map((ship) => {
+          // 이 주문배송비에 포함된 환불요청상품
+          const returnRequestedItemsInThisOrderShipping = returnItems.filter(
+            (ri) => ri.orderItem.orderShippingId === ship.id,
+          );
+          return returnRequestedItemsInThisOrderShipping.map((ri, index) => {
+            return (
+              <Tr key={ri.id}>
+                <Td>
+                  {ri?.orderItemOption?.goodsName}, {ri?.orderItemOption?.name} :{' '}
+                  {ri?.orderItemOption?.value}
+                </Td>
+                {index === 0 && (
+                  <>
+                    <Td rowSpan={returnRequestedItemsInThisOrderShipping.length}>
+                      {ri.orderItem.goods.seller.sellerShop.shopName}
+                    </Td>
+                    <Td rowSpan={returnRequestedItemsInThisOrderShipping.length}>
+                      {ship.shippingCost}원
+                    </Td>
+                  </>
+                )}
+              </Tr>
+            );
+          });
+        })}
+      </Tbody>
+    </Table>
+  );
+}
+
+/** 환불처리완료 정보 표시 테이블 */
+export function CancelDataDisplayTable({
+  cancels,
+}: {
+  cancels: TossPaymentCancel[];
+}): JSX.Element {
+  return (
+    <Table>
+      <Thead>
+        <Tr>
+          <Th>환불 이유</Th>
+          <Th>환불완료 일시</Th>
+          <Th>결제취소키(토스 결제 취소 건에 대한 고유키)</Th>
+          <Th>환불한 금액</Th>
+        </Tr>
+      </Thead>
+
+      <Tbody>
+        {cancels.map((cancel) => (
+          <Tr key={cancel.transactionKey}>
+            <Td>{cancel.cancelReason}</Td>
+            <Td>{dayjs(cancel.canceledAt).format('YYYY-MM-DD HH:mm:ss')}</Td>
+            <Td>{cancel.transactionKey}</Td>
+            <Td>{getLocaleNumber(cancel.cancelAmount)} 원</Td>
+          </Tr>
+        ))}
+      </Tbody>
+    </Table>
+  );
+}

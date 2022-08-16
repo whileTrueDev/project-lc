@@ -8,6 +8,6 @@ export class KkshowSearchController {
 
   @Get()
   getSearchResults(@Query(ValidationPipe) keyword: SearchKeyword): Promise<SearchResult> {
-    return this.kkshowSearchService.searchResultPreprocessing(keyword);
+    return this.kkshowSearchService.search(keyword.keyword);
   }
 }

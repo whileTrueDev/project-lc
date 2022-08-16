@@ -103,8 +103,18 @@ export function CommonFooter({ footerLinkList }: CommonFooterProps): JSX.Element
           </Stack>
           <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={2}>
             {footerInfoArr.map((t) => (
-              <GridItem key={t} colSpan={t.includes('사업장소재지') ? 2 : [2, 1]}>
-                <Text>{t}</Text>
+              <GridItem
+                key={t.contents}
+                colSpan={t.contents.includes('사업장소재지') ? 2 : [2, 1]}
+              >
+                <Text>
+                  {t.contents}{' '}
+                  {t.relatedLink ? (
+                    <Link isExternal href={t.relatedLink.href} textDecor="underline">
+                      {t.relatedLink.name}
+                    </Link>
+                  ) : null}
+                </Text>
               </GridItem>
             ))}
           </SimpleGrid>

@@ -34,14 +34,14 @@ export function Search(): JSX.Element {
           <Divider />
           <SearchResultGoodsSection keyword={searchKeyword} data={data.goods} />
           <Divider />
-          <SearchResultLiveContentsSection
-            keyword={searchKeyword}
-            data={data.liveContents}
-          />
-          <Divider />
           <SearchResultBroadcasterSection
             keyword={searchKeyword}
             data={data.broadcasters}
+          />
+          <Divider />
+          <SearchResultLiveContentsSection
+            keyword={searchKeyword}
+            data={data.liveContents}
           />
         </>
       )}

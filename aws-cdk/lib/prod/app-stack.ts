@@ -1,5 +1,6 @@
-import * as ec2 from '@aws-cdk/aws-ec2';
 import * as acm from '@aws-cdk/aws-certificatemanager';
+import * as ec2 from '@aws-cdk/aws-ec2';
+import { Repository, TagStatus } from '@aws-cdk/aws-ecr';
 import {
   AwsLogDriver,
   Cluster,
@@ -13,14 +14,13 @@ import {
   ApplicationLoadBalancer,
   ApplicationProtocol,
   ApplicationTargetGroup,
-  ListenerCondition,
   ListenerAction,
+  ListenerCondition,
   SslPolicy,
 } from '@aws-cdk/aws-elasticloadbalancingv2';
 import * as logs from '@aws-cdk/aws-logs';
 import * as ssm from '@aws-cdk/aws-ssm';
 import * as cdk from '@aws-cdk/core';
-import { Repository, TagStatus } from '@aws-cdk/aws-ecr';
 import { constants } from '../../constants';
 
 interface LCProdAppStackProps extends cdk.StackProps {
@@ -179,6 +179,23 @@ export class LCProdAppStack extends cdk.Stack {
       securityGroups: [this.apiSecGrp],
       assignPublicIp: false,
     });
+
+    // Auto Scaling 설정
+    const autoScalingGroup = service.autoScaleTaskCount({
+      minCapacity: 1,
+      maxCapacity: 50,
+    });
+    autoScalingGroup.scaleOnCpuUtilization('CpuScaling', {
+      targetUtilizationPercent: 70, // CPU 사용량 70% 이상일때
+      scaleInCooldown: cdk.Duration.seconds(150),
+      scaleOutCooldown: cdk.Duration.seconds(150),
+    });
+    autoScalingGroup.scaleOnMemoryUtilization('MemoryScaling', {
+      targetUtilizationPercent: 70, // Memory 사용량 70% 이상일 때
+      scaleInCooldown: cdk.Duration.seconds(150),
+      scaleOutCooldown: cdk.Duration.seconds(150),
+    });
+
     return service;
   }
 

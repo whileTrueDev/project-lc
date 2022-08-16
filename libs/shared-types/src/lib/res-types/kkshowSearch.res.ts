@@ -5,6 +5,7 @@ import {
   LiveShoppingVideo,
   BroadcasterChannel,
   Goods,
+  BroadcasterPromotionPage,
 } from '@prisma/client';
 
 export type SearchBroadcasterType = Pick<Broadcaster, 'userNickname' | 'avatar'>;
@@ -21,7 +22,7 @@ export type SearchConfirmationType = Pick<
 export type SearchGoodsImageType = Pick<GoodsImages, 'image'>;
 
 export interface BroadcasterWithChannel extends SearchBroadcasterType {
-  channels: OptionalBroadcasterChannelType[];
+  BroadcasterPromotionPage?: BroadcasterPromotionPage | null;
 }
 
 export interface ProductSearchLiveShopping {

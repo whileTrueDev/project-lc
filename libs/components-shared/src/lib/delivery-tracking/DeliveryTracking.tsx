@@ -147,7 +147,7 @@ export function DeliveryTrackingList({
   );
   return (
     <Box mt={4} mb={40}>
-      {exportsData.data?.list.map((exp) => (
+      {exportsData.data?.edges.map((exp) => (
         <DeliveryTracking key={exp.exportCode} exportData={exp} />
       ))}
     </Box>

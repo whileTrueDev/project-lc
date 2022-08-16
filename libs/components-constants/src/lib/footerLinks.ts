@@ -45,12 +45,19 @@ export const broadcasterFooterLinkList: FooterLinkListItem[] = sellerFooterLinkL
 export const kkshowFooterLinkList: FooterLinkListItem[] = sellerFooterLinkList;
 
 export const footerInfoArr = [
-  '상호명 : 와일트루',
-  '사업장소재지 : 부산광역시 연제구 연제로 24, 2층 207호(연산동, 부산청년창업허브)',
-  '사업자등록번호 : 659-03-01549',
-  '통신판매업신고 : 2019-부산금정-0581',
-  '대표이사 : 강동기',
-  '개인정보담당자 : 전민관',
-  '유선 전화번호 : 051-939-6309',
-  '메일 : support@onad.io',
+  { contents: '상호명 : 와일트루' },
+  {
+    contents:
+      '사업장소재지 : 부산광역시 연제구 연제로 24, 2층 207호(연산동, 부산청년창업허브)',
+    relatedLink: {
+      name: '사업자정보확인',
+      href: 'http://www.ftc.go.kr/bizCommPop.do?wrkr_no=6590301549',
+    },
+  },
+  { contents: '사업자등록번호 : 659-03-01549' },
+  { contents: '통신판매업신고 : 2019-부산금정-0581' },
+  { contents: '대표이사 : 강동기' },
+  { contents: '개인정보담당자 : 전민관' },
+  { contents: '유선 전화번호 : 051-939-6309' },
+  { contents: '메일 : support@onad.io' },
 ];

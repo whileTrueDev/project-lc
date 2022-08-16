@@ -91,4 +91,9 @@ export class FindExportListDto extends DefaultPaginationDto {
   @IsOptional()
   @Type(() => String)
   orderCode?: string;
+
+  @Type(() => Boolean)
+  @IsOptional()
+  @IsBoolean()
+  withSellerInfo?: boolean = false;
 }

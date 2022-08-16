@@ -22,6 +22,7 @@ import {
   RegistGoodsDto,
 } from '@project-lc/shared-types';
 import { goodsRegistStore } from '@project-lc/stores';
+import { saveContentsImageToS3 } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -32,10 +33,7 @@ import GoodsRegistDataOptions from './goods-regist/GoodsRegistDataOptions';
 import GoodsRegistDataSales from './goods-regist/GoodsRegistDataSales';
 import GoodsRegistDescription from './goods-regist/GoodsRegistDescription';
 import GoodsRegistExtraInfo from './goods-regist/GoodsRegistExtraInfo';
-import {
-  addGoodsOptionInfo,
-  saveContentsImageToS3,
-} from './goods-regist/GoodsRegistForm';
+import { addGoodsOptionInfo } from './goods-regist/GoodsRegistForm';
 import { GoodsRegistInformationNotice } from './goods-regist/GoodsRegistInformationNotice';
 import GoodsRegistKeywords from './goods-regist/GoodsRegistKeywords';
 import GoodsRegistMemo from './goods-regist/GoodsRegistMemo';
@@ -247,6 +245,13 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
         ...goodsDto,
         goodsInfoId: res.id,
       };
+    } else if (!data.goodsInfoId) {
+      // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함)
+      toast({
+        description: '상품 공통 정보를 입력하거나 기존 정보를 불러와서 등록해주세요',
+        status: 'warning',
+      });
+      return;
     }
 
     if (!shippingGroupId) {
@@ -360,12 +365,12 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
             left="0px"
             right="0px"
             bg="gray.400"
-            opacity="0.5"
+            opacity="0.8"
             flexDirection="column"
-            zIndex={99999}
+            zIndex="overlay"
           >
             <Spinner />
-            <Text>상품 정보를 수정중입니다...</Text>
+            <Text fontWeight="bold">상품 정보를 수정중입니다...</Text>
           </Center>
         )}
       </Stack>

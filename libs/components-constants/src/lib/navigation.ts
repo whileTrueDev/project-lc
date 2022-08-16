@@ -231,8 +231,8 @@ export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
 /** 관리자 페이지 상단 네비바 링크 */
 export const adminNavItems: Array<NavItem> = [
   {
-    label: '크크마켓',
-    href: 'https://k-kmarket.com/',
+    label: '크크쇼',
+    href: 'https://크크쇼.com/',
     isExternal: true,
   },
 ];
@@ -299,6 +299,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
       { name: '주문 목록', href: '/order/list', icon: FcList },
       { name: '환불요청 처리', href: '/order/refund', icon: FcMoneyTransfer },
       { name: '마일리지 설정', href: '/order/mileage-setting', icon: FcRating },
+      { name: '출고 목록', href: '/order/exports', icon: FcList },
     ],
   },
   {
