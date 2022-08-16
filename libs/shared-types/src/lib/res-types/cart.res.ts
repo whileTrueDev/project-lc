@@ -5,11 +5,13 @@ import {
   CartItemSupport,
   Goods,
   GoodsImages,
+  LiveShoppingSpecialPrice,
   SellerShop,
   ShippingCost,
   ShippingGroup,
   ShippingOption,
   ShippingSet,
+  LiveShopping,
 } from '@prisma/client';
 
 export type CartItemRes = Array<
@@ -17,6 +19,14 @@ export type CartItemRes = Array<
     support:
       | (CartItemSupport & {
           broadcaster: Pick<Broadcaster, 'userNickname' | 'avatar'>;
+          liveShopping: {
+            progress: LiveShopping['progress'];
+            broadcastStartDate: LiveShopping['broadcastStartDate'];
+            broadcastEndDate: LiveShopping['broadcastEndDate'];
+            sellStartDate: LiveShopping['sellStartDate'];
+            sellEndDate: LiveShopping['sellEndDate'];
+            liveShoppingSpecialPrices: LiveShoppingSpecialPrice[];
+          };
         })
       | null;
   } & {
