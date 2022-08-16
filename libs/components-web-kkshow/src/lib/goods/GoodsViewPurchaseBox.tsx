@@ -71,7 +71,7 @@ export function findMatchingSpecialPriceByGoodsOptionId({
   return Number(matching.specialPrice);
 }
 
-/** 후원방송인 선택시, 해당 방송인이 현재 진행중인 라이브쇼핑의 특가가격정보를 리턴 */
+/** 후원방송인 선택시, 해당 방송인이 현재 진행중인 라이브쇼핑의 특가가격정보를 리턴 => 상품페이지에서 사용 */
 export function useNowOnLiveSpecialPriceOptionList(goods: GoodsByIdRes): {
   goodsOptionsWithSpecialPrice: (GoodsByIdRes['options'][number] & {
     specialPrice?: number;
