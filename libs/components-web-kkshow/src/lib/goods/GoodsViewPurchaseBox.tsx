@@ -51,7 +51,7 @@ import {
   SpecialPriceItem,
 } from '@project-lc/shared-types';
 import { useGoodsViewStore, useKkshowOrderStore } from '@project-lc/stores';
-import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
+import { checkGoodsPurchasable, getLocaleNumber } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GoGift } from 'react-icons/go';
@@ -210,14 +210,15 @@ export function GoodsViewPurchaseBox({
                 if (!opt.specialPrice) {
                   return (
                     <option key={opt.id} value={opt.id}>
-                      {opt.option_title}: {opt.option1} ({opt.price})
+                      {opt.option_title}: {opt.option1} ({getLocaleNumber(opt.price)})
                     </option>
                   );
                 }
                 // 특가 있으면 원개 옵션가격 대신 라이브쇼핑 특가 표시
                 return (
                   <option key={opt.id} value={opt.id}>
-                    {opt.option_title}: {opt.option1} ({opt.specialPrice})
+                    [LIVE특가] {opt.option_title}: {opt.option1} (
+                    {getLocaleNumber(opt.specialPrice)})
                   </option>
                 );
               })}
