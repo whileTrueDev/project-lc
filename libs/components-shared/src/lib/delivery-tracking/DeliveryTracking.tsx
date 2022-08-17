@@ -7,18 +7,38 @@ import {
   Flex,
   Image,
   Link,
+  Stack,
   Text,
 } from '@chakra-ui/react';
-import { Order } from '@prisma/client';
-import { useExports, useProfile } from '@project-lc/hooks';
-import { ExportListItem } from '@project-lc/shared-types';
+import { OrderProcessStep } from '@prisma/client';
+import { useExportByCode } from '@project-lc/hooks';
 import { deliveryCompanies, getLocaleNumber } from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
 import { FaShippingFast } from 'react-icons/fa';
 import { OrderStatusBadge } from '../order/OrderStatusBadge';
 
 export interface DeliveryTrackingProps {
-  exportData: ExportListItem;
+  exportData: {
+    exportCode: string | null;
+    deliveryCompany: string;
+    deliveryNumber: string;
+    order: {
+      recipientName: string;
+      recipientAddress: string;
+      recipientDetailAddress: string;
+      memo: string;
+    };
+    items: Array<{
+      id: number;
+      image: string;
+      status: OrderProcessStep;
+      goodsName: string;
+      title1: string;
+      option1: string;
+      quantity: number;
+      price: string;
+    }>;
+  };
 }
 export function DeliveryTracking({ exportData }: DeliveryTrackingProps): JSX.Element {
   return (
@@ -136,24 +156,16 @@ export function DeliveryTrackingButton({
 export default DeliveryTracking;
 
 interface DeliveryTrackingListProps {
-  orderCode: Order['orderCode'];
+  exportCode: string;
 }
 export function DeliveryTrackingList({
-  orderCode,
-}: DeliveryTrackingListProps): JSX.Element {
-  const { data: profileData } = useProfile();
-  const exportsData = useExports(
-    {
-      orderCode: orderCode || '',
-      sellerId: profileData && profileData.type === 'seller' ? profileData.id : undefined, // 판매자의 상품이 포함된 출고만 조회하기 위해 sellerId 전달
-    },
-    { enabled: !!orderCode },
-  );
+  exportCode,
+}: DeliveryTrackingListProps): JSX.Element | null {
+  const exportsData = useExportByCode(exportCode, { enabled: !!exportCode });
+  if (!exportsData.data) return null;
   return (
-    <Box mt={4} mb={40}>
-      {exportsData.data?.edges.map((exp) => (
-        <DeliveryTracking key={exp.exportCode} exportData={exp} />
-      ))}
-    </Box>
+    <Stack mt={4} mb={40}>
+      <DeliveryTracking exportData={exportsData.data} />
+    </Stack>
   );
 }
