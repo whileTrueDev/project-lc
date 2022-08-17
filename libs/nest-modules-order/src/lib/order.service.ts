@@ -1208,17 +1208,7 @@ export class OrderService {
     });
 
     // 주문에 포함된 모든 주문상품옵션이 구매확정 되었다면 주문의 상태도 구매확정으로 변경
-    const everyOrderItemOptionsPurchaseConfirmed = order.orderItems
-      .flatMap((item) => item.options)
-      .filter((opt) => !skipSteps.includes(opt.step)) // 고려하지 않을 상태(주문취소, 결제취소, 주문무효)인 주문상품옵션 제외
-      .every((opt) => opt.step === 'purchaseConfirmed');
-
-    if (everyOrderItemOptionsPurchaseConfirmed) {
-      await this.prisma.order.update({
-        where: { id: order.id },
-        data: { step: 'purchaseConfirmed' },
-      });
-    }
+    await this.updateOrderStepByOrderItemOptionsSteps({ orderId: order.id });
 
     // * ---- 구매확정된 상품에 대한 마일리지 적립 ----
     if (order.customerId) {
