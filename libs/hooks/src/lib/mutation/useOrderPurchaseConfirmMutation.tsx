@@ -21,6 +21,10 @@ export const useOrderPurchaseConfirmMutation = (
     {
       onSuccess: () => {
         queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
+        queryClient.invalidateQueries('Exports');
+        queryClient.invalidateQueries('OrderDetail');
+        queryClient.invalidateQueries('getAdminOrder');
+        queryClient.invalidateQueries('AdminOrderList');
         queryClient.invalidateQueries('CustomerMileage', { refetchInactive: true });
         queryClient.invalidateQueries('CustomerMileageHistory', {
           refetchInactive: true,

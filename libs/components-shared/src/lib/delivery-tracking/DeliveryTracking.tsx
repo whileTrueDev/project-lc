@@ -10,7 +10,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { Order } from '@prisma/client';
-import { useExports } from '@project-lc/hooks';
+import { useExports, useProfile } from '@project-lc/hooks';
 import { ExportListItem } from '@project-lc/shared-types';
 import { deliveryCompanies, getLocaleNumber } from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
@@ -141,8 +141,12 @@ interface DeliveryTrackingListProps {
 export function DeliveryTrackingList({
   orderCode,
 }: DeliveryTrackingListProps): JSX.Element {
+  const { data: profileData } = useProfile();
   const exportsData = useExports(
-    { orderCode: orderCode || '' },
+    {
+      orderCode: orderCode || '',
+      sellerId: profileData && profileData.type === 'seller' ? profileData.id : undefined, // 판매자의 상품이 포함된 출고만 조회하기 위해 sellerId 전달
+    },
     { enabled: !!orderCode },
   );
   return (

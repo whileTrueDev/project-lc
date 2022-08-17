@@ -22,7 +22,7 @@ import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
 @UseInterceptors(HttpCacheInterceptor)
-@CacheClearKeys('admin/order')
+@CacheClearKeys('order')
 @Controller('admin/order')
 export class AdminOrderController {
   constructor(private readonly orderService: OrderService) {}

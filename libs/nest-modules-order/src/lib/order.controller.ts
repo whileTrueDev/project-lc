@@ -36,7 +36,7 @@ import {
 import { OrderService } from './order.service';
 
 @UseInterceptors(HttpCacheInterceptor)
-@CacheClearKeys('order')
+@CacheClearKeys('order', 'export')
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
@@ -45,7 +45,7 @@ export class OrderController {
   @UseGuards(JwtAuthGuard)
   @Post('purchase-confirm')
   purchaseConfirm(
-    @Body(ValidationPipe) dto: OrderPurchaseConfirmationDto,
+    @Body(new ValidationPipe({ transform: true })) dto: OrderPurchaseConfirmationDto,
   ): Promise<boolean> {
     return this.orderService.purchaseConfirm(dto);
   }

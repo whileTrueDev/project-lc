@@ -1,5 +1,6 @@
 import { Box, Button, Center, Link, Stack, Text } from '@chakra-ui/react';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
+import { ExportDetailActions } from '@project-lc/components-seller/ExportDetailActions';
 import { ExportDetailSummary } from '@project-lc/components-seller/ExportDetailSummary';
 import { ExportDetailTitle } from '@project-lc/components-seller/ExportDetailTitle';
 import { DeliveryTrackingList } from '@project-lc/components-shared/delivery-tracking/DeliveryTracking';
@@ -46,6 +47,10 @@ export default function ExportsDetail(): JSX.Element {
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={6} p={2}>
         <Box as="section">
           <ExportDetailTitle exportData={exp.data} />
+        </Box>
+
+        <Box as="section">
+          <ExportDetailActions exportData={exp.data} />
         </Box>
 
         <Box as="section">

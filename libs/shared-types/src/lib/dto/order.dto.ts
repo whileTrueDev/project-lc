@@ -1,4 +1,5 @@
 import {
+  BuyConfirmSubject,
   Coupon,
   LiveShopping,
   Order,
@@ -501,6 +502,10 @@ export class OrderPurchaseConfirmationDto {
   /** 구매확정 할 주문상품옵션 고유번호 */
   @IsNumber()
   orderItemOptionId: OrderItemOption['id'];
+
+  @IsOptional()
+  @IsEnum(BuyConfirmSubject)
+  buyConfirmSubject?: BuyConfirmSubject = 'admin';
 }
 
 /** 주문배송비 타입 dto */

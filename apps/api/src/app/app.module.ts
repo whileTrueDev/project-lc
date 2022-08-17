@@ -16,6 +16,7 @@ import { CartModule } from '@project-lc/nest-modules-cart';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { CouponModule } from '@project-lc/nest-modules-coupon';
 import { CustomerModule } from '@project-lc/nest-modules-customer';
+import { DeliveryModule } from '@project-lc/nest-modules-delivery';
 import { ExchangeModule } from '@project-lc/nest-modules-exchange';
 import { ExportModule } from '@project-lc/nest-modules-export';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
@@ -92,6 +93,7 @@ import { AppController } from './app.controller';
     ExchangeModule.withControllers(),
     ExportModule.withControllers(),
     ProductPromotionModule.withControllers(),
+    DeliveryModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],

@@ -51,6 +51,7 @@ export * from './lib/dto/customerCoupon.dto';
 export * from './lib/dto/customerInclude.dto';
 export * from './lib/dto/customerMileage.dto';
 export * from './lib/dto/deleteGoods.dto';
+export * from './lib/dto/delivery.dto';
 export * from './lib/dto/emailCodeVerification.dto';
 export * from './lib/dto/emailDupCheck.dto';
 export * from './lib/dto/exchange.dto';
