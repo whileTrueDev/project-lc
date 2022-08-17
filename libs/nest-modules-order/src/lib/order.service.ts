@@ -658,28 +658,74 @@ export class OrderService {
       ) {
         return firstItemStep;
       }
-      // 판매자의 상품옵션 상태가 다른 경우(일부 결제취소, 일부 구매확정인 경우가 존재할 수 있다 => 구매확정이 최종 상태여야함)
+      // * 판매자의 상품옵션 상태가 다른 경우(예: 일부 결제취소, 일부 구매확정인 경우 => 이 경우 구매확정이 주문의 최종 상태여야함)
       // 일부 결제실패인 경우는 존재할 수 없다. (결제실패 - 지불수단 가상계좌 선택후 입금기한 내 미입금하여 취소처리된 경우)
-      // 일부 주문무효인 경우는 현재는 존재하지 않음(주문무효 - 가상게좌 선택후 입금 전 소비자가 주문취소 하는 경우)
-      // 판매자 상품옵션 중 가장 높은 상태 구하기
-      const maxOptionStepNum = Math.max(
-        ...sellerGoodsOrderItemOptions.map((io) => Number(orderProcessStepDict[io.step])),
+      // 일부 주문무효인 경우는 현재는 존재하지 않음(주문무효 = 가상계좌 선택후 입금 전 소비자가 주문취소 하는 경우)
+      const sellerOrderItemStepNumList = sellerGoodsOrderItemOptions.map((io) =>
+        Number(orderProcessStepDict[io.step]),
       );
-      // 가장 높은 상태가 구매확정이거나 구매확정보다 낮은 단계라면 그대로 리턴
-      if (maxOptionStepNum <= 80) {
+      // 판매자 상품옵션 중 가장 높은 상태 구하기
+      const maxOptionStepNum = Math.max(...sellerOrderItemStepNumList);
+      // 가장 높은 상태가 구매확정보다 낮은 단계인 경우
+      // => 그대로 리턴
+      if (maxOptionStepNum < 80) {
         return this.getStepNameByStringNumber(
           maxOptionStepNum.toString() as OrderStatusNumString,
         );
       }
 
-      // 가장 높은 상태가 결제취소, 주문무효, 결제실패라면 해당 상태 제외한 주문상품 중 가장 높은 상태 리턴
-      // 판매자 상품옵션 중 결제취소85, 주문무효95, 결제실패99 제외한 가장 높은 상태 구하기
-      const exceptSkipStepsMaxOptionsStepStrNum = Math.max(
-        ...sellerGoodsOrderItemOptions
-          .filter((io) => !skipSteps.includes(io.step))
-          .map((io) => Number(orderProcessStepDict[io.step])),
-      ).toString() as OrderStatusNumString;
-      return this.getStepNameByStringNumber(exceptSkipStepsMaxOptionsStepStrNum);
+      // 가장 높은 상태가 구매확정인 경우 => 구매확정 제외한 상태중 높은 단계 리턴(모든 상태가 구매확정인 경우 위의 firstItemStep 부분에서 리턴됨 )
+      if (maxOptionStepNum === 80) {
+        // 구매확정 제외한 상품이 존재하는지 확인
+        const sellerOrderItemStepNumListExceptPurchaseConfirm =
+          sellerOrderItemStepNumList.filter((stepNum) => stepNum !== 80);
+
+        // 구매확정 제외한 상품이 존재하지 않으면 구매확정으로 상태 리턴
+        if (!sellerOrderItemStepNumListExceptPurchaseConfirm.length) {
+          return OrderProcessStep.purchaseConfirmed;
+        }
+
+        // 있으면 구매확정 제외한 상품 중 가장 높은 단계 리턴
+        const maxStepNumExceptPurchaseConfirm = Math.max(
+          ...sellerOrderItemStepNumListExceptPurchaseConfirm,
+        );
+        return this.getStepNameByStringNumber(
+          maxStepNumExceptPurchaseConfirm.toString() as OrderStatusNumString,
+        );
+      }
+
+      // 가장 높은 단계가 구매확정가장 높은 상태가 결제취소, 주문무효, 결제실패인 경우
+      if (maxOptionStepNum >= 85) {
+        // 결제취소85, 주문무효95, 결제실패99 상태 제외한 상품이 존재하는지 확인
+        const sellerGoodsOrderItemOptionsExceptSkipSteps =
+          sellerGoodsOrderItemOptions.filter((io) => !skipSteps.includes(io.step));
+
+        // 결제취소85, 주문무효95, 결제실패99 상태 제외한 상품이 존재하지 않는 경우 => 모든 상품의 상태가 결제취소, 주문무효, 결제실패 중 하나이므로 이 중 가장 높은상태 리턴
+        if (!sellerGoodsOrderItemOptionsExceptSkipSteps.length) {
+          return this.getStepNameByStringNumber(
+            maxOptionStepNum.toString() as OrderStatusNumString,
+          );
+        }
+
+        // 결제취소85, 주문무효95, 결제실패99 상태 제외한 상품이 존재한다면
+        const sellerOrderItemStepNumListExceptSkipSteps =
+          sellerGoodsOrderItemOptionsExceptSkipSteps.map((io) =>
+            Number(orderProcessStepDict[io.step]),
+          );
+        // 결제취소85, 주문무효95, 결제실패99 제외한 주문상품이 모두 구매확정인 경우 => 구매확정
+        if (sellerOrderItemStepNumList.every((stepNum) => stepNum === 80)) {
+          return OrderProcessStep.purchaseConfirmed;
+        }
+        // 모두 구매확정이 아닌 경우 => 구매확정 제외한 나머지 옵션 상태 중 가장 높은 상태 리턴
+        const maxOptionStepNumExceptSkipStepsAndPurchaseConfirm = Math.max(
+          ...sellerOrderItemStepNumListExceptSkipSteps.filter(
+            (stepNum) => stepNum !== 80,
+          ),
+        );
+        return this.getStepNameByStringNumber(
+          maxOptionStepNumExceptSkipStepsAndPurchaseConfirm.toString() as OrderStatusNumString,
+        );
+      }
     }
 
     // 판매자의 상품옵션 상태가 주문 원상태보다 낮거나 높은 상태가 없다(주문상태와 동일하다)
@@ -965,8 +1011,15 @@ export class OrderService {
         }))
         .filter((r) => r.items.length > 0);
 
-      // 판매자가 진행한  출고 (출고는 판매자별로 처리됨)
-      const sellerExports = exports.filter((exp) => exp.sellerId === dto.sellerId);
+      // 판매자의 상품이 포함된 출고정보
+      const sellerExports = exports
+        .map((e) => ({
+          ...e,
+          items: e.items.filter((item) =>
+            sellerOrderItemsIdList.includes(item.orderItemId),
+          ),
+        }))
+        .filter((e) => e.items.length > 0);
 
       result = {
         ...orderRestData,
@@ -1155,17 +1208,7 @@ export class OrderService {
     });
 
     // 주문에 포함된 모든 주문상품옵션이 구매확정 되었다면 주문의 상태도 구매확정으로 변경
-    const everyOrderItemOptionsPurchaseConfirmed = order.orderItems
-      .flatMap((item) => item.options)
-      .filter((opt) => !skipSteps.includes(opt.step)) // 고려하지 않을 상태(주문취소, 결제취소, 주문무효)인 주문상품옵션 제외
-      .every((opt) => opt.step === 'purchaseConfirmed');
-
-    if (everyOrderItemOptionsPurchaseConfirmed) {
-      await this.prisma.order.update({
-        where: { id: order.id },
-        data: { step: 'purchaseConfirmed' },
-      });
-    }
+    await this.updateOrderStepByOrderItemOptionsSteps({ orderId: order.id });
 
     // * ---- 구매확정된 상품에 대한 마일리지 적립 ----
     if (order.customerId) {

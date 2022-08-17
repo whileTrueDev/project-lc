@@ -258,12 +258,15 @@ export class ExportService {
   }
 
   /** 출고목록조회 - 판매자, 관리자 용
-   * @param dto.sellerId 값이 없으면 전체 출고목록 조회
+   * @param dto.sellerId 값이 있으면, 해당 판매자의 상품이 포함된 출고정보만 조회
    */
   public async getExportList(dto: FindExportListDto): Promise<ExportListRes> {
     const { sellerId, orderCode, skip, take, withSellerInfo } = dto;
 
-    const where: Prisma.ExportWhereInput = { sellerId, order: { orderCode } };
+    const where: Prisma.ExportWhereInput = {
+      order: { orderCode },
+      items: sellerId ? { some: { orderItem: { goods: { sellerId } } } } : undefined,
+    };
     const totalCount = await this.prisma.export.count({ where });
     const data = await this.prisma.export.findMany({
       where,
