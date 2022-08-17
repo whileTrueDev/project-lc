@@ -342,13 +342,31 @@ export class AdminService {
   public async updateLiveShoppingSpecialPrice({
     id,
     specialPrice,
+    goodsId,
+    goodsOptionId,
+    liveShoppingId,
+    discountType,
   }: { id: number } & LiveShoppingSpecialPriceUpdateDto): Promise<boolean> {
-    await this.prisma.liveShoppingSpecialPrice.update({
+    const existSpecialPrice = await this.prisma.liveShoppingSpecialPrice.findUnique({
       where: { id },
-      data: {
-        specialPrice,
-      },
     });
+    if (existSpecialPrice) {
+      await this.prisma.liveShoppingSpecialPrice.update({
+        where: { id },
+        data: { specialPrice },
+      });
+    } else {
+      await this.prisma.liveShoppingSpecialPrice.create({
+        data: {
+          specialPrice,
+          goodsId,
+          goodsOptionId,
+          liveShoppingId,
+          discountType,
+        },
+      });
+    }
+
     return true;
   }
 

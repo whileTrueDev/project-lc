@@ -8,12 +8,13 @@ import {
   useBoolean,
   useToast,
 } from '@chakra-ui/react';
-import { LiveShoppingSpecialPrice } from '@prisma/client';
+import { GoodsOptions, LiveShoppingSpecialPrice } from '@prisma/client';
 import {
   useAdminUpdateLiveShoppingSpecialPriceMutation,
   useAdminUpdateLiveShoppingSpecialPriceMutationDto,
 } from '@project-lc/hooks';
 import { LiveShoppingWithGoods } from '@project-lc/shared-types';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useState, useEffect } from 'react';
 
 export interface AdminLiveShoppingSpecialPriceProps {
@@ -36,11 +37,11 @@ export function AdminLiveShoppingSpecialPrice({
               <Text as="span">
                 {opt.option_title} : {opt.option1}
               </Text>
-              {specialPriceData && (
-                <SpecialPriceDataDisplayAndUpdateSection
-                  specialPriceData={specialPriceData}
-                />
-              )}
+              <SpecialPriceDataDisplayAndUpdateSection
+                specialPriceData={specialPriceData}
+                goodsOption={opt}
+                liveShoppingId={liveShopping.id}
+              />
             </Stack>
           );
         })}
@@ -53,16 +54,24 @@ export default AdminLiveShoppingSpecialPrice;
 
 function SpecialPriceDataDisplayAndUpdateSection({
   specialPriceData,
+  goodsOption,
+  liveShoppingId,
 }: {
-  specialPriceData: LiveShoppingSpecialPrice;
+  specialPriceData?: LiveShoppingSpecialPrice;
+  goodsOption: GoodsOptions;
+  liveShoppingId: number;
 }): JSX.Element {
   const [isOpen, { on, off }] = useBoolean();
-  const [price, setPrice] = useState(Number(specialPriceData.specialPrice));
+  const [price, setPrice] = useState(
+    Number(specialPriceData ? specialPriceData.specialPrice : goodsOption.price),
+  );
   const toast = useToast();
 
   useEffect(() => {
-    setPrice(Number(specialPriceData.specialPrice));
-  }, [specialPriceData]);
+    setPrice(
+      Number(specialPriceData ? specialPriceData.specialPrice : goodsOption.price),
+    );
+  }, [goodsOption.price, specialPriceData]);
 
   const { mutateAsync, isLoading } = useAdminUpdateLiveShoppingSpecialPriceMutation();
 
@@ -76,13 +85,29 @@ function SpecialPriceDataDisplayAndUpdateSection({
   };
 
   const onChangeSpecialPriceButtonClick = (): void => {
-    const mutationDto: useAdminUpdateLiveShoppingSpecialPriceMutationDto = {
-      id: specialPriceData.id,
-      dto: {
-        specialPrice: price,
-        discountType: 'W', // 수정시에는 퍼센트 입력 없이 금액입력만 만들어서 W 고정
-      },
-    };
+    let mutationDto: useAdminUpdateLiveShoppingSpecialPriceMutationDto;
+    if (specialPriceData) {
+      mutationDto = {
+        id: specialPriceData.id,
+        dto: {
+          specialPrice: price,
+          discountType: 'W', // 수정시에는 퍼센트 입력 없이 금액입력만 만들어서 W 고정
+        },
+      };
+    } else {
+      // 기존 특가가 없으므로 생성해야함(라이브쇼핑id, 상품id, 상품옵션id 전달필요)
+      mutationDto = {
+        id: -1, // 존재하지 않는 특가정보 id 전달(해당id 특가정보 없는경우 생성)
+        dto: {
+          liveShoppingId,
+          goodsId: goodsOption.goodsId,
+          goodsOptionId: goodsOption.id,
+          specialPrice: price,
+          discountType: 'W', // 수정시에는 퍼센트 입력 없이 금액입력만 만들어서 W 고정
+        },
+      };
+    }
+
     mutateAsync(mutationDto).then(handleSuccess).catch(handleError);
   };
 
@@ -90,7 +115,10 @@ function SpecialPriceDataDisplayAndUpdateSection({
     <Box>
       <Stack direction="row" alignItems="center">
         <Text as="span" fontWeight="bold" color="blue">
-          {specialPriceData.specialPrice} 원
+          {getLocaleNumber(
+            specialPriceData ? specialPriceData.specialPrice : goodsOption.price,
+          )}{' '}
+          원
         </Text>
 
         {!isOpen && (
@@ -116,7 +144,11 @@ function SpecialPriceDataDisplayAndUpdateSection({
           </Button>
           <Button
             onClick={() => {
-              setPrice(Number(specialPriceData.specialPrice));
+              setPrice(
+                Number(
+                  specialPriceData ? specialPriceData.specialPrice : goodsOption.price,
+                ),
+              );
               off();
             }}
           >
