@@ -5,6 +5,7 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import {
   CouponStatus,
   Goods,
@@ -21,6 +22,7 @@ import {
 import { MICROSERVICE_OVERLAY_TOKEN, UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
+import { PurchaseMessageService } from '@project-lc/nest-modules-liveshopping';
 import { MileageService, MileageSettingService } from '@project-lc/nest-modules-mileage';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -54,8 +56,6 @@ import { calculateShippingCost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
-import { ClientProxy } from '@nestjs/microservices';
-import { PurchaseMessageService } from '@project-lc/nest-modules-liveshopping';
 
 dayjs.extend(isToday);
 
@@ -241,7 +241,7 @@ export class OrderService {
     const orderItemsConnectedGoodsIds = orderItems.map((i) => i.goodsId);
     const orderItemConnectedGoodsData = await this.prisma.goods.findMany({
       where: { id: { in: orderItemsConnectedGoodsIds } },
-      select: { id: true, goods_name: true, image: true },
+      select: { id: true, goods_name: true, image: true, options: true },
     });
 
     // 주문 기본 상태 설정 (결제완료시 결제확인, 이외의 경우 주문접수)
@@ -267,6 +267,14 @@ export class OrderService {
       }
     }
 
+    const supportedLiveShoppingIdList = orderItems
+      .filter((oi) => !!oi.support)
+      .map((oi) => oi.support.liveShoppingId);
+    const relatedLiveShoppings = await this.prisma.liveShopping.findMany({
+      where: { id: { in: supportedLiveShoppingIdList } },
+      include: { liveShoppingSpecialPrices: true },
+    });
+
     // 주문상품, 주문상품옵션, 주문상품후원 생성
     const order = await this.prisma.order.create({
       data: {
@@ -278,6 +286,11 @@ export class OrderService {
           // 주문에 연결된 주문상품 생성
           create: orderItems.map((item) => {
             const { options, support, goodsName, ...rest } = item;
+
+            const supportLs = relatedLiveShoppings.find(
+              (ls) => ls.id === support.liveShoppingId,
+            );
+
             const connectedGoodsData = orderItemConnectedGoodsData.find(
               (goodsData) => goodsData.id === item.goodsId,
             );
@@ -287,12 +300,19 @@ export class OrderService {
               ...rest,
               // 주문상품옵션들 생성
               options: {
-                create: options.map((opt) => ({
-                  ...opt,
-                  goodsName,
-                  imageUrl,
-                  step: orderStep,
-                })),
+                create: options.map((opt) => {
+                  const specialPriceData = supportLs.liveShoppingSpecialPrices.find(
+                    (sp) => sp.goodsOptionId === opt.goodsOptionId,
+                  );
+                  return {
+                    ...opt,
+                    goodsName,
+                    imageUrl,
+                    step: orderStep,
+                    discountPrice: opt.discountPrice, // 주문 & 결제당시 크크쇼주문스토어에 저장된 가격
+                    liveShoppingSpecialPriceId: specialPriceData?.id, // 라이브쇼핑 특가 정보 연결
+                  };
+                }),
               },
               // 주문상품에 후원정보가 있는경우 주문상품후원생성
               support: support

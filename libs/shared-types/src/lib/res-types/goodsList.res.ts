@@ -70,11 +70,6 @@ export type GoodsListRes = {
   prevPage: number | null;
 };
 
-export type ApprovedGoodsNameAndId = {
-  firstmallGoodsConnectionId: number;
-  goods_name: string;
-};
-
 // GET /admin/goods 관리자 페이지 상품검수목록 리턴타입
 export type AdminGoodsListRes = {
   items: AdminGoodsData[];

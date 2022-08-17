@@ -90,6 +90,9 @@ export class CreateOrderItemOptionDto {
   /** 참조하는 상품옵션 고유번호 */
   @IsNumber()
   goodsOptionId: OrderItemOption['goodsOptionId'];
+
+  /** 라이브쇼핑 특가로 주문한 경우 라이브쇼핑 특가정보 */
+  @IsOptional() @IsNumber() liveShoppingSpecialPriceId?: number;
 }
 
 /** 주문상품 OrderItem 생성 dto */

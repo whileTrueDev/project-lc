@@ -1,7 +1,10 @@
 import { GoodsByIdRes, GoodsRelatedBroadcaster } from '@project-lc/shared-types';
 import create from 'zustand';
 
-type SelectedOpt = GoodsByIdRes['options'][number] & { quantity: number };
+type SelectedOpt = GoodsByIdRes['options'][number] & {
+  quantity: number;
+  specialPrice?: number;
+};
 type SelectedBc = GoodsRelatedBroadcaster;
 interface GoodsViewStore {
   selectedNavIdx: number;
@@ -10,6 +13,8 @@ interface GoodsViewStore {
   selectedOpts: Array<SelectedOpt>;
   handleSelectOpt: (opt: SelectedOpt, onFail?: () => void) => void;
   handleRemoveOpt: (targetOptId: number) => void;
+  // 선택된 옵션 목록을 대체하는 함수
+  replaceSelectedOpts: (newOpts: SelectedOpt[]) => void;
   handleIncreaseOptQuantity: (targetOptId: number) => void;
   handleDecreaseOptQuantity: (targetOptId: number) => void;
   // 선택된 방송인
@@ -37,6 +42,10 @@ export const useGoodsViewStore = create<GoodsViewStore>((set, get) => ({
   handleRemoveOpt: (targetOptId: number) => {
     const { selectedOpts } = get();
     set({ selectedOpts: selectedOpts.filter((o) => o.id !== targetOptId) });
+  },
+  // 선택된 옵션 목록을 대체하는 함수
+  replaceSelectedOpts: (newOpts: SelectedOpt[]) => {
+    set({ selectedOpts: newOpts });
   },
   handleIncreaseOptQuantity: (targetOptId: number) => {
     const { selectedOpts } = get();

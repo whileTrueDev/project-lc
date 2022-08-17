@@ -11,7 +11,7 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminAllLcGoodsList,
   AllGoodsIdsRes,
-  ApprovedGoodsNameAndId,
+  ApprovedGoodsListItem,
   DefaultPaginationDto,
   getLiveShoppingProgress,
   GoodsByIdRes,
@@ -700,7 +700,7 @@ export class GoodsService {
     }
   }
 
-  public async findMyGoodsNames(sellerId: number): Promise<ApprovedGoodsNameAndId[]> {
+  public async findMyGoodsNames(sellerId: number): Promise<ApprovedGoodsListItem[]> {
     const goodsIds = await this.prisma.goods.findMany({
       where: {
         seller: { id: sellerId },

@@ -22,7 +22,19 @@ export class CartService {
       include: {
         options: true,
         support: {
-          include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+          include: {
+            broadcaster: { select: { userNickname: true, avatar: true } },
+            liveShopping: {
+              select: {
+                progress: true,
+                broadcastStartDate: true,
+                broadcastEndDate: true,
+                sellStartDate: true,
+                sellEndDate: true,
+                liveShoppingSpecialPrices: true,
+              },
+            },
+          },
         },
         goods: {
           select: {
