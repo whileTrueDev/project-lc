@@ -5,7 +5,7 @@ import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { OrderToolbar } from '@project-lc/components-seller/kkshow-order/OrderList';
 import { useAdminOrderList } from '@project-lc/hooks';
-import { convertPaymentMethodToKrString } from '@project-lc/shared-types';
+import { convertPaymentMethodToKrString, OrderListRes } from '@project-lc/shared-types';
 import { useSellerOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
@@ -63,14 +63,16 @@ const columns: GridColumns = [
     width: 120,
     field: 'broadcaster',
     headerName: '방송인',
-    valueGetter: ({ row }: GridRowData) => {
-      if (row.orderItems.length > 1) {
-        return `${`${row.orderItems[0]?.support?.broadcaster?.userNickname || ''} 외 ${
-          row.orderItems.length - 1
-        }`}명`;
+    valueGetter: ({ row }) => {
+      const _row = row as OrderListRes['orders'][number];
+      const oiIncludesSupports = _row.orderItems.filter((x) => !!x.support);
+      if (oiIncludesSupports.length > 1) {
+        return `${`${
+          oiIncludesSupports[0]?.support?.broadcaster?.userNickname || ''
+        } 외 ${oiIncludesSupports.length - 1}`}명`;
       }
-      return row.orderItems[0]?.support
-        ? row.orderItems[0]?.support?.broadcaster?.userNickname || ''
+      return oiIncludesSupports[0]?.support
+        ? oiIncludesSupports[0]?.support?.broadcaster?.userNickname || ''
         : '후원X';
     },
   },
