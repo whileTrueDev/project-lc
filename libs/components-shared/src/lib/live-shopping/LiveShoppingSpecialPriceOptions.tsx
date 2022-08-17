@@ -1,4 +1,12 @@
-import { FormControl, FormErrorMessage, Input, Stack, Text } from '@chakra-ui/react';
+import {
+  FormControl,
+  FormErrorMessage,
+  Input,
+  Stack,
+  Text,
+  Divider,
+  Box,
+} from '@chakra-ui/react';
 import { GoodsOptions } from '@prisma/client';
 import {
   LiveShoppingSpecialPriceDiscountType,
@@ -91,61 +99,63 @@ export function LiveShoppingSpecialPriceOptions({
   }, [discountRate]);
 
   return (
-    <Stack>
+    <Stack spacing={4}>
       {fields.map((field, index) => {
         const originGoodsOption = goodsOptions.find(
           (opt) => opt.id === field.goodsOptionId,
         );
         if (!originGoodsOption) return null;
         return (
-          <Stack
-            key={field.id}
-            flexWrap="wrap"
-            direction="row"
-            alignItems="center"
-            height={10}
-          >
-            <Stack direction="row" mr={1} flexGrow={0} flexShrink={0} width="250px">
-              {originGoodsOption.option_title && originGoodsOption.option1 && (
-                <Text>
-                  {originGoodsOption.option_title} : {originGoodsOption.option1}
-                </Text>
-              )}
-            </Stack>
+          <Box key={field.id}>
+            <Stack
+              flexWrap="wrap"
+              direction={{ base: 'column', md: 'row' }}
+              alignItems={{ base: 'flex-start', md: 'center' }}
+              mb={4}
+            >
+              <Stack direction="row" flexGrow={0} flexShrink={0} width="250px">
+                {originGoodsOption.option_title && originGoodsOption.option1 && (
+                  <Text>
+                    {originGoodsOption.option_title} : {originGoodsOption.option1}
+                  </Text>
+                )}
+              </Stack>
 
-            <Stack direction="row" mb={1} flexGrow={0} flexShrink={0} width="200px">
-              <Text minWidth="40px">정가 : </Text>
-              <Text>{originGoodsOption.consumer_price}</Text>
-            </Stack>
+              <Stack direction="row" flexGrow={0} flexShrink={0} width="200px">
+                <Text minWidth="40px">정가 : </Text>
+                <Text>{originGoodsOption.consumer_price}</Text>
+              </Stack>
 
-            <Stack direction="row" mb={1} flexGrow={1} alignItems="center">
-              <Text minWidth="40px">라이브쇼핑 특가 :</Text>
-              {discountType === 'P' && <Text>{field.specialPrice}</Text>}
-              {discountType === 'W' && (
-                <FormControl
-                  isInvalid={!!errors?.specialPrices?.[index]?.specialPrice}
-                  width="auto"
-                >
-                  <Input
-                    size="sm"
-                    type="number"
-                    {...register(`specialPrices.${index}.specialPrice`, {
-                      valueAsNumber: true,
-                      min: { value: 1, message: '최소값은 1입니다' },
-                      max: {
-                        value: Number(originGoodsOption.consumer_price),
-                        message: '라이브쇼핑 특가는 기존 정가보다 낮아야 합니다',
-                      },
-                    })}
-                  />
-                  <FormErrorMessage>
-                    {errors?.specialPrices?.[index]?.specialPrice &&
-                      errors?.specialPrices?.[index]?.specialPrice?.message}
-                  </FormErrorMessage>
-                </FormControl>
-              )}
+              <Stack direction="row" flexGrow={1} alignItems="center">
+                <Text minWidth="40px">라이브쇼핑 특가 :</Text>
+                {discountType === 'P' && <Text>{field.specialPrice}</Text>}
+                {discountType === 'W' && (
+                  <FormControl
+                    isInvalid={!!errors?.specialPrices?.[index]?.specialPrice}
+                    width="auto"
+                  >
+                    <Input
+                      size="sm"
+                      type="number"
+                      {...register(`specialPrices.${index}.specialPrice`, {
+                        valueAsNumber: true,
+                        min: { value: 1, message: '최소값은 1입니다' },
+                        max: {
+                          value: Number(originGoodsOption.consumer_price),
+                          message: '라이브쇼핑 특가는 기존 정가보다 낮아야 합니다',
+                        },
+                      })}
+                    />
+                    <FormErrorMessage>
+                      {errors?.specialPrices?.[index]?.specialPrice &&
+                        errors?.specialPrices?.[index]?.specialPrice?.message}
+                    </FormErrorMessage>
+                  </FormControl>
+                )}
+              </Stack>
             </Stack>
-          </Stack>
+            <Divider />
+          </Box>
         );
       })}
     </Stack>
