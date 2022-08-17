@@ -965,8 +965,15 @@ export class OrderService {
         }))
         .filter((r) => r.items.length > 0);
 
-      // 판매자가 진행한  출고 (출고는 판매자별로 처리됨)
-      const sellerExports = exports.filter((exp) => exp.sellerId === dto.sellerId);
+      // 판매자의 상품이 포함된 출고정보
+      const sellerExports = exports
+        .map((e) => ({
+          ...e,
+          items: e.items.filter((item) =>
+            sellerOrderItemsIdList.includes(item.orderItemId),
+          ),
+        }))
+        .filter((e) => e.items.length > 0);
 
       result = {
         ...orderRestData,
