@@ -13,7 +13,7 @@ import { DeliveryService } from './delivery.service';
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
-@CacheClearKeys('export')
+@CacheClearKeys('export', 'order')
 @Controller('delivery')
 export class DeliveryController {
   constructor(private readonly deliveryService: DeliveryService) {}
