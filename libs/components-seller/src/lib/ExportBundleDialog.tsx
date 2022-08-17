@@ -137,11 +137,19 @@ export function ExportBundleDialog({
     const _orders: CreateKkshowExportDto[] = [];
     selectedKeys.forEach((k) => {
       const data = formData[Number(k)];
-      _orders.push({ ...data, deliveryCompany, deliveryNumber });
+      const realData = {
+        ...data,
+        items: data.items.filter((x) => !!x.quantity),
+        deliveryCompany,
+        deliveryNumber,
+      };
+      _orders.push(realData);
     });
-
+    const realOrders = _orders.filter((d) =>
+      selectedOrderShippings.find((x) => x.orderId === d.orderId),
+    );
     // 합포장 출고처리 요청
-    return exportBundle({ exportOrders: _orders });
+    return exportBundle({ exportOrders: realOrders });
   }
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
