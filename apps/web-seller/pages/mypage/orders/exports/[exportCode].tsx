@@ -75,7 +75,7 @@ export default function ExportsDetail(): JSX.Element {
 
         <SectionWithTitle title="출고 주문 정보">
           <Stack spacing={4}>
-            <DeliveryTrackingList orderCode={exp.data.order.orderCode} />
+            <DeliveryTrackingList exportCode={exportCode} />
           </Stack>
         </SectionWithTitle>
       </Stack>
