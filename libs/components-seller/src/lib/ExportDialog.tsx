@@ -56,7 +56,8 @@ export function ExportDialog({
   const onExportSuccess = useCallback(() => {
     toast({ status: 'success', description: '출고 처리가 성공적으로 완료되었습니다.' });
     closeAndResetShippings();
-  }, [closeAndResetShippings, toast]);
+    formMethods.reset();
+  }, [closeAndResetShippings, formMethods, toast]);
 
   const onExportFail = useCallback(
     (err: any) => {

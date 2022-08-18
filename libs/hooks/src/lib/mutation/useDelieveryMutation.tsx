@@ -17,7 +17,11 @@ export const useDelieveryStartMutation = (): UseMutationResult<
       axios.post<useDelieveryMutationRes>('/delivery/start', dto).then((res) => res.data),
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries(['Exports']);
+        queryClient.invalidateQueries('OrderDetail');
+        queryClient.invalidateQueries('getAdminOrder', { refetchInactive: true });
+        queryClient.invalidateQueries('AdminOrderList');
+        queryClient.invalidateQueries('Exports');
+        queryClient.invalidateQueries(['Exports'], { refetchInactive: true });
       },
     },
   );
@@ -35,7 +39,11 @@ export const useDelieveryDoneMutation = (): UseMutationResult<
       axios.post<useDelieveryMutationRes>('/delivery/done', dto).then((res) => res.data),
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries(['Exports']);
+        queryClient.invalidateQueries('OrderDetail');
+        queryClient.invalidateQueries('getAdminOrder', { refetchInactive: true });
+        queryClient.invalidateQueries('AdminOrderList');
+        queryClient.invalidateQueries('Exports');
+        queryClient.invalidateQueries(['Exports'], { refetchInactive: true });
       },
     },
   );
