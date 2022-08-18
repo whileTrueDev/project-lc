@@ -288,9 +288,9 @@ export class OrderService {
           create: orderItems.map((item) => {
             const { options, support, goodsName, ...rest } = item;
 
-            const supportLs = relatedLiveShoppings.find(
-              (ls) => ls.id === support.liveShoppingId,
-            );
+            const supportLs = relatedLiveShoppings.length
+              ? relatedLiveShoppings.find((ls) => ls.id === support.liveShoppingId)
+              : undefined;
 
             const connectedGoodsData = orderItemConnectedGoodsData.find(
               (goodsData) => goodsData.id === item.goodsId,
@@ -302,7 +302,7 @@ export class OrderService {
               // 주문상품옵션들 생성
               options: {
                 create: options.map((opt) => {
-                  const specialPriceData = supportLs.liveShoppingSpecialPrices.find(
+                  const specialPriceData = supportLs?.liveShoppingSpecialPrices.find(
                     (sp) => sp.goodsOptionId === opt.goodsOptionId,
                   );
                   return {
