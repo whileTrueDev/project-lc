@@ -301,7 +301,6 @@ $(document).ready(function ready() {
   $('#panel-activate-checkbox').click(function panelActivateButton() {
     $('.mid-area')
       .find('button')
-      .not('.admin-to-bc-live-state-board-box button')
       .prop('disabled', (_, val) => !val);
   });
 
