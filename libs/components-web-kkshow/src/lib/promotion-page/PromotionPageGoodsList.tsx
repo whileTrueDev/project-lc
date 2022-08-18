@@ -49,7 +49,7 @@ export function PromotionPageGoodsList({
             <Text as="h5" fontSize="xl" fontWeight="bold">
               현재 라이브 진행중 상품
             </Text>
-            <SimpleGrid mt={4} columns={[1, 2, 3]} spacing={4}>
+            <SimpleGrid mt={4} columns={[2, 2, 3]} spacing={4}>
               {liveShopping.data?.map((x) => (
                 <PromotinoPageGoodsDisplay
                   broadcasterId={broadcasterId}
@@ -66,7 +66,7 @@ export function PromotionPageGoodsList({
           <Text as="h5" fontSize="xl" fontWeight="bold">
             홍보중 상품
           </Text>
-          <SimpleGrid mt={4} columns={[1, 2, 3]} spacing={4}>
+          <SimpleGrid mt={4} columns={[2, 2, 3]} spacing={4}>
             {promotionItems &&
               promotionItems.pages.map((page, idx) => (
                 <Fragment key={idx}>
