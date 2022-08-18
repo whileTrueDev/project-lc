@@ -297,9 +297,9 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     children: [
       { name: '결제취소 요청', href: '/order/order-cancel', icon: FcDislike },
       { name: '주문 목록', href: '/order/list', icon: FcList },
+      { name: '출고 목록', href: '/order/exports', icon: FcList },
       { name: '환불요청 처리', href: '/order/refund', icon: FcMoneyTransfer },
       { name: '마일리지 설정', href: '/order/mileage-setting', icon: FcRating },
-      { name: '출고 목록', href: '/order/exports', icon: FcList },
     ],
   },
   {

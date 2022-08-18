@@ -158,10 +158,22 @@ export function CartActions(): JSX.Element {
           options: i.options.map((o) => {
             // CartOptionItem 타입에서 CreateOrderItemOptionDto 타입 만들기 위해 필요한 데이터만 사용
             const { cartItemId, goodsOptionsId, id, ...optData } = o;
+
+            let price = Number(o.discountPrice);
+            // 진행중인 라이브쇼핑 존재 && 특가정보 있는경우 특가를 저장
+            if (
+              defineCorrectChannel(i) === 'liveShopping' &&
+              i.support?.liveShopping.liveShoppingSpecialPrices.length
+            ) {
+              const spData = i.support.liveShopping?.liveShoppingSpecialPrices.find(
+                (sp) => sp.goodsOptionId === o.goodsOptionsId,
+              );
+              price = Number(spData?.specialPrice);
+            }
             return {
               ...optData,
               normalPrice: Number(o.normalPrice),
-              discountPrice: Number(o.discountPrice),
+              discountPrice: price,
               goodsOptionId: o.goodsOptionsId as number,
             };
           }),

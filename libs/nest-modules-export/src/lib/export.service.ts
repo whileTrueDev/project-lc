@@ -99,21 +99,24 @@ export class ExportService {
   }
 
   /** 연결된 주문상품옵션 상태변경 */
-  async updateOrderItemOptionsStatus(dto: CreateKkshowExportDto): Promise<boolean> {
+  async updateOrderItemOptionsStatus(
+    exportItems: CreateKkshowExportDto['items'],
+  ): Promise<boolean> {
     // 주문상품옵션
     const orderItemOptions = await this.prisma.orderItemOption.findMany({
-      where: { id: { in: dto.items.map((item) => item.orderItemOptionId) } },
+      where: { id: { in: exportItems.map((item) => item.orderItemOptionId) } },
       select: { id: true, quantity: true, exportItems: true },
     });
     // 주문상품옵션.quantity 가 총합(주문상품옵션.출고상품옵션.quantity)보다 작으면 부분출고
     // 아니면 전체출고로 주문상품옵션의 상태 업데이트
     const updateDataList = await Promise.all(
       orderItemOptions.map(async (orderItemOption) => {
-        const { quantity: originOrderAmount, exportItems, id } = orderItemOption; // 주문상품옵션 원래 주문개수
-        const totalExportedAmount = exportItems.reduce(
-          (sum, cur) => sum + cur.quantity,
-          0,
-        ); // 주문상품옵션에 연결된 출고상품의 출고개수 합
+        const {
+          quantity: originOrderAmount,
+          exportItems: _expItems,
+          id,
+        } = orderItemOption; // 주문상품옵션 원래 주문개수
+        const totalExportedAmount = _expItems.reduce((sum, cur) => sum + cur.quantity, 0); // 주문상품옵션에 연결된 출고상품의 출고개수 합
         const newOrderItemOptionStepAfterExport: OrderProcessStep =
           originOrderAmount <= totalExportedAmount ? 'exportDone' : 'partialExportDone';
         return { id, step: newOrderItemOptionStepAfterExport };
@@ -121,10 +124,7 @@ export class ExportService {
     );
     await this.prisma.$transaction(
       updateDataList.map(({ id, step }) => {
-        return this.prisma.orderItemOption.update({
-          where: { id },
-          data: { step },
-        });
+        return this.prisma.orderItemOption.update({ where: { id }, data: { step } });
       }),
     );
     return true;
@@ -132,7 +132,7 @@ export class ExportService {
 
   /** 연결된 주문 상태변경
    */
-  async updateOrderStatus(dto: CreateKkshowExportDto): Promise<Order> {
+  async updateOrderStatus(dto: Pick<CreateKkshowExportDto, 'orderId'>): Promise<Order> {
     return this.orderService.updateOrderStepByOrderItemOptionsSteps({
       orderId: dto.orderId,
     });
@@ -158,7 +158,7 @@ export class ExportService {
     /** 재고차감 */
     await this.updateGoodsSupplies(dto);
     /** 주문상품옵션의 상태변경 -> 주문상태변경보다 먼저 진행 */
-    await this.updateOrderItemOptionsStatus(dto);
+    await this.updateOrderItemOptionsStatus(dto.items);
     /** 주문의 상태변경 -> 주문상품옵션 상태변경 후 진행 */
     const order = await this.updateOrderStatus(dto);
 
@@ -258,12 +258,15 @@ export class ExportService {
   }
 
   /** 출고목록조회 - 판매자, 관리자 용
-   * @param dto.sellerId 값이 없으면 전체 출고목록 조회
+   * @param dto.sellerId 값이 있으면, 해당 판매자의 상품이 포함된 출고정보만 조회
    */
   public async getExportList(dto: FindExportListDto): Promise<ExportListRes> {
     const { sellerId, orderCode, skip, take, withSellerInfo } = dto;
 
-    const where: Prisma.ExportWhereInput = { sellerId, order: { orderCode } };
+    const where: Prisma.ExportWhereInput = {
+      order: { orderCode },
+      items: sellerId ? { some: { orderItem: { goods: { sellerId } } } } : undefined,
+    };
     const totalCount = await this.prisma.export.count({ where });
     const data = await this.prisma.export.findMany({
       where,

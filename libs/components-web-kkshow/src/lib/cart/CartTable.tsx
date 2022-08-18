@@ -36,6 +36,7 @@ import {
   useCartShippingGroups,
   useCartTruncateMutation,
   useIsThisGoodsNowOnLive,
+  useLiveShoppingSpecialPriceListNowOnLiveByBroadcaster,
   useProductPromotions,
 } from '@project-lc/hooks';
 import { CartItemRes } from '@project-lc/shared-types';
@@ -389,11 +390,40 @@ export function CartItemDisplay({
 }
 
 export function CartItemPriceDisplay({ cartItem }: CartTableItemProps): JSX.Element {
+  // 현재 진행중인 라이브인지 확인
+  const isNowLive = useIsThisGoodsNowOnLive(
+    cartItem.goods.id,
+    cartItem.support?.broadcasterId || undefined,
+  );
+
+  // 현재 진행중인 라이브쇼핑의 특가정보
+  const specialPriceItemList = useLiveShoppingSpecialPriceListNowOnLiveByBroadcaster(
+    cartItem.goods.id,
+    cartItem.support?.broadcasterId || undefined,
+  );
+
+  // 카트상품옵션 정보에 라이브특가 데이터 추가하기
+  const cartItemOptionsWithSpecialPrice: (CartItemOption & { specialPrice?: number })[] =
+    useMemo(() => {
+      if (!isNowLive || !specialPriceItemList) return cartItem.options;
+      return cartItem.options.map((cio) => {
+        const lsSpecialPrice = specialPriceItemList.find(
+          (sp) => sp.goodsOptionId === cio.goodsOptionsId,
+        );
+        return { ...cio, specialPrice: Number(lsSpecialPrice?.specialPrice) };
+      });
+    }, [cartItem.options, isNowLive, specialPriceItemList]);
+
   // 카트 상품 전체 금액
   const totalPrice = useMemo(() => {
-    return cartItem.options.reduce((p, n) => p + Number(n.discountPrice) * n.quantity, 0);
-  }, [cartItem.options]);
-
+    return cartItemOptionsWithSpecialPrice.reduce((p, n) => {
+      let price = Number(n.discountPrice);
+      if (n.specialPrice) {
+        price = n.specialPrice;
+      }
+      return p + price * n.quantity;
+    }, 0);
+  }, [cartItemOptionsWithSpecialPrice]);
   return (
     <Box>
       <Text fontSize="xl">
@@ -404,10 +434,14 @@ export function CartItemPriceDisplay({ cartItem }: CartTableItemProps): JSX.Elem
           원
         </Text>
       </Text>
-      {cartItem.options.map((opt, idx) => (
+      {cartItemOptionsWithSpecialPrice.map((opt, idx) => (
         <Flex key={opt.id} gap={2} mt={1}>
           <Text color="GrayText" fontSize="xs">
-            옵션{idx + 1} {getLocaleNumber(Number(opt.discountPrice) * opt.quantity)} 원
+            옵션{idx + 1}{' '}
+            {opt.specialPrice
+              ? getLocaleNumber(opt.specialPrice * opt.quantity)
+              : getLocaleNumber(Number(opt.discountPrice) * opt.quantity)}{' '}
+            원
           </Text>
         </Flex>
       ))}

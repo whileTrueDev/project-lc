@@ -9,12 +9,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import {
-  CacheClearKeys,
-  HttpCacheInterceptor,
-  SellerInfo,
-  UserPayload,
-} from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 // import { SellerInfo, UserPayload } from '@project-lc/nest-core';
 import {
@@ -30,29 +25,23 @@ import { ExportService } from './export.service';
 @UseGuards(JwtAuthGuard)
 @Controller('export')
 @UseInterceptors(HttpCacheInterceptor)
-@CacheClearKeys('order')
+@CacheClearKeys('order', 'export')
 export class ExportController {
   constructor(private readonly exportService: ExportService) {}
 
   /** 합포장 출고처리 -> 일괄출고처리와 비슷하나 출고에 합포장코드가 추가되고, 연결된 주문에 합포장플래그 true 설정 */
   @Post('bundle')
-  public exportBundle(
-    @Body(ValidationPipe) dto: ExportManyDto,
-    @SellerInfo() seller: UserPayload,
-  ): Promise<boolean> {
+  public exportBundle(@Body(ValidationPipe) dto: ExportManyDto): Promise<boolean> {
     return this.exportService.exportBundle({
-      exportOrders: dto.exportOrders.map((data) => ({ ...data, sellerId: seller.id })),
+      exportOrders: dto.exportOrders,
     });
   }
 
   /** 일괄 출고처리 */
   @Post('many')
-  public exportMany(
-    @Body(ValidationPipe) dto: ExportManyDto,
-    @SellerInfo() seller: UserPayload,
-  ): Promise<boolean> {
+  public exportMany(@Body(ValidationPipe) dto: ExportManyDto): Promise<boolean> {
     return this.exportService.exportMany({
-      exportOrders: dto.exportOrders.map((data) => ({ ...data, sellerId: seller.id })),
+      exportOrders: dto.exportOrders,
     });
   }
 
@@ -60,9 +49,8 @@ export class ExportController {
   @Post()
   public exportOne(
     @Body(ValidationPipe) dto: CreateKkshowExportDto,
-    @SellerInfo() seller: UserPayload,
   ): Promise<ExportCreateRes> {
-    return this.exportService.exportOne({ dto: { ...dto, sellerId: seller.id } });
+    return this.exportService.exportOne({ dto: { ...dto } });
   }
 
   /** 개별출고정보 조회 */

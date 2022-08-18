@@ -26,6 +26,22 @@ export class LiveShoppingService {
       where: { id: sellerId },
       select: { id: true },
     });
+
+    // 라이브쇼핑 특가 정보 입력한경우 생성
+    const createSpecialPrices = {
+      create: dto.specialPrices
+        ? dto.specialPrices.map((sp) => {
+            return {
+              specialPrice: sp.specialPrice,
+              goodsId: sp.goodsId,
+              goodsOptionId: sp.goodsOptionId,
+              discountType: sp.discountType,
+              discountRate: sp.discountRate,
+            };
+          })
+        : undefined,
+    };
+
     const liveShopping = await this.prisma.liveShopping.create({
       data: {
         seller: { connect: { id: userId.id } },
@@ -34,6 +50,7 @@ export class LiveShoppingService {
         desiredCommission: dto.desiredCommission || '0.00',
         goods: { connect: { id: dto.goodsId } },
         sellerContacts: { connect: { id: dto.contactId } },
+        liveShoppingSpecialPrices: createSpecialPrices,
       },
     });
     return { liveShoppingId: liveShopping.id };
@@ -126,6 +143,7 @@ export class LiveShoppingService {
             },
           },
         },
+        liveShoppingSpecialPrices: true,
       },
     });
   }
@@ -162,6 +180,9 @@ export class LiveShoppingService {
         progress: true,
         images: true,
         liveShoppingName: true,
+        liveShoppingSpecialPrices: {
+          select: { id: true, specialPrice: true, goodsId: true, goodsOptionId: true },
+        },
       },
     });
 

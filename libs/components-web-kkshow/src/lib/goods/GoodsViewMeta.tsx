@@ -6,6 +6,7 @@ import {
   Grid,
   GridItem,
   Heading,
+  HeadingProps,
   Image,
   ListItem,
   Skeleton,
@@ -16,8 +17,9 @@ import {
 import { Goods, GoodsStatus } from '@prisma/client';
 import { GoodsStatusBadge } from '@project-lc/components-shared/GoodsStatusBadge';
 import ShippingGroupSets from '@project-lc/components-shared/shipping/ShippingGroupSets';
-import { useGoodsById } from '@project-lc/hooks';
+import { useGoodsById, useLiveShoppingNowOnLive } from '@project-lc/hooks';
 import { GoodsByIdRes } from '@project-lc/shared-types';
+import { useGoodsViewStore } from '@project-lc/stores';
 import {
   getDiscountedRate,
   getLocaleNumber,
@@ -60,6 +62,7 @@ export function GoodsViewMeta(): JSX.Element | null {
 
           {/* 가격정보 */}
           <GoodsViewPriceTag
+            goodsId={goods.data.id}
             goodsOptions={goods.data.options}
             shippingGroup={goods.data.ShippingGroup}
           />
@@ -195,11 +198,13 @@ export function GoodsViewNameAndStatus({
 interface GoodsViewPriceTagProps {
   goodsOptions: GoodsByIdRes['options'];
   shippingGroup: GoodsByIdRes['ShippingGroup'];
+  goodsId: GoodsByIdRes['id'];
 }
 /** 상품 상세 페이지 상품 가격정보 */
 export function GoodsViewPriceTag({
   goodsOptions,
   shippingGroup,
+  goodsId,
 }: GoodsViewPriceTagProps): JSX.Element {
   // 기본 상품 옵션 데이터
   const defaultOption = useMemo(() => {
@@ -222,6 +227,46 @@ export function GoodsViewPriceTag({
     );
   }, [defaultOption.consumer_price, defaultOption.price]);
 
+  // 후원방송인 존재 && 특가정보 존재하는 경우 => Live 특가를 표시한다
+  const selectedBc = useGoodsViewStore((s) => s.selectedBc);
+  // 현재상품 & 선택된 방송인이 현재 진행중인 라이브쇼핑(목록형태로 리턴됨. 동일 방송인이 동시에 같은 상품을 라이브방송하지는 않으므로 첫번째 값을 사용함)
+  const nowOnliveLsListBySelectedBc = useLiveShoppingNowOnLive({
+    goodsId,
+    broadcasterId: selectedBc?.id,
+  });
+  // 라이브 특가가 존재하는지, 특가옵션 중 최저가, 라이브특가 할인율
+  const { hasLiveShoppingSpecialPrice, cheapestPrice, specialPriceDiscountRate } =
+    useMemo(() => {
+      const specialPriceInfo: {
+        hasLiveShoppingSpecialPrice: boolean;
+        cheapestPrice: number | null;
+        specialPriceDiscountRate: string;
+      } = {
+        hasLiveShoppingSpecialPrice: false,
+        cheapestPrice: null,
+        specialPriceDiscountRate: '',
+      };
+
+      if (
+        selectedBc &&
+        nowOnliveLsListBySelectedBc.data &&
+        nowOnliveLsListBySelectedBc.data[0]
+      ) {
+        specialPriceInfo.hasLiveShoppingSpecialPrice = true;
+        const specialPriceArr =
+          nowOnliveLsListBySelectedBc.data[0].liveShoppingSpecialPrices.map((spData) =>
+            Number(spData.specialPrice),
+          );
+        specialPriceInfo.cheapestPrice = Math.min(...specialPriceArr);
+        specialPriceInfo.specialPriceDiscountRate = getDiscountedRate(
+          Number(defaultOption.consumer_price),
+          Number(specialPriceInfo.cheapestPrice),
+        );
+      }
+
+      return specialPriceInfo;
+    }, [selectedBc, nowOnliveLsListBySelectedBc.data, defaultOption.consumer_price]);
+
   return (
     <Grid
       templateColumns="1fr 2fr"
@@ -234,7 +279,11 @@ export function GoodsViewPriceTag({
         <Text>정가</Text>
       </GridItem>
       <GridItem>
-        <Text fontWeight="medium">
+        <Text
+          fontWeight="medium"
+          textDecoration={hasLiveShoppingSpecialPrice ? 'line-through' : undefined}
+          color={hasLiveShoppingSpecialPrice ? 'GrayText' : undefined}
+        >
           {getLocaleNumber(defaultOption?.consumer_price)}원
         </Text>
       </GridItem>
@@ -242,18 +291,38 @@ export function GoodsViewPriceTag({
       <GridItem>
         <Text>판매가</Text>
       </GridItem>
-      <GridItem>
+      <GridItem
+        textDecoration={hasLiveShoppingSpecialPrice ? 'line-through' : undefined}
+        color={hasLiveShoppingSpecialPrice ? 'GrayText' : undefined}
+      >
         <Flex gap={1} flexWrap="wrap" alignItems="center">
           <Text id="price" fontWeight="medium">
             {getLocaleNumber(defaultOption?.price)}원
           </Text>
-          {defaultOption && discountRate !== '0' && (
-            <Heading ml={2} as="span" fontSize="lg" color="blue.500" id="discount-rate">
-              {discountRate}%
-            </Heading>
+          {defaultOption && discountRate !== '0' && !hasLiveShoppingSpecialPrice && (
+            <DiscountRateText discountRate={discountRate} id="discount-rate" />
           )}
         </Flex>
       </GridItem>
+
+      {/* 라이브 특가가 존재하는 경우 표시 */}
+      {hasLiveShoppingSpecialPrice && (
+        <>
+          <GridItem>
+            <Flex alignItems="center" height="100%">
+              <Text fontWeight="extrabold">LIVE특가</Text>
+            </Flex>
+          </GridItem>
+          <GridItem>
+            <Flex gap={1} flexWrap="wrap" alignItems="center">
+              <Text id="special-cheapest-price" fontWeight="extrabold" fontSize="2xl">
+                {getLocaleNumber(cheapestPrice)}원
+              </Text>
+              <DiscountRateText discountRate={specialPriceDiscountRate} />
+            </Flex>
+          </GridItem>
+        </>
+      )}
 
       {shippingGroup && (
         <>
@@ -276,6 +345,17 @@ export function GoodsViewPriceTag({
         </>
       )}
     </Grid>
+  );
+}
+
+function DiscountRateText({
+  discountRate,
+  ...rest
+}: { discountRate: string } & HeadingProps): JSX.Element {
+  return (
+    <Heading ml={2} as="span" fontSize="lg" color="blue.500" {...rest}>
+      {discountRate}%
+    </Heading>
   );
 }
 

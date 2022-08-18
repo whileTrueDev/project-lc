@@ -30,6 +30,7 @@ import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
 import { BroadcasterAutocomplete } from '@project-lc/components-admin/BroadcasterAutocomplete';
 import { LiveShoppingDatePicker } from '@project-lc/components-admin/LiveShoppingDatePicker';
 import { LiveShoppingDetailTitle } from '@project-lc/components-admin/LiveShoppingDetailTitle';
+import { AdminLiveShoppingSpecialPrice } from '@project-lc/components-admin/live-shopping/AdminLiveShoppingSpecialPrice';
 import { LiveShoppingProgressSelector } from '@project-lc/components-admin/LiveShoppingProgressSelector';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
 import { GoodsDetailCommonInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailCommonInfo';
@@ -377,6 +378,13 @@ export function LiveShoppingDetail(): JSX.Element {
                   : '미정'}
               </Text>
             </Stack>
+
+            <Divider />
+
+            {/* 라이브쇼핑 특가정보 표시 및 수정 */}
+            <AdminLiveShoppingSpecialPrice liveShopping={liveShopping[0]} />
+
+            <Divider />
 
             <Box>
               <Text>요청사항</Text>

@@ -52,7 +52,9 @@ export function ShippingTrackingIndex(): JSX.Element {
         <Text fontSize="xl" fontWeight="bold">
           배송 조회
         </Text>
-        <DeliveryTrackingList orderCode={orderCode} />
+        {orderDetail.data.exports.map((exp) => (
+          <DeliveryTrackingList key={exp.exportCode} exportCode={exp.exportCode} />
+        ))}
       </Box>
     </CustomerMypageLayout>
   );

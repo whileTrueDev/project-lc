@@ -21,7 +21,7 @@ import {
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { GoodsService } from '@project-lc/nest-modules-goods';
 import {
-  ApprovedGoodsNameAndId,
+  ApprovedGoodsListItem,
   FindLiveShoppingDto,
   FindNowPlayingLiveShoppingDto,
   LiveShoppingOutline,
@@ -75,7 +75,7 @@ export class LiveShoppingController {
   @UseGuards(JwtAuthGuard)
   async getApprovedGoodsList(
     @SellerInfo() seller: UserPayload,
-  ): Promise<ApprovedGoodsNameAndId[]> {
+  ): Promise<ApprovedGoodsListItem[]> {
     const sellerId = seller.id;
     const goodsList = await this.goodsService.findMyGoodsNames(sellerId);
     return goodsList;

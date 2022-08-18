@@ -16,6 +16,7 @@ import {
   GoodsRejectionDto,
   LiveShoppingUpdateDTO,
   LiveShoppingImageDto,
+  LiveShoppingSpecialPriceUpdateDto,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -238,6 +239,7 @@ export class AdminService {
           },
         },
       });
+
       // 취소상태로 변경하는 경우
       if (dto.progress === 'canceled') {
         // 카트상품 channel 변경
@@ -333,6 +335,38 @@ export class AdminService {
       data: { liveShoppingVideo: { delete: true } },
     });
     if (!videoUrl) throw new InternalServerErrorException(`비디오 삭제 실패`);
+    return true;
+  }
+
+  /** 라이브쇼핑 특가정보 수정 */
+  public async updateLiveShoppingSpecialPrice({
+    id,
+    specialPrice,
+    goodsId,
+    goodsOptionId,
+    liveShoppingId,
+    discountType,
+  }: { id: number } & LiveShoppingSpecialPriceUpdateDto): Promise<boolean> {
+    const existSpecialPrice = await this.prisma.liveShoppingSpecialPrice.findUnique({
+      where: { id },
+    });
+    if (existSpecialPrice) {
+      await this.prisma.liveShoppingSpecialPrice.update({
+        where: { id },
+        data: { specialPrice },
+      });
+    } else {
+      await this.prisma.liveShoppingSpecialPrice.create({
+        data: {
+          specialPrice,
+          goodsId,
+          goodsOptionId,
+          liveShoppingId,
+          discountType,
+        },
+      });
+    }
+
     return true;
   }
 

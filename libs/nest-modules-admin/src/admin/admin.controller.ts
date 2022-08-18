@@ -73,6 +73,7 @@ import {
   GoodsConfirmationDto,
   GoodsRejectionDto,
   LiveShoppingImageDto,
+  LiveShoppingSpecialPriceUpdateDto,
   LiveShoppingUpdateDTO,
   LiveShoppingWithGoods,
   OrderCancelRequestDetailRes,
@@ -256,6 +257,18 @@ export class AdminController {
     @Query(new ValidationPipe({ transform: true })) dto: FindLiveShoppingDto,
   ): Promise<LiveShoppingWithGoods[]> {
     return this.liveShoppingService.findLiveShoppings(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch('/live-shopping/special-price/:specialPriceId')
+  async updateLiveShoppingSpecialPriceData(
+    @Param('specialPriceId', ParseIntPipe) specialPriceId: number,
+    @Body() updateDto: LiveShoppingSpecialPriceUpdateDto,
+  ): Promise<boolean> {
+    return this.adminService.updateLiveShoppingSpecialPrice({
+      id: specialPriceId,
+      ...updateDto,
+    });
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
