@@ -13,7 +13,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
-import { SocialAccounts, UserType, USER_TYPE_KEY } from '@project-lc/shared-types';
+import {
+  NEXT_PAGE_PARAM_KEY,
+  SocialAccounts,
+  UserType,
+  USER_TYPE_KEY,
+} from '@project-lc/shared-types';
 import { getBroadcasterWebHost, getCustomerWebHost, getWebHost } from '@project-lc/utils';
 import { getUserTypeFromRequest } from '@project-lc/utils-backend';
 import { Request, Response } from 'express';
@@ -125,9 +130,8 @@ export class SocialController {
     // 로그인 기록 생성
     this.loginHistoryService.createLoginStamp(req, loginMethod);
 
-    console.log(nextpage);
     res.clearCookie(USER_TYPE_KEY);
-    res.clearCookie('nextpage');
+    res.clearCookie(NEXT_PAGE_PARAM_KEY);
     if (userType === 'customer') return res.redirect(hostUrl + (nextpage || ''));
     return res.redirect(`${hostUrl}/mypage`);
   }

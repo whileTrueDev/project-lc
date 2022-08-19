@@ -23,7 +23,7 @@ import {
   useCartMigrationMutation,
   useNextpageUrlParam,
 } from '@project-lc/hooks';
-import { LoginUserDto, UserType } from '@project-lc/shared-types';
+import { LoginUserDto, NEXT_PAGE_PARAM_KEY, UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
@@ -149,14 +149,14 @@ export function LoginForm({
           </Button>
 
           {/* 비회원 주문 링크 */}
-          {router.query.from === 'purchase' && router.query.nextpage && (
+          {router.query.from === 'purchase' && router.query[NEXT_PAGE_PARAM_KEY] && (
             <Box mt={4}>
               <Text>
                 비회원으로 구매하시겠습니까?{' '}
                 <ClickableUnderlinedText
                   color="blue.500"
                   fontSize="md"
-                  onClick={() => router.push(router.query.nextpage as string)}
+                  onClick={() => router.push(router.query[NEXT_PAGE_PARAM_KEY] as string)}
                   as="span"
                 >
                   비회원 구매
@@ -179,7 +179,7 @@ export function LoginForm({
           <Text fontSize="sm">
             처음 오셨나요?
             <NextLink
-              href={nextPage ? `/signup?nextpage=${nextPage}` : '/signup'}
+              href={nextPage ? `/signup?${NEXT_PAGE_PARAM_KEY}=${nextPage}` : '/signup'}
               passHref
             >
               <Link
