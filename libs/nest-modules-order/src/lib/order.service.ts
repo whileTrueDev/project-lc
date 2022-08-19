@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
-  BuyConfirmSubject,
   CouponStatus,
   Goods,
   GoodsOptions,
@@ -20,7 +19,7 @@ import {
   SellType,
   TtsSetting,
 } from '@prisma/client';
-import { MICROSERVICE_OVERLAY_TOKEN, UserPwManager } from '@project-lc/nest-core';
+import { MICROSERVICE_OVERLAY_TOKEN } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
 import { PurchaseMessageService } from '@project-lc/nest-modules-liveshopping';
@@ -57,6 +56,7 @@ import { calculateShippingCost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
+import { CipherService } from '@project-lc/nest-modules-cipher';
 
 dayjs.extend(isToday);
 
@@ -66,11 +66,11 @@ export class OrderService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly broadcasterService: BroadcasterService,
-    private readonly userPwManager: UserPwManager,
     private readonly customerCouponService: CustomerCouponService,
     private readonly mileageService: MileageService,
     private readonly mileageSettingService: MileageSettingService,
     private readonly purchaseMessageService: PurchaseMessageService,
+    private readonly cipherService: CipherService,
     @Inject(MICROSERVICE_OVERLAY_TOKEN) private readonly microService: ClientProxy,
   ) {}
 
@@ -288,9 +288,9 @@ export class OrderService {
           create: orderItems.map((item) => {
             const { options, support, goodsName, ...rest } = item;
 
-            const supportLs = relatedLiveShoppings.find(
-              (ls) => ls.id === support.liveShoppingId,
-            );
+            const supportLs = relatedLiveShoppings.length
+              ? relatedLiveShoppings.find((ls) => ls.id === support.liveShoppingId)
+              : undefined;
 
             const connectedGoodsData = orderItemConnectedGoodsData.find(
               (goodsData) => goodsData.id === item.goodsId,
@@ -302,7 +302,7 @@ export class OrderService {
               // 주문상품옵션들 생성
               options: {
                 create: options.map((opt) => {
-                  const specialPriceData = supportLs.liveShoppingSpecialPrices.find(
+                  const specialPriceData = supportLs?.liveShoppingSpecialPrices.find(
                     (sp) => sp.goodsOptionId === opt.goodsOptionId,
                   );
                   return {
@@ -1061,6 +1061,22 @@ export class OrderService {
       result = this.removeRecipientInfo(result);
       // 출고데이터에서 택배사, 운송장번호 정보 삭제
       result = this.removeDeliveryCompanyAndDeliveryNumber(result);
+    }
+
+    if (result.payment && result.payment.method === 'virtualAccount') {
+      const encryptedComplexAccountText = result.payment.account; // `은행명_암호화된가상계좌` 형태로 저장되어 있음 PaymentService.createPayment 참고
+      const [bankName, realEncryptedVirtualAccountText] =
+        encryptedComplexAccountText.split('_'); // => _로 분리 [은행명, 암호화된 가상계좌번호]
+      const decryptedVirtualAccount = this.cipherService.getDecryptedText(
+        realEncryptedVirtualAccountText,
+      );
+      result = {
+        ...result,
+        payment: {
+          ...result.payment,
+          account: `${bankName} ${decryptedVirtualAccount}`,
+        },
+      };
     }
 
     return result;
