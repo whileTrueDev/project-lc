@@ -1,35 +1,40 @@
 import {
-  Grid,
-  GridItem,
-  Button,
-  useDisclosure,
-  useToast,
-  Text,
-  Heading,
   Badge,
   Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  Button,
   Flex,
+  Grid,
+  GridItem,
+  Heading,
+  Text,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
-import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
-import {
-  useAdminCustomerCoupon,
-  useAdminCustomerCouponDeleteMutation,
-  useAdminCustomer,
-  useAdminCustomerCouponPostMutation,
-  useAdminAllCustomerCouponPostMutation,
-} from '@project-lc/hooks';
-import { useRouter } from 'next/router';
-import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import {
   GridColumns,
   GridRowData,
   GridSelectionModel,
   GridToolbar,
 } from '@material-ui/data-grid';
-import { AdminCustomerCouponStatusDialog } from '@project-lc/components-admin/AdminCustomerCouponStatusDialog';
-import { useState } from 'react';
-import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { CouponStatus } from '@prisma/client';
+import { AdminCustomerCouponStatusDialog } from '@project-lc/components-admin/AdminCustomerCouponStatusDialog';
+import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
+import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import {
+  useAdminAllCustomerCouponPostMutation,
+  useAdminCoupon,
+  useAdminCustomer,
+  useAdminCustomerCoupon,
+  useAdminCustomerCouponDeleteMutation,
+  useAdminCustomerCouponPostMutation,
+} from '@project-lc/hooks';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 export function CouponManage(): JSX.Element {
   const router = useRouter();
@@ -64,11 +69,13 @@ export function CouponManage(): JSX.Element {
   const { mutateAsync: couponIssueAllMutateAsync } =
     useAdminAllCustomerCouponPostMutation();
   const { couponId } = router.query;
+  const { data: coupon } = useAdminCoupon(Number(couponId));
   const { data } = useAdminCustomerCoupon({ couponId: Number(couponId) });
   const { data: customerData } = useAdminCustomer({
     orderBy: 'desc',
     orderByColumn: 'createDate',
     includeModels: ['coupons'],
+    take: 99999,
   });
   const columns: GridColumns = [
     { field: 'id' },
@@ -121,23 +128,9 @@ export function CouponManage(): JSX.Element {
   ];
 
   const customerColumns: GridColumns = [
-    {
-      field: 'id',
-      headerName: 'id',
-      width: 20,
-    },
-    {
-      field: 'email',
-      headerName: 'email',
-      width: 100,
-      flex: 1,
-    },
-    {
-      field: 'nickname',
-      headerName: '닉네임',
-      width: 100,
-      flex: 1,
-    },
+    { field: 'id', headerName: 'id', width: 20 },
+    { field: 'email', headerName: 'email', width: 100, flex: 1 },
+    { field: 'nickname', headerName: '닉네임', width: 100, flex: 1 },
     {
       field: 'button',
       headerName: '발급',
@@ -161,16 +154,10 @@ export function CouponManage(): JSX.Element {
   const handleDelete = (): Promise<void> =>
     mutateAsync(toDelete.id)
       .then(() => {
-        toast({
-          description: '삭제완료',
-          status: 'success',
-        });
+        toast({ description: '삭제완료', status: 'success' });
       })
       .catch(() => {
-        toast({
-          description: '삭제실패',
-          status: 'error',
-        });
+        toast({ description: '삭제실패', status: 'error' });
       });
 
   const handleIssueCoupon = (): Promise<void> =>
@@ -180,16 +167,10 @@ export function CouponManage(): JSX.Element {
       status: 'notUsed',
     })
       .then(() => {
-        toast({
-          description: '발행완료',
-          status: 'success',
-        });
+        toast({ description: '발행완료', status: 'success' });
       })
       .catch(() => {
-        toast({
-          description: '발행실패',
-          status: 'error',
-        });
+        toast({ description: '발행실패', status: 'error' });
       });
 
   const handleAllIssueCoupon = (): Promise<void> =>
@@ -199,21 +180,28 @@ export function CouponManage(): JSX.Element {
       status: 'notUsed',
     })
       .then((result: number) => {
-        toast({
-          description: `${result}개 발행완료`,
-          status: 'success',
-        });
+        toast({ description: `${result}개 발행완료`, status: 'success' });
         setManyCustomerCouponIssue([]);
       })
       .catch(() => {
-        toast({
-          description: '발행실패',
-          status: 'error',
-        });
+        toast({ description: '발행실패', status: 'error' });
       });
 
   return (
     <AdminPageLayout>
+      <Box mb={4}>
+        <Breadcrumb>
+          <BreadcrumbItem>
+            <Link href="/customer/coupon" passHref>
+              <BreadcrumbLink href="/customer/coupon">쿠폰 목록</BreadcrumbLink>
+            </Link>
+          </BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage>
+            <BreadcrumbLink>{coupon?.name}</BreadcrumbLink>
+          </BreadcrumbItem>
+        </Breadcrumb>
+      </Box>
+
       <Grid templateColumns="repeat(2, 2fr)" gap={3}>
         <GridItem colSpan={1}>
           <Heading size="lg">쿠폰 발행 목록</Heading>
