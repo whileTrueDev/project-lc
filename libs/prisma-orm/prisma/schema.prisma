@@ -1421,7 +1421,7 @@ model CustomerCoupon {
   couponId   Int
   coupon     Coupon              @relation(fields: [couponId], references: [id], onDelete: Cascade)
   customerId Int
-  customer   Customer            @relation(fields: [customerId], references: [id])
+  customer   Customer            @relation(fields: [customerId], references: [id], onDelete: Cascade)
   issueDate  DateTime            @default(now()) // 발급일
   status     CouponStatus        @default(notUsed) // 쿠폰상태
   logs       CustomerCouponLog[] // 쿠폰사용내역
