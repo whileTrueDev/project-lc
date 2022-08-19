@@ -21,6 +21,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { GridColDef, GridRowData } from '@material-ui/data-grid';
+import { Coupon, CustomerCoupon } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { useCustomerMileage } from '@project-lc/hooks';
@@ -217,7 +218,13 @@ export function Discount(): JSX.Element {
         onClose={couponSelectDialog.onClose}
         onCouponSelect={(coupon) => {
           setValue('couponId', coupon.id);
-          setValue('usedCouponAmount', coupon.amount);
+          if (coupon.unit === 'W') {
+            setValue('usedCouponAmount', coupon.amount);
+          } else {
+            // coupon.unit === 'P' 퍼센트 할인 쿠폰인 경우 => 주문가격 * 쿠폰할인율 만큼 할인 적용
+            const discountAmount = Math.floor(orderPrice * coupon.amount * 0.01);
+            setValue('usedCouponAmount', discountAmount);
+          }
         }}
       />
 
@@ -230,7 +237,11 @@ export function Discount(): JSX.Element {
 }
 
 type CouponSelectDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
-  onCouponSelect: (coupon: any) => void;
+  onCouponSelect: (coupon: {
+    id: CustomerCoupon['id'];
+    amount: Coupon['amount'];
+    unit: Coupon['unit'];
+  }) => void;
   orderPrice: number; // 주문 총 상품가격(쿠폰 최소주문금액과 비교하여 쿠폰사용여부 판단용)
   orderItemIdList: number[]; // 주문 상품 goodsId(number)[] (쿠폰 상품적용가능 여부 판단용)
 };
@@ -255,7 +266,18 @@ function CouponSelectDialog({
 
   const columns: GridColDef[] = [
     { field: 'name', headerName: '쿠폰명', flex: 1 },
-    { field: 'amount', headerName: '금액' },
+    {
+      field: 'amount',
+      headerName: '할인',
+      renderCell: ({ row }: GridRowData) => {
+        const { amount, unit } = row;
+        if (unit === 'P') {
+          return <Text>{amount}%</Text>;
+        }
+        // unit === 'W'
+        return <Text>{amount}원</Text>;
+      },
+    },
     {
       disableColumnMenu: true,
       disableExport: true,
@@ -278,7 +300,7 @@ function CouponSelectDialog({
               colorScheme="blue"
               disabled={!available}
               onClick={() => {
-                onCouponSelect({ id: row.id, amount: row.amount });
+                onCouponSelect({ id: row.id, amount: row.amount, unit: row.unit });
                 onClose();
               }}
             >
