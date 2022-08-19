@@ -100,10 +100,14 @@ export function Discount(): JSX.Element {
           <Text fontWeight="semibold">쿠폰할인</Text>
           <Flex alignItems="center" gap={2}>
             <Input size="sm" maxW={150} isReadOnly {...register('usedCouponAmount')} />
-            {customerCoupons && customerCoupons.length > 0 && (
+            {customerCoupons && customerCoupons.length > 0 ? (
               <Button size="xs" colorScheme="blue" onClick={couponSelectDialog.onOpen}>
                 쿠폰사용
               </Button>
+            ) : (
+              <Text color="GrayText" fontSize="xs">
+                사용 가능한 쿠폰이 없습니다
+              </Text>
             )}
 
             {watch('couponId') ? (
@@ -175,11 +179,10 @@ export function Discount(): JSX.Element {
               ) : null}
             </Flex>
 
-            {customerMileage && (
-              <FormHelperText color="GrayText">
-                보유한 총 적립금 {getLocaleNumber(customerMileage.mileage) || 0} 원
-              </FormHelperText>
-            )}
+            <FormHelperText color="GrayText">
+              보유 적립금 총{' '}
+              {customerMileage ? getLocaleNumber(customerMileage.mileage) : 0} 원
+            </FormHelperText>
 
             <FormErrorMessage>{errors.usedMileageAmount?.message}</FormErrorMessage>
           </FormControl>
