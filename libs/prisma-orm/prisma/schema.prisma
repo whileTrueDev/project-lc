@@ -176,8 +176,8 @@ model SellerSocialAccount {
   name         String
   registDate   DateTime @default(now())
   profileImage String?
-  accessToken  String?
-  refreshToken String?
+  accessToken  String?  @db.Text()
+  refreshToken String?  @db.Text()
   sellerId     Int
   seller       Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
@@ -563,8 +563,8 @@ model BroadcasterSocialAccount {
   name          String
   registDate    DateTime    @default(now())
   profileImage  String?
-  accessToken   String?
-  refreshToken  String?
+  accessToken   String?     @db.Text
+  refreshToken  String?     @db.Text
   broadcasterId Int
   broadcaster   Broadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 
@@ -983,8 +983,8 @@ model InactiveBroadcasterSocialAccount {
   name          String
   registDate    DateTime            @default(now())
   profileImage  String?
-  accessToken   String?
-  refreshToken  String?
+  accessToken   String?             @db.Text()
+  refreshToken  String?             @db.Text()
   broadcasterId Int
   broadcaster   InactiveBroadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 
@@ -997,8 +997,8 @@ model InactiveSellerSocialAccount {
   name         String
   registDate   DateTime       @default(now())
   profileImage String?
-  accessToken  String?
-  refreshToken String?
+  accessToken  String?        @db.Text()
+  refreshToken String?        @db.Text()
   sellerId     Int
   seller       InactiveSeller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
@@ -1317,8 +1317,8 @@ model CustomerSocialAccount {
   name         String // 이름
   registDate   DateTime @default(now()) // 생성일
   profileImage String? // 프로필사진
-  accessToken  String? // 액세스토큰
-  refreshToken String? // 리프레시토큰
+  accessToken  String?  @db.Text() // 액세스토큰
+  refreshToken String?  @db.Text() // 리프레시토큰
   customerId   Int // 소비자 고유번호
   customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
