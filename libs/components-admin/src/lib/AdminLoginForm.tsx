@@ -48,7 +48,7 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
       const user = await login
         .mutateAsync({ ...data, stayLogedIn: true })
         .catch((err) => {
-          setFormError(getMessage(err?.response.data?.status));
+          setFormError(getMessage(err?.response.data?.statusCode));
         });
       if (user) {
         router.push(`${getAdminHost()}/admin`);
