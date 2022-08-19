@@ -11,13 +11,7 @@ export function Coupon(): JSX.Element {
       <Box>
         <AdminCreateCoupon />
         <AdminCouponList />
-        <Button
-          onClick={() => {
-            router.push('coupon/history');
-          }}
-        >
-          쿠폰로그 보기
-        </Button>
+        <Button onClick={() => router.push('coupon/history')}>쿠폰로그 보기</Button>
       </Box>
     </AdminPageLayout>
   );
