@@ -70,7 +70,7 @@ export function LoginForm({
       });
       if (user && (user as InactiveUserPayload).inactiveFlag) {
         setToActivateEmail((user as InactiveUserPayload).sub);
-        router.push('/activate', { query: router.query });
+        router.push('/activate');
         return;
       }
       if (user) {
