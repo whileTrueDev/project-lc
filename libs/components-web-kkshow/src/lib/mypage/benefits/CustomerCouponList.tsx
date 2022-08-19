@@ -23,7 +23,7 @@ export function CustomerCouponList(): JSX.Element {
 
   const columns: GridColumns = [
     {
-      width: 120,
+      width: 200,
       field: 'couponName',
       headerName: '이름',
       valueGetter: ({ row }) => row.coupon.name,
