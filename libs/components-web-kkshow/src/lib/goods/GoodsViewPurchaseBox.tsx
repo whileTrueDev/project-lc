@@ -415,7 +415,6 @@ function GoodsViewBroadcasterSupportBox({
                     minH="55px"
                     resize="none"
                     rounded="md"
-                    size="sm"
                     placeholder="방송인 후원 메시지 도네이션 표시글"
                     value={supportMessage}
                     onChange={(e) => onSupMsgChange(e.target.value)}
