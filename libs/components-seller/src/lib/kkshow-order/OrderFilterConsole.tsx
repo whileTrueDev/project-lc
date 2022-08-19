@@ -210,37 +210,35 @@ export function OrderFilterConsole(): JSX.Element {
             )}
             <Divider />
             {(
-              Object.keys(kkshowOrderStatuses) as Array<keyof typeof kkshowOrderStatuses>
+              Object.keys(KkshowOrderCancelEnum) as Array<
+                keyof typeof kkshowOrderStatuses
+              >
             ).map((orderStatus) => {
               return (
-                <>
-                  {Object.keys(KkshowOrderCancelEnum).includes(orderStatus) && (
-                    <Checkbox
-                      m={1}
-                      aria-label={`order-status-${kkshowOrderStatuses[orderStatus].name}`}
-                      key={`extended-${orderStatus}`}
-                      colorScheme={kkshowOrderStatuses[orderStatus].chakraColor}
-                      isChecked={watch('searchExtendedStatus')?.includes(orderStatus)}
-                      onChange={(_) => {
-                        const prev = getValues('searchExtendedStatus');
-                        if (!prev) {
-                          return setValue('searchExtendedStatus', [orderStatus]);
-                        }
-                        if (prev.includes(orderStatus)) {
-                          return setValue(
-                            'searchExtendedStatus',
-                            prev.filter((x) => x !== orderStatus),
-                          );
-                        }
-                        return setValue('searchExtendedStatus', prev.concat(orderStatus));
-                      }}
-                    >
-                      <Badge colorScheme={kkshowOrderStatuses[orderStatus].chakraColor}>
-                        {kkshowOrderStatuses[orderStatus].name}
-                      </Badge>
-                    </Checkbox>
-                  )}
-                </>
+                <Checkbox
+                  m={1}
+                  aria-label={`order-status-${kkshowOrderStatuses[orderStatus].name}`}
+                  key={`extended-${orderStatus}`}
+                  colorScheme={kkshowOrderStatuses[orderStatus].chakraColor}
+                  isChecked={watch('searchExtendedStatus')?.includes(orderStatus)}
+                  onChange={(_) => {
+                    const prev = getValues('searchExtendedStatus');
+                    if (!prev) {
+                      return setValue('searchExtendedStatus', [orderStatus]);
+                    }
+                    if (prev.includes(orderStatus)) {
+                      return setValue(
+                        'searchExtendedStatus',
+                        prev.filter((x) => x !== orderStatus),
+                      );
+                    }
+                    return setValue('searchExtendedStatus', prev.concat(orderStatus));
+                  }}
+                >
+                  <Badge colorScheme={kkshowOrderStatuses[orderStatus].chakraColor}>
+                    {kkshowOrderStatuses[orderStatus].name}
+                  </Badge>
+                </Checkbox>
               );
             })}
           </Box>
