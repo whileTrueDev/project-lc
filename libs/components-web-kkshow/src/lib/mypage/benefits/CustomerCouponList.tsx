@@ -8,11 +8,37 @@ import {
 import { useCustomerCouponList } from '@project-lc/hooks';
 import { CustomerCouponRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { CustomerCouponDetailDialog } from './CustomerCouponDetailDialog';
 
+/** 소비자 쿠폰 중 사용가능한 상태(사용하지 않음, 사용기간 지나지 않음)의 쿠폰만 필터링하는 훅 */
+export function useValidCustomerCouponList(): {
+  validCoupons: CustomerCouponRes[];
+  isLoading: boolean;
+} {
+  const { data: coupons, isLoading } = useCustomerCouponList();
+  const validCoupons = useMemo(() => {
+    if (!coupons) return [];
+    return coupons.filter((c) => {
+      // 사용되지 않았는지 확인
+      const isUsed = c.status !== 'notUsed';
+      if (isUsed) return false;
+
+      // 쿠폰 사용기간 확인
+      const { startDate, endDate } = c.coupon;
+      // 현재 쿠폰 사용시작일시 이후인지 (쿠폰 사용시작일시이 설정되어 있지 않으면 true)
+      const isAfterStartDate = startDate ? dayjs().isAfter(dayjs(startDate)) : true;
+      // 현재 쿠폰 사용종료일시 이전인지 (쿠폰 사용종료일시이 설정되어 있지 않으면 true)
+      const isBeforeEndDate = endDate ? dayjs().isBefore(dayjs(endDate)) : true;
+
+      return !isUsed && isAfterStartDate && isBeforeEndDate;
+    });
+  }, [coupons]);
+  return { validCoupons, isLoading };
+}
+
 export function CustomerCouponList(): JSX.Element {
-  const { isLoading, data: coupons } = useCustomerCouponList();
+  const { validCoupons, isLoading } = useValidCustomerCouponList();
   const [couponDetail, setCouponDetail] = useState<CustomerCouponRes>();
 
   const handleButtonClick = (coupon: CustomerCouponRes): void => {
@@ -73,8 +99,8 @@ export function CustomerCouponList(): JSX.Element {
       <ChakraDataGrid
         loading={isLoading}
         columns={columns}
-        rows={coupons || []}
-        minH={500}
+        rows={validCoupons}
+        autoHeight
         disableColumnMenu
         disableColumnFilter
         density="compact"

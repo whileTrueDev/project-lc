@@ -23,10 +23,11 @@ import {
 import { GridColDef, GridRowData } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
-import { useCustomerCouponList, useCustomerMileage } from '@project-lc/hooks';
+import { useCustomerMileage } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { checkCouponAvailable, getLocaleNumber } from '@project-lc/utils-frontend';
 import { useFormContext } from 'react-hook-form';
+import { useValidCustomerCouponList } from '../mypage/benefits/CustomerCouponList';
 
 /** 적립금 사용시 100원 단위로 변경하기 위한 timeout 이벤트 저장 */
 let debounce: NodeJS.Timeout | null = null;
@@ -48,7 +49,7 @@ export function Discount(): JSX.Element {
   const discountCodeDialog = useDisclosure();
 
   const { data: customerMileage } = useCustomerMileage();
-  const { data: customerCoupons } = useCustomerCouponList();
+  const { validCoupons: customerCoupons } = useValidCustomerCouponList();
 
   const {
     resetField,
@@ -238,7 +239,7 @@ function CouponSelectDialog({
   orderPrice,
   orderItemIdList,
 }: CouponSelectDialogProps): JSX.Element {
-  const { data: customerCoupons } = useCustomerCouponList();
+  const { validCoupons: customerCoupons } = useValidCustomerCouponList();
 
   const couponList = customerCoupons
     ? customerCoupons.map((c) => {
