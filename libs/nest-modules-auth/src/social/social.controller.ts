@@ -115,6 +115,7 @@ export class SocialController {
     const userType: UserType = getUserTypeFromRequest(req);
     if (!userType) throw new BadRequestException('userType cookie must be defined');
     const userPayload = this.socialService.login(userType, req, res);
+    const { nextpage } = req.cookies;
     const hostUrl = this.getFrontUrl(userType);
 
     if (userPayload.inactiveFlag) {
@@ -124,8 +125,10 @@ export class SocialController {
     // 로그인 기록 생성
     this.loginHistoryService.createLoginStamp(req, loginMethod);
 
+    console.log(nextpage);
     res.clearCookie(USER_TYPE_KEY);
-    if (userType === 'customer') return res.redirect(hostUrl);
+    res.clearCookie('nextpage');
+    if (userType === 'customer') return res.redirect(hostUrl + (nextpage || ''));
     return res.redirect(`${hostUrl}/mypage`);
   }
 

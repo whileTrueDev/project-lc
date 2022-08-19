@@ -21,6 +21,7 @@ import {
   useLoginMutation,
   InactiveUserPayload,
   useCartMigrationMutation,
+  useNextpageUrlParam,
 } from '@project-lc/hooks';
 import { LoginUserDto, UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
@@ -40,6 +41,7 @@ export function LoginForm({
   userType,
 }: LoginFormProps): JSX.Element {
   const router = useRouter();
+  const nextPage = useNextpageUrlParam();
   const {
     handleSubmit,
     register,
@@ -68,20 +70,18 @@ export function LoginForm({
       });
       if (user && (user as InactiveUserPayload).inactiveFlag) {
         setToActivateEmail((user as InactiveUserPayload).sub);
-        router.push('/activate');
+        router.push('/activate', { query: router.query });
         return;
       }
       if (user) {
         cartMutation.mutateAsync({ customerId: user.id });
-        const nextPage = router.query.nextpage as string;
-        if (nextPage) {
-          router.push(nextPage.startsWith('/') ? nextPage : `/${nextPage}`);
-        } else {
+        if (nextPage) router.push(nextPage);
+        else {
           router.push('/mypage');
         }
       }
     },
-    [login, setValue, setToActivateEmail, router, cartMutation],
+    [login, setValue, setToActivateEmail, router, cartMutation, nextPage],
   );
 
   function getMessage(statusCode: number | undefined): string {
@@ -178,7 +178,10 @@ export function LoginForm({
           </NextLink>
           <Text fontSize="sm">
             처음 오셨나요?
-            <NextLink href="/signup" passHref>
+            <NextLink
+              href={nextPage ? `/signup?nextpage=${nextPage}` : '/signup'}
+              passHref
+            >
               <Link
                 ml={2}
                 color={useColorModeValue('blue.500', 'blue.400')}

@@ -20,6 +20,7 @@ import {
   useSellerSignupMutation,
   useCountdown,
   useCustomerSignupMutation,
+  useNextpageUrlParam,
 } from '@project-lc/hooks';
 import {
   emailCodeRegisterOptions,
@@ -40,6 +41,7 @@ export function SignupForm({
   userType = 'seller',
 }: SignupFormProps): JSX.Element {
   const router = useRouter();
+  const nextPage = useNextpageUrlParam();
   const toast = useToast();
 
   const { clearTimer, startCountdown, seconds } = useCountdown();
@@ -143,14 +145,11 @@ export function SignupForm({
       } else if (userType === 'customer') {
         user = await customerSignup.mutateAsync(data).catch(handleSignupError);
       }
-
       if (user) {
         // 로그인 과정이 수행
-        await login.mutateAsync({
-          email: data.email,
-          password: data.password,
-        });
-        router.push('/mypage');
+        await login.mutateAsync({ email: data.email, password: data.password });
+        if (nextPage) router.push(nextPage);
+        else router.push('/mypage');
       }
     },
     [
@@ -159,6 +158,7 @@ export function SignupForm({
       handleSignupError,
       login,
       router,
+      nextPage,
       sellerSignup,
       userType,
     ],

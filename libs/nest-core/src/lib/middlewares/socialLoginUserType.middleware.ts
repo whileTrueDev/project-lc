@@ -20,6 +20,10 @@ export class SocialLoginUserTypeMiddleware implements NestMiddleware {
       res.cookie(USER_TYPE_KEY, req.query[USER_TYPE_KEY]);
     }
 
+    if (req.query.nextpage) {
+      res.cookie('nextpage', req.query.nextpage);
+    }
+
     next();
   }
 }
