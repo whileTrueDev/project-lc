@@ -1,5 +1,5 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { USER_TYPE_KEY } from '@project-lc/shared-types';
+import { NEXT_PAGE_PARAM_KEY, USER_TYPE_KEY } from '@project-lc/shared-types';
 import { Request, Response, NextFunction } from 'express';
 
 /** 소셜로그인 시 로그인 시도한 유저 타입을 req.cookie에 저장하기 위한 미들웨어
@@ -18,6 +18,10 @@ export class SocialLoginUserTypeMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction): void {
     if (req.query[USER_TYPE_KEY]) {
       res.cookie(USER_TYPE_KEY, req.query[USER_TYPE_KEY]);
+    }
+
+    if (req.query[NEXT_PAGE_PARAM_KEY]) {
+      res.cookie(NEXT_PAGE_PARAM_KEY, req.query[NEXT_PAGE_PARAM_KEY]);
     }
 
     next();

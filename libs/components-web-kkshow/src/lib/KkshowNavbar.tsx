@@ -16,7 +16,7 @@ import CountBadge from '@project-lc/components-shared/CountBadge';
 import { KkshowLogoVariant, KksLogo } from '@project-lc/components-shared/KksLogo';
 import { PersonalPopoverMenu } from '@project-lc/components-shared/navbar/NavbarRightButtonSection';
 import { useCart, useIsLoggedIn } from '@project-lc/hooks';
-import { KkshowNavbarVariant } from '@project-lc/shared-types';
+import { KkshowNavbarVariant, NEXT_PAGE_PARAM_KEY } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
@@ -220,7 +220,7 @@ function LoginButton(): JSX.Element {
         px={0}
         variant="unstyle"
         color="current"
-        onClick={() => router.push('/login?nextpage=/')}
+        onClick={() => router.push(`/login?${NEXT_PAGE_PARAM_KEY}=/`)}
       >
         로그인
       </Button>

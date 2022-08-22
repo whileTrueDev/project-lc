@@ -20,7 +20,7 @@ import {
 } from '@chakra-ui/react';
 import { Goods } from '@prisma/client';
 import { useGoodsById, useGoodsInquiryMutation, useProfile } from '@project-lc/hooks';
-import { GoodsInquiryCreateDto } from '@project-lc/shared-types';
+import { GoodsInquiryCreateDto, NEXT_PAGE_PARAM_KEY } from '@project-lc/shared-types';
 
 import { useRouter } from 'next/router';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
@@ -102,7 +102,7 @@ export function GoodsInquiryForm({
   };
 
   const onLoginClick = (): void => {
-    router.push('/login', { query: { nextpage: `/goods/${goodsId}` } });
+    router.push('/login', { query: { [NEXT_PAGE_PARAM_KEY]: `/goods/${goodsId}` } });
   };
 
   if (!profile.data?.id) {
