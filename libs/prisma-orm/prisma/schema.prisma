@@ -777,7 +777,7 @@ model LiveShoppingPurchaseMessage {
   price              Int // 구매금액
   phoneCallEventFlag Boolean      @default(false) // 전화 이벤트 참여 여부 
   giftFlag           Boolean      @default(false) // 스트리머����� 선물하기 여부
-  loginFlag          Boolean      @default(true) // 회원 | 비회원 구분 \
+  loginFlag          Boolean      @default(true) // 구매메시지 기본송출 여부 (true: 기본메시지송출, false: 간략메시지 송출)
   broadcaster        Broadcaster  @relation(fields: [broadcasterEmail], references: [email])
   broadcasterEmail   String // 스트리머의 아이디 
   createDate         DateTime     @default(now()) // 작성일자

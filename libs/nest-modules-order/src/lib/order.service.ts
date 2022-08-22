@@ -442,7 +442,7 @@ export class OrderService {
           email: purchase.roomName,
           level: purchase.level,
           liveShoppingId: purchase.liveShoppingId,
-          loginFlag: !nonMemberOrderFlag,
+          loginFlag: !purchase.simpleMessageFlag,
           message: purchase.message,
           nickname: purchase.nickname,
           productName: purchase.productName,
