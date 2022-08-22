@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Center,
   Divider,
@@ -30,7 +29,7 @@ export function ReceiptOrderItemInfo({
 
       {data?.map((item) => (
         <Box key={item.id}>
-          <Grid templateColumns="repeat(8, 2fr)" alignItems="start">
+          <Grid templateColumns="repeat(8, 2fr)">
             <GridItem colSpan={8}>
               <HStack>
                 <BsShopWindow />
@@ -38,50 +37,36 @@ export function ReceiptOrderItemInfo({
               </HStack>
             </GridItem>
             <GridItem colSpan={5} mb={4}>
-              <Flex direction="row" alignItems="start" gap={2}>
-                <ChakraNextImage
-                  layout="intrinsic"
-                  src={`${item.goods.image[0].image}`}
-                  width={70}
-                  height={70}
-                  rounded="md"
-                />
-                <Flex direction="column" ml={1}>
-                  <Link
-                    isTruncated
-                    isExternal
-                    colorScheme="blue"
-                    href={`${getCustomerWebHost()}/goods/${item.goods.id}`}
-                  >
-                    <Text fontWeight="bold">{item.goods.goods_name}</Text>
-                  </Link>
-                  {item.options.map((option) => (
-                    <Flex key={option.id} fontSize="xs">
-                      <Text as="span">옵션 : {option.value}</Text>
-                      <TextDotConnector mr={2} ml={2} />
-                      <Text>{option.quantity}개</Text>
-                      <TextDotConnector mr={2} ml={2} />
-                      <Text as="span">
-                        {Number(option.discountPrice).toLocaleString()}원
-                      </Text>
-                    </Flex>
-                  ))}
-
-                  {item.support && (
-                    <Box mt={2} fontSize="sm">
-                      <Text fontWeight="bold">방송인 후원정보</Text>
-                      <Flex align="start" gap={1}>
-                        <Avatar src={item.support?.broadcaster.avatar || ''} size="sm" />
-                        <Box>
-                          <Text mt={2}>{item.support?.broadcaster.userNickname}</Text>
-                          <Text>후원닉네임: {item.support?.nickname}</Text>
-                          <Text>후원메시지: {item.support?.message}</Text>
-                        </Box>
+              <Link
+                isTruncated
+                href={`${getCustomerWebHost()}/goods/${item.goods.id}`}
+                fontWeight="bold"
+                colorScheme="blue"
+                isExternal
+              >
+                <Flex direction="row" alignItems="center">
+                  <ChakraNextImage
+                    layout="intrinsic"
+                    src={`${item.goods.image[0].image}`}
+                    width={70}
+                    height={70}
+                  />
+                  <Flex direction="column" ml={1}>
+                    <Text>{item.goods.goods_name}</Text>
+                    {item.options.map((option) => (
+                      <Flex key={option.id} fontSize="xs">
+                        <Text as="span">옵션 : {option.value}</Text>
+                        <TextDotConnector mr={2} ml={2} />
+                        <Text>{option.quantity}개</Text>
+                        <TextDotConnector mr={2} ml={2} />
+                        <Text as="span">
+                          {Number(option.discountPrice).toLocaleString()}원
+                        </Text>
                       </Flex>
-                    </Box>
-                  )}
+                    ))}
+                  </Flex>
                 </Flex>
-              </Flex>
+              </Link>
             </GridItem>
             <GridItem>
               <Center w="100%" h="100%">

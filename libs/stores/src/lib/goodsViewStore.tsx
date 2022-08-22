@@ -22,8 +22,6 @@ interface GoodsViewStore {
   handleSelectBc: (v: SelectedBc | null) => void;
   supportMessage: string;
   onSupMsgChange: (msg: string) => void;
-  supportNickname: string;
-  onSuNickChange: (msg: string) => void;
 }
 export const useGoodsViewStore = create<GoodsViewStore>((set, get) => ({
   selectedNavIdx: 0,
@@ -84,9 +82,5 @@ export const useGoodsViewStore = create<GoodsViewStore>((set, get) => ({
   onSupMsgChange: (msg: string) => {
     if (msg.length > 30) return;
     set({ supportMessage: msg });
-  },
-  supportNickname: '',
-  onSuNickChange: (nick: string) => {
-    set({ supportNickname: nick });
   },
 }));
