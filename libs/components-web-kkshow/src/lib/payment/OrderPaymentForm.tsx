@@ -84,7 +84,6 @@ export function OrderPaymentForm(): JSX.Element | null {
           ? {
               ...oi.support,
               broadcasterId: oi.support?.broadcasterId || null,
-              nickname: customer?.nickname || '',
             }
           : undefined,
       })),
