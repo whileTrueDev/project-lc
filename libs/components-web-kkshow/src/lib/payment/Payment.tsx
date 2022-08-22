@@ -3,15 +3,11 @@ import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { useDefaultMileageSetting } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
-import { getCustomerWebHost } from '@project-lc/utils';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
-import { loadTossPayments } from '@tosspayments/payment-sdk';
-import dayjs from 'dayjs';
-import { nanoid } from 'nanoid';
-import { useFormContext } from 'react-hook-form';
 import { useMemo } from 'react';
-import { TermBox } from './TermBox';
+import { useFormContext } from 'react-hook-form';
 import { KkshowSubNavbarHeight } from '../KkshowSubNavbar';
+import { TermBox } from './TermBox';
 
 export function getOrderPrice(
   originalPrice: number,
@@ -22,31 +18,6 @@ export function getOrderPrice(
 ): number {
   return originalPrice + shippingCost - discount - mileageDiscount - couponDiscount;
 }
-
-export async function doPayment(
-  paymentType: '카드' | '계좌이체' | '가상계좌' | '미선택',
-  client_key: string,
-  amount: number,
-  productName: string,
-  customerName: string,
-): Promise<void> {
-  return loadTossPayments(client_key)
-    .then((tossPayments) => {
-      return tossPayments.requestPayment(paymentType, {
-        amount,
-        orderId: `${dayjs().format('YYYYMMDDHHmmssSSS')}${nanoid(6)}`,
-        orderName: `${productName}`,
-        customerName,
-        successUrl: `${getCustomerWebHost()}/payment/success`,
-        failUrl: `${getCustomerWebHost()}/payment/fail`,
-      });
-    })
-    .catch((err) => {
-      console.error('Error - loadTossPayments');
-      console.error(err);
-    });
-}
-
 export function MileageBenefit({
   productPrice,
   mileage,
