@@ -1,5 +1,5 @@
 import { Grid, GridItem, Heading, Stack } from '@chakra-ui/react';
-import { useCustomerInfo, useProfile } from '@project-lc/hooks';
+import { useProfile } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useCartStore, useKkshowOrderStore } from '@project-lc/stores';
 import { getCustomerWebHost } from '@project-lc/utils';
@@ -146,6 +146,7 @@ export function OrderPaymentForm(): JSX.Element | null {
         py={6}
         mb={{ base: 0, lg: 20 }}
         as="form"
+        id="order-payment-form"
         onSubmit={methods.handleSubmit(onSubmit)}
       >
         <GridItem colSpan={7}>

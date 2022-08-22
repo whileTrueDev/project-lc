@@ -408,17 +408,15 @@ export class OrderService {
           broadcasterId: x.support.broadcasterId,
           productName: x.goodsName,
           purchaseNum,
-          nickname: nonMemberOrderFlag
-            ? setting?.fanNick || '비회원'
-            : x.support.nickname,
+          nickname: x.support?.nickname || setting?.fanNick || '익명의구매자',
           message: giftFlag
             ? `[방송인에게 선물!] ${x.support.message}`
-            : x.support.message,
+            : x.support.message || '',
           ttsSetting: setting?.ttsSetting || TtsSetting.full,
           level: setting?.levelCutOffPoint < purchaseNum ? '2' : '1',
-          nonMemberOrderFlag,
           giftFlag,
           liveShoppingId: x.support.liveShoppingId,
+          simpleMessageFlag: !x.support?.nickname, // 닉네임이 없는 경우 간단 메시지 송출 + 랭킹반영X
         };
       });
     // orderItems를 구매메시지 데이터로 전환한 배열의 각 송출 overlay 채널을 조회
@@ -444,7 +442,7 @@ export class OrderService {
           email: purchase.roomName,
           level: purchase.level,
           liveShoppingId: purchase.liveShoppingId,
-          loginFlag: !purchase.nonMemberOrderFlag,
+          loginFlag: !nonMemberOrderFlag,
           message: purchase.message,
           nickname: purchase.nickname,
           productName: purchase.productName,

@@ -627,7 +627,7 @@ $(document).ready(function ready() {
             productName,
             purchaseNum: soldPrice,
             nickname: customerNickname,
-            nonMemberOrderFlag: true,
+            simpleMessageFlag: true,
             message: '',
           });
         }

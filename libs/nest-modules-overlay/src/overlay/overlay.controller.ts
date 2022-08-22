@@ -67,11 +67,12 @@ export class OverlayController {
   // API -> 마이크로서비스 -> Overlay 구매메시지 핸들러
   @MessagePattern('liveshopping:overlay:purchase-msg')
   public async handlePurchaseMsg(@Payload() purchase: PurchaseMessage): Promise<void> {
-    if (purchase.nonMemberOrderFlag)
-      return this.overlayService.handlePurchaseMessageNonMember(
+    if (purchase.simpleMessageFlag) {
+      return this.overlayService.handleSimplePurchaseMessage(
         purchase,
         this.overlayMessageGateway.server,
       );
+    }
     return this.overlayService.handlePurchaseMessage(
       purchase,
       this.overlayMessageGateway.server,

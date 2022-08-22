@@ -62,6 +62,7 @@ export function OrderItemSupport({
             </FormLabel>
             <Input {...register(`orderItems.${orderItemIndex}.support.nickname`)} />
           </FormControl>
+
           <FormControl
             isInvalid={
               !!(errors.orderItems && errors.orderItems[orderItemIndex].support?.message)
@@ -79,7 +80,7 @@ export function OrderItemSupport({
               })}
             />
             <FormErrorMessage>
-              {errors?.orderItems?.[orderItemIndex]?.support?.message}
+              {errors?.orderItems?.[orderItemIndex]?.support?.message?.message}
             </FormErrorMessage>
           </FormControl>
         </Stack>
