@@ -24,7 +24,7 @@ export class CustomerService {
         data: {
           email: dto.email,
           password: hashedPw,
-          nickname: '',
+          nickname: dto.nickname || '',
           name: dto.name,
           agreementFlag: true,
         },
