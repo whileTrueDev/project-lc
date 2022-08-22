@@ -31,6 +31,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, NAVER_PROVIDER) {
     refreshToken: null,
     profile: Profile,
   ): Promise<Seller | Broadcaster | Customer> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { email, nickname, profile_image, id } = profile._json;
 
     if (!email) {
@@ -49,7 +50,8 @@ export class NaverStrategy extends PassportStrategy(Strategy, NAVER_PROVIDER) {
       provider: NAVER_PROVIDER,
       email,
       name: nickname,
-      picture: profile_image,
+      // 220822 주석처리 => 연관일감: [회원가입] 소셜로그인시 프로필사진 받아온 프로필사진으로 설정하지 않기 by dan
+      // picture: profile_image,
       accessToken,
       refreshToken,
     });

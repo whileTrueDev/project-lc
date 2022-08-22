@@ -33,6 +33,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, KAKAO_PROVIDER) {
     const { id, username, _json } = profile;
     const { kakao_account } = _json;
     const { email, profile: kakaoProfile } = kakao_account;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { is_default_image, profile_image_url } = kakaoProfile;
 
     if (!email) {
@@ -51,7 +52,8 @@ export class KakaoStrategy extends PassportStrategy(Strategy, KAKAO_PROVIDER) {
       provider: KAKAO_PROVIDER,
       email,
       name: username,
-      picture: is_default_image ? '' : profile_image_url,
+      // 220822 주석처리 => 연관일감: [회원가입] 소셜로그인시 프로필사진 받아온 프로필사진으로 설정하지 않기 by dan
+      // picture: is_default_image ? '' : profile_image_url,
       accessToken,
       refreshToken,
     });
