@@ -9,12 +9,7 @@ import {
   useBreakpoint,
   useDisclosure,
 } from '@chakra-ui/react';
-import {
-  GridColumns,
-  GridRowId,
-  GridToolbarContainer,
-  GridRowData,
-} from '@material-ui/data-grid';
+import { GridColumns, GridRowId, GridToolbarContainer } from '@material-ui/data-grid';
 import { OrderItemOption, ProcessStatus } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { TooltipedText } from '@project-lc/components-core/TooltipedText';
@@ -31,8 +26,8 @@ import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaTruck } from 'react-icons/fa';
-import { KkshowOrderStatusBadge } from '../KkshowOrderStatusBadge';
 import ExportManyDialog from '../ExportManyDialog';
+import { KkshowOrderStatusBadge } from '../KkshowOrderStatusBadge';
 import OrderListDownloadDialog from './OrderListDownloadDialog';
 
 const columns: GridColumns = [
@@ -140,37 +135,32 @@ const columns: GridColumns = [
 ];
 
 function OrderStatusBadge(row: OrderDataWithRelations): JSX.Element {
-  // 환불/재배송(=반품/교환), 혹은 주문취소 요청이 있는경우
-  // 요청이 완료되었음에도 '취소요청' 등으로 표시되는 문제가 있어서
-  // 해당 요청이 모두 완료되지 않은 경우에만 해당 요청 상태로 표시하도록 수정하였습니다
-  if (
+  // 완료되지 않은 환불(반품), 교환요청이 있는경우 주문의 상태 옆에 취소요청, 교환요청, 반품요청 배지를 표시함
+  const hasUncompletedReturnRequest =
     row.returns &&
     row.returns.length > 0 &&
-    !row.returns.every((r) => r.status === ProcessStatus.complete)
-  ) {
-    return <KkshowOrderStatusBadge orderStatus="returns" />;
-  }
-  // 환불은 주문취소, 환불/재배송요청(=반품/교환요청)의 결과로 생기는 데이터입니다
-  // refunds가 존재한다 === (주문취소에 대한 환불처리가 완료되었음 || 환불(=반품) 요청에 대한 환불처리가 완료되었음)을 의미
-  // refunds가 존재한다 !== 환불요청이 존재한다
-  // if (row.refunds.length) {
-  //   return <KkshowOrderStatusBadge orderStatus="refunds" />;
-  // }
-  if (
+    !row.returns.every((r) => r.status === ProcessStatus.complete);
+  const hasUncompletedExchangeRequest =
     row.exchanges &&
     row.exchanges.length > 0 &&
-    !row.exchanges.every((e) => e.status === ProcessStatus.complete)
-  ) {
-    return <KkshowOrderStatusBadge orderStatus="exchanges" />;
-  }
-  if (
+    !row.exchanges.every((e) => e.status === ProcessStatus.complete);
+  const hasUncompletedCancelRequest =
     row.orderCancellations &&
     row.orderCancellations.length > 0 &&
-    !row.orderCancellations.every((c) => c.status === ProcessStatus.complete)
-  ) {
-    return <KkshowOrderStatusBadge orderStatus="orderCancellations" />;
-  }
-  return <KkshowOrderStatusBadge orderStatus={row.step} />;
+    !row.orderCancellations.every((c) => c.status === ProcessStatus.complete);
+
+  return (
+    <>
+      <KkshowOrderStatusBadge orderStatus={row.step} />
+      {hasUncompletedReturnRequest && <KkshowOrderStatusBadge orderStatus="returns" />}
+      {hasUncompletedExchangeRequest && (
+        <KkshowOrderStatusBadge orderStatus="exchanges" />
+      )}
+      {hasUncompletedCancelRequest && (
+        <KkshowOrderStatusBadge orderStatus="orderCancellations" />
+      )}
+    </>
+  );
 }
 
 export function OrderList(): JSX.Element {
