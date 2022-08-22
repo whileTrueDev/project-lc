@@ -1,5 +1,11 @@
 import { Grid, GridItem, Heading, Stack } from '@chakra-ui/react';
-import { useCustomerInfo, useProfile } from '@project-lc/hooks';
+import {
+  useCustomerAddress,
+  useCustomerAddressMutation,
+  useCustomerInfo,
+  useDefaultCustomerAddress,
+  useProfile,
+} from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useCartStore, useKkshowOrderStore } from '@project-lc/stores';
 import { setCookie } from '@project-lc/utils-frontend';
@@ -48,6 +54,9 @@ export function OrderPaymentForm(): JSX.Element | null {
   }
 
   const { getValues, setValue } = methods;
+
+  const { data: defaultAddr } = useDefaultCustomerAddress();
+  const { mutateAsync: createAddress } = useCustomerAddressMutation();
 
   // 로그인하여 소비자 정보가 있는경우 id등 기타 정보 저장
   useEffect(() => {
@@ -98,6 +107,21 @@ export function OrderPaymentForm(): JSX.Element | null {
     const cookieExpire = new Date();
     cookieExpire.setMinutes(cookieExpire.getMinutes() + 1);
     setCookie('amount', amount, { expire: cookieExpire, path: '/' }); // path 설정 안하면 /payment로 저장되기는 함. 이유는 모르겠으나 한번은 path가 /goods로 저장되어 /payment페이지에서 쿠키가 읽히지 않음 -> 결제금액 비교 못하는 문제가 발생하여 '/' 로 저장함
+
+    // 현재 배송지 기본 배송지로 등록 요청 (백그라운드로 요청만 보낼것이므로 await 처리하지 않음.)
+    if (customer && !defaultAddr) {
+      createAddress({
+        title: '기본',
+        isDefault: true,
+        address: submitData.recipientAddress,
+        detailAddress: submitData.recipientDetailAddress,
+        customerId: customer?.id,
+        phone: submitData.recipientPhone,
+        postalCode: submitData.recipientPostalCode,
+        recipient: submitData.recipientName,
+        memo: submitData.memo,
+      });
+    }
 
     return doPayment(
       paymentType,

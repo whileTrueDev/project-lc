@@ -13,6 +13,7 @@ import { CustomerAddress } from '@prisma/client';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
 import { useFormContext } from 'react-hook-form';
+import { CustomerAddressCreateButton } from '../address/CustomerAddressCreateDialog';
 import CustomerAddressList from '../address/CustomerAddressList';
 
 type DeliveryListProps = {
@@ -23,13 +24,14 @@ type DeliveryListProps = {
 export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX.Element {
   const { handleAddressType } = useKkshowOrderStore();
   const handleAddressSelect = (data: CustomerAddress): void => {
-    const phone1 = data.phone?.slice(0, 3);
-    const phone2 = data.phone?.slice(3, 7);
-    const phone3 = data.phone?.slice(7, 12);
+    const phoneData = (data.phone || '').match(/(\d+)/g);
+    if (phoneData && phoneData.length === 3) {
+      const [phone1, phone2, phone3] = phoneData;
+      setValue('recipientPhone1', phone1 || '');
+      setValue('recipientPhone2', phone2 || '');
+      setValue('recipientPhone3', phone3 || '');
+    }
     setValue('recipientName', data.recipient || '');
-    setValue('recipientPhone1', phone1 || '');
-    setValue('recipientPhone2', phone2 || '');
-    setValue('recipientPhone3', phone3 || '');
     setValue('recipientPostalCode', data.postalCode || '');
     setValue('recipientAddress', data.address || '');
     setValue('recipientDetailAddress', data.detailAddress || '');
@@ -51,6 +53,7 @@ export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX
         <ModalCloseButton />
         <ModalHeader>배송지목록</ModalHeader>
         <ModalBody>
+          <CustomerAddressCreateButton />
           <Center>
             <CustomerAddressList
               editable={false}
