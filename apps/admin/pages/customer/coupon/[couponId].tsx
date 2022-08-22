@@ -236,7 +236,7 @@ export function CouponManage(): JSX.Element {
             <Heading size="lg">고객 목록</Heading>
             <Flex direction="column">
               <Button onClick={issueAllOnOpen} colorScheme="blue">
-                전체/선택 발급
+                선택된 고객 일괄 발급
               </Button>
             </Flex>
           </Flex>

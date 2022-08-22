@@ -1,5 +1,5 @@
-import { IsNumber, IsOptional, IsEnum, IsArray } from 'class-validator';
 import { CouponStatus } from '@prisma/client';
+import { IsArray, IsEnum, IsNumber, IsOptional } from 'class-validator';
 
 export class CouponStatusDto {
   @IsNumber()
