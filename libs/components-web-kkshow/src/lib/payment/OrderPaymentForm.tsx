@@ -1,6 +1,5 @@
 import { Grid, GridItem, Heading, Stack } from '@chakra-ui/react';
 import {
-  useCustomerAddress,
   useCustomerAddressMutation,
   useCustomerInfo,
   useDefaultCustomerAddress,
