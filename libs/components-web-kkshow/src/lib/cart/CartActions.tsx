@@ -8,7 +8,7 @@ import {
   useProductPromotions,
   useProfile,
 } from '@project-lc/hooks';
-import { CartItemRes } from '@project-lc/shared-types';
+import { CartItemRes, NEXT_PAGE_PARAM_KEY } from '@project-lc/shared-types';
 import { OrderShippingData, useCartStore, useKkshowOrderStore } from '@project-lc/stores';
 import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
@@ -204,7 +204,7 @@ export function CartActions(): JSX.Element {
 
     // 비회원 주문 로그인화면으로 이동, 로그인 이후 페이지를 주문페이지로
     if (!profile.data?.id) {
-      router.push(`/login?from=purchase&nextpage=/payment`);
+      router.push(`/login?from=purchase&${NEXT_PAGE_PARAM_KEY}=/payment`);
       return;
     }
     router.push('/payment');

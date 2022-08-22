@@ -5,6 +5,7 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  HStack,
   Input,
   Stack,
   Text,
@@ -20,6 +21,7 @@ import {
   useSellerSignupMutation,
   useCountdown,
   useCustomerSignupMutation,
+  useNextpageUrlParam,
 } from '@project-lc/hooks';
 import {
   emailCodeRegisterOptions,
@@ -40,6 +42,7 @@ export function SignupForm({
   userType = 'seller',
 }: SignupFormProps): JSX.Element {
   const router = useRouter();
+  const nextPage = useNextpageUrlParam();
   const toast = useToast();
 
   const { clearTimer, startCountdown, seconds } = useCountdown();
@@ -143,14 +146,11 @@ export function SignupForm({
       } else if (userType === 'customer') {
         user = await customerSignup.mutateAsync(data).catch(handleSignupError);
       }
-
       if (user) {
         // 로그인 과정이 수행
-        await login.mutateAsync({
-          email: data.email,
-          password: data.password,
-        });
-        router.push('/mypage');
+        await login.mutateAsync({ email: data.email, password: data.password });
+        if (nextPage) router.push(nextPage);
+        else router.push('/mypage');
       }
     },
     [
@@ -159,28 +159,62 @@ export function SignupForm({
       handleSignupError,
       login,
       router,
+      nextPage,
       sellerSignup,
       userType,
     ],
   );
+  const grayText = useColorModeValue('gray.500', 'gray.400');
   return (
     <CenterBox enableShadow header={{ title: '크크쇼 시작하기', desc: '' }}>
       <Stack mt={4} spacing={4} as="form" onSubmit={handleSubmit(onSubmit)}>
-        <FormControl isInvalid={!!errors.name}>
-          <FormLabel htmlFor="name">이름</FormLabel>
-          <Input
-            id="name"
-            type="text"
-            placeholder="김크크쇼"
-            autoComplete="off"
-            isReadOnly={phase === 2}
-            {...register('name', {
-              required: '이름을 작성해주세요.',
-              minLength: { value: 2, message: '이름은 2글자 이상이어야 합니다.' },
-            })}
-          />
-          <FormErrorMessage>{errors.name && errors.name.message}</FormErrorMessage>
-        </FormControl>
+        <HStack align="baseline">
+          <FormControl isInvalid={!!errors.name}>
+            <FormLabel htmlFor="name">
+              이름
+              <Text fontSize="xs" color={grayText} as="span">
+                (실명)
+              </Text>
+            </FormLabel>
+            <Input
+              id="name"
+              type="text"
+              placeholder="홍길동"
+              autoComplete="off"
+              isReadOnly={phase === 2}
+              {...register('name', {
+                required: '이름을 작성해주세요.',
+                minLength: { value: 2, message: '이름은 2글자 이상이어야 합니다.' },
+              })}
+            />
+            <FormErrorMessage fontSize="xs">
+              {errors.name && errors.name.message}
+            </FormErrorMessage>
+          </FormControl>
+
+          {userType === 'customer' && (
+            <FormControl isInvalid={!!errors.nickname}>
+              <FormLabel htmlFor="nickname">
+                닉네임
+                <Text fontSize="xs" color={grayText} as="span">
+                  (선택사항)
+                </Text>
+              </FormLabel>
+              <Input
+                id="nickname"
+                type="text"
+                placeholder="크크티비"
+                autoComplete="off"
+                isReadOnly={phase === 2}
+                {...register('nickname')}
+              />
+              <FormErrorMessage fontSize="xs">
+                {errors.nickname && errors.nickname.message}
+              </FormErrorMessage>
+            </FormControl>
+          )}
+        </HStack>
+
         <FormControl isInvalid={!!errors.email}>
           <FormLabel htmlFor="email">이메일</FormLabel>
           <Input
@@ -191,16 +225,14 @@ export function SignupForm({
             autoComplete="off"
             {...register('email', { ...emailRegisterOptions })}
           />
-          <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
+          <FormErrorMessage fontSize="xs">
+            {errors.email && errors.email.message}
+          </FormErrorMessage>
         </FormControl>
         <FormControl isInvalid={!!errors.password}>
           <FormLabel htmlFor="password">
             암호
-            <Text
-              fontSize="xs"
-              color={useColorModeValue('gray.500', 'gray.400')}
-              as="span"
-            >
+            <Text fontSize="xs" color={grayText} as="span">
               (문자,숫자,특수문자 포함 8자 이상)
             </Text>
           </FormLabel>
@@ -211,7 +243,7 @@ export function SignupForm({
             placeholder="********"
             {...register('password', { ...passwordRegisterOptions })}
           />
-          <FormErrorMessage>
+          <FormErrorMessage fontSize="xs">
             {errors.password && errors.password.message}
           </FormErrorMessage>
         </FormControl>
@@ -219,11 +251,7 @@ export function SignupForm({
         <FormControl isInvalid={!!errors.repassword}>
           <FormLabel htmlFor="password">
             암호 확인
-            <Text
-              fontSize="xs"
-              color={useColorModeValue('gray.500', 'gray.400')}
-              as="span"
-            >
+            <Text fontSize="xs" color={grayText} as="span">
               (동일한 암호를 입력하세요.)
             </Text>
           </FormLabel>
@@ -239,7 +267,7 @@ export function SignupForm({
                 value === watch('password') || '암호가 동일하지 않습니다.',
             })}
           />
-          <FormErrorMessage>
+          <FormErrorMessage fontSize="xs">
             {errors.repassword && errors.repassword.message}
           </FormErrorMessage>
         </FormControl>
@@ -276,7 +304,9 @@ export function SignupForm({
                 </Text>
               )}
             </Flex>
-            <FormErrorMessage>{errors.code && errors.code.message}</FormErrorMessage>
+            <FormErrorMessage fontSize="xs">
+              {errors.code && errors.code.message}
+            </FormErrorMessage>
 
             <Flex alignItems="center" my={1}>
               <Text fontSize="sm" color="gray.500">

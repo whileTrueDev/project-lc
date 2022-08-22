@@ -15,7 +15,7 @@ export interface PasswordCheckFormData {
 }
 export interface PasswordCheckFormProps {
   email?: string;
-  onCancel: () => void;
+  onCancel?: () => void;
   onConfirm: () => void;
   onFail?: () => void;
 }
@@ -72,7 +72,7 @@ export function PasswordCheckForm(props: PasswordCheckFormProps): JSX.Element {
         <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
       </FormControl>
       <ButtonGroup mt={2} width="100%" justifyContent="flex-end">
-        <Button onClick={onCancel}>취소</Button>
+        {onCancel && <Button onClick={onCancel}>취소</Button>}
         <Button colorScheme="blue" type="submit" disabled={!watch('password')}>
           비밀번호 확인
         </Button>

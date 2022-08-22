@@ -21,8 +21,9 @@ import {
   useLoginMutation,
   InactiveUserPayload,
   useCartMigrationMutation,
+  useNextpageUrlParam,
 } from '@project-lc/hooks';
-import { LoginUserDto, UserType } from '@project-lc/shared-types';
+import { LoginUserDto, NEXT_PAGE_PARAM_KEY, UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
@@ -40,6 +41,7 @@ export function LoginForm({
   userType,
 }: LoginFormProps): JSX.Element {
   const router = useRouter();
+  const nextPage = useNextpageUrlParam();
   const {
     handleSubmit,
     register,
@@ -72,15 +74,13 @@ export function LoginForm({
       }
       if (user) {
         cartMutation.mutateAsync({ customerId: user.id });
-        const nextPage = router.query.nextpage as string;
-        if (nextPage) {
-          router.push(nextPage.startsWith('/') ? nextPage : `/${nextPage}`);
-        } else {
+        if (nextPage) router.push(nextPage);
+        else {
           router.push('/mypage');
         }
       }
     },
-    [login, setValue, setToActivateEmail, router, cartMutation],
+    [login, setValue, setToActivateEmail, router, cartMutation, nextPage],
   );
 
   function getMessage(statusCode: number | undefined): string {
@@ -148,14 +148,14 @@ export function LoginForm({
           </Button>
 
           {/* 비회원 주문 링크 */}
-          {router.query.from === 'purchase' && router.query.nextpage && (
+          {router.query.from === 'purchase' && router.query[NEXT_PAGE_PARAM_KEY] && (
             <Box mt={4}>
               <Text>
                 비회원으로 구매하시겠습니까?{' '}
                 <ClickableUnderlinedText
                   color="blue.500"
                   fontSize="md"
-                  onClick={() => router.push(router.query.nextpage as string)}
+                  onClick={() => router.push(router.query[NEXT_PAGE_PARAM_KEY] as string)}
                   as="span"
                 >
                   비회원 구매
@@ -177,7 +177,10 @@ export function LoginForm({
           </NextLink>
           <Text fontSize="sm">
             처음 오셨나요?
-            <NextLink href="/signup" passHref>
+            <NextLink
+              href={nextPage ? `/signup?${NEXT_PAGE_PARAM_KEY}=${nextPage}` : '/signup'}
+              passHref
+            >
               <Link
                 ml={2}
                 color={useColorModeValue('blue.500', 'blue.400')}

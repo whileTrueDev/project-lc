@@ -1,4 +1,4 @@
-import { Box, Flex, Stack, Text, useDisclosure } from '@chakra-ui/react';
+import { Box, Flex, Stack, Text } from '@chakra-ui/react';
 import { PasswordCheckForm } from '@project-lc/components-shared/PasswordCheckForm';
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
 import { UserInfo } from '@project-lc/components-web-kkshow/mypage/info/UserInfo';
@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react';
 export function Info(): JSX.Element {
   const title = '내 정보 수정';
   const { data: profileData } = useProfile();
-  const { onClose } = useDisclosure();
   const [isValidated, setIsValidated] = useState(false);
 
   const onConfirm = (): void => {
@@ -50,11 +49,7 @@ export function Info(): JSX.Element {
 
               <Box>
                 <Text>비밀번호</Text>
-                <PasswordCheckForm
-                  email={profileData?.email}
-                  onCancel={onClose}
-                  onConfirm={onConfirm}
-                />
+                <PasswordCheckForm email={profileData?.email} onConfirm={onConfirm} />
               </Box>
             </Stack>
           </Stack>

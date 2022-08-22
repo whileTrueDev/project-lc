@@ -754,12 +754,23 @@ export class OrderService {
     // 주문상품옵션 중 자기 상품옵션만 남기기
     // 자기상품옵션 상태에 기반한 주문상태 표시
   */
-  private postProcessSellerOrders(
+  private async postProcessSellerOrders(
     orders: OrderDataWithRelations[],
     sellerId: number, // 판매자 고유번호
-  ): OrderDataWithRelations[] {
+  ): Promise<OrderDataWithRelations[]> {
+    const sellerShippingGroupList = await this.prisma.shippingGroup.findMany({
+      where: { sellerId },
+    });
     return orders.map((o) => {
-      const { orderItems, ...orderRestData } = o;
+      const {
+        orderItems,
+        exchanges,
+        returns,
+        orderCancellations,
+        shippings,
+        exports,
+        ...orderRestData
+      } = o;
 
       // 주문상품옵션 중 판매자 본인의 상품옵션만 남기기
       const sellerGoodsOrderItems = orderItems.filter(
@@ -773,16 +784,69 @@ export class OrderService {
           o.step,
           sellerGoodsOrderItems.flatMap((oi) => oi.options),
         );
+      } // * 판매자 본인의 배송비정책과 연결된 주문배송비정보만 보내기
+      let sellerShippings = shippings;
+
+      if (sellerShippingGroupList.length > 0) {
+        const shippingGroupIdList = sellerShippingGroupList.map((g) => g.id);
+        sellerShippings = shippings.filter((s) =>
+          shippingGroupIdList.includes(s.shippingGroupId),
+        );
       }
 
-      // if (dto.searchExtendedStatus.length) {
-      //   dto.searchExtendedStatus.map((item) => `${item}`)
-      // }
+      // * 판매자 상품이 포함된 교환/반품/취소/출고 데이터, 상품만 보내기
+      // 해당 판매자의 상품인 주문상품id (OrderItem.id) 목록
+      const sellerOrderItemsIdList = sellerGoodsOrderItems.map((item) => item.id);
+      // 판매자의 상품이 포함된 교환(재배송)요청
+      const sellerExchanges = exchanges
+        .map((ex) => ({
+          ...ex,
+          // 교환요청 상품 중 판매자의 상품만 필터
+          exchangeItems: ex.exchangeItems.filter((item) =>
+            sellerOrderItemsIdList.includes(item.orderItemId),
+          ),
+        }))
+        .filter((ex) => ex.exchangeItems.length > 0); // 판매자 상품이 포함된 교환요청만 필터
+
+      // 판매자 상품이 포함된 주문취소요청
+      const sellerOrderCancellations = orderCancellations
+        .map((oc) => ({
+          ...oc,
+          items: oc.items.filter((item) =>
+            sellerOrderItemsIdList.includes(item.orderItemId),
+          ),
+        }))
+        .filter((oc) => oc.items.length > 0);
+
+      // 판매자 상품이 포함된 반품요청
+      const sellerReturns = returns
+        .map((r) => ({
+          ...r,
+          items: r.items.filter((item) =>
+            sellerOrderItemsIdList.includes(item.orderItemId),
+          ),
+        }))
+        .filter((r) => r.items.length > 0);
+
+      // 판매자의 상품이 포함된 출고정보
+      const sellerExports = exports
+        .map((e) => ({
+          ...e,
+          items: e.items.filter((item) =>
+            sellerOrderItemsIdList.includes(item.orderItemId),
+          ),
+        }))
+        .filter((e) => e.items.length > 0);
 
       return {
         ...orderRestData,
         step: displaySellerOrderStep,
         orderItems: sellerGoodsOrderItems,
+        exchanges: sellerExchanges,
+        returns: sellerReturns,
+        orderCancellations: sellerOrderCancellations,
+        exports: sellerExports,
+        shippings: sellerShippings,
       };
     });
   }
@@ -795,7 +859,7 @@ export class OrderService {
 
     // 주문상품옵션 중 자기 상품옵션만 남기기
     // 자기상품옵션 상태에 기반한 주문상태 표시
-    const ordersWithOnlySellerGoodsOrderItems = this.postProcessSellerOrders(
+    const ordersWithOnlySellerGoodsOrderItems = await this.postProcessSellerOrders(
       orders,
       dto.sellerId,
     );
