@@ -79,7 +79,7 @@ export function OrderItemSupport({
               })}
             />
             <FormErrorMessage>
-              {errors?.orderItems?.[orderItemIndex]?.support?.message}
+              {errors?.orderItems?.[orderItemIndex]?.support?.message?.message}
             </FormErrorMessage>
           </FormControl>
         </Stack>
