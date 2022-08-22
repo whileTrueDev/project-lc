@@ -7,7 +7,7 @@ import { ActionTypeBadge } from '@project-lc/components-shared/CouponBadge';
 
 const column: GridColumns = [
   {
-    width: 120,
+    width: 200,
     field: 'couponName',
     headerName: '쿠폰명',
     valueGetter: ({ row }: GridRowData) => row.customerCoupon.coupon.name,

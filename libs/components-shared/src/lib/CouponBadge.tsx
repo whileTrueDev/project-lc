@@ -89,7 +89,7 @@ export function ActionTypeBadge(value: CouponLogType): JSX.Element {
       return (
         <Box lineHeight={2}>
           <Badge variant="outline" colorScheme="blue">
-            적립
+            발급
           </Badge>
         </Box>
       );
