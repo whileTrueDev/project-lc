@@ -97,11 +97,12 @@ export class KkshowSearchService {
         _goods.LiveShopping.forEach((liveShopping) => {
           if (
             liveShopping.broadcaster?.userNickname &&
-            !ID_SET.has(`bc:${liveShopping.broadcaster.userNickname}`)
+            !ID_SET.has(`bc:${liveShopping.broadcaster.userNickname}`) &&
+            liveShopping.broadcaster.BroadcasterPromotionPage?.url
           ) {
             broadcasters.push({
               title: liveShopping.broadcaster.userNickname,
-              linkUrl: liveShopping.broadcaster.BroadcasterPromotionPage.url,
+              linkUrl: liveShopping.broadcaster.BroadcasterPromotionPage?.url,
               imageUrl: liveShopping.broadcaster.avatar,
             });
             ID_SET.add(`bc:${liveShopping.broadcaster.userNickname}`);
@@ -128,7 +129,11 @@ export class KkshowSearchService {
         ID_SET.add(`goods:${_goods.goods_name}`);
       }
 
-      if (broadcaster?.userNickname && !ID_SET.has(`bc:${broadcaster.userNickname}`)) {
+      if (
+        broadcaster?.userNickname &&
+        !ID_SET.has(`bc:${broadcaster.userNickname}`) &&
+        broadcaster.BroadcasterPromotionPage?.url
+      ) {
         broadcasters.push({
           title: broadcaster?.userNickname,
           linkUrl: broadcaster.BroadcasterPromotionPage?.url,
