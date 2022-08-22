@@ -50,7 +50,7 @@ export function PasswordChangeForm(props: PasswordChangeFormProps): JSX.Element 
           title: `새 비밀번호 등록 실패`,
           status: 'error',
         });
-        onCancel();
+        if (onCancel) onCancel();
       })
       .finally(() => {
         reset();
