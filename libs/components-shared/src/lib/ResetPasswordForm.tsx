@@ -252,11 +252,19 @@ export function ResetPasswordForm(): JSX.Element {
 
       {/* step 2 : 비밀번호 재설정 */}
       {step === 2 && (
-        <PasswordChangeForm
-          email={getValues('email')}
-          onCancel={moveToStepZero}
-          onConfirm={() => router.push('/login')}
-        />
+        <Box>
+          <PasswordChangeForm
+            email={getValues('email')}
+            onCancel={moveToStepZero}
+            onConfirm={() => router.push('/login')}
+          />
+          <Stack direction="row">
+            <Button onClick={moveToStepZero}>취소</Button>
+            <Button colorScheme="blue" type="submit" form="password-change-form">
+              비밀번호 변경
+            </Button>
+          </Stack>
+        </Box>
       )}
     </CenterBox>
   );
