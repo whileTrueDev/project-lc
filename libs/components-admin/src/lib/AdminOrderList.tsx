@@ -66,13 +66,15 @@ const columns: GridColumns = [
     valueGetter: ({ row }) => {
       const _row = row as OrderListRes['orders'][number];
       const oiIncludesSupports = _row.orderItems.filter((x) => !!x.support);
+      const gitftOrderStr = _row.giftFlag ? '[선물]' : '';
       if (oiIncludesSupports.length > 1) {
-        return `${`${
+        return `${gitftOrderStr} ${`${
           oiIncludesSupports[0]?.support?.broadcaster?.userNickname || ''
         } 외 ${oiIncludesSupports.length - 1}`}명`;
       }
       return oiIncludesSupports[0]?.support
-        ? oiIncludesSupports[0]?.support?.broadcaster?.userNickname || ''
+        ? `${gitftOrderStr} ${oiIncludesSupports[0]?.support?.broadcaster?.userNickname}` ||
+            ''
         : '후원X';
     },
   },
