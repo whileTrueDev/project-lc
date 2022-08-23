@@ -6,7 +6,6 @@ import {
   TossPaymentCancelDto,
 } from '@project-lc/shared-types';
 import axios from 'axios';
-import { nanoid } from 'nanoid';
 
 const ENCODED_SECRET_KEY = Buffer.from(
   `${process.env.TOSS_PAYMENTS_SECRET_KEY}:`,
@@ -29,8 +28,8 @@ export type PaymentsByDateRequestType = {
   limit: number;
 };
 
-/** 토스페이먼츠 결제취소요청 */
-const requestCancelPayment = async (dto: TossPaymentCancelDto): Promise<any> => {
+/** 토스페이먼츠 결제취소요청 - 응답 Payment객체의 cancels 필드에 취소객체가 배열로 들어옴 */
+const requestCancelPayment = async (dto: TossPaymentCancelDto): Promise<Payment> => {
   const url = `${BASE_URL}/payments/${dto.paymentKey}/cancel`;
   const response = await axios.post(url, dto, axiosConfig);
   return response.data;
