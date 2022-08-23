@@ -28,26 +28,6 @@ export type PaymentsByDateRequestType = {
   startingAfter: string;
   limit: number;
 };
-/** 토스페이먼츠 결제취소 위해 필요한 결제정보와 transactionKey 생성 위해 만듦
- * 테스트용으로 만든거라 안쓰이는 경우 삭제필요
- */
-const makeDummyTossPaymentData = async (): Promise<any> => {
-  const orderId = nanoid(6);
-  const postData = {
-    amount: 15000,
-    orderId,
-    orderName: '테스트주문',
-    cardNumber: '4330123412341234',
-    cardExpirationYear: '24',
-    cardExpirationMonth: '07',
-    cardPassword: '12',
-    customerIdentityNumber: '881212',
-  };
-
-  const url = `${BASE_URL}/payments/key-in`;
-  const response = await axios.post(url, postData, axiosConfig);
-  return response.data;
-};
 
 /** 토스페이먼츠 결제취소요청 */
 const requestCancelPayment = async (dto: TossPaymentCancelDto): Promise<any> => {
@@ -68,8 +48,9 @@ const createPayment = async (dto: PaymentRequestDto): Promise<Payment> => {
   const postData = {
     orderId: dto.orderId,
     amount: dto.amount,
+    paymentKey: dto.paymentKey,
   };
-  const url = `${BASE_URL}/payments/${dto.paymentKey}`;
+  const url = `${BASE_URL}/payments/confirm`;
   const response = await axios.post(url, postData, {
     responseType: 'json',
     ...axiosConfig,
@@ -97,7 +78,6 @@ const getPaymentsByDate = async (
 };
 
 export const TossPaymentsApi = {
-  makeDummyTossPaymentData,
   requestCancelPayment,
   getPaymentByOrderCode,
   createPayment,
