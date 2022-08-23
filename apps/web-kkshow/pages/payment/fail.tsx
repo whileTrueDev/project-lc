@@ -28,6 +28,14 @@ export function Success(): JSX.Element {
           >
             <Text fontWeight="bold">사유 : {failReason}</Text>
           </Box>
+          <Button
+            onClick={() => router.push('/payment')}
+            mt={3}
+            variant="outline"
+            colorScheme="blue"
+          >
+            주문서로 돌아가기
+          </Button>
           <Button onClick={() => router.push('/cart')} colorScheme="blue" mt={3}>
             장바구니로 돌아가기
           </Button>
