@@ -243,21 +243,24 @@ export function GoodsViewPriceTag({
         specialPriceDiscountRate: string;
       } = {
         hasLiveShoppingSpecialPrice: false,
-        cheapestPrice: null,
+        cheapestPrice: Number(defaultOption?.price),
         specialPriceDiscountRate: '',
       };
 
       if (
         selectedBc &&
         nowOnliveLsListBySelectedBc.data &&
-        nowOnliveLsListBySelectedBc.data[0]
+        nowOnliveLsListBySelectedBc.data[0] &&
+        nowOnliveLsListBySelectedBc.data[0].liveShoppingSpecialPrices.length > 0
       ) {
         specialPriceInfo.hasLiveShoppingSpecialPrice = true;
         const specialPriceArr =
           nowOnliveLsListBySelectedBc.data[0].liveShoppingSpecialPrices.map((spData) =>
             Number(spData.specialPrice),
           );
-        specialPriceInfo.cheapestPrice = Math.min(...specialPriceArr);
+        specialPriceInfo.cheapestPrice = Math.min(
+          ...specialPriceArr.concat(Number(defaultOption.price)),
+        );
         specialPriceInfo.specialPriceDiscountRate = getDiscountedRate(
           Number(defaultOption.consumer_price),
           Number(specialPriceInfo.cheapestPrice),
@@ -265,7 +268,12 @@ export function GoodsViewPriceTag({
       }
 
       return specialPriceInfo;
-    }, [selectedBc, nowOnliveLsListBySelectedBc.data, defaultOption.consumer_price]);
+    }, [
+      defaultOption.price,
+      defaultOption.consumer_price,
+      selectedBc,
+      nowOnliveLsListBySelectedBc.data,
+    ]);
 
   return (
     <Grid
@@ -306,23 +314,25 @@ export function GoodsViewPriceTag({
       </GridItem>
 
       {/* 라이브 특가가 존재하는 경우 표시 */}
-      {hasLiveShoppingSpecialPrice && (
-        <>
-          <GridItem>
-            <Flex alignItems="center" height="100%">
-              <Text fontWeight="extrabold">LIVE특가</Text>
-            </Flex>
-          </GridItem>
-          <GridItem>
-            <Flex gap={1} flexWrap="wrap" alignItems="center">
-              <Text id="special-cheapest-price" fontWeight="extrabold" fontSize="2xl">
-                {getLocaleNumber(cheapestPrice)}원
-              </Text>
-              <DiscountRateText discountRate={specialPriceDiscountRate} />
-            </Flex>
-          </GridItem>
-        </>
-      )}
+      {hasLiveShoppingSpecialPrice &&
+        cheapestPrice &&
+        cheapestPrice < Number(defaultOption.price) && (
+          <>
+            <GridItem>
+              <Flex alignItems="center" height="100%">
+                <Text fontWeight="extrabold">LIVE특가</Text>
+              </Flex>
+            </GridItem>
+            <GridItem>
+              <Flex gap={1} flexWrap="wrap" alignItems="center">
+                <Text id="special-cheapest-price" fontWeight="extrabold" fontSize="2xl">
+                  {getLocaleNumber(cheapestPrice)}원
+                </Text>
+                <DiscountRateText discountRate={specialPriceDiscountRate} />
+              </Flex>
+            </GridItem>
+          </>
+        )}
 
       {shippingGroup && (
         <>
