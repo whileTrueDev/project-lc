@@ -14,6 +14,18 @@ import OAuth2Strategy, {
 import { Customer, Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
+type NaverAuthorizationParams = {
+  /** 재동의 요청의 경우 'reprompt'로 전송해야 함 */
+  auth_type?: 'reprompt';
+};
+/** snakecase -> camelcase 변경 타입 ex) auth_type -> authType */
+type SnakeToCamel<S extends string> = S extends `${infer T}_${infer U}`
+  ? `${T}${Capitalize<SnakeToCamel<U>>}`
+  : S;
+type NaverAuthorizationParamOptions = {
+  [K in keyof NaverAuthorizationParams as SnakeToCamel<K>]: NaverAuthorizationParams[K];
+};
+
 export type NaverSocialProfile = {
   provider: 'naver';
   /** 동일인 식별 정보: 동일인 식별 정보는 네이버 아이디마다 고유하게 발급되는 값입니다. */
@@ -60,9 +72,8 @@ class NaverStrategyBase extends OAuth2Strategy {
     this.name = NAVER_PROVIDER;
   }
 
-  authorizationParams(options: any): object {
-    if (options.authType) return { auth_type: options.authType };
-    return {};
+  authorizationParams(options: NaverAuthorizationParamOptions): object {
+    return { auth_type: options.authType, ...options };
   }
 
   userProfile(accessToken: string, done: (err?: Error, profile?: any) => void): void {
