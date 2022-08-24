@@ -27,6 +27,7 @@ import { MileageService, MileageSettingService } from '@project-lc/nest-modules-
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
+  CreateOrderItemDto,
   CreateOrderShippingData,
   FindAllOrderByBroadcasterRes,
   FindManyDto,
@@ -199,6 +200,116 @@ export class OrderService {
     );
   }
 
+  /** 주문생성시 사용. paymentId 가 있는 경우 결제완료 여부 확인하여 주문의 초기 상태 구하는 함수 */
+  private async getInitialOrderStep({
+    paymentId,
+  }: {
+    paymentId?: number;
+  }): Promise<OrderProcessStep> {
+    let orderStep: OrderProcessStep = 'orderReceived';
+
+    if (!paymentId) return orderStep;
+
+    // 결제정보 조회
+    const paymentInfo = await this.prisma.orderPayment.findUnique({
+      where: { id: paymentId },
+    });
+    if (!paymentInfo) return orderStep;
+
+    if (paymentInfo.method === 'virtualAccount') {
+      // 가상계좌 결제 && 가상계좌에 입금 완료시
+      if (
+        paymentInfo.depositStatus === 'DONE' &&
+        paymentInfo.depositDoneFlag &&
+        paymentInfo.depositDate
+      ) {
+        orderStep = 'paymentConfirmed';
+      }
+    }
+    // 카드결제 OR 계좌이체 결제시
+    if (['card', 'transfer'].includes(paymentInfo.method) && paymentInfo.depositDate) {
+      orderStep = 'paymentConfirmed';
+    }
+    return orderStep;
+  }
+
+  /** OrderCreateInput['orderItems']['create'] 주문create 중 orderItems create 부분 생성  */
+  private async getOrderItemsCreateInput({
+    orderItems,
+    orderStep,
+  }: {
+    orderItems: CreateOrderItemDto[];
+    orderStep: OrderProcessStep;
+  }): Promise<Prisma.OrderCreateInput['orderItems']['create']> {
+    // 주문에 연결될 상품 정보 조회
+    const orderItemsConnectedGoodsIds = orderItems.map((i) => i.goodsId);
+    const orderItemConnectedGoodsData = await this.prisma.goods.findMany({
+      where: { id: { in: orderItemsConnectedGoodsIds } },
+      select: { id: true, goods_name: true, image: true, options: true },
+    });
+
+    // 주문상품과 연결된 후원 라이브방송들 정보 찾기
+    const supportedLiveShoppingIdList = orderItems
+      .filter((oi) => !!oi.support)
+      .map((oi) => oi.support.liveShoppingId);
+    const relatedLiveShoppings = await this.prisma.liveShopping.findMany({
+      where: { id: { in: supportedLiveShoppingIdList } },
+      include: { liveShoppingSpecialPrices: true },
+    });
+
+    return orderItems.map((item) => {
+      const { options, support, goodsName, goodsId, channel, shippingGroupId } = item;
+
+      const supportLs =
+        relatedLiveShoppings.length > 0 && !!support
+          ? relatedLiveShoppings.find((ls) => ls.id === support.liveShoppingId)
+          : undefined;
+
+      const connectedGoodsData = orderItemConnectedGoodsData.find(
+        (goodsData) => goodsData.id === item.goodsId,
+      );
+      // 상품대표이미지(이미지 중 첫번째)
+      const imageUrl = connectedGoodsData?.image[0]?.image;
+
+      return {
+        goodsId,
+        channel,
+        shippingGroupId,
+        // 주문상품옵션들 생성
+        options: {
+          create: options.map((opt) => {
+            const specialPriceData = supportLs?.liveShoppingSpecialPrices.find(
+              (sp) => sp.goodsOptionId === opt.goodsOptionId,
+            );
+            const liveShoppingSpecialPriceId = specialPriceData
+              ? specialPriceData.id
+              : undefined;
+            return {
+              ...opt,
+              goodsName,
+              imageUrl,
+              step: orderStep,
+              discountPrice: opt.discountPrice, // 주문 & 결제당시 크크쇼주문스토어에 저장된 가격
+              liveShoppingSpecialPriceId, // 라이브쇼핑 특가 정보 연결(존재하는 경우)
+            };
+          }),
+        },
+        // 주문상품에 후원정보가 있는경우 주문상품후원생성
+        support: support
+          ? {
+              create: {
+                broadcasterId: support.broadcasterId,
+                message: support?.message,
+                nickname: support?.nickname,
+                liveShoppingId: support?.liveShoppingId,
+                productPromotionId: support?.productPromotionId,
+              },
+            }
+          : undefined,
+      };
+    });
+  }
+
   /** 주문생성 */
   async createOrder({
     orderDto,
@@ -212,25 +323,32 @@ export class OrderService {
       cartItemIdList,
       usedMileageAmount,
       couponId,
-      usedCouponAmount,
-      totalDiscount,
       paymentId,
-      ...data // createInput에 사용할 데이터
-    } = orderDto;
-    const {
       nonMemberOrderFlag,
       giftFlag,
       orderItems,
       supportOrderIncludeFlag,
       orderCode,
-    } = data;
+    } = orderDto;
 
     let createInput: Prisma.OrderCreateInput = {
-      ...data,
-      orderItems: undefined,
       orderCode: orderCode || this.createOrderCode(),
-      payment: paymentId ? { connect: { id: paymentId } } : undefined,
       customer: !nonMemberOrderFlag ? { connect: { id: customerId } } : undefined,
+      payment: paymentId ? { connect: { id: paymentId } } : undefined,
+      orderItems: undefined,
+      orderPrice: orderDto.orderPrice,
+      paymentPrice: orderDto.paymentPrice,
+      recipientName: orderDto.recipientName,
+      recipientPhone: orderDto.recipientPhone,
+      recipientEmail: orderDto.recipientEmail,
+      recipientAddress: orderDto.recipientAddress,
+      recipientDetailAddress: orderDto.recipientDetailAddress,
+      recipientPostalCode: orderDto.recipientPostalCode,
+      ordererName: orderDto.ordererName,
+      ordererPhone: orderDto.ordererPhone,
+      ordererEmail: orderDto.ordererEmail,
+      memo: orderDto.memo,
+      cashReceipts: orderDto.cashReceipts,
     };
 
     // 선물하기의 경우(주문상품은 1개, 후원데이터가 존재함)
@@ -238,42 +356,12 @@ export class OrderService {
       createInput = { ...createInput, ...(await this.handleGiftOrder(orderDto)) };
     }
 
-    // 주문에 연결될 상품 정보 조회
-    const orderItemsConnectedGoodsIds = orderItems.map((i) => i.goodsId);
-    const orderItemConnectedGoodsData = await this.prisma.goods.findMany({
-      where: { id: { in: orderItemsConnectedGoodsIds } },
-      select: { id: true, goods_name: true, image: true, options: true },
-    });
-
     // 주문 기본 상태 설정 (결제완료시 결제확인, 이외의 경우 주문접수)
-    let orderStep: OrderProcessStep = 'orderReceived';
-    if (paymentId) {
-      // 결제정보 조회
-      const paymentInfo = await this.prisma.orderPayment.findUnique({
-        where: { id: paymentId },
-      });
-      if (paymentInfo.method === 'virtualAccount') {
-        // 가상계좌 결제 && 가상계좌에 입금 완료시
-        if (
-          paymentInfo.depositStatus === 'DONE' &&
-          paymentInfo.depositDoneFlag &&
-          paymentInfo.depositDate
-        ) {
-          orderStep = 'paymentConfirmed';
-        }
-      }
-      // 카드결제 OR 계좌이체 결제시
-      if (['card', 'transfer'].includes(paymentInfo.method) && paymentInfo.depositDate) {
-        orderStep = 'paymentConfirmed';
-      }
-    }
+    const orderStep = await this.getInitialOrderStep({ paymentId });
 
-    const supportedLiveShoppingIdList = orderItems
-      .filter((oi) => !!oi.support)
-      .map((oi) => oi.support.liveShoppingId);
-    const relatedLiveShoppings = await this.prisma.liveShopping.findMany({
-      where: { id: { in: supportedLiveShoppingIdList } },
-      include: { liveShoppingSpecialPrices: true },
+    const orderItemsCreateInput = await this.getOrderItemsCreateInput({
+      orderItems,
+      orderStep,
     });
 
     // 주문상품, 주문상품옵션, 주문상품후원 생성
@@ -283,53 +371,7 @@ export class OrderService {
         supportOrderIncludeFlag:
           supportOrderIncludeFlag || this.hasSupportOrderItem(orderDto),
         step: orderStep,
-        orderItems: {
-          // 주문에 연결된 주문상품 생성
-          create: orderItems.map((item) => {
-            const { options, support, goodsName, ...rest } = item;
-
-            const supportLs = relatedLiveShoppings.length
-              ? relatedLiveShoppings.find((ls) => ls.id === support.liveShoppingId)
-              : undefined;
-
-            const connectedGoodsData = orderItemConnectedGoodsData.find(
-              (goodsData) => goodsData.id === item.goodsId,
-            );
-            // 상품대표이미지(이미지 중 첫번째)
-            const imageUrl = connectedGoodsData?.image[0]?.image;
-            return {
-              ...rest,
-              // 주문상품옵션들 생성
-              options: {
-                create: options.map((opt) => {
-                  const specialPriceData = supportLs?.liveShoppingSpecialPrices.find(
-                    (sp) => sp.goodsOptionId === opt.goodsOptionId,
-                  );
-                  return {
-                    ...opt,
-                    goodsName,
-                    imageUrl,
-                    step: orderStep,
-                    discountPrice: opt.discountPrice, // 주문 & 결제당시 크크쇼주문스토어에 저장된 가격
-                    liveShoppingSpecialPriceId: specialPriceData?.id, // 라이브쇼핑 특가 정보 연결
-                  };
-                }),
-              },
-              // 주문상품에 후원정보가 있는경우 주문상품후원생성
-              support: support
-                ? {
-                    create: {
-                      broadcasterId: support.broadcasterId,
-                      message: support.message,
-                      nickname: support.nickname,
-                      liveShoppingId: support.liveShoppingId,
-                      productPromotionId: support.productPromotionId,
-                    },
-                  }
-                : undefined,
-            };
-          }),
-        },
+        orderItems: { create: orderItemsCreateInput },
       },
     });
 
@@ -408,17 +450,15 @@ export class OrderService {
           broadcasterId: x.support.broadcasterId,
           productName: x.goodsName,
           purchaseNum,
-          nickname: nonMemberOrderFlag
-            ? setting?.fanNick || '비회원'
-            : x.support.nickname,
+          nickname: x.support?.nickname || setting?.fanNick || '익명의구매자',
           message: giftFlag
             ? `[방송인에게 선물!] ${x.support.message}`
-            : x.support.message,
+            : x.support.message || '',
           ttsSetting: setting?.ttsSetting || TtsSetting.full,
           level: setting?.levelCutOffPoint < purchaseNum ? '2' : '1',
-          nonMemberOrderFlag,
           giftFlag,
           liveShoppingId: x.support.liveShoppingId,
+          simpleMessageFlag: !x.support?.nickname, // 닉네임이 없는 경우 간단 메시지 송출 + 랭킹반영X
         };
       });
     // orderItems를 구매메시지 데이터로 전환한 배열의 각 송출 overlay 채널을 조회
@@ -444,7 +484,7 @@ export class OrderService {
           email: purchase.roomName,
           level: purchase.level,
           liveShoppingId: purchase.liveShoppingId,
-          loginFlag: !purchase.nonMemberOrderFlag,
+          loginFlag: !purchase.simpleMessageFlag,
           message: purchase.message,
           nickname: purchase.nickname,
           productName: purchase.productName,

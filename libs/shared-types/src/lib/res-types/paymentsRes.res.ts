@@ -126,13 +126,6 @@ export interface Payment {
   discount: null | PaymentDiscount;
 }
 
-export interface CreatePaymentRes {
-  status: string;
-  message?: string;
-  orderId: string;
-  orderPaymentId?: number; // OrderPayment 고유번호
-}
-
 /** 결제 취소 이력 */
 export interface TossPaymentCancel {
   /** 결제를 취소한 금액입니다. */

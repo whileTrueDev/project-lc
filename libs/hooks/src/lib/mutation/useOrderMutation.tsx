@@ -1,5 +1,9 @@
 import { Order } from '@prisma/client';
-import { CreateOrderDto, UpdateOrderDto } from '@project-lc/shared-types';
+import {
+  CreateOrderDto,
+  CreateOrderShippingDto,
+  UpdateOrderDto,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
@@ -27,7 +31,7 @@ export const useOrderUpdateMutation = (): UseMutationResult<
 
 export type OrderCreateDataType = {
   order: CreateOrderDto;
-  shipping: any;
+  shipping: CreateOrderShippingDto;
 };
 
 /** 주문 생성 훅 */

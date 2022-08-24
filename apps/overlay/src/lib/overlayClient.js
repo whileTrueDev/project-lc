@@ -463,10 +463,7 @@ socket.on('get right-top purchase message', async (data) => {
 
 // 비회원 응원메세지
 socket.on('get non client purchase message', async (data) => {
-  const { nickname } = data;
-  const { productName } = data;
-  const price = data.purchaseNum;
-
+  const { nickname, productName, purchaseNum: price } = data;
   messageHtml = `
   <div class="donation-wrapper">
     <iframe src="/audio/alarm-type-1.wav"

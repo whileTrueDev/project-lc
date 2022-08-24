@@ -7,7 +7,11 @@ import {
 } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useCartStore, useKkshowOrderStore } from '@project-lc/stores';
+import { getCustomerWebHost } from '@project-lc/utils';
 import { setCookie } from '@project-lc/utils-frontend';
+import { loadTossPayments } from '@tosspayments/payment-sdk';
+import dayjs from 'dayjs';
+import { nanoid } from 'nanoid';
 import { useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { BuyerInfo } from './BuyerInfo';
@@ -15,13 +19,36 @@ import { DeliveryAddress } from './DeliveryAddress';
 import { Discount } from './Discount';
 import { GiftBox } from './Gift';
 import { OrderItemInfo } from './OrderItemInfo';
-import { doPayment, getOrderPrice, PaymentBox } from './Payment';
+import { getOrderPrice, PaymentBox } from './Payment';
 import PaymentNotice from './PaymentNotice';
 import { PaymentSelection } from './PaymentSelection';
 
+export async function doPayment(
+  paymentType: '카드' | '계좌이체' | '가상계좌' | '미선택',
+  client_key: string,
+  amount: number,
+  productName: string,
+  customerName: string,
+): Promise<void> {
+  return loadTossPayments(client_key)
+    .then((tossPayments) => {
+      return tossPayments.requestPayment(paymentType, {
+        amount,
+        orderId: `${dayjs().format('YYYYMMDDHHmmssSSS')}${nanoid(6)}`,
+        orderName: `${productName}`,
+        customerName,
+        successUrl: `${getCustomerWebHost()}/payment/success`,
+        failUrl: `${getCustomerWebHost()}/payment/fail`,
+      });
+    })
+    .catch((err) => {
+      console.error('Error - loadTossPayments');
+      console.error(err);
+    });
+}
+
 export function OrderPaymentForm(): JSX.Element | null {
   const { data: profile } = useProfile();
-  const { data: customer } = useCustomerInfo(profile?.id);
   const orderPrepareData = useKkshowOrderStore((s) => s.order);
 
   const methods = useForm<CreateOrderForm>({
