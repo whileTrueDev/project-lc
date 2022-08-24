@@ -16,7 +16,6 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
   CreateOrderShippingData,
-  CreatePaymentRes,
   KKsPaymentProviders,
   Payment,
   PaymentCancelRequestResult,
@@ -42,38 +41,8 @@ export class PaymentService {
     private readonly orderService: OrderService,
   ) {}
 
-  /** 크크쇼 OrderPayment 테이블에 결제 데이터 저장 */
-  public async savePaymentRecord(dto: {
-    method: string;
-    orderId?: number;
-    paymentKey: string;
-    depositDate?: Date;
-    depositor?: string;
-    depositSecret?: string;
-    depositDueDate?: Date;
-    depositDoneFlag: boolean;
-    account?: string;
-  }): Promise<OrderPayment> {
-    let paymentMethod: PaymentMethod = PaymentMethod.card;
-    let depositStatus: VirtualAccountDepositStatus = null;
-    if (dto.method === '카드') {
-      paymentMethod = PaymentMethod.card;
-    } else if (dto.method === '계좌이체') {
-      paymentMethod = PaymentMethod.transfer;
-    } else if (dto.method === '가상계좌') {
-      paymentMethod = PaymentMethod.virtualAccount;
-      depositStatus = VirtualAccountDepositStatus.WAITING;
-    }
-    return this.prisma.orderPayment.create({
-      data: {
-        ...dto,
-        method: paymentMethod,
-        depositStatus,
-      },
-    });
-  }
-
-  public async savePaymentRecordTemp(result: Payment): Promise<OrderPayment> {
+  /** 토스페이먼츠 결제승인 결과 Payment 를 받아와 크크쇼 OrderPaymen생성 (결제정보 저장) */
+  public async savePaymentRecord(result: Payment): Promise<OrderPayment> {
     // 가상계좌 결제의 경우 소비자가 입금전까지는 승인되지 않으므로 approvedAt이 null로 전달됨
     // 가상계좌 결제시 입금전까지 depositDate : null, depositDoneFlag: false임
     const virtualAccountInfo = !result.virtualAccount
@@ -116,8 +85,15 @@ export class PaymentService {
     });
   }
 
-  /** 여기에 결제 & 주문생성 같이 하기 */
-  public async createPaymentTemp({
+  /** 결제 & 주문생성 같이 처리
+   * 1. 토스페이먼츠 결제승인요청
+   * 2. 크크쇼 OrderPayment 생성
+   * 3. 크크쇼 Order 생성
+   *
+   * 각 단계마다 에러발생시 PaymentOrderProcessException 던짐
+   * => POST /payment/success에 사용된 PaymentOrderProcessExceptionFilter에 걸려서 처리(결제취소처리) 후 프론트로 에러메시지 전달하는 구조로 되어있음
+   */
+  public async createPaymentAndOrder({
     paymentDto,
     orderDto,
     shipping,
@@ -147,7 +123,7 @@ export class PaymentService {
 
     // * 2. 크크쇼 OrderPayment 테이블에 데이터 저장
     try {
-      orderPayment = await this.savePaymentRecordTemp(tossPaymentResult);
+      orderPayment = await this.savePaymentRecord(tossPaymentResult);
     } catch (err) {
       this.logger.debug(
         `orderPayment 생성중 오류발생, orderCode : ${paymentDto.orderId}, 에러 : ${err}`,
@@ -160,7 +136,7 @@ export class PaymentService {
       });
     }
 
-    // * 크크쇼 주문생성
+    // * 3. 크크쇼 주문생성
     try {
       const orderDtoWithPaymentId = { ...orderDto, paymentId: orderPayment.id };
 
@@ -189,7 +165,7 @@ export class PaymentService {
   }
 
   /** PaymentExceptionFilter에서 사용. 결제 오류 단계에 따라 해야 할일(결제취소처리)을 처리하고, 단계에 맞는 에러메시지 리턴 */
-  async handlePayementError({
+  public async handlePayementError({
     process: errorOccuredProcess,
     tossPaymentResult,
     error,
@@ -250,58 +226,6 @@ export class PaymentService {
       });
     }
     return errorMessage;
-  }
-
-  /** 토스페이먼츠 결제승인 요청 API */
-  public async createPayment(dto: PaymentRequestDto): Promise<CreatePaymentRes> {
-    let result: Payment;
-    try {
-      result = await TossPaymentsApi.createPayment(dto);
-    } catch (err) {
-      console.log('error - createPayment > TossPaymentsApi.createPayment');
-      console.error(err.response);
-      return {
-        status: 'error',
-        message: err.response.data.message,
-        orderId: dto.orderId,
-      };
-    }
-
-    try {
-      // 가상계좌 결제의 경우 소비자가 입금전까지는 승인되지 않으므로 approvedAt이 null로 전달됨
-      // 가상계좌 결제시 입금전까지 depositDate : null, depositDoneFlag: false임
-      const virtualAccountInfo = !result.virtualAccount
-        ? undefined
-        : {
-            depositor: result.virtualAccount.customerName,
-            depositDueDate: result.virtualAccount.dueDate
-              ? new Date(result.virtualAccount.dueDate)
-              : null,
-            account: `${result.virtualAccount.bank}_${this.cipherService.getEncryptedText(
-              result.virtualAccount.accountNumber,
-            )}`,
-          };
-
-      // * 크크쇼 OrderPayment 테이블에 데이터 저장
-      const orderPayment = await this.savePaymentRecord({
-        method: result.method as PaymentMethod,
-        paymentKey: result.paymentKey,
-        depositDate: result.approvedAt ? new Date(result.approvedAt) : undefined,
-        depositDoneFlag: !!result.approvedAt,
-        depositSecret: result.secret,
-        ...virtualAccountInfo,
-      });
-
-      return { status: 'success', orderId: dto.orderId, orderPaymentId: orderPayment.id };
-    } catch (err) {
-      console.log('error - createPayment > savePaymentRecord');
-      console.error(err.response);
-      return {
-        status: 'error',
-        message: err.response.data.message,
-        orderId: dto.orderId,
-      };
-    }
   }
 
   /** 주문번호별 결제내역 */
