@@ -36,6 +36,7 @@ interface UserDataInterface {
   provider: string;
   email: string;
   name: string;
+  nickname?: string;
   picture?: string;
   accessToken: string;
   refreshToken?: string;
