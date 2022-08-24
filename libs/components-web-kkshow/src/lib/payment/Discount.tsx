@@ -275,7 +275,7 @@ function CouponSelectDialog({
           return <Text>{amount}%</Text>;
         }
         // unit === 'W'
-        return <Text>{amount}원</Text>;
+        return <Text>{getLocaleNumber(amount)}원</Text>;
       },
     },
     {
