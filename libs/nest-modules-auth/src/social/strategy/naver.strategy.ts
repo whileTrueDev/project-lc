@@ -15,8 +15,8 @@ import { Customer, Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
 type NaverAuthorizationParams = {
-  /** 재동의 요청의 경우 'reprompt'로 전송해야 함 */
-  auth_type?: 'reprompt';
+  /** 재동의 요청의 경우 'reprompt'로 전송해야 함. 매번 로그인부터 다시 시작한다면 'reauthenticate' */
+  auth_type?: 'reprompt' | 'reauthenticate';
 };
 /** snakecase -> camelcase 변경 타입 ex) auth_type -> authType */
 type SnakeToCamel<S extends string> = S extends `${infer T}_${infer U}`
