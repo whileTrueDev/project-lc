@@ -49,6 +49,7 @@ export async function doPayment(
 
 export function OrderPaymentForm(): JSX.Element | null {
   const { data: profile } = useProfile();
+  const { data: customer } = useCustomerInfo(profile?.id);
   const orderPrepareData = useKkshowOrderStore((s) => s.order);
 
   const methods = useForm<CreateOrderForm>({
