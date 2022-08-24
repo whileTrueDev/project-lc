@@ -36,6 +36,7 @@ interface UserDataInterface {
   provider: string;
   email: string;
   name: string;
+  nickname?: string;
   picture?: string;
   accessToken: string;
   refreshToken?: string;
@@ -171,7 +172,7 @@ export class SocialService {
   private async createBroadcasterSocialAccountRecord(
     userData: UserDataInterface,
   ): Promise<Broadcaster> {
-    const { id, email, name, picture, ...rest } = userData;
+    const { id, email, name, picture, nickname, ...rest } = userData;
     const socialAccountCreateInput = {
       serviceId: id,
       profileImage: picture,
@@ -181,11 +182,7 @@ export class SocialService {
 
     const createdBroadcaster = await this.prisma.broadcaster.upsert({
       where: { email },
-      update: {
-        socialAccounts: {
-          create: socialAccountCreateInput,
-        },
-      },
+      update: { socialAccounts: { create: socialAccountCreateInput } },
       create: {
         email,
         userName: name,
@@ -242,7 +239,7 @@ export class SocialService {
   private async createCustomerSocialAccountRecrod(
     userData: UserDataInterface,
   ): Promise<Customer> {
-    const { id, email, name, picture, ...rest } = userData;
+    const { id, email, name, picture, nickname, ...rest } = userData;
     const socialAccountCreateInput = {
       serviceId: id,
       profileImage: picture,
@@ -256,6 +253,7 @@ export class SocialService {
       create: {
         email,
         name,
+        nickname,
         password: null,
         socialAccounts: { create: socialAccountCreateInput },
       },
@@ -324,7 +322,8 @@ export class SocialService {
   private async createSellerSocialAccountRecord(
     sellerData: UserDataInterface,
   ): Promise<Seller> {
-    const { id, email, name, picture, ...rest } = sellerData;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, email, name, picture, nickname, ...rest } = sellerData;
     const socialAccountCreateInput = {
       serviceId: id,
       profileImage: picture,
