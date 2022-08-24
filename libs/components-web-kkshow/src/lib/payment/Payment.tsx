@@ -197,7 +197,6 @@ export function PaymentBox(): JSX.Element {
         <Button
           form="order-payment-form"
           type="submit"
-          form="order-payment-form"
           size="lg"
           colorScheme="blue"
           isFullWidth
