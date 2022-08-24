@@ -187,7 +187,6 @@ export class SocialService {
         email,
         userName: name,
         overlayUrl: `/${email}`,
-        userNickname: nickname || null,
         avatar: picture || null,
         password: null,
         socialAccounts: {
