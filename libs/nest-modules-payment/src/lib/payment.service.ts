@@ -130,15 +130,13 @@ export class PaymentService {
     let orderPayment: OrderPayment;
     let order: Order;
 
-    this.logger.debug(
-      `START createPaymentTemp, orderId(orderCode) : ${paymentDto.orderId}`,
-    );
+    this.logger.debug(`START 결제-주문 프로세스, orderCode : ${paymentDto.orderId}`);
     // * 1. 토스페이먼츠 결제요청
     try {
       tossPaymentResult = await TossPaymentsApi.createPayment(paymentDto);
     } catch (err) {
       this.logger.debug(
-        `createPaymentTemp에서 에러캐치 - 함수 : createPayment, 에러코드 ${err?.response?.status}, 에러 : ${err} `,
+        `토스페이먼츠 결제승인에서 오류 발생, orderCode : ${paymentDto.orderId}, 에러코드 ${err?.response?.status}, 에러 : ${err} `,
       );
       throw new PaymentOrderProcessException({
         process: 'createTossPayments',
@@ -152,9 +150,7 @@ export class PaymentService {
       orderPayment = await this.savePaymentRecordTemp(tossPaymentResult);
     } catch (err) {
       this.logger.debug(
-        `createPaymentTemp에서 에러캐치 - 함수 : savePaymentRecordTemp, 에러코드 ${
-          err?.response?.status || 500
-        }, 에러 : ${err}`,
+        `orderPayment 생성중 오류발생, orderCode : ${paymentDto.orderId}, 에러 : ${err}`,
       );
       throw new PaymentOrderProcessException({
         process: 'saveOrderPayment',
@@ -178,8 +174,7 @@ export class PaymentService {
       }
     } catch (err) {
       this.logger.debug(
-        `createPaymentTemp에서 에러캐치 - 함수 : createOrder, 원에러코드 ${err?.response?.status} 원 에러 : `,
-        err,
+        `Order 생성중 오류발생, orderCode : ${paymentDto.orderId}, 에러 : ${err}`,
       );
       throw new PaymentOrderProcessException({
         process: 'createOrder',
@@ -193,11 +188,10 @@ export class PaymentService {
     return { orderId: order.id };
   }
 
-  /** 결제 오류 단계에 따라 해야 할일을 처리하고, 단계에 맞는 에러메시지 리턴함 */
+  /** PaymentExceptionFilter에서 사용. 결제 오류 단계에 따라 해야 할일(결제취소처리)을 처리하고, 단계에 맞는 에러메시지 리턴 */
   async handlePayementError({
     process: errorOccuredProcess,
     tossPaymentResult,
-    orderPayment,
     error,
   }: {
     process: PaymentOrderProcess;
@@ -205,13 +199,6 @@ export class PaymentService {
     tossPaymentResult?: Payment;
     orderPayment?: OrderPayment;
   }): Promise<string> {
-    this.logger.debug(`
-    [PaymentOrderProcessExceptionFilter 에서 에러핸들러 실행]
-    process : ${errorOccuredProcess},
-    paymentKey : ${tossPaymentResult?.paymentKey},
-    orderPaymentId : ${orderPayment?.id}
-    `);
-
     let errorMessage = '';
 
     const tossPaymentCancelable =
@@ -222,29 +209,22 @@ export class PaymentService {
 
     switch (errorOccuredProcess) {
       case 'createTossPayments':
-        this.logger.debug(
-          `토스페이먼츠에서 결제오류발생. toss결제x, 결제데이터x, 주문데이터x. 토스페이먼츠 결제 자체가 실행되지 않았으므로 크크쇼에서는 처리할게 없음`,
-        );
-        // error?.response?.data 에 {code, message} 형태로 토스페이먼츠 에러객체가 들어옴 https://docs.tosspayments.com/guides/apis/usage#%EC%9D%91%EB%8B%B5-http-%EC%BD%94%EB%93%9C-%EB%AA%A9%EB%A1%9D
-        // TODO:  토스페이먼츠에서 온 오류메시지를 보여줄 필요가 있을지?? 내부에러로 처리하고 로그만 남기는 게 나을지 ?
+        // 토스페이먼츠에서 결제오류발생. toss결제x, 결제데이터x, 주문데이터x. 토스페이먼츠 결제 자체가 실행되지 않았으므로 크크쇼에서는 처리할게 없음
+        // error.response.data 에 {code, message} 형태로 토스페이먼츠 에러객체가 들어옴 https://docs.tosspayments.com/guides/apis/usage#%EC%9D%91%EB%8B%B5-http-%EC%BD%94%EB%93%9C-%EB%AA%A9%EB%A1%9D
         errorMessage = `[토스페이먼츠 오류] ${
           typeof error === 'string' ? error : error?.response?.data?.message
         }`;
         break;
 
       case 'saveOrderPayment':
-        this.logger.debug(
-          `OrderPayment 생성중 오류발생. toss결제 o, 결제데이터x, 주문데이터x. 
-          (결제방식이 가상계좌가 아닌 경우) 토스 결제취소처리 진행`,
-        );
+        // OrderPayment 생성중 오류발생. toss결제 o, 결제데이터x, 주문데이터x.
+        // (결제방식이 가상계좌가 아닌 경우) 토스 결제취소처리 진행
         errorMessage = '결제데이터 생성 오류로 인한 실패';
         break;
 
       case 'createOrder':
-        this.logger.debug(
-          `Order 생성중 오류발생. toss결제 o,  결제데이터 o, 주문데이터 x 
-          (결제방식이 가상계좌가 아닌 경우) 토스 결제취소처리 진행 & OrderPayment 상태 변경`,
-        );
+        // Order 생성중 오류발생. toss결제 o,  결제데이터 o, 주문데이터 x
+        // (결제방식이 가상계좌가 아닌 경우) 토스 결제취소처리 진행 & OrderPayment 상태 변경
         errorMessage = '주문데이터 생성 오류로 인한 실패';
         break;
 
@@ -269,9 +249,6 @@ export class PaymentService {
         cancelReason: errorMessage,
       });
     }
-    this.logger.debug(
-      `[PaymentOrderProcessExceptionFilter 에서 에러핸들러 실행종료], 리턴될 에러메시지 : ${errorMessage}`,
-    );
     return errorMessage;
   }
 
@@ -364,13 +341,7 @@ export class PaymentService {
       if (provider === KKsPaymentProviders.TossPayments) {
         const dto = _dto as TossPaymentCancelDto;
         this.logger.debug(
-          `
-        토스 결제취소를 요청함:   
-        paymentKey: ${dto.paymentKey},
-        cancelReason: ${dto.cancelReason},
-        cancelAmount: ${dto.cancelAmount}
-        `,
-          '[requestCancel]',
+          `[requestCancel] 토스 결제취소를 요청함. paymentKey: ${dto.paymentKey}, cancelReason: ${dto.cancelReason}, cancelAmount: ${dto.cancelAmount}`,
         );
         const cancelResult = await TossPaymentsApi.requestCancelPayment({
           paymentKey: dto.paymentKey,
@@ -386,7 +357,7 @@ export class PaymentService {
             : undefined,
         });
 
-        this.logger.debug(`토스 결제취소 완료 처리됨`, '[requestCancel]');
+        this.logger.debug(`[requestCancel] 토스 결제취소 완료 처리됨`);
 
         return cancelResult;
       }
@@ -399,10 +370,7 @@ export class PaymentService {
       if (provider === KKsPaymentProviders.TossPayments) {
         paymentKey = (_dto as TossPaymentCancelDto).paymentKey;
         this.logger.debug(
-          `
-        토스 결제취소요청 오류 statusCode:${error.response.status}, message: ${error.response.data.message}, paymentKey: ${paymentKey}
-        `,
-          '[requestCancel]',
+          `[requestCancel]토스 결제취소요청 오류. statusCode:${error.response.status}, message: ${error.response.data.message}, paymentKey: ${paymentKey}`,
         );
 
         throw new HttpException(

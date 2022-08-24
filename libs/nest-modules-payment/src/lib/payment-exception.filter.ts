@@ -16,7 +16,6 @@ export class PaymentOrderProcessException extends HttpException {
   private _tossPaymentResult?: Payment;
   private _orderPayment?: OrderPayment;
 
-  // https://docs.tosspayments.com/guides/apis/usage#%EC%97%90%EB%9F%AC-%EA%B0%9D%EC%B2%B4
   constructor({
     error,
     code,
@@ -43,24 +42,12 @@ export class PaymentOrderProcessException extends HttpException {
     return this._process;
   }
 
-  public set process(process: PaymentOrderProcess) {
-    this._process = process;
-  }
-
   public get tossPaymentResult(): Payment | undefined {
     return this._tossPaymentResult;
   }
 
-  public set tossPaymentResult(tossPaymentResult: Payment) {
-    this._tossPaymentResult = tossPaymentResult;
-  }
-
   public get orderPayment(): OrderPayment | undefined {
     return this._orderPayment;
-  }
-
-  public set orderPayment(orderPayment: OrderPayment) {
-    this._orderPayment = orderPayment;
   }
 }
 
@@ -84,13 +71,16 @@ export class PaymentOrderProcessExceptionFilter
     const error = exception.getResponse();
     const { process, tossPaymentResult, orderPayment } = exception;
 
+    // paymentService 에 있는 에러처리함수 실행(에러메시지 생성 & 결제취소처리)
     const errorMessage = await this.paymentService.handlePayementError({
       process,
       tossPaymentResult,
       orderPayment,
       error,
     });
-    await response.status(status).json({
+
+    // 프론트에 표시될 에러메시지(사유) 전송
+    response.status(status).json({
       statusCode: status,
       message: errorMessage,
     });
