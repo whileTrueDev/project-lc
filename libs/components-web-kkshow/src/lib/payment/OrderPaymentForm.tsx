@@ -54,7 +54,7 @@ export function OrderPaymentForm(): JSX.Element | null {
 
   const { getValues, setValue } = methods;
 
-  const { data: defaultAddr } = useDefaultCustomerAddress();
+  const { data: defaultAddr } = useDefaultCustomerAddress(customer?.id);
   const { mutateAsync: createAddress } = useCustomerAddressMutation();
 
   // 로그인하여 소비자 정보가 있는경우 id등 기타 정보 저장
@@ -142,6 +142,7 @@ export function OrderPaymentForm(): JSX.Element | null {
         py={6}
         mb={{ base: 0, lg: 20 }}
         as="form"
+        id="order-payment-form"
         onSubmit={methods.handleSubmit(onSubmit)}
       >
         <GridItem colSpan={7}>

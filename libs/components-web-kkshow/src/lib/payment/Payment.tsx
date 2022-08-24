@@ -224,6 +224,7 @@ export function PaymentBox(): JSX.Element {
       </Box>
       <Center>
         <Button
+          form="order-payment-form"
           type="submit"
           size="lg"
           colorScheme="blue"

@@ -20,8 +20,12 @@ export const useCustomerAddressMutation = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: (resData) => {
-        queryClient.invalidateQueries(['CustomerAddress', resData.customerId]);
-        queryClient.invalidateQueries(['DefaultCustomerAddress', resData.customerId]);
+        queryClient.invalidateQueries(['CustomerAddress', resData.customerId], {
+          refetchInactive: true,
+        });
+        queryClient.invalidateQueries(['DefaultCustomerAddress', resData.customerId], {
+          refetchInactive: true,
+        });
       },
     },
   );
