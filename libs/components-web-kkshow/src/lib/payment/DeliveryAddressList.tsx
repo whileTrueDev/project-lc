@@ -13,7 +13,6 @@ import { CustomerAddress } from '@prisma/client';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
 import { useFormContext } from 'react-hook-form';
-import { CustomerAddressCreateButton } from '../address/CustomerAddressCreateDialog';
 import CustomerAddressList from '../address/CustomerAddressList';
 
 type DeliveryListProps = {
@@ -65,7 +64,6 @@ export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX
         <ModalCloseButton />
         <ModalHeader>배송지목록</ModalHeader>
         <ModalBody>
-          <CustomerAddressCreateButton />
           <Center>
             <CustomerAddressList
               editable={false}
