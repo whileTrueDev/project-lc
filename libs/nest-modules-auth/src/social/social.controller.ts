@@ -13,7 +13,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
-import { SocialAccounts, UserType, USER_TYPE_KEY } from '@project-lc/shared-types';
+import {
+  NEXT_PAGE_PARAM_KEY,
+  SocialAccounts,
+  UserType,
+  USER_TYPE_KEY,
+} from '@project-lc/shared-types';
 import { getBroadcasterWebHost, getCustomerWebHost, getWebHost } from '@project-lc/utils';
 import { getUserTypeFromRequest } from '@project-lc/utils-backend';
 import { Request, Response } from 'express';
@@ -115,6 +120,7 @@ export class SocialController {
     const userType: UserType = getUserTypeFromRequest(req);
     if (!userType) throw new BadRequestException('userType cookie must be defined');
     const userPayload = this.socialService.login(userType, req, res);
+    const { nextpage } = req.cookies;
     const hostUrl = this.getFrontUrl(userType);
 
     if (userPayload.inactiveFlag) {
@@ -125,7 +131,8 @@ export class SocialController {
     this.loginHistoryService.createLoginStamp(req, loginMethod);
 
     res.clearCookie(USER_TYPE_KEY);
-    if (userType === 'customer') return res.redirect(hostUrl);
+    res.clearCookie(NEXT_PAGE_PARAM_KEY);
+    if (userType === 'customer') return res.redirect(hostUrl + (nextpage || ''));
     return res.redirect(`${hostUrl}/mypage`);
   }
 

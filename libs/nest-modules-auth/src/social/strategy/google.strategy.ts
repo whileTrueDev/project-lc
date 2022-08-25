@@ -39,6 +39,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_PROVIDER) 
     refreshToken: string,
     profile: Profile,
   ): Promise<Seller | Broadcaster | Customer> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, displayName, emails, photos } = profile;
 
     if (!emails[0].value) {
@@ -57,7 +58,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_PROVIDER) 
       provider: GOOGLE_PROVIDER,
       email: emails[0].value,
       name: displayName,
-      picture: photos[0].value,
+      // 220822 주석처리 => 연관일감: [회원가입] 소셜로그인시 프로필사진 받아온 프로필사진으로 설정하지 않기 by dan
+      // picture: photos[0].value,
       accessToken,
       refreshToken,
     });

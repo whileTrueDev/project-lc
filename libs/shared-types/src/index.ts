@@ -8,6 +8,7 @@ export * from './lib/constants/exchangeReturnCancelProcessDict';
 export * from './lib/constants/kkshowOrderStatuses';
 export * from './lib/constants/koreaProvinces';
 export * from './lib/constants/liveShoppingProgress';
+export * from './lib/constants/nextpageParamKey';
 export * from './lib/constants/orderProcessStepDict';
 export * from './lib/constants/orderStats';
 export * from './lib/constants/payment';

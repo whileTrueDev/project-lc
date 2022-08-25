@@ -114,6 +114,12 @@ export function OrderDetail(): JSX.Element {
               <Text>{data.ordererEmail}</Text>
             </Flex>
             <Flex justifyContent="space-between">
+              <Text>선물주문여부</Text>
+              <Text color={data.giftFlag ? 'red.500' : 'unset'}>
+                {data.giftFlag ? '이 주문은 선물 주문입니다' : 'X'}
+              </Text>
+            </Flex>
+            <Flex justifyContent="space-between">
               <Text>단계</Text>
               <Flex>
                 {!isEdit ? (
@@ -251,7 +257,14 @@ export function OrderDetail(): JSX.Element {
             </Box>
             <Flex justifyContent="space-between">
               <Text>수령인 이름</Text>
-              <Text>{data.recipientName}</Text>
+              <Text>
+                {data.giftFlag ? (
+                  <Text as="span" color="red.500">
+                    {'[선물주문!] 아래 배송지는 방송인 선물 수령지입니다. => '}
+                  </Text>
+                ) : null}
+                {data.recipientName}
+              </Text>
             </Flex>
             <Flex justifyContent="space-between">
               <Text>수령인 연락처</Text>

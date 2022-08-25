@@ -22,6 +22,7 @@ import {
   HttpCacheInterceptor,
   UserPayload,
 } from '@project-lc/nest-core';
+import * as __multer from 'multer';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
 import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';

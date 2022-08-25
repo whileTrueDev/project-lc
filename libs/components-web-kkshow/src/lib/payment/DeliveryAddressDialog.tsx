@@ -15,7 +15,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { CreateOrderForm } from '@project-lc/shared-types';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
 import { useFormContext } from 'react-hook-form';
 
@@ -30,6 +30,7 @@ export function DeliveryAddressDialog({
 }): JSX.Element {
   const daumOpen = useDisclosure();
   const toast = useToast();
+  const detailAddressInputRef = useRef<HTMLInputElement>(null);
   const { setValue, clearErrors, trigger } = useFormContext<CreateOrderForm>();
 
   const handleAddressSelected = (addressData: AddressData): void => {
@@ -38,6 +39,7 @@ export function DeliveryAddressDialog({
     clearErrors('recipientAddress');
     setPostalCode(zonecode);
     setAddress(addr);
+    detailAddressInputRef.current?.focus();
     daumOpen.onClose();
   };
 
@@ -93,6 +95,7 @@ export function DeliveryAddressDialog({
                   </HStack>
                   <HStack>
                     <Input
+                      ref={detailAddressInputRef}
                       maxW="280px"
                       placeholder="상세주소를 입력해주세요"
                       onChange={(e) => setDetailAddress(e.target.value)}

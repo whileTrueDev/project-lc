@@ -21,12 +21,14 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { GridColDef, GridRowData } from '@material-ui/data-grid';
+import { Coupon, CustomerCoupon } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
-import { useCustomerCouponList, useCustomerMileage } from '@project-lc/hooks';
+import { useCustomerMileage } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { checkCouponAvailable, getLocaleNumber } from '@project-lc/utils-frontend';
 import { useFormContext } from 'react-hook-form';
+import { useValidCustomerCouponList } from '../mypage/benefits/CustomerCouponList';
 
 /** 적립금 사용시 100원 단위로 변경하기 위한 timeout 이벤트 저장 */
 let debounce: NodeJS.Timeout | null = null;
@@ -48,7 +50,7 @@ export function Discount(): JSX.Element {
   const discountCodeDialog = useDisclosure();
 
   const { data: customerMileage } = useCustomerMileage();
-  const { data: customerCoupons } = useCustomerCouponList();
+  const { validCoupons: customerCoupons } = useValidCustomerCouponList();
 
   const {
     resetField,
@@ -99,10 +101,14 @@ export function Discount(): JSX.Element {
           <Text fontWeight="semibold">쿠폰할인</Text>
           <Flex alignItems="center" gap={2}>
             <Input size="sm" maxW={150} isReadOnly {...register('usedCouponAmount')} />
-            {customerCoupons && customerCoupons.length > 0 && (
+            {customerCoupons && customerCoupons.length > 0 ? (
               <Button size="xs" colorScheme="blue" onClick={couponSelectDialog.onOpen}>
                 쿠폰사용
               </Button>
+            ) : (
+              <Text color="GrayText" fontSize="xs">
+                사용 가능한 쿠폰이 없습니다
+              </Text>
             )}
 
             {watch('couponId') ? (
@@ -174,11 +180,10 @@ export function Discount(): JSX.Element {
               ) : null}
             </Flex>
 
-            {customerMileage && (
-              <FormHelperText color="GrayText">
-                보유한 총 적립금 {getLocaleNumber(customerMileage.mileage) || 0} 원
-              </FormHelperText>
-            )}
+            <FormHelperText color="GrayText">
+              보유 적립금 총{' '}
+              {customerMileage ? getLocaleNumber(customerMileage.mileage) : 0} 원
+            </FormHelperText>
 
             <FormErrorMessage>{errors.usedMileageAmount?.message}</FormErrorMessage>
           </FormControl>
@@ -213,7 +218,13 @@ export function Discount(): JSX.Element {
         onClose={couponSelectDialog.onClose}
         onCouponSelect={(coupon) => {
           setValue('couponId', coupon.id);
-          setValue('usedCouponAmount', coupon.amount);
+          if (coupon.unit === 'W') {
+            setValue('usedCouponAmount', coupon.amount);
+          } else {
+            // coupon.unit === 'P' 퍼센트 할인 쿠폰인 경우 => 주문가격 * 쿠폰할인율 만큼 할인 적용
+            const discountAmount = Math.floor(orderPrice * coupon.amount * 0.01);
+            setValue('usedCouponAmount', discountAmount);
+          }
         }}
       />
 
@@ -226,7 +237,11 @@ export function Discount(): JSX.Element {
 }
 
 type CouponSelectDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
-  onCouponSelect: (coupon: any) => void;
+  onCouponSelect: (coupon: {
+    id: CustomerCoupon['id'];
+    amount: Coupon['amount'];
+    unit: Coupon['unit'];
+  }) => void;
   orderPrice: number; // 주문 총 상품가격(쿠폰 최소주문금액과 비교하여 쿠폰사용여부 판단용)
   orderItemIdList: number[]; // 주문 상품 goodsId(number)[] (쿠폰 상품적용가능 여부 판단용)
 };
@@ -238,7 +253,7 @@ function CouponSelectDialog({
   orderPrice,
   orderItemIdList,
 }: CouponSelectDialogProps): JSX.Element {
-  const { data: customerCoupons } = useCustomerCouponList();
+  const { validCoupons: customerCoupons } = useValidCustomerCouponList();
 
   const couponList = customerCoupons
     ? customerCoupons.map((c) => {
@@ -251,7 +266,18 @@ function CouponSelectDialog({
 
   const columns: GridColDef[] = [
     { field: 'name', headerName: '쿠폰명', flex: 1 },
-    { field: 'amount', headerName: '금액' },
+    {
+      field: 'amount',
+      headerName: '할인',
+      renderCell: ({ row }: GridRowData) => {
+        const { amount, unit } = row;
+        if (unit === 'P') {
+          return <Text>{amount}%</Text>;
+        }
+        // unit === 'W'
+        return <Text>{getLocaleNumber(amount)}원</Text>;
+      },
+    },
     {
       disableColumnMenu: true,
       disableExport: true,
@@ -274,7 +300,7 @@ function CouponSelectDialog({
               colorScheme="blue"
               disabled={!available}
               onClick={() => {
-                onCouponSelect({ id: row.id, amount: row.amount });
+                onCouponSelect({ id: row.id, amount: row.amount, unit: row.unit });
                 onClose();
               }}
             >

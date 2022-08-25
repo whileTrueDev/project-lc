@@ -12,7 +12,7 @@ export class CouponService {
   ) {}
 
   /** 쿠폰 상세조회 */
-  findCoupon(couponId: number): Promise<Coupon> {
+  public async findCoupon(couponId: number): Promise<Coupon> {
     return this.prismaService.coupon.findFirst({
       where: {
         id: couponId,
@@ -34,7 +34,7 @@ export class CouponService {
   }
 
   /** 쿠폰 목록 조회 */
-  findCoupons(): Promise<Coupon[]> {
+  public async findCoupons(): Promise<Coupon[]> {
     return this.prismaService.coupon.findMany({
       include: {
         goods: true,
@@ -43,13 +43,11 @@ export class CouponService {
   }
 
   /** 쿠폰 생성 */
-  async createCoupon(dto: CouponDto): Promise<Coupon> {
-    let goodsList;
+  public async createCoupon(dto: CouponDto): Promise<Coupon> {
+    let goodsList = [];
 
-    if (dto.applyType === 'allGoods') {
-      goodsList = await this.goodsService
-        .findAllConfirmedLcGoodsListWithCategory()
-        .then((item) => item.map((value) => ({ id: value.id })));
+    if (dto.applyType === 'selectedGoods') {
+      goodsList = dto.goods.map((item) => ({ id: item }));
     } else if (dto.applyType === 'exceptSelectedGoods') {
       goodsList = await this.goodsService
         .findAllConfirmedLcGoodsListWithCategory()
@@ -58,10 +56,7 @@ export class CouponService {
             .map((value) => !dto.goods.includes(value.id) && { id: value.id })
             .filter(Boolean),
         );
-    } else {
-      goodsList = dto.goods.map((item) => ({ id: item }));
     }
-
     return this.prismaService.coupon.create({
       data: {
         ...dto,
@@ -75,7 +70,7 @@ export class CouponService {
   }
 
   /** 특정 쿠폰 수정 */
-  updateCoupon(id: number, dto: CouponDto): Promise<Coupon> {
+  public async updateCoupon(id: number, dto: CouponDto): Promise<Coupon> {
     return this.prismaService.coupon.update({
       where: { id },
       data: { ...dto },
@@ -83,7 +78,7 @@ export class CouponService {
   }
 
   /** 특정 쿠폰 제거 */
-  deleteCoupon(couponId: number): Promise<Coupon> {
+  public async deleteCoupon(couponId: number): Promise<Coupon> {
     return this.prismaService.coupon.delete({
       where: { id: couponId },
     });

@@ -87,7 +87,7 @@ export function CategoryGoodsList(): JSX.Element | null {
         ))}
       </SimpleGrid>
 
-      <SimpleGrid my={10} gap={6} columns={[1, 2, 4]}>
+      <SimpleGrid my={10} gap={6} columns={[2, 3, 4]}>
         {data?.pages?.map((goodsList, idx) => (
           <Fragment key={`GoodsOutlineByCategory${idx}`}>
             {goodsList?.edges?.map((goodsOutline) => (
@@ -99,7 +99,7 @@ export function CategoryGoodsList(): JSX.Element | null {
               >
                 <GoodsDisplay
                   goods={makeGoodsOutlineToGoodsDisplay(goodsOutline)}
-                  detailProps={{ noOfLines: 2 }}
+                  detailProps={{ noOfLines: 2, fontSize: { base: 'sm', md: 'lg' } }}
                 />
               </GridItem>
             ))}

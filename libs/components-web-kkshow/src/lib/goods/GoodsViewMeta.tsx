@@ -243,29 +243,41 @@ export function GoodsViewPriceTag({
         specialPriceDiscountRate: string;
       } = {
         hasLiveShoppingSpecialPrice: false,
-        cheapestPrice: null,
+        cheapestPrice: Number(defaultOption?.price),
         specialPriceDiscountRate: '',
       };
 
       if (
         selectedBc &&
         nowOnliveLsListBySelectedBc.data &&
-        nowOnliveLsListBySelectedBc.data[0]
+        nowOnliveLsListBySelectedBc.data[0] &&
+        nowOnliveLsListBySelectedBc.data[0].liveShoppingSpecialPrices.length > 0
       ) {
-        specialPriceInfo.hasLiveShoppingSpecialPrice = true;
         const specialPriceArr =
           nowOnliveLsListBySelectedBc.data[0].liveShoppingSpecialPrices.map((spData) =>
             Number(spData.specialPrice),
           );
-        specialPriceInfo.cheapestPrice = Math.min(...specialPriceArr);
+        specialPriceInfo.cheapestPrice = Math.min(
+          ...specialPriceArr.concat(Number(defaultOption.price)),
+        );
         specialPriceInfo.specialPriceDiscountRate = getDiscountedRate(
           Number(defaultOption.consumer_price),
           Number(specialPriceInfo.cheapestPrice),
         );
+
+        // 라이브특가 정보가 존재하고, 최저가가 기존옵션가보다 작은경우 특가가 존재한다고 판단함
+        specialPriceInfo.hasLiveShoppingSpecialPrice =
+          !!specialPriceInfo.cheapestPrice &&
+          specialPriceInfo.cheapestPrice < Number(defaultOption.price);
       }
 
       return specialPriceInfo;
-    }, [selectedBc, nowOnliveLsListBySelectedBc.data, defaultOption.consumer_price]);
+    }, [
+      defaultOption.price,
+      defaultOption.consumer_price,
+      selectedBc,
+      nowOnliveLsListBySelectedBc.data,
+    ]);
 
   return (
     <Grid

@@ -10,8 +10,8 @@ export const createKkshowSubNavDummy = async (prisma: PrismaClient): Promise<voi
       },
       {
         index: 2,
-        link: 'https://naver.com',
-        name: '네이버',
+        link: '/goods/4',
+        name: '4번상품',
       },
       {
         index: 3,

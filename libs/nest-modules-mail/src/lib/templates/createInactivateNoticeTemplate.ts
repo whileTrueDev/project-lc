@@ -126,7 +126,7 @@ export const createPreInactivateNoticeTemplate = (targetDetails): string => `
                   </td>
                   <td style="padding:0 30px 30px 0;" width="580">
                     <p style="margin:0; word-break:keep-all; font-size:11px;">대표이사. 강동기  |  사업자등록번호. 659-03-01549 <br> 사업장소재지. 부산광역시 금정구 장전온천천로 51 (테라스파크) 313호<br>
-                      통신판매업신고번호. 2019-부산금정-0581  |  개인정보 관리책임자. 기획 및 경영지원팀장 전민관<br>ⓒ 2021 whiletrue. All Rights Reserved.
+                      통신판매업신고번호. 2022-부산연제-0281  |  개인정보 관리책임자. 기획 및 경영지원팀장 전민관<br>ⓒ 2021 whiletrue. All Rights Reserved.
                     </p>
                   </td>
                 </tr>
@@ -258,7 +258,7 @@ export const createInactivateNoticeTemplate = (targetDetails): string => `
                   </td>
                   <td style="padding:0 30px 30px 0;" width="580">
                     <p style="margin:0; word-break:keep-all; font-size:11px;">대표이사. 강동기  |  사업자등록번호. 659-03-01549 <br> 사업장소재지. 부산광역시 금정구 장전온천천로 51 (테라스파크) 313호<br>
-                      통신판매업신고번호. 2019-부산금정-0581  |  개인정보 관리책임자. 기획 및 경영지원팀장 전민관<br>ⓒ 2021 whiletrue. All Rights Reserved.
+                      통신판매업신고번호. 2022-부산연제-0281  |  개인정보 관리책임자. 기획 및 경영지원팀장 전민관<br>ⓒ 2021 whiletrue. All Rights Reserved.
                     </p>
                   </td>
                 </tr>

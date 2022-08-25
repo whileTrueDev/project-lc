@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Flex, Heading, Spinner } from '@chakra-ui/react';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
-import { useOrderCreateMutation, usePaymentMutation } from '@project-lc/hooks';
+import { usePaymentMutation } from '@project-lc/hooks';
 import {
   CreateOrderDto,
   CreateOrderForm,
   CreateOrderShippingData,
   CreateOrderShippingDto,
+  PaymentRequestDto,
 } from '@project-lc/shared-types';
 import { OrderShippingData, useKkshowOrderStore } from '@project-lc/stores';
 import { deleteCookie, getCookie } from '@project-lc/utils-frontend';
@@ -59,12 +60,21 @@ export function Success(): JSX.Element {
   const { order, shipping, resetOrder, resetShippingData, resetShopNames } =
     useKkshowOrderStore();
 
+  /** 해당 라우터 내부에서 결제->주문 생성을 순차적으로 처리함 */
   const { mutateAsync } = usePaymentMutation();
 
-  const createOrder = useOrderCreateMutation();
-
+  // temp 로 요청
   useEffect(() => {
     const tossPaymentsAmount = Number(getCookie('amount'));
+
+    if (isRequested.current) return;
+
+    // 결제금액 확인
+    if (redirectAmount && redirectAmount !== tossPaymentsAmount) {
+      deleteCookie('amount');
+      router.push('/payment/fail?message=결제금액 오류');
+    }
+
     if (
       orderCode &&
       paymentKey &&
@@ -72,77 +82,50 @@ export function Success(): JSX.Element {
       !isRequested.current &&
       redirectAmount === tossPaymentsAmount
     ) {
-      mutateAsync({
+      const paymentRequestDto: PaymentRequestDto = {
         orderId: orderCode,
         paymentKey,
         amount: redirectAmount,
+      };
+      const createOrderDtoTemp: CreateOrderDto = {
+        ...extractCreateOrderDtoDataFromCreateOrderForm(order),
+        orderCode,
+        recipientEmail: order.recipientEmail || '',
+        paymentPrice: tossPaymentsAmount, // 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한/입금해야 할 금액 + 총 배송비,
+      };
+
+      // * CreateOrderShippingDto 만들기 :  store.shipping을 dto 형태로 바꾸기
+      const shippingDtoTemp: CreateOrderShippingDto = {
+        shipping: OrderShippingDataToDto(shipping),
+      };
+
+      // 결제 & 주문생성 dto 한번에 보내기
+      mutateAsync({
+        payment: paymentRequestDto,
+        order: createOrderDtoTemp,
+        shipping: shippingDtoTemp,
       })
-        .then((item) => {
+        .then((res) => {
+          /** 결제 && 주문생성 완료 이후  할일들 */
           deleteCookie('amount');
           isRequested.current = true;
-          if (item.status === 'error') {
-            router.push(`/payment/fail?message=${item.message}`);
-          } else {
-            const orderPaymentId = item.orderPaymentId || undefined; // 토스페이먼츠 결제요청 후 생성한 OrderPayment.id;
 
-            // * createOrderDto 만들기 :  createOrderForm 에서 createOrderDto에 해당하는 데이터만 가져오기
-            const createOrderDtoData =
-              extractCreateOrderDtoDataFromCreateOrderForm(order);
+          // 주문스토어 주문,배송비정보 리셋
+          resetOrder();
+          resetShippingData();
+          resetShopNames();
 
-            const paymentPrice = tossPaymentsAmount; // 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한/입금해야 할 금액 + 총 배송비
-
-            const createOrderDto: CreateOrderDto = {
-              ...createOrderDtoData,
-              paymentId: orderPaymentId,
-              orderCode,
-              recipientEmail: order.recipientEmail || '',
-              paymentPrice,
-            };
-
-            // * CreateOrderShippingDto 만들기 :  store.shipping을 dto 형태로 바꾸기
-            const shippingDto: CreateOrderShippingDto = {
-              shipping: OrderShippingDataToDto(shipping),
-            };
-
-            const dto = {
-              order: createOrderDto,
-              shipping: shippingDto,
-            };
-
-            // * 주문생성
-            createOrder
-              .mutateAsync(dto)
-              .then((res) => {
-                // 주문스토어 주문,배송비정보 리셋
-                resetOrder();
-                resetShippingData();
-                resetShopNames();
-
-                // 주문완료페이지로 이동
-                const orderId = res.id;
-                router.push(`/payment/receipt?orderId=${orderId}&orderCode=${orderCode}`);
-              })
-              .catch((e) => {
-                console.error(e);
-                console.error(e.response?.data?.message);
-                router.push('/payment/fail?message=주문생성 오류');
-              });
-          }
+          // 주문완료페이지로 이동
+          const { orderId } = res;
+          router.push(`/payment/receipt?orderId=${orderId}&orderCode=${orderCode}`);
         })
         .catch((err) => {
+          /** 결제 -> 주문 생성 과정 중 오류가 발생한 부분에 따라 다른 오류메시지를 표시함 */
           console.error(err);
           console.error(err.response?.data?.message);
-          router.push('/payment/fail?message=결제승인요청 오류');
+          const message = `${err.response?.data?.message}`;
+          router.push(`/payment/fail?message=${message}`);
         });
-    } else if (
-      orderCode &&
-      paymentKey &&
-      redirectAmount &&
-      !isRequested.current &&
-      redirectAmount !== tossPaymentsAmount
-    ) {
-      deleteCookie('amount');
-      router.push('/payment/fail?message=결제금액 오류');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderCode, paymentKey, redirectAmount]);

@@ -47,7 +47,7 @@ export function PromotinoPageGoodsDisplay({
         <Box py={2} px={1}>
           <NextLink href={`/goods/${item.goods.id}?bc=${broadcasterId}`} passHref>
             <LinkOverlay>
-              <Text noOfLines={1}>
+              <Text noOfLines={2} fontSize={['sm', 'md']}>
                 {isLive && (
                   <Badge variant="solid" colorScheme="red" mr={1}>
                     LIVE
@@ -57,15 +57,20 @@ export function PromotinoPageGoodsDisplay({
               </Text>
             </LinkOverlay>
           </NextLink>
-          <Text color="GrayText" fontSize="sm" noOfLines={1}>
+          <Text
+            color="GrayText"
+            fontSize="sm"
+            noOfLines={1}
+            display={{ base: 'none', sm: 'block' }}
+          >
             {item.goods.summary}
           </Text>
 
           <Box>
-            <Flex fontSize="xl" gap={2} maxW={270}>
+            <Flex fontSize={['sm', 'md', 'xl']} gap={2} maxW={270}>
               <Text>
                 {isDiscounted ? (
-                  <Text as="span" color="red">
+                  <Text as="span" color="red" fontWeight="bold">
                     {getDiscountedRate(
                       Number(defaultOpt.consumer_price),
                       Number(defaultOpt.price),
@@ -75,7 +80,7 @@ export function PromotinoPageGoodsDisplay({
                 ) : null}
                 {getLocaleNumber(defaultOpt.price)}원{' '}
                 {isDiscounted ? (
-                  <RedLinedText color="GrayText" as="span" fontSize="sm">
+                  <RedLinedText color="GrayText" as="span" fontSize={['xs', 'sm']}>
                     {getLocaleNumber(defaultOpt.consumer_price)}원
                   </RedLinedText>
                 ) : null}

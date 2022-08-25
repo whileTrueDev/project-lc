@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { CloseIcon, Icon } from '@chakra-ui/icons';
+import { CloseIcon } from '@chakra-ui/icons';
 import {
   Accordion,
   AccordionButton,
@@ -19,6 +19,7 @@ import {
   Grid,
   GridItem,
   IconButton,
+  Input,
   ListItem,
   Modal,
   ModalBody,
@@ -40,6 +41,7 @@ import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUn
 import {
   useCartMutation,
   useCustomerInfo,
+  useCustomerInfoMutation,
   useIsThisGoodsNowOnLive,
   useLiveShoppingNowOnLive,
   useProfile,
@@ -48,6 +50,7 @@ import {
   getLiveShoppingIsNowLive,
   GoodsByIdRes,
   GoodsRelatedBroadcaster,
+  NEXT_PAGE_PARAM_KEY,
   SpecialPriceItem,
 } from '@project-lc/shared-types';
 import { useGoodsViewStore, useKkshowOrderStore } from '@project-lc/stores';
@@ -293,16 +296,26 @@ export function GoodsViewPurchaseBox({
 function GoodsViewBroadcasterSupportBox({
   goods,
 }: GoodsViewPurchaseBoxProps): JSX.Element | null {
-  const { selectedBc, handleSelectBc, supportMessage, onSupMsgChange } =
-    useGoodsViewStore(
-      (s) => ({
-        selectedBc: s.selectedBc,
-        handleSelectBc: s.handleSelectBc,
-        supportMessage: s.supportMessage,
-        onSupMsgChange: s.onSupMsgChange,
-      }),
-      shallow,
-    );
+  const { data: profile } = useProfile();
+  const { data: customer } = useCustomerInfo(profile?.id);
+  const {
+    selectedBc,
+    handleSelectBc,
+    supportMessage,
+    onSupMsgChange,
+    supportNickname,
+    onSupNickChange,
+  } = useGoodsViewStore(
+    (s) => ({
+      selectedBc: s.selectedBc,
+      handleSelectBc: s.handleSelectBc,
+      supportMessage: s.supportMessage,
+      onSupMsgChange: s.onSupMsgChange,
+      supportNickname: s.supportNickname,
+      onSupNickChange: s.onSuNickChange,
+    }),
+    shallow,
+  );
   const relatedBroadcasters = useMemo(() => {
     const livBcs =
       goods.LiveShopping?.map((liv) => liv.broadcaster).filter((x) => !!x) || [];
@@ -340,6 +353,11 @@ function GoodsViewBroadcasterSupportBox({
 
   // 현재 상품과 연결된 현재 판매중인 라이브쇼핑 목록
   const ls = useLiveShoppingNowOnLive({ goodsId: goods.id });
+
+  // 후원닉네임 최초값 설정 (등록된 닉네임 있는 경우)
+  useEffect(() => {
+    if (customer) onSupNickChange(customer?.nickname || '');
+  }, [customer, onSupNickChange]);
 
   if (relatedBroadcasters.length === 0) return null;
   return (
@@ -404,6 +422,15 @@ function GoodsViewBroadcasterSupportBox({
               </Box>
 
               <Box flex={1}>
+                <Text>후원 닉네임</Text>
+                <FormControl>
+                  <Input
+                    rounded="md"
+                    placeholder="후원 닉네임"
+                    value={supportNickname}
+                    onChange={(e) => onSupNickChange(e.target.value)}
+                  />
+                </FormControl>
                 <Text>
                   방송인 후원 메시지{' '}
                   <Text fontSize="xs" as="span" color="GrayText">
@@ -415,7 +442,6 @@ function GoodsViewBroadcasterSupportBox({
                     minH="55px"
                     resize="none"
                     rounded="md"
-                    size="sm"
                     placeholder="방송인 후원 메시지 도네이션 표시글"
                     value={supportMessage}
                     onChange={(e) => onSupMsgChange(e.target.value)}
@@ -463,15 +489,6 @@ function GoodsViewSupportNotice(): JSX.Element {
               방송인이 라이브쇼핑 방송 중인 경우 후원메시지는 방송 화면에 전송됩니다.
             </Text>
           </ListItem>
-          <ListItem>
-            <Text>
-              방송인에게 선물하기 버튼{' '}
-              <Text as="span">
-                <Icon as={GoGift} verticalAlign="middle" />
-              </Text>{' '}
-              을 클릭하여 이 상품을 후원 방송인에게 선물할 수 있습니다.
-            </Text>
-          </ListItem>
         </UnorderedList>
       </Collapse>
     </Box>
@@ -493,6 +510,7 @@ function GoodsViewButtonSet({
   const selectedOpts = useGoodsViewStore((s) => s.selectedOpts);
   const selectedBc = useGoodsViewStore((s) => s.selectedBc);
   const supportMessage = useGoodsViewStore((s) => s.supportMessage);
+  const supportNickname = useGoodsViewStore((s) => s.supportNickname);
 
   /** 선택 상품 옵션 합계 정보 */
   const totalInfo = useMemo(() => {
@@ -553,6 +571,9 @@ function GoodsViewButtonSet({
     return SellType.normal;
   }, [isNowLive, selectedBc]);
 
+  // 닉네임 수정 요청
+  const nicknameMutation = useCustomerInfoMutation(customer?.id || -1);
+
   // 장바구니 담기
   const createCartItem = useCartMutation();
   const handleCartClick = useCallback((): void => {
@@ -580,7 +601,7 @@ function GoodsViewButtonSet({
         support: selectedBc
           ? {
               broadcasterId: selectedBc.id,
-              nickname: customer?.nickname || '', // 소비자 닉네임, 비회원의 경우 빈값처리
+              nickname: supportNickname || '',
               message: supportMessage,
               liveShoppingId: connectedLiveShoppingId,
               // 라이브쇼핑 후원의 경우 상품홍보 후원으로는 포함시키지 않는다. (수수료 두번 처리될 가능성)
@@ -590,7 +611,19 @@ function GoodsViewButtonSet({
             }
           : undefined,
       })
-      .then(() => cartDoneDialog.onOpen())
+      .then(() => {
+        // 로그인되어있으며, 기본 설정된 닉네임이 없는 경우 후원닉네임 입력한 값을 기본 닉네임으로 설정
+        if (
+          profile.data?.id &&
+          profile.data?.type === 'customer' &&
+          customer &&
+          !customer?.nickname &&
+          supportNickname
+        ) {
+          nicknameMutation.mutateAsync({ nickname: supportNickname });
+        }
+        cartDoneDialog.onOpen();
+      })
       .catch(() => {
         toast({
           status: 'error',
@@ -598,18 +631,22 @@ function GoodsViewButtonSet({
         });
       });
   }, [
-    cartDoneDialog,
-    createCartItem,
-    customer?.nickname,
     executePurchaseCheck,
     goods.LiveShopping,
-    goods.id,
     goods.productPromotion,
+    goods.id,
     goods.shippingGroupId,
-    selectedBc,
+    createCartItem,
     selectedOpts,
     sellType,
+    selectedBc,
+    supportNickname,
     supportMessage,
+    profile.data?.id,
+    profile.data?.type,
+    customer,
+    cartDoneDialog,
+    nicknameMutation,
     toast,
   ]);
 
@@ -660,7 +697,7 @@ function GoodsViewButtonSet({
               ? {
                   broadcasterId: selectedBc.id,
                   message: supportMessage,
-                  nickname: customer?.nickname || '', // 소비자 닉네임, 비회원의 경우 빈값처리
+                  nickname: supportNickname || '', // 소비자 닉네임, 비회원의 경우 빈값처리
                   avatar: selectedBc.avatar,
                   liveShoppingId: connectedLiveShoppingId,
                   // 라이브쇼핑 후원의 경우 상품홍보 후원으로는 포함시키지 않는다. (수수료 두번 처리될 가능성)
@@ -675,9 +712,20 @@ function GoodsViewButtonSet({
 
       // 비회원 주문 로그인화면으로 이동, 로그인 이후 페이지를 주문페이지로
       if (!profile.data?.id) {
-        router.push(`/login?from=purchase&nextpage=/payment`);
+        router.push(`/login?from=purchase&${NEXT_PAGE_PARAM_KEY}=/payment`);
         return;
       }
+      // 로그인되어있으며, 설정된 닉네임이 없는 경우, 입력한 후원닉네임을 기본 닉네임으로 설정
+      if (
+        profile.data?.id &&
+        profile.data?.type === 'customer' &&
+        customer &&
+        !customer?.nickname &&
+        supportNickname
+      ) {
+        nicknameMutation.mutateAsync({ nickname: supportNickname });
+      }
+
       router.push('/payment');
     },
     [
@@ -693,12 +741,15 @@ function GoodsViewButtonSet({
       totalInfo.price,
       selectedBc,
       profile.data?.id,
+      profile.data?.type,
       selectedOpts,
       sellType,
       supportMessage,
-      customer?.nickname,
+      supportNickname,
+      customer,
       router,
       isNowLive,
+      nicknameMutation,
     ],
   );
 

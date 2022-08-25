@@ -59,8 +59,8 @@ export interface PurchaseMessage {
   purchaseNum: number;
   /** tts 세팅 */
   ttsSetting: TtsSetting;
-  /** 비회원 메시지 여부 */
-  nonMemberOrderFlag?: boolean;
+  /** 간략 메시지(닉네임을 알 수 없는 익명메시지) 여부 */
+  simpleMessageFlag?: boolean;
   /** 선물 구매 여부 */
   giftFlag?: boolean;
 }

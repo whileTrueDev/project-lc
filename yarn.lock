@@ -12927,23 +12927,6 @@ passport-local@^1.0.0:
   dependencies:
     passport-strategy "1.x.x"
 
-passport-naver@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.npmjs.org/passport-naver/-/passport-naver-1.0.6.tgz"
-  integrity sha512-5XEbJesiPVshwE0cTDvbbJrOiYSJ9VFRJTctqiZL1Xip6qOi9n7d49UesOqavLT+Ry8C7aw3zdzbmWosqHcQ/Q==
-  dependencies:
-    passport-oauth "^1.0.0"
-    underscore "^1.8.3"
-
-passport-oauth1@1.x.x:
-  version "1.2.0"
-  resolved "https://registry.npmjs.org/passport-oauth1/-/passport-oauth1-1.2.0.tgz"
-  integrity sha512-Sv2YWodC6jN12M/OXwmR4BIXeeIHjjbwYTQw4kS6tHK4zYzSEpxBgSJJnknBjICA5cj0ju3FSnG1XmHgIhYnLg==
-  dependencies:
-    oauth "0.9.x"
-    passport-strategy "1.x.x"
-    utils-merge "1.x.x"
-
 passport-oauth2@1.x.x:
   version "1.6.1"
   resolved "https://registry.npmjs.org/passport-oauth2/-/passport-oauth2-1.6.1.tgz"
@@ -12963,14 +12946,6 @@ passport-oauth2@~1.1.2:
     oauth "0.9.x"
     passport-strategy "1.x.x"
     uid2 "0.0.x"
-
-passport-oauth@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/passport-oauth/-/passport-oauth-1.0.0.tgz"
-  integrity sha1-kK/2M4dUDwIImvKM2tOep/gNd98=
-  dependencies:
-    passport-oauth1 "1.x.x"
-    passport-oauth2 "1.x.x"
 
 passport-strategy@1.x.x, passport-strategy@^1.0.0:
   version "1.0.0"
@@ -15955,11 +15930,6 @@ unbox-primitive@^1.0.1:
     has-bigints "^1.0.1"
     has-symbols "^1.0.2"
     which-boxed-primitive "^1.0.2"
-
-underscore@^1.8.3:
-  version "1.13.2"
-  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.13.2.tgz#276cea1e8b9722a8dbed0100a407dda572125881"
-  integrity sha512-ekY1NhRzq0B08g4bGuX4wd2jZx5GnKz6mKSqFL4nqBlfyMGiG10gDFhDTMEfYmDL6Jy0FUIZp7wiRB+0BP7J2g==
 
 undici@3.3.6:
   version "3.3.6"

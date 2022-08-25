@@ -18,7 +18,11 @@ export const getAdminCoupon = async (couponId: Coupon['id']): Promise<Coupon> =>
 export const useAdminCoupon = (
   couponId: Coupon['id'],
 ): UseQueryResult<Coupon, AxiosError> => {
-  return useQuery<Coupon, AxiosError>('AdminCoupon', () => getAdminCoupon(couponId), {
-    enabled: !!couponId,
-  });
+  return useQuery<Coupon, AxiosError>(
+    ['AdminCoupon', { couponId }],
+    () => getAdminCoupon(couponId),
+    {
+      enabled: !!couponId,
+    },
+  );
 };

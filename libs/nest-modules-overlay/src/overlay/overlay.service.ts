@@ -187,7 +187,7 @@ export class OverlayService {
   }
 
   /** 구매 메시지(비회원) 송출 핸들러 (overlay client 화면으로 송출 이벤트 전달) */
-  public async handlePurchaseMessageNonMember(
+  public async handleSimplePurchaseMessage(
     purchase: PurchaseMessage,
     socketServer: Server,
   ): Promise<void> {

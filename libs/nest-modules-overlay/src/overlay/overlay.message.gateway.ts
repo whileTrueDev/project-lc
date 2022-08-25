@@ -68,7 +68,7 @@ export class OverlayMessageGateway
    */
   @SubscribeMessage('get non client purchase message from admin')
   getNonClientMessage(@MessageBody() data: PurchaseMessage): void {
-    this.overlayService.handlePurchaseMessageNonMember(data, this.server);
+    this.overlayService.handleSimplePurchaseMessage(data, this.server);
   }
 
   // 하단 응원메세지 복구

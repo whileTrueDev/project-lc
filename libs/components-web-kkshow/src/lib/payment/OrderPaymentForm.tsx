@@ -1,8 +1,17 @@
 import { Grid, GridItem, Heading, Stack } from '@chakra-ui/react';
-import { useCustomerInfo, useProfile } from '@project-lc/hooks';
+import {
+  useCustomerAddressMutation,
+  useCustomerInfo,
+  useDefaultCustomerAddress,
+  useProfile,
+} from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useCartStore, useKkshowOrderStore } from '@project-lc/stores';
+import { getCustomerWebHost } from '@project-lc/utils';
 import { setCookie } from '@project-lc/utils-frontend';
+import { loadTossPayments } from '@tosspayments/payment-sdk';
+import dayjs from 'dayjs';
+import { nanoid } from 'nanoid';
 import { useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { BuyerInfo } from './BuyerInfo';
@@ -10,9 +19,33 @@ import { DeliveryAddress } from './DeliveryAddress';
 import { Discount } from './Discount';
 import { GiftBox } from './Gift';
 import { OrderItemInfo } from './OrderItemInfo';
-import { doPayment, getOrderPrice, PaymentBox } from './Payment';
+import { getOrderPrice, PaymentBox } from './Payment';
 import PaymentNotice from './PaymentNotice';
 import { PaymentSelection } from './PaymentSelection';
+
+export async function doPayment(
+  paymentType: '카드' | '계좌이체' | '가상계좌' | '미선택',
+  client_key: string,
+  amount: number,
+  productName: string,
+  customerName: string,
+): Promise<void> {
+  return loadTossPayments(client_key)
+    .then((tossPayments) => {
+      return tossPayments.requestPayment(paymentType, {
+        amount,
+        orderId: `${dayjs().format('YYYYMMDDHHmmssSSS')}${nanoid(6)}`,
+        orderName: `${productName}`,
+        customerName,
+        successUrl: `${getCustomerWebHost()}/payment/success`,
+        failUrl: `${getCustomerWebHost()}/payment/fail`,
+      });
+    })
+    .catch((err) => {
+      console.error('Error - loadTossPayments');
+      console.error(err);
+    });
+}
 
 export function OrderPaymentForm(): JSX.Element | null {
   const { data: profile } = useProfile();
@@ -49,6 +82,9 @@ export function OrderPaymentForm(): JSX.Element | null {
 
   const { getValues, setValue } = methods;
 
+  const { data: defaultAddr } = useDefaultCustomerAddress(customer?.id);
+  const { mutateAsync: createAddress } = useCustomerAddressMutation();
+
   // 로그인하여 소비자 정보가 있는경우 id등 기타 정보 저장
   useEffect(() => {
     if (profile) {
@@ -71,12 +107,15 @@ export function OrderPaymentForm(): JSX.Element | null {
       ...rest
     } = submitData;
     // * 주문 생성에 필요한 데이터를 formState에서 가져와 store에 저장
+    const recipientPhone = [recipientPhone1, recipientPhone2, recipientPhone3].join('-');
+    const ordererPhone = [ordererPhone1, ordererPhone2, ordererPhone3].join('-');
+
     handleOrderPrepare({
       ...rest,
       cartItemIdList: selectedItems,
       customerId: profile?.id,
-      recipientPhone: [recipientPhone1, recipientPhone2, recipientPhone3].join('-'),
-      ordererPhone: [ordererPhone1, ordererPhone2, ordererPhone3].join('-'),
+      recipientPhone,
+      ordererPhone,
       nonMemberOrderFlag: !profile?.id,
       orderItems: orderItems.map((oi) => ({
         ...oi,
@@ -84,7 +123,6 @@ export function OrderPaymentForm(): JSX.Element | null {
           ? {
               ...oi.support,
               broadcasterId: oi.support?.broadcasterId || null,
-              nickname: customer?.nickname || '',
             }
           : undefined,
       })),
@@ -97,8 +135,23 @@ export function OrderPaymentForm(): JSX.Element | null {
       getValues('usedCouponAmount') || 0,
     );
     const cookieExpire = new Date();
-    cookieExpire.setMinutes(cookieExpire.getMinutes() + 1);
+    cookieExpire.setMinutes(cookieExpire.getMinutes() + 5);
     setCookie('amount', amount, { expire: cookieExpire, path: '/' }); // path 설정 안하면 /payment로 저장되기는 함. 이유는 모르겠으나 한번은 path가 /goods로 저장되어 /payment페이지에서 쿠키가 읽히지 않음 -> 결제금액 비교 못하는 문제가 발생하여 '/' 로 저장함
+
+    // 현재 배송지 기본 배송지로 등록 요청 (백그라운드로 요청만 보낼것이므로 await 처리하지 않음.)
+    if (customer && !defaultAddr) {
+      createAddress({
+        title: '기본',
+        isDefault: true,
+        address: submitData.recipientAddress,
+        detailAddress: submitData.recipientDetailAddress,
+        customerId: customer?.id,
+        phone: recipientPhone.replace(/-/g, ''),
+        postalCode: submitData.recipientPostalCode,
+        recipient: submitData.recipientName,
+        memo: submitData.memo,
+      });
+    }
 
     return doPayment(
       paymentType,
@@ -120,6 +173,7 @@ export function OrderPaymentForm(): JSX.Element | null {
         py={6}
         mb={{ base: 0, lg: 20 }}
         as="form"
+        id="order-payment-form"
         onSubmit={methods.handleSubmit(onSubmit)}
       >
         <GridItem colSpan={7}>
