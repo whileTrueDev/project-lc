@@ -123,6 +123,7 @@ async function createCustomer(): Promise<Customer> {
       address: '부산 금정구 장전온천천로 51 ',
       detailAddress: '313 호',
       postalCode: '12345',
+      phone: '01012341234',
       isDefault: true,
       customer: { connect: { id: customer.id } },
     },
