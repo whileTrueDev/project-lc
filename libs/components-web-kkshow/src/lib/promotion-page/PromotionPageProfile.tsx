@@ -107,7 +107,6 @@ export function PromotionPageRanking({
   };
   const { data } = usePromotionPageRanking(Number(broadcasterId), { by });
 
-  if (!data) return null;
   return (
     <Box
       minHeight="200px"
@@ -121,7 +120,14 @@ export function PromotionPageRanking({
       <Tabs
         fontSize={{ base: 'sm', md: 'md' }}
         onChange={(idx) => {
-          onByChange(idx === 0 ? GetRankingBy.purchasePrice : GetRankingBy.giftPrice);
+          onByChange(
+            // eslint-disable-next-line no-nested-ternary
+            idx === 0
+              ? GetRankingBy.purchasePrice
+              : idx === 1
+              ? GetRankingBy.giftPrice
+              : GetRankingBy.reviewCount,
+          );
         }}
       >
         <TabList>
@@ -131,22 +137,26 @@ export function PromotionPageRanking({
           <Tab p={2} fontSize={{ base: 'sm', md: 'md' }}>
             선물순위
           </Tab>
+          <Tab p={2} fontSize={{ base: 'sm', md: 'md' }}>
+            후기순위
+          </Tab>
         </TabList>
 
         <TabPanels>
           <TabPanel>
             <Grid gridTemplateColumns="2fr 1fr" gap={1}>
-              {data.length === 0 && <Text>아직 구매 내역이 없습니다.</Text>}
-              {data.length > 0 &&
-                data.map((rank, idx) => (
+              {data?.length === 0 && <Text>아직 구매 내역이 없습니다.</Text>}
+              {data &&
+                data?.length > 0 &&
+                data?.map((rank, idx) => (
                   <Fragment key={rank.nickname}>
                     <GridItem>
-                      <Text>
+                      <Text noOfLines={1}>
                         {medals[idx]} {rank.nickname}
                       </Text>
                     </GridItem>
                     <GridItem textAlign="right">
-                      <Text>{getLocaleNumber(rank._sum?.price)}원</Text>
+                      <Text noOfLines={1}>{getLocaleNumber(rank._sum?.price)}원</Text>
                     </GridItem>
                   </Fragment>
                 ))}
@@ -155,17 +165,38 @@ export function PromotionPageRanking({
 
           <TabPanel>
             <Grid gridTemplateColumns="2fr 1fr" gap={1}>
-              {data.length === 0 && <Text>아직 선물 내역이 없습니다.</Text>}
-              {data.length > 0 &&
-                data.map((rank, idx) => (
+              {data?.length === 0 && <Text>아직 선물 내역이 없습니다.</Text>}
+              {data &&
+                data?.length > 0 &&
+                data?.map((rank, idx) => (
                   <Fragment key={rank.nickname}>
                     <GridItem>
-                      <Text>
+                      <Text noOfLines={1}>
                         {medals[idx]} {rank.nickname}
                       </Text>
                     </GridItem>
                     <GridItem textAlign="right">
-                      <Text>{getLocaleNumber(rank._sum?.price)}원</Text>
+                      <Text noOfLines={1}>{getLocaleNumber(rank._sum?.price)}원</Text>
+                    </GridItem>
+                  </Fragment>
+                ))}
+            </Grid>
+          </TabPanel>
+
+          <TabPanel>
+            <Grid gridTemplateColumns="4fr 1fr" gap={1}>
+              {data?.length === 0 && <Text>아직 후기 내역이 없습니다.</Text>}
+              {data &&
+                data?.length > 0 &&
+                data?.map((rank, idx) => (
+                  <Fragment key={rank.nickname}>
+                    <GridItem>
+                      <Text noOfLines={1}>
+                        {medals[idx]} {rank.nickname}
+                      </Text>
+                    </GridItem>
+                    <GridItem textAlign="right">
+                      <Text noOfLines={1}>{getLocaleNumber(rank._count)}개</Text>
                     </GridItem>
                   </Fragment>
                 ))}

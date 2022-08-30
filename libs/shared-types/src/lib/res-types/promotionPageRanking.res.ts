@@ -1,5 +1,6 @@
 export interface GetRankingResItem {
-  _sum: { price: number };
+  _count?: number;
+  _sum?: { price: number };
   nickname: string;
 }
 export type GetRankingRes = GetRankingResItem[];

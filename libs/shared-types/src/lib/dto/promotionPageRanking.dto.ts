@@ -3,6 +3,7 @@ import { IsEnum, IsInt, IsNumber, IsOptional } from 'class-validator';
 export enum GetRankingBy {
   'purchasePrice' = 'purchasePrice',
   'giftPrice' = 'giftPrice',
+  'reviewCount' = 'reviewCount',
 }
 export class GetRankingDto {
   @IsEnum(GetRankingBy)

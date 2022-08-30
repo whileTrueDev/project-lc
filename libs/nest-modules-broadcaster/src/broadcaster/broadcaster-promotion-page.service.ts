@@ -163,6 +163,25 @@ export class BroadcasterPromotionPageService {
     broadcasterId: Broadcaster['id'],
     dto: GetRankingDto,
   ): Promise<GetRankingRes> {
+    if (dto.by === GetRankingBy.reviewCount) {
+      const reviews = await this.prisma.goodsReview.findMany({
+        select: { writer: { select: { nickname: true } } },
+        where: { orderItem: { some: { support: { broadcasterId } } } },
+      });
+      const result: GetRankingRes = [];
+      reviews.forEach((review) => {
+        const targetIdx = result.findIndex((x) => x.nickname === review.writer.nickname);
+        if (targetIdx > -1) {
+          result[targetIdx] = {
+            ...result[targetIdx],
+            _count: result[targetIdx]._count + 1,
+          };
+        } else {
+          result.push({ nickname: review.writer.nickname, _count: 1 });
+        }
+      });
+      return result;
+    }
     const result = await this.prisma.liveShoppingPurchaseMessage.groupBy({
       by: ['nickname'],
       _sum: { price: true },
