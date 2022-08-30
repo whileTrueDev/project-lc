@@ -9,7 +9,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { GridCellParams, GridColumns, GridRowData } from '@material-ui/data-grid';
-import { Notice } from '@prisma/client';
+import { Notice, NoticeTarget } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import {
   useDeleteNoticeMutation,
@@ -18,6 +18,13 @@ import {
 } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { AdminNoticeDialog } from './AdminNoticeDialog';
+
+const noticeTargetKr: Record<NoticeTarget, string> = {
+  all: '전체',
+  seller: '판매자',
+  broadcaster: '방송인',
+  customer: '소비자',
+};
 
 const columns = (
   handleChange: any,
@@ -37,6 +44,12 @@ const columns = (
           />
         );
       },
+    },
+    {
+      field: 'target',
+      headerName: '대상',
+      minWidth: 80,
+      valueFormatter: ({ row }) => noticeTargetKr[row.target as NoticeTarget],
     },
     {
       field: 'title',

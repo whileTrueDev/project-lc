@@ -1,4 +1,5 @@
-import { IsBoolean, IsNumber, IsString } from 'class-validator';
+import { NoticeTarget } from '@prisma/client';
+import { IsBoolean, IsNumber, IsString, IsEnum } from 'class-validator';
 
 export class NoticePostDto {
   @IsString()
@@ -6,6 +7,9 @@ export class NoticePostDto {
 
   @IsString()
   url: string;
+
+  @IsEnum(NoticeTarget)
+  target: NoticeTarget;
 }
 
 export class NoticePatchDto {

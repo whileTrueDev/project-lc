@@ -31,6 +31,7 @@ export class NoticeService {
       data: {
         title: dto.title,
         url: dto.url,
+        target: dto.target,
         postingDate: dayjs().toISOString(),
       },
     });
