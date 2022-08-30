@@ -82,10 +82,10 @@ export function CouponApplicableGoodsListDialog({
         {DiscountApplyTypeBadge(coupon.applyType)}
       </Button>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader fontSize="md">적용 가능한 상품 목록</ModalHeader>
+          <ModalHeader fontSize="md">{coupon.name} - 적용 가능한 상품 목록</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <CouponApplicableGoodsList goodsList={coupon.goods} />
