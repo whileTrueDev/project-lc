@@ -53,12 +53,10 @@ export function MypageNoticeSection(): JSX.Element {
         headerHeight={40}
         minHeight={100}
         autoHeight
-        hideFooter
         density="compact"
         columns={columns}
         rows={makeListRow(notices)}
         rowsPerPageOptions={[25, 50]}
-        rowCount={5}
         pageSize={5}
         disableColumnMenu
         disableColumnFilter
