@@ -15,7 +15,6 @@ export const commonFooterLinkList: FooterLinkListItem[] = [
       {
         title: '개인정보처리방침',
         href: '/privacy',
-        isBold: true,
       },
       {
         title: '이용약관',
@@ -29,6 +28,10 @@ export const commonFooterLinkList: FooterLinkListItem[] = [
       {
         title: 'FAQ',
         href: 'https://whiletrue.notion.site/FAQ-f182f90b7e984badb031a62ddd1bd00d',
+      },
+      {
+        title: '공지사항',
+        href: 'https://whiletrue.notion.site/624da834257946dd91c0c4bcb7d8ab67',
       },
     ],
   },
