@@ -1,5 +1,20 @@
-import { Grid, GridItem, GridProps, Image, Link } from '@chakra-ui/react';
+import {
+  Button,
+  Grid,
+  GridItem,
+  GridProps,
+  Image,
+  Link,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { Goods, GoodsImages } from '@prisma/client';
+import { DiscountApplyTypeBadge } from '@project-lc/components-shared/CouponBadge';
 import { CustomerCouponRes } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 
@@ -51,6 +66,32 @@ function ApplicableGoodsLink({
           <Link fontSize="sm">{goods_name}</Link>
         </NextLink>
       </GridItem>
+    </>
+  );
+}
+
+export function CouponApplicableGoodsListDialog({
+  coupon,
+}: {
+  coupon: CustomerCouponRes['coupon'];
+}): JSX.Element {
+  const { isOpen, onClose, onOpen } = useDisclosure();
+  return (
+    <>
+      <Button variant="unstyled" onClick={onOpen}>
+        {DiscountApplyTypeBadge(coupon.applyType)}
+      </Button>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader fontSize="md">적용 가능한 상품 목록</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <CouponApplicableGoodsList goodsList={coupon.goods} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </>
   );
 }
