@@ -379,6 +379,11 @@ const customerMypageActivityChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
 /** 크크쇼 소비자 마이페이지 사이드바 - "정보" 하위 탭 */
 const customerMypageInfoChildrenNavLinks: MypageLink[] = [
   {
+    name: '공지사항',
+    href: '/mypage/notice',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
     name: '회원 정보 수정',
     href: '/mypage/info',
     checkIsActive: defaultIsActiveChecker,
