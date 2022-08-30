@@ -79,6 +79,7 @@ export function CustomerCouponDetailDialog({
 
                       <CouponApplicableGoodsList
                         goodsList={customerCoupon.coupon.goods}
+                        maxHeight="150px"
                       />
                     </GridItem>
                   )}

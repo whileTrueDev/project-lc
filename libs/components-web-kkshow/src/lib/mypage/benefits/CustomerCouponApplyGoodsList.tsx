@@ -1,20 +1,22 @@
-import { Grid, GridItem, Image, Link } from '@chakra-ui/react';
+import { Grid, GridItem, GridProps, Image, Link } from '@chakra-ui/react';
 import { Goods, GoodsImages } from '@prisma/client';
 import { CustomerCouponRes } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 
 export interface CouponApplicableGoodsListProps {
   goodsList: CustomerCouponRes['coupon']['goods'];
+  maxHeight?: GridProps['maxHeight'];
 }
 export function CouponApplicableGoodsList({
   goodsList,
+  maxHeight,
 }: CouponApplicableGoodsListProps): JSX.Element {
   return (
     <Grid
       gridTemplateColumns="repeat(6, 1fr)"
       fontSize={{ base: 'sm', md: 'md' }}
       rowGap={1}
-      maxHeight="120px"
+      maxHeight={maxHeight}
       overflowY="auto"
     >
       {goodsList.map((goods) => (
