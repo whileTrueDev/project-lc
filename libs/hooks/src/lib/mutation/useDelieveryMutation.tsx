@@ -1,5 +1,5 @@
 import { Export } from '@prisma/client';
-import { DeliveryDto } from '@project-lc/shared-types';
+import { DeliveryDto, DeliveryManyDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
@@ -19,7 +19,32 @@ export const useDelieveryStartMutation = (): UseMutationResult<
       onSuccess: (data) => {
         queryClient.invalidateQueries('OrderDetail');
         queryClient.invalidateQueries('getAdminOrder', { refetchInactive: true });
-        queryClient.invalidateQueries('AdminOrderList');
+        queryClient.invalidateQueries('AdminOrderList', { refetchInactive: true });
+        queryClient.invalidateQueries('Exports');
+        queryClient.invalidateQueries(['Exports'], { refetchInactive: true });
+      },
+    },
+  );
+};
+
+export type useDelieveryMutationManyRes = Export[];
+/** 배송중처리 - 일괄처리 요청 */
+export const useDelieveryStartManyMutation = (): UseMutationResult<
+  useDelieveryMutationManyRes,
+  AxiosError,
+  DeliveryManyDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<useDelieveryMutationManyRes, AxiosError, DeliveryManyDto>(
+    (dto: DeliveryManyDto) =>
+      axios
+        .post<useDelieveryMutationManyRes>('/delivery/start/many', dto)
+        .then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('OrderDetail');
+        queryClient.invalidateQueries('getAdminOrder', { refetchInactive: true });
+        queryClient.invalidateQueries('AdminOrderList', { refetchInactive: true });
         queryClient.invalidateQueries('Exports');
         queryClient.invalidateQueries(['Exports'], { refetchInactive: true });
       },
@@ -41,7 +66,32 @@ export const useDelieveryDoneMutation = (): UseMutationResult<
       onSuccess: (data) => {
         queryClient.invalidateQueries('OrderDetail');
         queryClient.invalidateQueries('getAdminOrder', { refetchInactive: true });
-        queryClient.invalidateQueries('AdminOrderList');
+        queryClient.invalidateQueries('AdminOrderList', { refetchInactive: true });
+        queryClient.invalidateQueries('Exports');
+        queryClient.invalidateQueries(['Exports'], { refetchInactive: true });
+      },
+    },
+  );
+};
+
+export type useDelieveryDoneManyRes = Export[];
+/** 배송완료처리 - 일괄처리 요청 */
+export const useDelieveryDoneManyMutation = (): UseMutationResult<
+  useDelieveryDoneManyRes,
+  AxiosError,
+  DeliveryManyDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<useDelieveryDoneManyRes, AxiosError, DeliveryManyDto>(
+    (dto: DeliveryManyDto) =>
+      axios
+        .post<useDelieveryDoneManyRes>('/delivery/done/many', dto)
+        .then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('OrderDetail');
+        queryClient.invalidateQueries('getAdminOrder', { refetchInactive: true });
+        queryClient.invalidateQueries('AdminOrderList', { refetchInactive: true });
         queryClient.invalidateQueries('Exports');
         queryClient.invalidateQueries(['Exports'], { refetchInactive: true });
       },
