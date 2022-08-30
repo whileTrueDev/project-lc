@@ -838,11 +838,19 @@ model SellCommission {
 // 공지사항
 // -------------------------------------------------
 model Notice {
-  id          Int      @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   title       String // 공지사항 글의 제목
   url         String // 공지사항 글의 notion URL
-  postingFlag Boolean  @default(false) // 공지사항 글 게시여부
-  postingDate DateTime @default(now()) // 공지사항 글 게시시간
+  postingFlag Boolean      @default(false) // 공지사항 글 게시여부
+  postingDate DateTime     @default(now()) // 공지사항 글 게시시간
+  target      NoticeTarget @default(all) // 공지사항 대상(전체, 판매자, 방송인, 구매자)
+}
+
+enum NoticeTarget {
+  all // 전체
+  seller // 판매자
+  broadcaster // 방송인
+  customer // 구매자
 }
 
 // 전자 결제 수수료 정보 (퍼스트몰의 fm_account_payment_fee와 유사함, 와일트루 정책에 따르기위해 따로 구현)
