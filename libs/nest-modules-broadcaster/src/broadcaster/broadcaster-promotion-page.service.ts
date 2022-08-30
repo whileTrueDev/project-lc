@@ -6,7 +6,10 @@ import {
   BroadcasterPromotionPageListRes,
   BroadcasterPromotionPageUpdateDto,
   FindManyDto,
-  PromotionPagePromotionGoodsRes,
+  GetRankingBy,
+  GetRankingDto,
+  type GetRankingRes,
+  type PromotionPagePromotionGoodsRes,
 } from '@project-lc/shared-types';
 import { getKkshowWebHost } from '@project-lc/utils';
 
@@ -153,5 +156,24 @@ export class BroadcasterPromotionPageService {
       return newPromotionPage.id;
     }
     return existPromotionPage.id;
+  }
+
+  /** 방송인 기준 구매/선물구매 랭킹 조회 */
+  public async getRanking(
+    broadcasterId: Broadcaster['id'],
+    dto: GetRankingDto,
+  ): Promise<GetRankingRes> {
+    const result = await this.prisma.liveShoppingPurchaseMessage.groupBy({
+      by: ['nickname'],
+      _sum: { price: true },
+      where: {
+        broadcaster: { id: broadcasterId },
+        giftFlag: dto.by === GetRankingBy.giftPrice,
+      },
+    });
+
+    return result
+      .sort((a, b) => b._sum.price - a._sum.price) // 내림차순 정렬
+      .slice(0, dto.take || 5);
   }
 }

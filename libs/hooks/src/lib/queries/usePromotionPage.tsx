@@ -1,5 +1,10 @@
 import { Broadcaster, BroadcasterPromotionPage } from '@prisma/client';
-import { FindManyDto, PromotionPagePromotionGoodsRes } from '@project-lc/shared-types';
+import {
+  FindManyDto,
+  GetRankingDto,
+  GetRankingRes,
+  PromotionPagePromotionGoodsRes,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import {
   useInfiniteQuery,
@@ -58,5 +63,26 @@ export const usePromotionPageGoods = (
       },
       enabled: !!bcId,
     },
+  );
+};
+
+export const getPromotionPageRanking = async (
+  broadcasterId?: Broadcaster['id'],
+  dto?: GetRankingDto,
+): Promise<GetRankingRes> => {
+  return axios
+    .get(`/broadcaster/${broadcasterId}/promotion-page/ranking`, { params: dto })
+    .then((res) => res.data);
+};
+
+export const usePromotionPageRanking = (
+  broadcasterId?: Broadcaster['id'],
+  dto?: GetRankingDto,
+): UseQueryResult<GetRankingRes, AxiosError> => {
+  const bcId = Number(broadcasterId);
+  return useQuery<GetRankingRes, AxiosError>(
+    ['PromotionPageRanking', broadcasterId, dto],
+    () => getPromotionPageRanking(bcId, dto),
+    { enabled: !!broadcasterId },
   );
 };
