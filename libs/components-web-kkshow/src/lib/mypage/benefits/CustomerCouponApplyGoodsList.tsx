@@ -16,7 +16,7 @@ import {
 import { Goods, GoodsImages } from '@prisma/client';
 import { DiscountApplyTypeBadge } from '@project-lc/components-shared/CouponBadge';
 import { CustomerCouponRes } from '@project-lc/shared-types';
-import NextLink from 'next/link';
+import { getKkshowWebHost } from '@project-lc/utils';
 
 export interface CouponApplicableGoodsListProps {
   goodsList: CustomerCouponRes['coupon']['goods'];
@@ -62,9 +62,9 @@ function ApplicableGoodsLink({
         />
       </GridItem>
       <GridItem colSpan={5}>
-        <NextLink passHref href={`/goods/${id}`}>
-          <Link fontSize="sm">{goods_name}</Link>
-        </NextLink>
+        <Link fontSize="sm" href={`${getKkshowWebHost()}/goods/${id}`} isExternal>
+          {goods_name}
+        </Link>
       </GridItem>
     </>
   );
