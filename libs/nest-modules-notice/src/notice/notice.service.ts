@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Notice } from '@prisma/client';
+import { Notice, NoticeTarget } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { NoticePatchDto, NoticePostDto } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -8,9 +8,9 @@ import dayjs from 'dayjs';
 export class NoticeService {
   constructor(private readonly prisma: PrismaService) {}
 
-  public async getNotices(): Promise<Notice[]> {
+  public async getNotices(target?: NoticeTarget): Promise<Notice[]> {
     const notice = await this.prisma.notice.findMany({
-      where: { postingFlag: true },
+      where: { postingFlag: true, target: target ? { in: ['all', target] } : undefined },
       orderBy: [{ postingDate: 'desc' }],
     });
 
