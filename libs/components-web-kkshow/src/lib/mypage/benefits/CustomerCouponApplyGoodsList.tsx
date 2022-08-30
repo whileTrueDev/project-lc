@@ -3,12 +3,12 @@ import { Goods, GoodsImages } from '@prisma/client';
 import { CustomerCouponRes } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 
-export interface CustomerCouponApplyGoodsListProps {
+export interface CouponApplicableGoodsListProps {
   goodsList: CustomerCouponRes['coupon']['goods'];
 }
-export function CustomerCouponApplyGoodsList({
+export function CouponApplicableGoodsList({
   goodsList,
-}: CustomerCouponApplyGoodsListProps): JSX.Element {
+}: CouponApplicableGoodsListProps): JSX.Element {
   return (
     <Grid
       gridTemplateColumns="repeat(6, 1fr)"
@@ -18,15 +18,15 @@ export function CustomerCouponApplyGoodsList({
       overflowY="auto"
     >
       {goodsList.map((goods) => (
-        <CouponApplyGoodsLink key={goods.id} {...goods} />
+        <ApplicableGoodsLink key={goods.id} {...goods} />
       ))}
     </Grid>
   );
 }
 
-export default CustomerCouponApplyGoodsList;
+export default CouponApplicableGoodsList;
 
-function CouponApplyGoodsLink({
+function ApplicableGoodsLink({
   id,
   goods_name,
   image,

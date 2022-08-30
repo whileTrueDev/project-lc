@@ -17,7 +17,7 @@ import {
 } from '@project-lc/components-shared/CouponBadge';
 import { CustomerCouponRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import CustomerCouponApplyGoodsList from './CustomerCouponApplyGoodsList';
+import CouponApplicableGoodsList from './CustomerCouponApplyGoodsList';
 
 type CustomerCouponDetailDialogProps = {
   isOpen: boolean;
@@ -77,7 +77,7 @@ export function CustomerCouponDetailDialog({
                     <GridItem colSpan={4}>
                       <Text>적용 가능한 상품 목록</Text>
 
-                      <CustomerCouponApplyGoodsList
+                      <CouponApplicableGoodsList
                         goodsList={customerCoupon.coupon.goods}
                       />
                     </GridItem>
