@@ -305,7 +305,7 @@ function DeliveryDoneManyConfirmDialog({
     <ConfirmDialog
       isOpen={isOpen}
       onClose={onClose}
-      title="일괄배송중처리"
+      title="일괄배송완료처리"
       onConfirm={onDeliveryDoneMany}
     >
       선택된 모든 출고의 상태를 배송완료로 상태를 변경할까요?
