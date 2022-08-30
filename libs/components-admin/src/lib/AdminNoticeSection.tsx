@@ -32,6 +32,11 @@ const columns = (
 ): GridColumns => {
   return [
     {
+      field: 'id',
+      headerName: 'id',
+      width: 30,
+    },
+    {
       field: 'posting',
       headerName: '포스팅하기',
       minWidth: 120,
@@ -54,11 +59,11 @@ const columns = (
     {
       field: 'title',
       headerName: '제목',
-      minWidth: 800,
+      minWidth: 400,
     },
     {
       field: 'date',
-      headerName: '날짜',
+      headerName: '포스팅 한 날짜',
       valueFormatter: ({ row }) =>
         dayjs(row.postingDate as Date).format('YYYY/MM/DD HH:mm:ss'),
       minWidth: 200,
@@ -164,14 +169,14 @@ export function AdminNoticeSection(): JSX.Element {
         headerHeight={40}
         minHeight={100}
         autoHeight
-        hideFooter
+        // hideFooter
         density="compact"
         columns={columns(handleFlagChange, handleDelete)}
         rows={makeListRow(notices)}
         rowsPerPageOptions={[25, 50]}
         onCellClick={handleClick}
-        rowCount={5}
-        pageSize={5}
+        pageSize={25}
+        pagination
         disableColumnMenu
         disableColumnFilter
         disableSelectionOnClick

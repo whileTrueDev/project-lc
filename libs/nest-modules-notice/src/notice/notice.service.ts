@@ -13,14 +13,13 @@ export class NoticeService {
       where: { postingFlag: true, target: target ? { in: ['all', target] } : undefined },
       orderBy: [{ postingDate: 'desc' }],
     });
-
     return notice;
   }
 
   // 관리자용 공지사항 조건 미할당 조회
   public async getAdminNotices(): Promise<Notice[]> {
     const notice = await this.prisma.notice.findMany({
-      orderBy: [{ postingDate: 'desc' }],
+      orderBy: [{ id: 'desc' }],
     });
     return notice;
   }
