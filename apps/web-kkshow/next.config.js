@@ -19,6 +19,8 @@ const nextConfig = {
       // 테스트용 랜덤 사진 사이트. 프로덕션에는 필요 없음.
       // by @hwasurr
       'picsum.photos',
+      'i.ibb.co',
+      'phinf.pstatic.net',
     ],
   },
 };
