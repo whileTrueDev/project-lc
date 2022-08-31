@@ -18,7 +18,7 @@ import { SellerModule } from '@project-lc/nest-modules-seller';
 import { OrderModule } from '@project-lc/nest-modules-order';
 import { ReturnModule } from '@project-lc/nest-modules-return';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
-import { RefundModule } from '@project-lc/nest-modules-refund';
+import { OverlayThemeModule } from '@project-lc/nest-modules-overlay-controller';
 import { AdminAccountService } from './admin-account.service';
 import { AdminCouponController } from './admin-coupon.controller';
 import { AdminCustomerCouponController } from './admin-customer-coupon.controller';
@@ -35,6 +35,7 @@ import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 import { AdminOrderController } from './admin-order.controller';
+import { AdminOverlayThemeController } from './admin-overlay-theme.controller';
 
 @Module({})
 export class AdminModule {
@@ -64,6 +65,7 @@ export class AdminModule {
     AdminCouponController,
     AdminCustomerCouponController,
     AdminOrderController,
+    AdminOverlayThemeController,
   ];
 
   private static readonly imports = [
@@ -84,6 +86,7 @@ export class AdminModule {
     OrderModule.withoutControllers(),
     ReturnModule.withoutControllers(),
     CipherModule,
+    OverlayThemeModule.withoutControllers(),
   ];
 
   static withoutControllers(): DynamicModule {
