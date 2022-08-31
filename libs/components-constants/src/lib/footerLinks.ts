@@ -15,6 +15,7 @@ export const commonFooterLinkList: FooterLinkListItem[] = [
       {
         title: '개인정보처리방침',
         href: '/privacy',
+        isBold: true,
       },
       {
         title: '이용약관',
