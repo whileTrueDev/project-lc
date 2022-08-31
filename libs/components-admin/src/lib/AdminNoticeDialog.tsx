@@ -13,7 +13,10 @@ import {
   FormErrorMessage,
   Grid,
   GridItem,
+  HStack,
   Input,
+  Radio,
+  RadioGroup,
   useColorModeValue,
   useToast,
 } from '@chakra-ui/react';
@@ -25,6 +28,7 @@ import {
 import { useNoticeMutation } from '@project-lc/hooks';
 import { NoticePostDto } from '@project-lc/shared-types';
 import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
 
 export interface AdminNoticeDialogProps {
   isOpen: boolean;
@@ -38,7 +42,8 @@ export function AdminNoticeDialog({
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    reset,
+    formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm<NoticePostDto>();
 
   const toast = useToast();
@@ -61,6 +66,12 @@ export function AdminNoticeDialog({
       onClose();
     }
   };
+
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset();
+    }
+  }, [isSubmitSuccessful, reset]);
 
   return (
     <Modal isOpen={isOpen} size="5xl" onClose={onClose}>
@@ -88,6 +99,33 @@ export function AdminNoticeDialog({
                 />
                 <FormErrorMessage ml={3} mt={0}>
                   {errors.title && errors.title.message}
+                </FormErrorMessage>
+              </FormControl>
+            </GridItem>
+            <GridItem {...useDialogHeaderConfig(useColorModeValue)}>
+              공지사항 대상
+            </GridItem>
+            <GridItem {...useDialogValueConfig(useColorModeValue)}>
+              <FormControl isInvalid={!!errors.target}>
+                <RadioGroup defaultValue="all">
+                  <HStack>
+                    <Radio value="all" {...register('target')}>
+                      전체
+                    </Radio>
+                    <Radio value="seller" {...register('target')}>
+                      판매자
+                    </Radio>
+                    <Radio value="broadcaster" {...register('target')}>
+                      방송인
+                    </Radio>
+                    <Radio value="customer" {...register('target')}>
+                      소비자
+                    </Radio>
+                  </HStack>
+                </RadioGroup>
+
+                <FormErrorMessage ml={3} mt={0}>
+                  {errors.target && errors.target.message}
                 </FormErrorMessage>
               </FormControl>
             </GridItem>

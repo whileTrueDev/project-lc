@@ -8,11 +8,12 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { Notice } from '@prisma/client';
+import { Notice, NoticeTarget } from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { NoticePatchDto, NoticePostDto } from '@project-lc/shared-types';
@@ -26,8 +27,8 @@ export class NoticeController {
 
   @Get()
   @CacheTTL(60 * 60 * 60) // 1시간
-  getNotice(): Promise<Notice[]> {
-    return this.noticeService.getNotices();
+  getNotice(@Query('target') target: NoticeTarget): Promise<Notice[]> {
+    return this.noticeService.getNotices(target);
   }
 
   @UseGuards(JwtAuthGuard)

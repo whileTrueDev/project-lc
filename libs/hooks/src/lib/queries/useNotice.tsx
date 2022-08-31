@@ -7,7 +7,9 @@ import { Notice } from '@prisma/client';
 import axios from '../../axios';
 
 export function getNotice(): Promise<Notice[]> {
-  return axios.get<Notice[]>('/notice').then((res) => res.data);
+  return axios
+    .get<Notice[]>('/notice', { params: { target: process.env.NEXT_PUBLIC_APP_TYPE } })
+    .then((res) => res.data);
 }
 
 export function getAdminNotice(): Promise<Notice[]> {
