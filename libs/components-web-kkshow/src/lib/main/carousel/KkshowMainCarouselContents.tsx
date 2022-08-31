@@ -1,17 +1,11 @@
-import {
-  AspectRatio,
-  Box,
-  BoxProps,
-  Image,
-  LinkBox,
-  LinkOverlay,
-} from '@chakra-ui/react';
+import { AspectRatio, Box, BoxProps, LinkBox, LinkOverlay } from '@chakra-ui/react';
 import { KkshowMainCarouselItem } from '@project-lc/shared-types';
 import { EmbededVideo } from '@project-lc/components-shared/EmbededVideo';
 import { memo, useCallback } from 'react';
 import Link from 'next/link';
 import { YouTubePlayer } from 'youtube-player/dist/types';
 import { useSwiper } from 'swiper/react';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 
 export interface KkshowMainCarouselContentsProps {
   item: KkshowMainCarouselItem;
@@ -53,7 +47,16 @@ export function KkshowMainCarouselContents({
           <LinkBox rounded="xl">
             <Link href={item.productLinkUrl} passHref>
               <LinkOverlay isExternal={item.productLinkUrl.includes('http')}>
-                <Image src={item.imageUrl} rounded="xl" w="100%" h="100%" />
+                <ChakraNextImage
+                  layout="fill"
+                  objectFit="contain"
+                  src={item.imageUrl}
+                  rounded="xl"
+                  priority
+                  quality={100}
+                  width="100%"
+                  height="100%"
+                />
               </LinkOverlay>
             </Link>
           </LinkBox>
@@ -68,7 +71,16 @@ export function KkshowMainCarouselContents({
           <LinkBox rounded="xl">
             <Link href={item.linkUrl || '#'} passHref>
               <LinkOverlay isExternal={!!(item.linkUrl && item.linkUrl.includes('http'))}>
-                <Image src={item.imageUrl} rounded="xl" w="100%" h="100%" />
+                <ChakraNextImage
+                  layout="fill"
+                  objectFit="contain"
+                  src={item.imageUrl}
+                  rounded="xl"
+                  priority
+                  quality={100}
+                  width="100%"
+                  height="100%"
+                />
               </LinkOverlay>
             </Link>
           </LinkBox>

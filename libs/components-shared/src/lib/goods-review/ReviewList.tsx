@@ -14,7 +14,6 @@ import {
   Center,
   Divider,
   Flex,
-  Image,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -24,6 +23,7 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import StarRating from '@project-lc/components-core/StarRating';
 import {
   useGoodsById,
@@ -234,17 +234,17 @@ export function ReviewDetail({
 
         <Flex gap={1} my={2} flexWrap="wrap">
           {review.images.slice(0, 5).map((i, idx) => (
-            <Image
-              rounded="md"
-              key={i.id}
-              h="90px"
-              w="90px"
-              objectFit="cover"
-              src={i.imageUrl}
-              draggable={false}
-              cursor="pointer"
-              onClick={() => handleImageClick(idx)}
-            />
+            <button key={i.id} onClick={() => handleImageClick(idx)} type="button">
+              <ChakraNextImage
+                rounded="md"
+                height="90px"
+                width="90px"
+                objectFit="cover"
+                src={i.imageUrl}
+                draggable={false}
+                cursor="pointer"
+              />
+            </button>
           ))}
         </Flex>
         <Box>
@@ -318,8 +318,9 @@ export function ReviewDetail({
             {selectedImageIdx !== null && (
               <Box pos="relative">
                 <AspectRatio maxH={600} maxW={600} textAlign="center">
-                  <Image
-                    w="100%"
+                  <ChakraNextImage
+                    layout="fill"
+                    width="100%"
                     src={review.images[selectedImageIdx].imageUrl}
                     objectFit="cover"
                   />

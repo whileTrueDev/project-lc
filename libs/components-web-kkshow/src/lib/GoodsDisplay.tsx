@@ -10,6 +10,7 @@ import {
   LinkOverlay,
   Text,
 } from '@chakra-ui/react';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import { KkshowShoppingTabGoodsData } from '@project-lc/shared-types';
 import { getDiscountedRate, getLocaleNumber } from '@project-lc/utils-frontend';
@@ -99,23 +100,20 @@ export const GoodsDisplayImage = ({
 }: GoodsDisplayImageProps): JSX.Element => (
   <AspectRatio ratio={ratio}>
     <Box
-      position="relative"
       maxWidth={{ base: 'unset', md: 340 }}
       borderRadius={rest.borderRadius || 'xl'}
       {...rest}
     >
-      <motion.img
-        style={{
-          shadow: hasShadow ? 'md' : 'none',
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-        }}
-        alt={alt}
-        src={src}
-        draggable={false}
-        {...imageProps}
-      />
+      <motion.div {...imageProps}>
+        <ChakraNextImage
+          layout="fill"
+          shadow={hasShadow ? 'md' : 'none'}
+          objectFit="cover"
+          alt={alt}
+          src={src}
+          draggable={false}
+        />
+      </motion.div>
 
       {withArrowIcon && <GoodsDisplayArrowIcon />}
     </Box>
@@ -169,9 +167,8 @@ export function GoodsDisplay({
           src={goods.imageUrl}
           ratio={ratio}
           borderBottomRadius={variant === 'card' ? 'none' : undefined}
-          imageProps={{
-            variants: { hover: { scale: 1.05 } },
-          }}
+          // 이미지 컴포넌트를 motion.img에서 ChakraNextImage로 변경이후, hover시 이미지 사라지는 현상으로 임시 제거
+          // imageProps={{ variants: { hover: { scale: 1.05 } } }}
         />
 
         <GoodsDisplayContainer

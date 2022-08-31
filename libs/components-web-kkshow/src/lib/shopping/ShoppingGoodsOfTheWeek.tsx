@@ -1,4 +1,5 @@
-import { Box, Flex, Heading, Image, LinkBox, LinkOverlay } from '@chakra-ui/react';
+import { Box, Flex, Heading, LinkBox, LinkOverlay } from '@chakra-ui/react';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import FadeUp from '@project-lc/components-layout/motion/FadeUp';
 import SlideCustom from '@project-lc/components-layout/motion/SlideCustom';
 import { useKkshowShopping } from '@project-lc/hooks';
@@ -92,9 +93,11 @@ export function ShoppingGoodsOfTheWeek(): JSX.Element {
             data.goodsOfTheWeek.map((item) => (
               <SwiperSlide key={item.name} style={{ width: '75%', maxWidth: 340 }}>
                 {({ isActive }) => (
-                  <Image
+                  <ChakraNextImage
+                    layout="intrinsic"
                     objectFit="cover"
-                    h={{ base: 240, md: 340 }}
+                    height={340}
+                    width={340}
                     src={item.imageUrl}
                     alt={item.name}
                     transform={isActive ? 'scale(1)' : 'scale(0.8)'}

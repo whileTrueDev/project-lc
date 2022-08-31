@@ -210,7 +210,8 @@ export const kkshowShoppingTabDummyData = {
       linkUrl: 'https://k-kmarket.com/board/view?id=goods_review&seq=2',
       contents:
         '티비에서 방송하는걸 본적 있던 예스닭강정\n\n\n\n이번에 라이브커머스로 소개되자마자 예전 기억이 떠오르면서 구매하게 됐습니다\n\n\n\n\n\n일단 기본적으로 닭강정입니다\n\n\n\n네, 실패할수가 없다는 말이죠\n\n\n\n다만 뼈있는 닭강정이 아니라 순살 닭강정입니다\n\n\n\n네, 먹기가 편하다는거죠\n\n\n\n기본적으로 닭강정들은 먹을때 따로 뎁히지 않고 차갑게 된 상태에서 먹는게 국룰입니다\n\n\n\n다만 예스닭강정의 경우 순살 닭강정이다 보니 차갑게 먹는것보다 전자레인지에 살짝 뎁히는편이 더 좋았습니다\n\n\n\n1분은 좀 과했고, 30초정도가 딱 좋았네요\n\n\n\n세일즈포인트중 하나가 공기층이 같이 있어서 부들부들한 식감이었는데, 30초 뎁히니까 딱 부드러우면서 쫄깃하고 달콤한 닭강정 최적의 맛이 나왔습니다\n\n\n\n블랙닭강정의 경우는 일단 신기해서 같이 시켜봤는데요.\n\n\n\n일단 생각하는 맛은 아닙니다.\n\n\n\n춘장이 들어가있기는 한데, 그렇다고 짜장맛은 아니구요\n\n\n\n기본적인 닭강정맛에서 매운맛을 조금 더 덜어내고, 달짝한 맛이 추가됐습니다\n\n\n\n그리고 춘장이 들어가서 소스가 일반 닭강정보다 약간 꾸덕한 느낌이 듭니다. 춘장맛은 일부러 찾으려고 하지 않으면 잘 느껴지지는 않고, 꾸덕함과 달짝한 맛이 더 추가됐다고 생각하시면 되겠습니다\n\n\n\n그리고 먹는다고 이빨이 까매지지는 않았습니다\n\n\n\n색다른 닭강정이 먹고 싶다면 한번쯤 도전해볼만 합니다. 기본 닭강정에서 지나치게 바뀌진 않으면서 다른맛이 납니다\n\n\n\n\n\n결론 - 닭강정은 항상 맛있다. 존..맛 ',
-      imageUrl: 'https://i.ibb.co/Qbm6Lyp/Kakao-Talk-20211221-194813657.jpg',
+      imageUrl:
+        'https://k-kmarket.com/data/board/goods_review/761167a21b74945284840126978ac0611424122.jpg',
       createDate: '2021-12-21',
     },
     {
@@ -219,7 +220,7 @@ export const kkshowShoppingTabDummyData = {
       linkUrl: 'https://k-kmarket.com/board/view?id=goods_review&seq=4',
       contents: '배송이 잘못왔는데 대처가 너무 만족스럽습니다.',
       imageUrl:
-        'https://phinf.pstatic.net/checkout.phinf/20220123_210/1642904591443WBJrD_JPEG/review-attachment-7eab1102-c0fb-4276-8eb5-bad83ff536b6.jpeg?type=w640',
+        'https://k-kmarket.com/data/board/goods_review/761167a21b74945284840126978ac0611424122.jpg',
       createDate: '2022-01-23',
     },
   ],
