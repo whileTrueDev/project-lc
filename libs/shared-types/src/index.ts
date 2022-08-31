@@ -127,6 +127,7 @@ export * from './lib/front-type/goodsRegistEditFormType';
 export * from './lib/front-type/kkshowNavbarVariantType';
 export * from './lib/front-type/liveShoppingInputType';
 export * from './lib/front-type/orderFilterFormType';
+export * from './lib/front-type/overlayThemeType';
 export * from './lib/front-type/updateReturnStatusFormType';
 export * from './lib/inactive-handler-type/inactive-handler-types';
 export * from './lib/overlay-controller/overlay-controller-types';

@@ -15,6 +15,7 @@ export * from './lib/mutation/useAdminManualMutation';
 export * from './lib/mutation/useAdminMileageMutation';
 export * from './lib/mutation/useAdminMileageSettingMutation';
 export * from './lib/mutation/useAdminOrderPatchMutation';
+export * from './lib/mutation/useAdminOverlayThemeMutation';
 export * from './lib/mutation/useAdminPolicyMutation';
 export * from './lib/mutation/useAdminPrivacyApproadchHistoryMutation';
 export * from './lib/mutation/useAdminProductPromotionMutation';

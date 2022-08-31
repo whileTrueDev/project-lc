@@ -1,4 +1,4 @@
-import { IsJSON, IsString } from 'class-validator';
+import { IsJSON, IsOptional, IsString } from 'class-validator';
 
 export class CreateOverlayThemeDto {
   @IsString()
@@ -7,8 +7,9 @@ export class CreateOverlayThemeDto {
   @IsString()
   key: string;
 
+  @IsOptional()
   @IsString()
-  category: string;
+  category?: string;
 
   @IsJSON()
   data: string;
