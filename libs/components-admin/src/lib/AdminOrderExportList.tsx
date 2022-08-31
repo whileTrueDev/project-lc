@@ -1,13 +1,42 @@
-import { Box, Link, Text } from '@chakra-ui/react';
-import { GridColumns, GridRowData, GridRowId, GridToolbar } from '@material-ui/data-grid';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  ButtonProps,
+  Link,
+  Text,
+  useButtonGroup,
+  useDisclosure,
+  useToast,
+} from '@chakra-ui/react';
+import {
+  GridColumns,
+  GridRowData,
+  GridRowId,
+  GridSelectionModel,
+  GridToolbar,
+} from '@material-ui/data-grid';
 import { OrderProcessStep } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
+import {
+  ConfirmDialog,
+  ConfirmDialogProps,
+} from '@project-lc/components-core/ConfirmDialog';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
-import { useExports } from '@project-lc/hooks';
-import { convertkkshowOrderStatusToString } from '@project-lc/shared-types';
+import {
+  useDelieveryDoneManyMutation,
+  useDelieveryStartManyMutation,
+  useExports,
+} from '@project-lc/hooks';
+import {
+  convertkkshowOrderStatusToString,
+  ExportListItem,
+} from '@project-lc/shared-types';
+import { useAdminOrderExportListStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { FaTruck } from 'react-icons/fa';
 
 const columns: GridColumns = [
   {
@@ -99,24 +128,216 @@ export function AdminOrderExportList(): JSX.Element {
       data?.totalCount ? data.totalCount : prevRowCountState,
     );
   }, [data, setRowCountState]);
+
+  // * 출고 선택
+  const { selectedItems, onSelectedItemsChange, setSelectedExports } =
+    useAdminOrderExportListStore();
+  const _onSelectedItemsChange = (m: GridSelectionModel): void => {
+    onSelectedItemsChange(m);
+    const targets = data?.edges
+      .filter((x) => m.includes(x.id))
+      .filter((x) => !!x.exportCode);
+    if (targets) setSelectedExports(targets);
+  };
+
   return (
-    <ChakraDataGrid
-      components={{ Toolbar: GridToolbar }}
-      columns={columns}
-      page={page}
-      rowsPerPageOptions={rowsPerPageOptions.current}
-      onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-      rows={data?.edges || []}
-      minH={500}
-      autoHeight
-      loading={isLoading}
-      disableSelectionOnClick
-      pageSize={pageSize}
-      pagination
-      rowCount={rowCountState}
-      density="compact"
-      paginationMode="server"
-      onPageChange={handlePageChange}
-    />
+    <>
+      <Box>
+        <ButtonGroup size="sm" isDisabled={!(selectedItems.length > 0)}>
+          <DeliveryStartManyConfirmDialogButton />
+          <DeliveryDoneManyConfirmDialogButton />
+        </ButtonGroup>
+      </Box>
+      <ChakraDataGrid
+        components={{ Toolbar: GridToolbar }}
+        columns={columns}
+        page={page}
+        rowsPerPageOptions={rowsPerPageOptions.current}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        rows={data?.edges || []}
+        minH={500}
+        autoHeight
+        loading={isLoading}
+        disableSelectionOnClick
+        pageSize={pageSize}
+        pagination
+        rowCount={rowCountState}
+        density="compact"
+        paginationMode="server"
+        onPageChange={handlePageChange}
+        checkboxSelection
+        onSelectionModelChange={_onSelectedItemsChange}
+        selectionModel={selectedItems}
+      />
+    </>
+  );
+}
+
+type DeliveryStartManyConfirmDialogProps = Pick<
+  ConfirmDialogProps,
+  'onClose' | 'isOpen'
+> & {
+  targets: ExportListItem[];
+};
+function DeliveryStartManyConfirmDialog({
+  isOpen,
+  onClose,
+  targets,
+}: DeliveryStartManyConfirmDialogProps): JSX.Element {
+  const toast = useToast();
+  const resetSelectedExports = useAdminOrderExportListStore(
+    (s) => s.resetSelectedExports,
+  );
+  const deliveryStartMany = useDelieveryStartManyMutation();
+  const onDeliveryStartMany = async (): Promise<void> => {
+    if (targets.length <= 0)
+      toast({
+        status: 'warning',
+        title: '선택된 출고중 배송중처리할 수 있는 출고(배송중상태의 출고)가 없습니다.',
+      });
+    else {
+      deliveryStartMany
+        .mutateAsync({
+          deliveryDTOs: targets.map((exp) => ({
+            exportCode: exp.exportCode as string,
+            status: 'shipping',
+          })),
+        })
+        .then(() => {
+          resetSelectedExports();
+          toast({ status: 'success', title: '일괄 배송중 처리 성공' });
+        })
+        .catch((err) => {
+          toast({
+            status: 'error',
+            title: '일괄 배송중 처리 실패',
+            description: err.response?.data?.message,
+          });
+        });
+    }
+  };
+  return (
+    <ConfirmDialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title="일괄배송중처리"
+      onConfirm={onDeliveryStartMany}
+    >
+      선택된 모든 출고의 상태를 배송중으로 상태를 변경할까요?
+    </ConfirmDialog>
+  );
+}
+
+function DeliveryStartManyConfirmDialogButton(props: ButtonProps): JSX.Element {
+  const btnGrpProps = useButtonGroup();
+  // 다중 배송중처리
+  const deliveryStartDialog = useDisclosure();
+  const selectedExports = useAdminOrderExportListStore((s) => s.selectedExports);
+  const targets = selectedExports.filter((exp) =>
+    ['exportDone', 'partialExportDone'].includes(exp.status),
+  );
+
+  return (
+    <>
+      <Button
+        {...btnGrpProps}
+        {...props}
+        isDisabled={targets.length <= 0 || btnGrpProps.isDisabled || props.isDisabled}
+        leftIcon={<FaTruck />}
+        colorScheme="purple"
+        onClick={deliveryStartDialog.onOpen}
+      >
+        일괄배송중처리
+      </Button>
+      <DeliveryStartManyConfirmDialog
+        isOpen={deliveryStartDialog.isOpen}
+        onClose={deliveryStartDialog.onClose}
+        targets={targets}
+      />
+    </>
+  );
+}
+
+type DeliveryDoneManyConfirmDialogProps = Pick<
+  ConfirmDialogProps,
+  'onClose' | 'isOpen'
+> & {
+  targets: ExportListItem[];
+};
+function DeliveryDoneManyConfirmDialog({
+  isOpen,
+  onClose,
+  targets,
+}: DeliveryDoneManyConfirmDialogProps): JSX.Element {
+  const toast = useToast();
+  const resetSelectedExports = useAdminOrderExportListStore(
+    (s) => s.resetSelectedExports,
+  );
+  const deliveryDoneMany = useDelieveryDoneManyMutation();
+  const onDeliveryDoneMany = async (): Promise<void> => {
+    if (targets.length <= 0)
+      toast({
+        status: 'warning',
+        title: '선택된 출고중 배송완료처리할 수 있는 출고(배송중상태의 출고)가 없습니다.',
+      });
+    else {
+      deliveryDoneMany
+        .mutateAsync({
+          deliveryDTOs: targets.map((exp) => ({
+            exportCode: exp.exportCode as string,
+            status: 'shippingDone',
+          })),
+        })
+        .then(() => {
+          resetSelectedExports();
+          toast({ status: 'success', title: '일괄 배송완료 처리 성공' });
+        })
+        .catch((err) => {
+          toast({
+            status: 'error',
+            title: '일괄 배송완료 처리 실패',
+            description: err.response?.data?.message,
+          });
+        });
+    }
+  };
+  return (
+    <ConfirmDialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title="일괄배송완료처리"
+      onConfirm={onDeliveryDoneMany}
+    >
+      선택된 모든 출고의 상태를 배송완료로 상태를 변경할까요?
+    </ConfirmDialog>
+  );
+}
+
+function DeliveryDoneManyConfirmDialogButton(props: ButtonProps): JSX.Element {
+  const btnGrpProps = useButtonGroup();
+  // 다중 배송중처리
+  const deliveryDoneDialog = useDisclosure();
+  const selectedExports = useAdminOrderExportListStore((s) => s.selectedExports);
+  const targets = selectedExports.filter((exp) =>
+    ['shipping', 'partialShipping'].includes(exp.status),
+  );
+  return (
+    <>
+      <Button
+        {...btnGrpProps}
+        {...props}
+        leftIcon={<FaTruck />}
+        colorScheme="messenger"
+        isDisabled={targets.length <= 0 || btnGrpProps.isDisabled || props.isDisabled}
+        onClick={deliveryDoneDialog.onOpen}
+      >
+        일괄배송완료처리
+      </Button>
+      <DeliveryDoneManyConfirmDialog
+        isOpen={deliveryDoneDialog.isOpen}
+        onClose={deliveryDoneDialog.onClose}
+        targets={targets}
+      />
+    </>
   );
 }
