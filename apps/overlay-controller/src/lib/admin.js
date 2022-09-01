@@ -7,6 +7,7 @@ let email;
 let streamerNickname;
 let liveShoppingId;
 let isLogin = true;
+
 const socket = io(process.env.OVERLAY_HOST, { transports: ['websocket'] });
 
 const liveShoppingStateSocket = io(
@@ -494,6 +495,53 @@ $(document).ready(function ready() {
     socket.emit('change theme from admin', { roomName, themeType: this.id });
   });
 
+  $('#theme-load-button').click(function loadThemesAndRenderThemeButtons() {
+    $.ajax({
+      type: 'GET',
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/overlay-themes`,
+      success(data) {
+        console.log('overlay-themes', data);
+        const themeAndBtnElemList = data.map((theme, idx) => {
+          const themeBtnElem = new ThemeButton(
+            theme,
+            `background-color: ${
+              ThemeButton.buttonColors[idx % ThemeButton.buttonColors.length]
+            }`,
+          );
+          // theme 데이터와 이벤트핸들러 할당한 버튼 엘리먼트 반환
+          return { ...theme, btnElem: themeBtnElem };
+        });
+
+        const buttonsByCategory = {};
+        themeAndBtnElemList.forEach((themeAndBtnElem) => {
+          if (buttonsByCategory[themeAndBtnElem.category]) {
+            buttonsByCategory[themeAndBtnElem.category].push(themeAndBtnElem.btnElem);
+          } else {
+            buttonsByCategory[themeAndBtnElem.category] = [themeAndBtnElem.btnElem];
+          }
+        });
+
+        const categories = Object.keys(buttonsByCategory);
+
+        const buttonContainer = $('.theme-control-button-container');
+        // 버튼 컨테이너 엘리먼트 초기화
+        buttonContainer.empty();
+
+        console.log({ themeAndBtnElemList, categories });
+        // 카테고리별로 제목, 버튼 렌더링
+        categories.forEach((cat) => {
+          const buttons = buttonsByCategory[cat];
+          console.log({ cat, buttons });
+          const titleElem = $(`<h4>${cat}</h4>`);
+          const categorybuttonsContainer = $(`<div></div>`);
+          buttons.forEach((btnElem) => categorybuttonsContainer.append(btnElem));
+
+          buttonContainer.append(titleElem).append(categorybuttonsContainer);
+        });
+      },
+    });
+  });
+
   $('#chicken-movement-button').click(function chickenMovementButtonClickEvent() {
     socket.emit('get chicken move from admin', roomName);
   });
@@ -714,5 +762,34 @@ class LiveShoppingStateBoardController {
 
   sendAlert() {
     liveShoppingStateSocket.emit('createAdminAlert', this._liveShoppingId);
+  }
+}
+
+class ThemeButton {
+  static buttonColors = [
+    'red',
+    'blue',
+    'orange',
+    'green',
+    'firebrick',
+    'purple',
+    'darksalmon',
+    'cadetblue',
+    'chartreuse',
+    'darkcyan',
+  ];
+
+  constructor(theme, buttonStyle) {
+    return $(`
+    <button class="theme-selction-box-button" id="${theme.key}" style="margin-right:10px;${buttonStyle}">${theme.name}</button>
+  `)
+      .css('background-color', false)
+      .on('click', () =>
+        socket.emit('change theme from admin temp', {
+          roomName,
+          themeType: theme.id,
+          themeData: theme.data,
+        }),
+      );
   }
 }
