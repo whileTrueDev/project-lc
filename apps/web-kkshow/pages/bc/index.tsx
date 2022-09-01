@@ -51,7 +51,7 @@ function BroadcasterList(): JSX.Element {
     );
 
   return (
-    <SimpleGrid columns={[2, 3, 5]} gap={8} rowGap={16}>
+    <SimpleGrid columns={[3, 4, 5]} gap={8} rowGap={16}>
       {data?.map((bc) => (
         <BestBroadcasterItem
           key={bc.id}
