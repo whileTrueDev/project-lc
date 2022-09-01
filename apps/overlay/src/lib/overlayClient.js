@@ -951,42 +951,35 @@ socket.on('change theme from server', (themeType) => {
 
 // 테마변경 temp (테마 id 가 아닌 변경될 이미지, 스타일 보냄)
 socket.on('change theme from server temp', ({ themeType, themeData }) => {
+  const logo = $('#kks-logo');
+  const liveCommerceFrame = $('.live-commerce');
+  const leftArea = $('.ranking-area,  .bottom-area-left,  .bottom-fever-timer');
+  const rankingTitleText = $('.ranking-text-area#title');
+  const podiumIcon = $('#podium');
+  const timerIcon = $('.bottom-area-left-icon');
   // 초기화
-  $('#kks-logo').show();
-  $('.live-commerce').css('background', '');
-  $('.ranking-area,  .bottom-area-left,  .bottom-fever-timer')
-    .css('background-color', 'rgba(0, 0, 0, 0.5)')
-    .css('color', '#ffffff');
-  $('.ranking-text-area').css('color', '#ffd200').css('text-shadow', '5px 5px 10px #000');
-  $('#podium').attr('src', '/images/podium.png');
-  $('.bottom-area-left-icon').attr('src', '/images/clock.png');
+  logo.show();
+  liveCommerceFrame.css('background', '');
+  leftArea.css('background-color', 'rgba(0, 0, 0, 0.5)').css('color', '#ffffff');
+  rankingTitleText.css('color', '#ffd200').css('text-shadow', '5px 5px 10px #000');
+  podiumIcon.attr('src', '/images/podium.png');
+  timerIcon.attr('src', '/images/clock.png');
 
-  if (themeType === 'default' && !themeData) {
-    return;
-  }
+  if (themeType === 'default' && !themeData) return;
 
   if (themeData.backgroundImage) {
-    $('#kks-logo').hide();
-    $('.live-commerce').css('background', `url(${themeData.backgroundImage}) no-repeat`);
+    logo.hide();
+    liveCommerceFrame.css('background', `url(${themeData.backgroundImage}) no-repeat`);
   }
   if (themeData.backgroundColor) {
-    $('.ranking-area,  .bottom-area-left,  .bottom-fever-timer').css(
-      'background-color',
-      themeData.backgroundColor,
-    );
+    leftArea.css('background-color', themeData.backgroundColor);
   }
-  if (themeData.color) {
-    $('.ranking-area,  .bottom-area-left,  .bottom-fever-timer').css(
-      'color',
-      themeData.color,
-    );
-  }
-  if (themeData.textShadow) {
-    $('.ranking-text-area').css('text-shadow', themeData.textShadow);
-  }
-  if (themeData.titleColor) $('.ranking-text-area').css('color', themeData.titleColor);
-  if (themeData.podiumImage) $('#podium').attr('src', themeData.podiumImage);
-  if (themeData.timerImage) $('.bottom-area-left-icon').attr('src', themeData.timerImage);
+
+  if (themeData.color) leftArea.css('color', themeData.color);
+  if (themeData.textShadow) rankingTitleText.css('text-shadow', themeData.textShadow);
+  if (themeData.titleColor) rankingTitleText.css('color', themeData.titleColor);
+  if (themeData.podiumImage) podiumIcon.attr('src', themeData.podiumImage);
+  if (themeData.timerImage) timerIcon.attr('src', themeData.timerImage);
 });
 
 // bgm 재생
