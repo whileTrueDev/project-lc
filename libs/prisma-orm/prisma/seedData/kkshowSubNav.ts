@@ -28,6 +28,11 @@ export const createKkshowSubNavDummy = async (prisma: PrismaClient): Promise<voi
         link: '/search?keyword=asdfasdfasdf',
         name: '검색페이지',
       },
+      {
+        index: 6,
+        link: '/bc',
+        name: '방송인목록',
+      },
     ],
   });
 };

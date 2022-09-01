@@ -38,6 +38,39 @@ export const createKkshowBcListDummy = async (prisma: PrismaClient): Promise<voi
         profileImage:
           'https://static-cdn.jtvnw.net/jtv_user_pictures/ae615604-67ff-493f-9d58-45fcae3a659d-profile_image-300x300.png',
       },
+      {
+        id: 6,
+        nickname: '음바쿠TV',
+        profileImage: 'https://picsum.photos/302/301',
+        href: '/bc/1',
+      },
+      {
+        id: 7,
+        nickname: '테스트방송인닉네임',
+        profileImage: 'https://picsum.photos/300/300',
+        href: '/bc/2',
+      },
+      {
+        id: 8,
+        nickname: '한동숙',
+        profileImage:
+          'https://static-cdn.jtvnw.net/jtv_user_pictures/c5a2baa2-74ed-4b72-b047-8326572c9bfa-profile_image-300x300.png',
+        href: 'https://www.twitch.tv/handongsuk',
+      },
+      {
+        id: 9,
+        nickname: '서새봄냥',
+        profileImage:
+          'https://static-cdn.jtvnw.net/jtv_user_pictures/saddummy-profile_image-925b92caa01026ae-300x300.jpeg',
+        href: 'https://www.twitch.tv/saddummy',
+      },
+      {
+        id: 10,
+        nickname: '얍얍',
+        profileImage:
+          'https://static-cdn.jtvnw.net/jtv_user_pictures/dbb514f1-469b-479e-b5ba-3ac0f09a2776-profile_image-300x300.png',
+        href: 'https://www.twitch.tv/yapyap30',
+      },
     ],
   });
 };
