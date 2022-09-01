@@ -18,7 +18,7 @@ export const useAdminOverlayThemeCreateMutation = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('AdminOverlayThemeList');
+        queryClient.invalidateQueries('AdminOverlayThemeList', { refetchInactive: true });
       },
     },
   );
@@ -36,7 +36,7 @@ export const useAdminOverlayThemeDeleteMutation = (): UseMutationResult<
       axios.delete<boolean>(`/admin/overlay-theme/${id}`).then((res) => res.data),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('AdminOverlayThemeList');
+        queryClient.invalidateQueries('AdminOverlayThemeList', { refetchInactive: true });
       },
     },
   );

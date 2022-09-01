@@ -18,6 +18,7 @@ import { getExtension } from '@project-lc/utils';
 import { s3 } from '@project-lc/utils-s3';
 import { nanoid } from 'nanoid';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import OverlayDisplayPreview from './OverlayDisplayPreview';
 
@@ -35,6 +36,7 @@ export function AddOverlayThemeSection(): JSX.Element {
 export default AddOverlayThemeSection;
 
 export function AddOverlayThemeForm(): JSX.Element {
+  const router = useRouter();
   const toast = useToast();
   const methods = useForm<OverlayThemeFormData>({
     defaultValues: {
@@ -49,6 +51,7 @@ export function AddOverlayThemeForm(): JSX.Element {
   const handleMutateSuccess = (): void => {
     toast({ title: '테마 생성 성공', status: 'success' });
     methods.reset();
+    router.push('/overlay-theme');
   };
   const handleMutateError = (e: any): void => {
     toast({ title: '테마 생성 중 에러', status: 'error' });
