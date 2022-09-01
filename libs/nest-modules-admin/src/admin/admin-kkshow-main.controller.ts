@@ -1,6 +1,5 @@
 import {
   Body,
-  CacheTTL,
   Controller,
   Delete,
   Get,
@@ -12,7 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { KkshowBcList, KkshowShoppingTabCategory } from '@prisma/client';
-import { HttpCacheInterceptor, CacheClearKeys } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   KkshowBcListService,
@@ -92,7 +91,6 @@ export class AdminKkshowMainController {
   /** 크크쇼 방송인 목록 관리 */
   /** ===================== */
   @UseInterceptors(HttpCacheInterceptor)
-  @CacheTTL(60 * 60 * 60) // 1시간
   @Get('kkshow-bc-list')
   public async getKkshowBcList(): Promise<KkshowBcList[]> {
     return this.kkshowBcListService.findAll();
