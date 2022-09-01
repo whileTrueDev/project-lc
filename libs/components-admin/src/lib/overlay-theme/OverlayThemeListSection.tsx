@@ -95,12 +95,12 @@ function OverlayPreviewDialog({ theme }: { theme: OverlayTheme }): JSX.Element {
             {/* 미리보기 */}
             <OverlayDisplayPreview
               _backgroundImage={style.backgroundImage}
-              _podiumImage={style.backgroundColor}
-              _timerImage={style.color}
-              _backgroundColor={style.titleColor}
-              _color={style.textShadow}
-              _titleColor={style.podiumImage}
-              _textShadow={style.timerImage}
+              _podiumImage={style.podiumImage}
+              _timerImage={style.timerImage}
+              _backgroundColor={style.backgroundColor}
+              _color={style.color}
+              _titleColor={style.titleColor}
+              _textShadow={style.textShadow}
             />
             <Text whiteSpace="pre-wrap">
               data : {JSON.stringify(theme.data, null, 2)}

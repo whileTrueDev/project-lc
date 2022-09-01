@@ -18,6 +18,7 @@ export function OverlayDisplayPreview({
   _titleColor,
   _textShadow,
 }: OverlayDisplayPreviewProps): JSX.Element {
+  const value = 0.25;
   const backgroundImageUrl = _backgroundImage ? `url(${_backgroundImage})` : undefined;
 
   const podiumImageUrl = _podiumImage;
@@ -34,14 +35,15 @@ export function OverlayDisplayPreview({
 0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83)`;
   return (
     <Box
-      width={576}
-      height={384}
+      width={`${1920 * value}px`}
+      height={`${1080 * value}px`}
       position="relative"
       outline="auto"
       outlineColor="blue.300"
       backgroundImage={backgroundImageUrl}
       backgroundRepeat="no-repeat"
       backgroundSize="contain"
+      overflow="hidden"
     >
       <Text
         fontWeight="extrabold"
@@ -55,17 +57,17 @@ export function OverlayDisplayPreview({
         오버레이 화면 예시
       </Text>
       <Stack
-        justifyContent="space-around"
         position="absolute"
-        width="25%"
+        width={`${400 * value}px`}
         height="100%"
-        left={4}
+        top={`${50 * value}px`}
+        left={`${15 * value}px`}
         color="#fff"
       >
         <Flex
           flexDirection="column"
           width="100%"
-          height="25%"
+          height={`${240 * value}px`}
           rounded="lg"
           bg={bgColor}
           color={fontColor}
