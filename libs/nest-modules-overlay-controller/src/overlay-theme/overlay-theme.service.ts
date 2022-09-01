@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { OverlayTheme } from '@prisma/client';
 
 import { PrismaService } from '@project-lc/prisma-orm';
 import { CreateOverlayThemeDto } from '@project-lc/shared-types';
@@ -8,7 +9,7 @@ export class OverlayThemeService {
   constructor(private readonly prisma: PrismaService) {}
 
   // 생성
-  async createTheme(dto: CreateOverlayThemeDto): Promise<any> {
+  async createTheme(dto: CreateOverlayThemeDto): Promise<OverlayTheme> {
     const theme = await this.prisma.overlayTheme.create({
       data: {
         name: dto.name,
@@ -29,16 +30,15 @@ export class OverlayThemeService {
   }
 
   // 목록 조회
-  async getList(): Promise<any> {
+  async getList(): Promise<OverlayTheme[]> {
     const list = await this.prisma.overlayTheme.findMany({
-      select: { id: true, name: true, category: true, data: true },
-      orderBy: [{ category: 'asc' }, { id: 'desc' }], // 카테고리 순 정렬, 동일카테고리 내에서 id순 정렬
+      orderBy: [{ category: 'asc' }, { createDate: 'desc' }],
     });
     return list;
   }
 
   // 특정 테마 데이터 조회
-  async getTheme(id: number): Promise<any> {
+  async getTheme(id: number): Promise<OverlayTheme> {
     const theme = await this.prisma.overlayTheme.findUnique({ where: { id } });
     return theme;
   }

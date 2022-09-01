@@ -167,6 +167,7 @@ export * from './lib/queries/useOrderDetail';
 export * from './lib/queries/useOrderItem';
 export * from './lib/queries/useOrderList';
 export * from './lib/queries/useOrderShippingCheck';
+export * from './lib/queries/useOverlayTheme';
 export * from './lib/queries/usePayment';
 export * from './lib/queries/usePolicy';
 export * from './lib/queries/useProductPromotions';
