@@ -5,7 +5,6 @@ export function AdminOverlayThemeAddPage(): JSX.Element {
   return (
     <AdminPageLayout>
       <AddOverlayThemeSection />
-      {/* 목록 */}
     </AdminPageLayout>
   );
 }

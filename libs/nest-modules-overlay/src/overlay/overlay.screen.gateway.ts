@@ -283,18 +283,8 @@ export class OverlayScreenGateway
     this.server.to(roomName).emit('delete virtual character audio from server');
   }
 
-  // 오버레이 테마전환
-  @SubscribeMessage('change theme from admin')
-  changeTheme(
-    @MessageBody() roomNameAndThemeType: { roomName: string; themeType: string },
-  ): void {
-    const { roomName } = roomNameAndThemeType;
-    const { themeType } = roomNameAndThemeType;
-    this.server.to(roomName).emit('change theme from server', themeType);
-  }
-
   // 오버레이 테마전환 with themeData
-  @SubscribeMessage('change theme from admin temp')
+  @SubscribeMessage('change theme from admin')
   changeThemeTemp(
     @MessageBody()
     {
@@ -307,9 +297,7 @@ export class OverlayScreenGateway
       themeData?: OverlayThemeDataType;
     },
   ): void {
-    this.server
-      .to(roomName)
-      .emit('change theme from server temp', { themeType, themeData });
+    this.server.to(roomName).emit('change theme from server', { themeType, themeData });
   }
 
   // 치킨 테마 크크쇼 이벤트 알림 애니메이션 전송 (최소 10초 간격 두고 사용)

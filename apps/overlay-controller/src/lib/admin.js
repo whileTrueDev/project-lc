@@ -491,18 +491,16 @@ $(document).ready(function ready() {
     },
   );
 
-  $('.theme-selction-box-button').click(function themeButtonOnclick() {
-    socket.emit('change theme from admin', { roomName, themeType: this.id });
-  });
-
+  /** 테마초기화 버튼 핸들러 */
   $('#theme-reset-button').click(function resetTheme() {
-    socket.emit('change theme from admin temp', {
+    socket.emit('change theme from admin', {
       roomName,
       themeType: 'default',
-      // themeData 값을 보내지 않으면 오버레이 클라이언트에서 기본 화면으로 세팅함
+      // themeData 값을 보내지 않는다. -> 오버레이 클라이언트에서 기본 화면으로 세팅함
     });
   });
 
+  /** 테마 불러오기 버튼 핸들러 -> 테마버튼 렌더링 */
   $('#theme-load-button').click(function loadThemesAndRenderThemeButtons() {
     $.ajax({
       type: 'GET',
@@ -770,6 +768,7 @@ class LiveShoppingStateBoardController {
   }
 }
 
+/** jQuery로 감싼테마변경 버튼 엘리먼트 생성 & 이벤트 핸들러 연결 */
 class ThemeButton {
   static buttonColors = [
     'red',
@@ -790,7 +789,7 @@ class ThemeButton {
   `)
       .css('background-color', false)
       .on('click', () =>
-        socket.emit('change theme from admin temp', {
+        socket.emit('change theme from admin', {
           roomName,
           themeType: theme.id,
           themeData: theme.data,
