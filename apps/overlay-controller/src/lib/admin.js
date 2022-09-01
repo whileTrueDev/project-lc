@@ -495,12 +495,19 @@ $(document).ready(function ready() {
     socket.emit('change theme from admin', { roomName, themeType: this.id });
   });
 
+  $('#theme-reset-button').click(function resetTheme() {
+    socket.emit('change theme from admin temp', {
+      roomName,
+      themeType: 'default',
+      // themeData 값을 보내지 않으면 오버레이 클라이언트에서 기본 화면으로 세팅함
+    });
+  });
+
   $('#theme-load-button').click(function loadThemesAndRenderThemeButtons() {
     $.ajax({
       type: 'GET',
       url: `${process.env.OVERLAY_CONTROLLER_HOST}/overlay-themes`,
       success(data) {
-        console.log('overlay-themes', data);
         const themeAndBtnElemList = data.map((theme, idx) => {
           const themeBtnElem = new ThemeButton(
             theme,
@@ -527,11 +534,9 @@ $(document).ready(function ready() {
         // 버튼 컨테이너 엘리먼트 초기화
         buttonContainer.empty();
 
-        console.log({ themeAndBtnElemList, categories });
-        // 카테고리별로 제목, 버튼 렌더링
+        // 카테고리별로 버튼 렌더링
         categories.forEach((cat) => {
           const buttons = buttonsByCategory[cat];
-          console.log({ cat, buttons });
           const titleElem = $(`<h4>${cat}</h4>`);
           const categorybuttonsContainer = $(`<div></div>`);
           buttons.forEach((btnElem) => categorybuttonsContainer.append(btnElem));
