@@ -27,6 +27,7 @@ import { GoodsReviewModule } from '@project-lc/nest-modules-goods-review';
 import { InquiryModule } from '@project-lc/nest-modules-inquiry';
 import { JwtHelperModule } from '@project-lc/nest-modules-jwt-helper';
 import {
+  KkshowBcListModule,
   KkshowMainModule,
   KkshowShoppingModule,
   KkshowSubNavModule,
@@ -77,6 +78,7 @@ import { AppController } from './app.controller';
     KkshowSearchModule.withControllers(),
     KkshowShoppingModule.withControllers(),
     KkshowSubNavModule.withControllers(),
+    KkshowBcListModule.withControllers(),
     CustomerModule.withControllers(),
     PaymentModule.withControllers(),
     OrderModule.withControllers(),

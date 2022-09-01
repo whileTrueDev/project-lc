@@ -1230,6 +1230,14 @@ model KkshowShoppingTabCategory {
   goodsCategoryCode String        @unique
 }
 
+// 크크쇼 방송인 목록
+model KkshowBcList {
+  id           Int    @id @default(autoincrement())
+  nickname     String @unique
+  profileImage String
+  href         String
+}
+
 enum UserType {
   seller // 판매자
   broadcaster // 방송인

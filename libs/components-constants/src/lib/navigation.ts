@@ -341,6 +341,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
         href: '/kkshow-main/kkshow-shopping',
         icon: FcBiohazard,
       },
+      {
+        name: '크크쇼 방송인목록',
+        href: '/kkshow-main/kkshow-bc-list',
+        icon: FcBusinessman,
+      },
     ],
   },
 ];

@@ -47,6 +47,7 @@ import {
 import { dummyPayments } from './seedData/dummyPayment';
 import { createGoodsInquiry, createGoodsInquiry2 } from './seedData/goods-inquiry';
 import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
+import { createKkshowBcListDummy } from './seedData/kkshowBcList';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
 import { createKkshowSubNavDummy } from './seedData/kkshowSubNav';
@@ -507,6 +508,8 @@ async function main(): Promise<void> {
   await createKkshowSubNavDummy(prisma);
   // 더미 방송인 생성 2 (promotion page 존재하지 않는 방송인)
   await createDummyBroadcaster(prisma);
+  // 더미 크크쇼 방송인 목록 생성
+  await createKkshowBcListDummy(prisma);
 }
 
 main()
