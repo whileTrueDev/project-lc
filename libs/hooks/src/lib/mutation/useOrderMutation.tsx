@@ -75,6 +75,7 @@ export const useOrderItemOptionUpdateMutation = (): UseMutationResult<
         queryClient.invalidateQueries('Cart', { refetchInactive: true });
         queryClient.invalidateQueries('OrderDetail');
         queryClient.invalidateQueries('getAdminOrder');
+        queryClient.invalidateQueries('AdminOrderList', { refetchInactive: true });
         queryClient.invalidateQueries('SellerOrderList', { refetchInactive: true });
       },
     },
