@@ -16,6 +16,7 @@ import {
   OrderCancellationItemDto,
   RefundAccountDto,
 } from '@project-lc/shared-types';
+import { getOrderItemOptionSteps } from '@project-lc/utils';
 import { useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { OrderItemOptionInfo } from './OrderItemOptionInfo';
@@ -152,6 +153,8 @@ export function OrderCancelDialog({
     }
   };
 
+  const orderItemOptionSteps = getOrderItemOptionSteps(orderDetailData);
+
   return (
     <ConfirmDialog
       title="주문 취소"
@@ -200,7 +203,7 @@ export function OrderCancelDialog({
           </Box>
 
           {orderDetailData.payment?.method === 'virtualAccount' &&
-            orderDetailData.step === 'paymentConfirmed' && (
+            orderItemOptionSteps.some((oios) => oios === 'paymentConfirmed') && (
               <FormProvider {...formMethods}>
                 <RefundAccountForm />
               </FormProvider>

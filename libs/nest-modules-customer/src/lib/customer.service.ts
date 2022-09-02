@@ -7,6 +7,7 @@ import {
   SignUpDto,
   UpdateCustomerDto,
 } from '@project-lc/shared-types';
+import { getOrderItemOptionSteps } from '@project-lc/utils';
 import { s3 } from '@project-lc/utils-s3';
 
 @Injectable()
@@ -166,7 +167,13 @@ export class CustomerService {
         _count: {
           select: { followingBroadcasters: true, followingLiveShoppings: true },
         },
-        orders: true,
+        orders: {
+          include: {
+            orderItems: {
+              select: { options: { select: { step: true } } },
+            },
+          },
+        },
       },
     });
     if (!customer)
@@ -179,9 +186,12 @@ export class CustomerService {
     // 팔로잉중인 방송인 수, 팔로잉중인 라이브쇼핑 개수
     const { followingBroadcasters, followingLiveShoppings } = customer._count;
     // 배송중인 주문 개수
-    const shippingOrders = customer.orders.filter((order) =>
-      ['shipping', 'partialShipping'].includes(order.step),
-    ).length;
+    const shippingOrders = customer.orders.filter((order) => {
+      const orderItemOptionSteps = getOrderItemOptionSteps(order);
+      return orderItemOptionSteps.some((oios) =>
+        ['shipping', 'partialShipping'].includes(oios),
+      );
+    }).length;
     return {
       id: customerId,
       nickname,
