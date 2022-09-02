@@ -449,22 +449,31 @@ export class AdminService {
           gte: sellStartDate ? new Date(sellStartDate) : undefined,
           lte: sellEndDate ? new Date(sellEndDate) : undefined,
         },
-        orderItems: { some: { goodsId, support: { broadcasterId } } },
-        step: {
-          in: [
-            'orderReceived',
-            'paymentConfirmed',
-            'goodsReady',
-            'partialExportReady',
-            'exportReady',
-            'partialExportDone',
-            'exportDone',
-            'partialShipping',
-            'shipping',
-            'partialShippingDone',
-            'shippingDone',
-            'purchaseConfirmed',
-          ],
+        orderItems: {
+          some: {
+            goodsId,
+            support: { broadcasterId },
+            options: {
+              some: {
+                step: {
+                  in: [
+                    'orderReceived',
+                    'paymentConfirmed',
+                    'goodsReady',
+                    'partialExportReady',
+                    'exportReady',
+                    'partialExportDone',
+                    'exportDone',
+                    'partialShipping',
+                    'shipping',
+                    'partialShippingDone',
+                    'shippingDone',
+                    'purchaseConfirmed',
+                  ],
+                },
+              },
+            },
+          },
         },
         giftFlag: true,
       },

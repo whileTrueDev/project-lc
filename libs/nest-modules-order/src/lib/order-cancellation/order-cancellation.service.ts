@@ -15,7 +15,6 @@ import {
   OrderCancellationDetailRes,
   OrderCancellationListRes,
   OrderCancellationUpdateRes,
-  skipSteps,
   UpdateOrderCancellationStatusDto,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
@@ -77,7 +76,7 @@ export class OrderCancellationService {
     // 주문취소, 주문취소상품 상태는 승인이 필요하지 않으므로 '완료됨' 상태로 생성한다
     let status: ProcessStatus = 'complete';
     // 만약 주문상태가 '결제완료' 상태인경우 환불과정이 필요하므로 '요청됨' 상태로 생성 후, 환불과정이 완료될 때 거기서 주문취소의 상태를 변경한다
-    if (order.step === 'paymentConfirmed') {
+    if (options.every((x) => x.step === 'paymentConfirmed')) {
       status = 'requested';
     }
 
@@ -136,7 +135,7 @@ export class OrderCancellationService {
     // 원 주문 데이터 구하기(결제정보 확인용)
     const originOrder = await this.prisma.order.findUnique({
       where: { id: orderId },
-      select: { step: true, payment: true },
+      select: { payment: true },
     });
 
     // * 취소요청 승인된 주문상품옵션의 새로운 상태 -> 원주문의 결제완료 여부에 따라 달라짐
@@ -163,9 +162,6 @@ export class OrderCancellationService {
       where: { orderItem: { orderId }, id: { in: targetOrderItemOptionsIds } },
       data: { step: orderItemOptionNewStep },
     });
-
-    // 그 다음 주문 주문 상태 업데이트(모든 주문상품옵션들 상태 모두 고려하여 주문 상태 업데이트)
-    await this.orderService.updateOrderStepByOrderItemOptionsSteps({ orderId });
   }
 
   /* 주문취소 내역 조회 */

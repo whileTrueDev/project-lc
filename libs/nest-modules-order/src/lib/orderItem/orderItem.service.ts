@@ -16,9 +16,9 @@ export class OrderItemService {
     return this.prisma.orderItem.findMany({
       where: {
         reviewId: null,
-        order: {
-          customerId: dto.customerId,
-          step: { in: ['shippingDone', 'purchaseConfirmed'] },
+        order: { customerId: dto.customerId },
+        options: {
+          every: { step: { in: ['shippingDone', 'purchaseConfirmed'] } },
         },
         goodsId: { not: null },
         // 리뷰 작성 가능한 시간제한이 있다면 여기에 추가

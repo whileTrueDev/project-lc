@@ -4,6 +4,7 @@ import { ExchangeReturnCancelRequestStatusBadge } from '@project-lc/components-s
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import ProcessStatusBadge from '@project-lc/components-shared/ProcessStatusBadge';
 import { OrderDetailRes } from '@project-lc/shared-types';
+import { getOrderItemOptionSteps } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useMemo } from 'react';
@@ -23,14 +24,18 @@ export function OrderDetailTitle({ order }: OrderDetailTitleProps): JSX.Element 
       if (returnStatusList.includes('processing')) return 'processing';
       if (returnStatusList.includes('requested')) return 'requested';
     }
-
     return null;
   }, [order.returns]);
+
+  const orderItemOptionSteps = useMemo(() => getOrderItemOptionSteps(order), [order]);
+
   return (
     <>
       <Heading>주문 {order.orderCode}</Heading>
       <Stack direction="row" alignItems="center">
-        <OrderStatusBadge step={order.step} />
+        {orderItemOptionSteps.map((oios) => (
+          <OrderStatusBadge key={oios} step={oios} />
+        ))}
         {/* 환불이 완료된 후 환불 데이터가 생성되므로 환불상태는 항상 완료로 고정 */}
         {order.refunds && order.refunds.length > 0 && (
           <ProcessStatusBadge processStatus="complete" />

@@ -130,7 +130,6 @@ export type OrderDetailRes = OrderBaseData & {
  */
 export interface FindAllOrderByBroadcaster {
   orderCode: string;
-  step: string;
   orderPrice: number;
   paymentPrice: number;
   giftFlag: boolean;
@@ -139,6 +138,7 @@ export interface FindAllOrderByBroadcaster {
   orderItems: Array<{
     id: OrderItem['id'];
     channel: SellType;
+    options: OrderItemOption[];
     review: GoodsReview | null;
     support?: OrderItemSupport;
     goods: {

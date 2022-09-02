@@ -12,6 +12,8 @@ import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 import { OrderItemController } from './orderItem/orderItem.controller';
 import { OrderItemService } from './orderItem/orderItem.service';
+import { OrderItemOptionController } from './orderitemoption/orderitemoption.controller';
+import { OrderItemOptionService } from './orderitemoption/orderitemoption.service';
 
 @Module({})
 export class OrderModule {
@@ -20,13 +22,20 @@ export class OrderModule {
     UserPwManager,
     OrderCancellationService,
     OrderItemService,
+    OrderItemOptionService,
   ];
 
-  private static readonly exports = [OrderCancellationService, OrderService];
+  private static readonly exports = [
+    OrderCancellationService,
+    OrderService,
+    OrderItemOptionService,
+  ];
+
   private static readonly controllers = [
     OrderCancellationController,
     OrderController,
     OrderItemController,
+    OrderItemOptionController,
   ];
 
   private static readonly imports = [

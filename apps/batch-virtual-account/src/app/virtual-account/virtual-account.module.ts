@@ -1,5 +1,5 @@
 import { BullModule } from '@nestjs/bull';
-import { DynamicModule, Module, OnModuleDestroy } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { ShutdownManagerModule } from '../shutdown-manager/shutdown.manager.module';
 import { QueueKey } from './virtual-account.constant';
 import { VirtualAccountConsumer } from './virtual-account.consumer';

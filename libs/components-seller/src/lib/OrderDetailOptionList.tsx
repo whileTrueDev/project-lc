@@ -1,6 +1,9 @@
+import { ArrowForwardIcon } from '@chakra-ui/icons';
 import {
   Box,
+  Button,
   Collapse,
+  Flex,
   Stack,
   Table,
   Tbody,
@@ -10,12 +13,14 @@ import {
   Thead,
   Tr,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { OrderItemOption } from '@prisma/client';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import TextDotConnector from '@project-lc/components-core/TextDotConnector';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import ShowMoreTextButton from '@project-lc/components-shared/ShowMoreTextButton';
-import { useDisplaySize } from '@project-lc/hooks';
+import { useDisplaySize, useOrderItemOptionUpdateMutation } from '@project-lc/hooks';
 import { ExportBaseData } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
@@ -54,23 +59,76 @@ export function OrderDetailOptionListItem({
     const price = Number(option.discountPrice) * Number(option.quantity);
     return `${getLocaleNumber(price)} 원`;
   }, [option.discountPrice, option.quantity]);
+
+  const toast = useToast();
+  const { isOpen, onClose, onOpen } = useDisclosure();
+  const { mutateAsync: update } = useOrderItemOptionUpdateMutation();
+  const handleStatusChange = async (): Promise<void> => {
+    return update({ orderItemOptionId: option.id, step: 'goodsReady' })
+      .then(() => {
+        toast({ title: '주문 상태가 올바르게 변경되었습니다.', status: 'success' });
+        onClose();
+      })
+      .catch((err) => {
+        console.log(err);
+        toast({
+          title: '주문 상태 변경 중 오류가 발생했습니다.',
+          description: err.response?.data?.message,
+          status: 'error',
+        });
+      });
+  };
+
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
-      {withBadge && <OrderStatusBadge step={option.step} />}
-      <Text isTruncated>{option.goodsName}, </Text>
-      {option.name && option.value && (
+    <Box borderWidth="thin" p={2} my={1} rounded="md">
+      {option.step === 'paymentConfirmed' && (
         <>
-          <Text isTruncated>
-            {option.name}: {option.value}
-          </Text>
-          <TextDotConnector />
+          <Button colorScheme="green" variant="outline" size="sm" onClick={onOpen}>
+            상품준비 처리
+          </Button>
+          <ConfirmDialog
+            title="상품준비 처리"
+            isOpen={isOpen}
+            onClose={onClose}
+            onConfirm={handleStatusChange}
+          >
+            <Flex key={option.id} align="center" gap={2}>
+              {option.name && option.value && (
+                <Text>
+                  {option.name}: {option.value}
+                </Text>
+              )}
+              <OrderStatusBadge step={option.step} />
+              <ArrowForwardIcon />
+              <OrderStatusBadge step="goodsReady" />
+            </Flex>
+          </ConfirmDialog>
         </>
       )}
 
-      <Text isTruncated>{option.quantity} 개</Text>
-      <TextDotConnector />
-      <Text isTruncated>{orderPrice}</Text>
-    </Stack>
+      {withBadge && <OrderStatusBadge step={option.step} />}
+      <Stack
+        direction="row"
+        spacing={1.5}
+        alignItems="center"
+        flexWrap="nowrap"
+        justify="start"
+      >
+        <Text isTruncated>{option.goodsName}</Text>
+        <TextDotConnector />
+        {option.name && option.value && (
+          <>
+            <Text isTruncated>
+              {option.name}: {option.value}
+            </Text>
+            <TextDotConnector />
+          </>
+        )}
+        <Text isTruncated>{option.quantity} 개</Text>
+        <TextDotConnector />
+        <Text isTruncated>{orderPrice}</Text>
+      </Stack>
+    </Box>
   );
 }
 
