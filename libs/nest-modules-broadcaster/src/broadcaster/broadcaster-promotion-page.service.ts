@@ -188,7 +188,6 @@ export class BroadcasterPromotionPageService {
       by: ['nickname'],
       _sum: { price: true },
       where: {
-        loginFlag: true,
         nickname: { notIn: ['비회원', '익명의구매자'] },
         broadcaster: { id: broadcasterId },
         giftFlag: dto.by === GetRankingBy.giftPrice || undefined,
