@@ -25,6 +25,8 @@ export const useOrderUpdateMutation = (): UseMutationResult<
       onSuccess: (data) => {
         queryClient.invalidateQueries('OrderDetail');
         queryClient.invalidateQueries('SellerOrderList', { refetchInactive: true });
+        queryClient.invalidateQueries('getAdminOrder');
+        queryClient.invalidateQueries('AdminOrderList', { refetchInactive: true });
       },
     },
   );
