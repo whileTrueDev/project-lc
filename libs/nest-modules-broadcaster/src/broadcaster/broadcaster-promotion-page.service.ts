@@ -180,14 +180,18 @@ export class BroadcasterPromotionPageService {
           result.push({ nickname: review.writer.nickname, _count: 1 });
         }
       });
-      return result;
+      return result
+        .sort((a, b) => b._sum.price - a._sum.price) // 내림차순 정렬
+        .slice(0, dto.take || 5);
     }
     const result = await this.prisma.liveShoppingPurchaseMessage.groupBy({
       by: ['nickname'],
       _sum: { price: true },
       where: {
+        loginFlag: true,
+        nickname: { notIn: ['비회원', '익명의구매자'] },
         broadcaster: { id: broadcasterId },
-        giftFlag: dto.by === GetRankingBy.giftPrice,
+        giftFlag: dto.by === GetRankingBy.giftPrice || undefined,
       },
     });
 

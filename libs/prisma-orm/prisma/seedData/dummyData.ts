@@ -203,6 +203,75 @@ export const dummyLiveShoppingData: Omit<
       ttsSetting: 'full',
     },
   },
+  liveShoppingPurchaseMessage: {
+    createMany: {
+      data: [
+        {
+          broadcasterEmail: 'testbc@gmail.com',
+          price: 30000,
+          text: 'test',
+          nickname: '테스트닉네임1',
+        },
+        {
+          broadcasterEmail: 'testbc@gmail.com',
+          price: 33900,
+          text: 'test2',
+          nickname: '테스트닉네임1',
+        },
+        {
+          broadcasterEmail: 'testbc@gmail.com',
+          price: 12000,
+          text: 'test',
+          nickname: '테스트닉네임2',
+        },
+        {
+          broadcasterEmail: 'testbc@gmail.com',
+          price: 40000,
+          text: 'test',
+          nickname: '테스트닉네임3',
+        },
+        {
+          broadcasterEmail: 'testbc@gmail.com',
+          price: 30000,
+          text: 'test',
+          nickname: '테스트닉네임4',
+        },
+        {
+          broadcasterEmail: 'testbc@gmail.com',
+          price: 30000,
+          giftFlag: true,
+          text: 'test',
+          nickname: '테스트닉네임4',
+        },
+        {
+          broadcasterEmail: 'testbc@gmail.com',
+          price: 12000,
+          text: '선물 테스트',
+          nickname: '테스트닉네임5',
+          giftFlag: true,
+        },
+        {
+          broadcasterEmail: 'testbc@gmail.com',
+          price: 14000,
+          text: 'test',
+          nickname: '테스트닉네임5',
+        },
+        {
+          broadcasterEmail: 'testbc@gmail.com',
+          price: 14000,
+          text: 'test',
+          nickname: '비회원',
+        },
+        {
+          broadcasterEmail: 'testbc@gmail.com',
+          price: 14000,
+          text: 'test',
+          loginFlag: false,
+          nickname: '테스트닉네임5',
+        },
+      ],
+    },
+  },
 };
 
 export const dummyBroadcasterAddress: Prisma.BroadcasterAddressCreateInput = {
