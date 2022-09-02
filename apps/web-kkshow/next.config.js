@@ -13,12 +13,14 @@ const nextConfig = {
   images: {
     domains: [
       'project-lc-dev-test.s3.ap-northeast-2.amazonaws.com',
+      'lc-project.s3.ap-northeast-2.amazonaws.com',
       'whiletrue.firstmall.kr',
       'k-kmarket.com',
       // 테스트용 랜덤 사진 사이트. 프로덕션에는 필요 없음.
       // by @hwasurr
-      'lc-project.s3.ap-northeast-2.amazonaws.com',
       'picsum.photos',
+      'i.ibb.co',
+      'phinf.pstatic.net',
     ],
   },
 };

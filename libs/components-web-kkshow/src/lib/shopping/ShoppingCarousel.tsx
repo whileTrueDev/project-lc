@@ -1,4 +1,5 @@
-import { Flex, Image, useBreakpointValue } from '@chakra-ui/react';
+import { Flex, useBreakpointValue } from '@chakra-ui/react';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { useKkshowShopping } from '@project-lc/hooks';
 import { KkshowShoppingTabCarouselItem } from '@project-lc/shared-types';
 import Link from 'next/link';
@@ -30,6 +31,8 @@ export function ShoppingCarousel(): JSX.Element {
             <SwiperSlide
               style={{
                 margin: '0 auto',
+                width: '100%',
+                height: '100%',
                 maxWidth: 1000,
                 maxHeight: 500,
               }}
@@ -62,13 +65,17 @@ const ShoppingCarouselItem = ({
       onSlideNext={onSlideNext}
       onSlidePrev={onSlidePrev}
     >
-      <Link href={linkUrl}>
-        <Image
-          src={imageUrl}
-          w={{ base: 'unset', lg: 1000 }}
-          h={{ base: 'unset', lg: 500 }}
-          objectFit="contain"
-        />
+      <Link href={linkUrl} passHref>
+        <a>
+          <ChakraNextImage
+            layout="intrinsic"
+            width="1000px"
+            height="500px"
+            quality={100}
+            src={imageUrl}
+            objectFit="contain"
+          />
+        </a>
       </Link>
     </SwiperSlideItem>
   );
