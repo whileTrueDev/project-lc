@@ -26,6 +26,7 @@ export const useUpdateLiveShoppingManageMutation = (): UseMutationResult<
     {
       onSuccess: () => {
         qc.invalidateQueries('AdminGoodsList');
+        qc.invalidateQueries('AdminLiveShoppingList');
       },
     },
   );
