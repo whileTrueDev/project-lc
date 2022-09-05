@@ -9,13 +9,18 @@ import {
   Text,
   Textarea,
 } from '@chakra-ui/react';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { GoodsConfirmationStatuses } from '@prisma/client';
-import { AdminLiveShoppingBroadcasterName } from '@project-lc/components-admin/AdminLiveShoppingBroadcasterName';
-import { AdminLiveShoppingSpecialPrice } from '@project-lc/components-admin/live-shopping/AdminLiveShoppingSpecialPrice';
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
-import { LiveShoppingWithGoods, LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
+import {
+  LiveShoppingKkshowGoodsData,
+  LiveShoppingWithGoods,
+  LIVE_SHOPPING_PROGRESS,
+} from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
+import AdminLiveShoppingBroadcasterName from '../AdminLiveShoppingBroadcasterName';
+import AdminLiveShoppingSpecialPrice from './AdminLiveShoppingSpecialPrice';
 
 function getDuration(startDate: Date | null, endDate: Date | null): string {
   if (startDate && startDate) {
@@ -33,43 +38,37 @@ export function LiveShoppingCurrentDataDisplay({
 }: {
   liveShopping: LiveShoppingWithGoods;
 }): JSX.Element {
-  const router = useRouter();
   return (
     <Stack spacing={5}>
       <Box>
+        {liveShopping.externalGoods && (
+          <Text fontWeight="bold" color="red">
+            * 크크쇼에 등록된 상품이 아닌, 외부 상품으로 진행하는 라이브커머스입니다
+          </Text>
+        )}
         <Stack direction="row">
           <Text as="span">상품명 :</Text>
-          <Text color="blue">
-            <Text as="span" color="red">
-              {liveShopping.goods.confirmation?.status ===
-                GoodsConfirmationStatuses.waiting ||
-                (liveShopping.goods.confirmation?.status ===
-                  GoodsConfirmationStatuses.needReconfirmation &&
-                  `(검수미완료) `)}
-              {liveShopping.goods.confirmation?.status ===
-                GoodsConfirmationStatuses.rejected && `(검수거절상품) `}
+          {liveShopping.externalGoods && (
+            <Link href={liveShopping.externalGoods.linkUrl} isExternal color="blue">
+              <Text as="span" color="red" fontSize="xs">
+                [외부상품]
+              </Text>
+              {liveShopping.externalGoods.name}
+              <ExternalLinkIcon mx="2px" />
+            </Link>
+          )}
+          {liveShopping.goods && (
+            <Text color="blue">
+              <KkshowGoodsConfirmationStatusText goods={liveShopping.goods} />
+              {liveShopping.goods.goods_name}
             </Text>
-            {liveShopping.broadcaster
-              ? `${liveShopping.goods.goods_name} + ${liveShopping.broadcaster.userNickname}`
-              : `${liveShopping.goods.goods_name}`}
-          </Text>
+          )}
         </Stack>
-        {liveShopping.goods.confirmation?.status !==
-          GoodsConfirmationStatuses.confirmed && (
-          <Alert status="info" variant="left-accent" rounded="md">
-            <AlertDescription>
-              {liveShopping.goods.confirmation?.status ===
-              GoodsConfirmationStatuses.rejected
-                ? '해당 상품은 검수 거절된 상품입니다. (라이브쇼핑을 취소하세요.)'
-                : '검수 미완료 상태이므로 상품 검수부터 진행해야 합니다.'}
-              <Button
-                size="xs"
-                onClick={() => router.push(`/goods/${liveShopping.goodsId}`)}
-              >
-                상품 검수 이동하기
-              </Button>
-            </AlertDescription>
-          </Alert>
+        {liveShopping.goods && liveShopping.goodsId && (
+          <LiveShoppingKkshowGoodsConfirmationAlert
+            goods={liveShopping.goods}
+            goodsId={liveShopping.goodsId}
+          />
         )}
       </Box>
       <Stack direction="row">
@@ -224,8 +223,10 @@ export function LiveShoppingCurrentDataDisplay({
 
       <Divider />
 
-      {/* 라이브쇼핑 특가정보 표시 및 수정 */}
-      <AdminLiveShoppingSpecialPrice liveShopping={liveShopping} />
+      {/* 크크쇼 상품으로 진행하는 경우에만 - 라이브쇼핑 특가정보 표시 및 수정 */}
+      {liveShopping.goods && (
+        <AdminLiveShoppingSpecialPrice liveShopping={liveShopping} />
+      )}
 
       <Divider />
 
@@ -238,3 +239,45 @@ export function LiveShoppingCurrentDataDisplay({
 }
 
 export default LiveShoppingCurrentDataDisplay;
+
+function KkshowGoodsConfirmationStatusText({
+  goods,
+}: {
+  goods: LiveShoppingKkshowGoodsData;
+}): JSX.Element {
+  return (
+    <Text as="span" color="red">
+      {goods.confirmation?.status === GoodsConfirmationStatuses.waiting ||
+        (goods.confirmation?.status === GoodsConfirmationStatuses.needReconfirmation &&
+          `(검수미완료) `)}
+      {goods.confirmation?.status === GoodsConfirmationStatuses.rejected &&
+        `(검수거절상품) `}
+    </Text>
+  );
+}
+
+/** 크크쇼  상품으로 라이브 진행하는 경우 - 검수완료 되지 않은경우 검수하라는 메시지 표시 */
+function LiveShoppingKkshowGoodsConfirmationAlert({
+  goods,
+  goodsId,
+}: {
+  goods: LiveShoppingKkshowGoodsData;
+  goodsId: number;
+}): JSX.Element {
+  const router = useRouter();
+  if (!goods?.confirmation || goods?.confirmation.status === 'confirmed') {
+    return <></>;
+  }
+  return (
+    <Alert status="info" variant="left-accent" rounded="md">
+      <AlertDescription>
+        {goods?.confirmation?.status === GoodsConfirmationStatuses.rejected
+          ? '해당 상품은 검수 거절된 상품입니다. (라이브쇼핑을 취소하세요.)'
+          : '검수 미완료 상태이므로 상품 검수부터 진행해야 합니다.'}
+        <Button size="xs" onClick={() => router.push(`/goods/${goodsId}`)}>
+          상품 검수 이동하기
+        </Button>
+      </AlertDescription>
+    </Alert>
+  );
+}

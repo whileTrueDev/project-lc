@@ -12,11 +12,6 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { TtsSetting } from '@prisma/client';
-import { AdminLiveShoppingUpdateConfirmModal } from '@project-lc/components-admin/AdminLiveShoppingUpdateConfirmModal';
-import { AdminOverlayImageUploadDialog } from '@project-lc/components-admin/AdminOverlayImageUploadDialog';
-import { BroadcasterAutocomplete } from '@project-lc/components-admin/BroadcasterAutocomplete';
-import { LiveShoppingDatePicker } from '@project-lc/components-admin/LiveShoppingDatePicker';
-import { LiveShoppingProgressSelector } from '@project-lc/components-admin/LiveShoppingProgressSelector';
 import {
   LiveShoppingManage,
   useUpdateLiveShoppingManageMutation,
@@ -26,6 +21,11 @@ import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { AdminLiveShoppingUpdateConfirmModal } from '../AdminLiveShoppingUpdateConfirmModal';
+import { AdminOverlayImageUploadDialog } from '../AdminOverlayImageUploadDialog';
+import BroadcasterAutocomplete from '../BroadcasterAutocomplete';
+import LiveShoppingDatePicker from '../LiveShoppingDatePicker';
+import LiveShoppingProgressSelector from '../LiveShoppingProgressSelector';
 
 export type LiveShoppingFormData = Omit<LiveShoppingUpdateDTO, 'id'>;
 
@@ -90,6 +90,7 @@ export function AdminLiveShoppingUpdateForm({
   };
 
   const onFail = (err?: AxiosError): void => {
+    console.error(err);
     toast({
       title: '변경 실패',
       description:
