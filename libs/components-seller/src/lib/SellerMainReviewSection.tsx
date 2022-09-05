@@ -87,7 +87,7 @@ export function SellerMainReviewSection(): JSX.Element {
                     height={y}
                     src={item.img}
                     borderRadius="2xl"
-                    placeholder="blur"
+                    placeholder="empty"
                   />
                 </MotionBox>
               </GridItem>
