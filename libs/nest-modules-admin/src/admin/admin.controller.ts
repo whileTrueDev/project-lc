@@ -25,6 +25,7 @@ import {
   BusinessRegistrationConfirmation,
   ConfirmHistory,
   GoodsConfirmation,
+  LiveShopping,
   PrivacyApproachHistory,
 } from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
@@ -73,6 +74,7 @@ import {
   GoodsConfirmationDto,
   GoodsRejectionDto,
   LiveShoppingImageDto,
+  LiveShoppingRegistByAdminDto,
   LiveShoppingSpecialPriceUpdateDto,
   LiveShoppingUpdateDTO,
   LiveShoppingWithGoods,
@@ -252,6 +254,14 @@ export class AdminController {
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('/live-shopping')
+  async createLiveShoppingByAdmin(
+    @Body(ValidationPipe) dto: LiveShoppingRegistByAdminDto,
+  ): Promise<LiveShopping> {
+    return this.liveShoppingService.createLiveShoppingByAdmin(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/live-shoppings')
   async getLiveShoppings(
     @Query(new ValidationPipe({ transform: true })) dto: FindLiveShoppingDto,
@@ -279,6 +289,7 @@ export class AdminController {
   async updateLiveShoppings(
     @Body() data: { dto: LiveShoppingUpdateDTO; videoUrlExist?: boolean },
   ): Promise<boolean> {
+    console.log(data.dto);
     let videoId;
     if (data.dto.videoUrl) {
       if (data.videoUrlExist) {

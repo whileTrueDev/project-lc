@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { LiveShoppingMessageSetting } from '@prisma/client';
+import { LiveShopping, LiveShoppingMessageSetting } from '@prisma/client';
 import { UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -11,6 +11,7 @@ import {
   getLiveShoppingIsNowLive,
   LiveShoppingOutline,
   FindNowPlayingLiveShoppingDto,
+  LiveShoppingRegistByAdminDto,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -54,6 +55,30 @@ export class LiveShoppingService {
       },
     });
     return { liveShoppingId: liveShopping.id };
+  }
+
+  public async createLiveShoppingByAdmin(
+    dto: LiveShoppingRegistByAdminDto,
+  ): Promise<LiveShopping> {
+    if (dto.externalGoods) {
+      const lsWithExternalGoods = await this.prisma.liveShopping.create({
+        data: {
+          sellerId: dto.sellerId,
+          externalGoods: {
+            create: { name: dto.externalGoods.name, linkUrl: dto.externalGoods.linkUrl },
+          },
+        },
+      });
+      return lsWithExternalGoods;
+    }
+
+    const ls = await this.prisma.liveShopping.create({
+      data: {
+        sellerId: dto.sellerId,
+        goodsId: dto.goodsId,
+      },
+    });
+    return ls;
   }
 
   /** 라이브쇼핑 삭제 */
@@ -144,6 +169,7 @@ export class LiveShoppingService {
           },
         },
         liveShoppingSpecialPrices: true,
+        externalGoods: true,
       },
     });
   }
