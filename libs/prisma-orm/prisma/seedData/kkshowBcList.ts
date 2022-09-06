@@ -43,12 +43,14 @@ export const createKkshowBcListDummy = async (prisma: PrismaClient): Promise<voi
         nickname: '음바쿠TV',
         profileImage: 'https://picsum.photos/302/301',
         href: '/bc/1',
+        broadcasterId: 1,
       },
       {
         id: 7,
         nickname: '테스트방송인닉네임',
         profileImage: 'https://picsum.photos/300/300',
         href: '/bc/2',
+        broadcasterId: 2,
       },
       {
         id: 8,
