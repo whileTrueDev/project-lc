@@ -10,13 +10,16 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { LiveShoppingMessageSetting } from '@prisma/client';
+import { LiveShoppingMessageSetting, OverlayTheme } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   LiveShoppingService,
   PurchaseMessageService,
 } from '@project-lc/nest-modules-liveshopping';
-import { OverlayControllerService } from '@project-lc/nest-modules-overlay-controller';
+import {
+  OverlayControllerService,
+  OverlayThemeService,
+} from '@project-lc/nest-modules-overlay-controller';
 import {
   liveShoppingPurchaseMessageDto,
   OverlayControllerMainRes,
@@ -35,6 +38,7 @@ export class AppController {
     private readonly overlayControllerService: OverlayControllerService,
     private readonly liveShoppingService: LiveShoppingService,
     private readonly purchaseMessageService: PurchaseMessageService,
+    private readonly themeService: OverlayThemeService,
   ) {}
 
   @Get('health-check')
@@ -96,5 +100,10 @@ export class AppController {
     @Query('liveShoppingId', ParseIntPipe) liveShoppingId: number,
   ): Promise<LiveShoppingMessageSetting> {
     return this.liveShoppingService.findLiveShoppingMsgSetting(liveShoppingId);
+  }
+
+  @Get('overlay-themes')
+  async getOverlayThemes(): Promise<OverlayTheme[]> {
+    return this.themeService.getList();
   }
 }

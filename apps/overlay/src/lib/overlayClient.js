@@ -889,64 +889,44 @@ socket.on('refresh ranking from server', () => {
   );
 });
 
-// 테마변경
-socket.on('change theme from server', (themeType) => {
-  switch (themeType) {
-    case 'spring':
-      $(
-        '.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left, .bottom-area-right, .bottom-fever-timer',
-      ).addClass(themeType);
-      $('#podium').attr('src', '/images/cherry-blossom-tree.png');
-      $('#kks-logo').attr('src', '/images/kks-spring-logo.png');
-      $('.live-commerce').append(
-        `<img src="/images/top-left-cherry-blossom.png" style="position:absolute;top:0px;left:0px;" alt="top-left"/>`,
-        `<img src="/images/bottom-right-cherry-blossom.png" style="position:absolute;bottom:0px;right:0px;" alt="right-bottom"/>`,
-      );
-      break;
-    case 'summer':
-      $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').addClass(
-        themeType,
-      );
-      $('.ranking-area-inner').append(`
-      <img src='/images/wave_bg.png' id='summer-theme-ranking-background' style='width:100%;position:absolute;left:0px;bottom:0px;z-index:-1' />`);
-      $('.live-commerce').append(`
-      <div class='tube' id='left'>
-        <img src='/images/tube.png' />
-      </div>
-      `);
-      break;
-    case 'chicken':
-      $(
-        '.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left, .bottom-area-right, .bottom-fever-timer',
-      ).addClass(themeType);
-      $('#kks-logo').attr('src', '/images/kks-chicken-logo.png');
-      $('#podium').attr('src', '/images/chicken-head.png');
-      $('.bottom-area-left-icon').attr('src', '/images/egg.png');
-      $('.live-commerce').append(`
-      <div
-        class='chicken-move'
-      >
-        <div id="mother-chicken">
-          <img src='/images/chicken.png' />
-          <span class="chicken-move-text">크크쇼 플친 <br> 이벤트 진행중</span>
-        </div>
-        <img class="chic" id='baby-1' src='/images/chic.png' />
-        <img class="chic" id='baby-2' src='/images/chic.png' />
-        <img class="chic" id='baby-3' src='/images/chic.png' />
-      </div>
-      `);
-      $('.live-commerce').append(`
-      <div class='confetti' id='left'>
-        <img src='/images/confetti_l.png' />
-      </div>
-      <div class='confetti' id='right'>
-        <img src='/images/confetti_r.png' />
-      </div>
-      `);
-      break;
-    default:
-      console.log('default');
+/**
+ * 테마변경
+ * themeType : OverlayTheme.key(식별값) | 'default'
+ * themeData? : OverlayThemeDataType
+ */
+socket.on('change theme from server', ({ themeType, themeData }) => {
+  const logo = $('#kks-logo');
+  const liveCommerceFrame = $('.live-commerce');
+  const areas = $(
+    '.ranking-area,  .bottom-area-left, .bottom-area-right, .bottom-fever-timer',
+  );
+  const rankingTitleText = $('.ranking-text-area#title');
+  const podiumIcon = $('#podium');
+  const timerIcon = $('.bottom-area-left-icon');
+  // 우선 테마 변경시 바뀌는 요소들 초기화(기본테마)
+  logo.show();
+  liveCommerceFrame.css('background', '');
+  areas.css('background-color', 'rgba(0, 0, 0, 0.5)').css('color', '#ffffff');
+  rankingTitleText.css('color', '#ffd200').css('text-shadow', '5px 5px 10px #000');
+  podiumIcon.attr('src', '/images/podium.png');
+  timerIcon.attr('src', '/images/clock.png');
+
+  // themeData 값을 전달받는 경우에만 요소들을 변경한다
+  if (themeType === 'default' && !themeData) return;
+
+  if (themeData.backgroundImage) {
+    logo.hide();
+    liveCommerceFrame.css('background', `url(${themeData.backgroundImage}) no-repeat`);
   }
+  if (themeData.backgroundColor) {
+    areas.css('background-color', themeData.backgroundColor);
+  }
+
+  if (themeData.color) areas.css('color', themeData.color);
+  if (themeData.textShadow) rankingTitleText.css('text-shadow', themeData.textShadow);
+  if (themeData.titleColor) rankingTitleText.css('color', themeData.titleColor);
+  if (themeData.podiumImage) podiumIcon.attr('src', themeData.podiumImage);
+  if (themeData.timerImage) timerIcon.attr('src', themeData.timerImage);
 });
 
 // bgm 재생

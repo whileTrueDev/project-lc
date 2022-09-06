@@ -289,7 +289,10 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '라이브쇼핑',
     href: '/live-shopping',
-    children: [{ name: '라이브 쇼핑 목록', href: '/live-shopping', icon: FcVideoCall }],
+    children: [
+      { name: '라이브 쇼핑 목록', href: '/live-shopping', icon: FcVideoCall },
+      { name: '오버레이 테마', href: '/overlay-theme', icon: FcList },
+    ],
   },
   {
     name: '주문',

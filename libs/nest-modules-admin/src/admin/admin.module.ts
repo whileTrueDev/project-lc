@@ -15,6 +15,7 @@ import { ManualModule } from '@project-lc/nest-modules-manual';
 import { MileageModule } from '@project-lc/nest-modules-mileage';
 import { OrderModule } from '@project-lc/nest-modules-order';
 import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
+import { OverlayThemeModule } from '@project-lc/nest-modules-overlay-controller';
 import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { ReturnModule } from '@project-lc/nest-modules-return';
@@ -28,6 +29,7 @@ import { AdminKkshowMainController } from './admin-kkshow-main.controller';
 import { AdminManualController } from './admin-manual.controller';
 import { AdminMileageController } from './admin-mileage.controller';
 import { AdminOrderController } from './admin-order.controller';
+import { AdminOverlayThemeController } from './admin-overlay-theme.controller';
 import { AdminPolicyController } from './admin-policy.controller';
 import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
 import { AdminProductPromotionController } from './admin-product-promotion.controller';
@@ -64,6 +66,7 @@ export class AdminModule {
     AdminCouponController,
     AdminCustomerCouponController,
     AdminOrderController,
+    AdminOverlayThemeController,
   ];
 
   private static readonly imports = [
@@ -85,6 +88,7 @@ export class AdminModule {
     OrderModule.withoutControllers(),
     ReturnModule.withoutControllers(),
     CipherModule,
+    OverlayThemeModule.withoutControllers(),
   ];
 
   static withoutControllers(): DynamicModule {

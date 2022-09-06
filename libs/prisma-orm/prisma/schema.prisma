@@ -2104,3 +2104,13 @@ model GoodsCategory {
 
   kkshowShoppingTabCategory KkshowShoppingTabCategory?
 }
+
+// 오버레이 테마
+model OverlayTheme {
+  id         Int      @id @default(autoincrement())
+  createDate DateTime @default(now())
+  name       String // 테마 이름
+  key        String   @unique // 테마 식별 키
+  category   String? // 테마 분류(게임, 계절..)
+  data       Json // OverlayThemeType 형태의 객체 string
+}
