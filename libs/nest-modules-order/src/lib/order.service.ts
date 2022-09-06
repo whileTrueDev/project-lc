@@ -592,7 +592,12 @@ export class OrderService {
     // 특정 주문상태로 조회시
     if (searchStatuses) {
       OR.push({
-        orderItems: { some: { options: { some: { step: { in: dto.searchStatuses } } } } },
+        orderItems: {
+          some: {
+            goods: sellerId ? { sellerId } : undefined,
+            options: { some: { step: { in: dto.searchStatuses } } },
+          },
+        },
       });
     }
 
