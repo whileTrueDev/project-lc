@@ -289,7 +289,6 @@ export class AdminController {
   async updateLiveShoppings(
     @Body() data: { dto: LiveShoppingUpdateDTO; videoUrlExist?: boolean },
   ): Promise<boolean> {
-    console.log(data.dto);
     let videoId;
     if (data.dto.videoUrl) {
       if (data.videoUrlExist) {
