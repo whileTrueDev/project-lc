@@ -1,7 +1,8 @@
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, Link, Button } from '@chakra-ui/react';
 import { AdminGiftList } from '@project-lc/components-admin/AdminGiftList';
 import { AdminLiveShoppingList } from '@project-lc/components-admin/AdminLiveShoppingList';
 import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
+import NextLink from 'next/link';
 
 import { useState } from 'react';
 
@@ -12,6 +13,11 @@ export default function LiveShopping(): JSX.Element {
 
   return (
     <AdminPageLayout>
+      <NextLink passHref href="/live-shopping/create">
+        <Link color="blue.500" fontSize="sm" as={Button}>
+          관리자로 라이브쇼핑 생성하기
+        </Link>
+      </NextLink>
       {/* 라이브쇼핑 목록 */}
       <AdminLiveShoppingList
         onRowClick={(liveShoppingId) => setSelectedLiveShoppingId(liveShoppingId)}

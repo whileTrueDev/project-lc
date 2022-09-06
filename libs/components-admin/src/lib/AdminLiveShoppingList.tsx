@@ -1,14 +1,25 @@
-import NextLink from 'next/link';
-import { Box, Button, Heading, Tooltip, Text, Link } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { Box, Button, Heading, Link, LinkProps, Text, Tooltip } from '@chakra-ui/react';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
+import { GoodsConfirmationStatuses } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
 import { useAdminLiveShoppingList, useProfile } from '@project-lc/hooks';
 import { getLiveShoppingProgress, LiveShoppingWithGoods } from '@project-lc/shared-types';
-import dayjs from 'dayjs';
 import { getCustomerWebHost } from '@project-lc/utils';
-import { GoodsConfirmationStatuses } from '@prisma/client';
+import dayjs from 'dayjs';
+import { forwardRef } from 'react';
+
+/** Tooltip 이 functional component 감싸는 경우 forwardRef 사용해 ref 전달하도록 해야한다고 함
+ * https://chakra-ui.com/docs/components/tooltip/usage#usage
+ */
+const CustomNameLink = forwardRef<HTMLAnchorElement, LinkProps>(
+  ({ children, ...rest }, ref) => (
+    <Link ref={ref} {...rest}>
+      {children}
+    </Link>
+  ),
+);
 
 export function AdminLiveShoppingList({
   onRowClick,
@@ -33,12 +44,10 @@ export function AdminLiveShoppingList({
       flex: 1,
       renderCell: ({ row }) => (
         <Tooltip label="상세페이지로 이동">
-          <NextLink href={`/live-shopping/${row.id}`} passHref>
-            <Link color="blue">
-              {row.liveShoppingName ||
-                '라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록하면 됩니다.'}
-            </Link>
-          </NextLink>
+          <CustomNameLink href={`/live-shopping/${row.id}`}>
+            {row.liveShoppingName ||
+              '라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록하면 됩니다.'}
+          </CustomNameLink>
         </Tooltip>
       ),
     },
@@ -52,29 +61,61 @@ export function AdminLiveShoppingList({
       field: 'goodsName',
       headerName: '상품명',
       minWidth: 350,
-      renderCell: ({ row }) =>
-        new Date(row.sellEndDate) > new Date() ? (
-          <Tooltip label="상품페이지로 이동">
-            <Link href={`${getCustomerWebHost()}/goods/${row.goodsId}`} isExternal>
-              {row.goods.goods_name} <ExternalLinkIcon mx="2px" />
-            </Link>
-          </Tooltip>
-        ) : (
-          <Text>
-            <Text as="span" color="red" fontSize="xs">
-              {row.goods.confirmation &&
-              (row.goods.confirmation?.status === GoodsConfirmationStatuses.waiting ||
-                row.goods.confirmation?.status ===
-                  GoodsConfirmationStatuses.needReconfirmation)
-                ? '(검수미완료) '
-                : ''}
-              {row.goods.confirmation &&
-                row.goods.confirmation?.status === GoodsConfirmationStatuses.rejected &&
-                '(검수거절상품)'}
+      renderCell: ({ row }) => {
+        const withExternalGoods = !!row.externalGoods;
+        const withKkshowGoods = !!row.goods;
+
+        if (withExternalGoods) {
+          return (
+            <CustomNameLink href={row.externalGoods.linkUrl} isExternal>
+              <Text as="span" color="red" fontSize="xs">
+                [외부상품]
+              </Text>
+              {row.externalGoods.name}
+              <ExternalLinkIcon mx="2px" />
+            </CustomNameLink>
+          );
+        }
+
+        if (withKkshowGoods) {
+          if (new Date(row.sellEndDate) > new Date()) {
+            return (
+              <Tooltip label="상품페이지로 이동">
+                <CustomNameLink
+                  href={`${getCustomerWebHost()}/goods/${row.goodsId}`}
+                  isExternal
+                >
+                  {row.goods.goods_name}
+                  <ExternalLinkIcon mx="2px" />
+                </CustomNameLink>
+              </Tooltip>
+            );
+          }
+
+          let confirmationStateText = '';
+          if (
+            !row.goods.confirmation ||
+            row.goods.confirmation?.status === GoodsConfirmationStatuses.waiting ||
+            row.goods.confirmation?.status ===
+              GoodsConfirmationStatuses.needReconfirmation
+          ) {
+            confirmationStateText = '(검수미완료) ';
+          }
+          if (row.goods.confirmation?.status === GoodsConfirmationStatuses.rejected) {
+            confirmationStateText = '(검수거절상품) ';
+          }
+
+          return (
+            <Text>
+              <Text as="span" color="red" fontSize="xs">
+                {confirmationStateText}
+              </Text>
+              {row.goods.goods_name}
             </Text>
-            {row.goods.goods_name}
-          </Text>
-        ),
+          );
+        }
+        return '';
+      },
     },
     {
       field: 'progress',
