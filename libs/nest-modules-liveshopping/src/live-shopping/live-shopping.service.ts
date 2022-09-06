@@ -224,7 +224,7 @@ export class LiveShoppingService {
     const now = new Date();
     now.setHours(now.getHours() - 3);
 
-    return this.prisma.liveShopping.findMany({
+    const liveShoppings = await this.prisma.liveShopping.findMany({
       where: {
         progress: 'confirmed',
         broadcastEndDate: { gte: now },
@@ -237,7 +237,17 @@ export class LiveShoppingService {
         goods: { select: { goods_name: true } },
         broadcastStartDate: true,
         broadcastEndDate: true,
+        externalGoods: { select: { name: true } },
       },
+    });
+
+    return liveShoppings.map((ls) => {
+      // 외부상품으로 진행시 goods_name에 외부상품명을 넣어서 전달
+      if (ls?.externalGoods && !ls?.goods) {
+        const externalGoodsName = ls.externalGoods.name;
+        return { ...ls, goods: { goods_name: externalGoodsName } };
+      }
+      return ls;
     });
   }
 
