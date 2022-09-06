@@ -88,9 +88,19 @@ export class DeliveryService {
     return this.handleDelivery(dto);
   }
 
+  /** 배송시작 이벤트 핸들러 - 일괄처리 */
+  public async deliveryStartMany(dto: DeliveryDto[]): Promise<Export[]> {
+    return Promise.all(dto.map((deliveryDto) => this.handleDelivery(deliveryDto)));
+  }
+
   /** 배송완료 이벤트 핸들러 */
   public async deliveryDone(dto: DeliveryDto): Promise<Export> {
     // 향후 Noti 알림처리 등 handleDelivery와 독립적인 작업을 여기에 추가할 수 있을 것.
     return this.handleDelivery(dto);
+  }
+
+  /** 배송완료 이벤트 핸들러 - 일괄처리 */
+  public async deliveryDoneMany(dto: DeliveryDto[]): Promise<Export[]> {
+    return Promise.all(dto.map((deliveryDto) => this.handleDelivery(deliveryDto)));
   }
 }

@@ -552,6 +552,7 @@ model Broadcaster {
   orderItemSupport  OrderItemSupport[] // 주문된 상품의 후원정보 => 방송인이 후원받은 내역 조회시 사용할듯
   followers         CustomerFollowBroadcaster[] // 팔로우하는 소비자
   productPromotions ProductPromotion[] // 홍보중인상품
+  kkshowBcList      KkshowBcList?
 
   @@fulltext([userNickname])
 }
@@ -1228,6 +1229,16 @@ model KkshowShoppingTabCategory {
 
   category          GoodsCategory @relation(fields: [goodsCategoryCode], references: [categoryCode], onDelete: Cascade)
   goodsCategoryCode String        @unique
+}
+
+// 크크쇼 방송인 목록
+model KkshowBcList {
+  id            Int          @id @default(autoincrement())
+  nickname      String       @unique // 닉네임
+  profileImage  String // 프로필사진
+  href          String // 링크
+  broadcasterId Int?         @unique // 가입한 방송인과 연결하는 경우
+  broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 }
 
 enum UserType {

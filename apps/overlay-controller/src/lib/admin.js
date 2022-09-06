@@ -348,6 +348,8 @@ $(document).ready(function ready() {
       date: selectedTime,
       streamerAndProduct,
     });
+    const sel = `현재 전송된 시작 시간: ${selectedTime}`;
+    $('#etc-control-start-time').text(sel);
   });
 
   $('#product-name-send-button').click(function startTimeSendButtonClickEvent() {
@@ -366,11 +368,15 @@ $(document).ready(function ready() {
   $('#end-time-send-button').click(function endTimeSendButtonClickEvent() {
     const selectedTime = $('#end-time-picker').val();
     socket.emit('get d-day', { roomName, date: selectedTime });
+    const sel = `현재 전송된 종료 시간: ${selectedTime}`;
+    $('#etc-control-end-time').text(sel);
   });
 
   $('#fever-time-send-button').click(function feverTimeSendButtonClickEvent() {
     const selectedTime = $('#fever-time-picker').val();
     socket.emit('get fever date from admin', { roomName, date: selectedTime });
+    const sel = `현재 전송된 피버 시간: ${selectedTime}`;
+    $('#etc-control-fever-time').text(sel);
   });
 
   $('#data-send-all').click(function dataSendAllButtonClickEvent() {

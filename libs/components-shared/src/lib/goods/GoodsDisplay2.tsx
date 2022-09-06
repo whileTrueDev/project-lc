@@ -1,4 +1,4 @@
-import { Avatar, Badge, Box, Flex, Image, Link, Text } from '@chakra-ui/react';
+import { Avatar, Badge, Box, Flex, Link, Text } from '@chakra-ui/react';
 import {
   Goods,
   GoodsImages,
@@ -7,6 +7,7 @@ import {
   Seller,
   SellerShop,
 } from '@prisma/client';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import NextLink from 'next/link';
 import { OrderStatusBadge } from '../order/OrderStatusBadge';
 
@@ -62,7 +63,7 @@ export function GoodsDisplay2({
   return (
     <Flex gap={2}>
       {goods.imageSrc && (
-        <Image
+        <ChakraNextImage
           rounded="md"
           src={goods.imageSrc}
           width={imageSize}

@@ -1,7 +1,7 @@
 import {
+  Box,
   Button,
   Checkbox,
-  Image,
   LinkBox,
   LinkOverlay,
   Modal,
@@ -12,6 +12,7 @@ import {
   useBoolean,
   useDisclosure,
 } from '@chakra-ui/react';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { useProfile } from '@project-lc/hooks';
 import { getKkshowWebHost } from '@project-lc/utils';
 import { deleteCookie, getCookie, setCookie } from '@project-lc/utils-frontend';
@@ -65,10 +66,16 @@ export function EventPopup(): JSX.Element {
           <LinkBox>
             <NextLink href={`${getKkshowWebHost()}/signup`} passHref>
               <LinkOverlay>
-                <Image
-                  src={s3.getSavedObjectUrl(KKSHOW_OPEN_EVENT_IMAGE_KEY)}
-                  borderTopRadius="md"
-                />
+                <Box h={[300, 400, 500]} pos="relative">
+                  <ChakraNextImage
+                    layout="fill"
+                    quality={100}
+                    objectFit="fill"
+                    priority
+                    src={s3.getSavedObjectUrl(KKSHOW_OPEN_EVENT_IMAGE_KEY)}
+                    borderTopRadius="md"
+                  />
+                </Box>
               </LinkOverlay>
             </NextLink>
           </LinkBox>

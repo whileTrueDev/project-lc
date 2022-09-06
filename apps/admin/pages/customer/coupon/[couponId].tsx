@@ -254,9 +254,7 @@ export function CouponManage(): JSX.Element {
               }}
               selectionModel={manyCustomerCouponIssue}
               checkboxSelection
-              components={{
-                Toolbar: GridToolbar,
-              }}
+              components={{ Toolbar: GridToolbar }}
             />
           )}
 
