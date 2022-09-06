@@ -25,6 +25,7 @@ import {
   BusinessRegistrationConfirmation,
   ConfirmHistory,
   GoodsConfirmation,
+  LiveShopping,
   PrivacyApproachHistory,
 } from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
@@ -73,6 +74,7 @@ import {
   GoodsConfirmationDto,
   GoodsRejectionDto,
   LiveShoppingImageDto,
+  LiveShoppingRegistByAdminDto,
   LiveShoppingSpecialPriceUpdateDto,
   LiveShoppingUpdateDTO,
   LiveShoppingWithGoods,
@@ -249,6 +251,14 @@ export class AdminController {
   @Put('/goods/reject')
   setGoodsRejection(@Body() dto: GoodsRejectionDto): Promise<GoodsConfirmation> {
     return this.adminService.setGoodsRejection(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('/live-shopping')
+  async createLiveShoppingByAdmin(
+    @Body(ValidationPipe) dto: LiveShoppingRegistByAdminDto,
+  ): Promise<LiveShopping> {
+    return this.liveShoppingService.createLiveShoppingByAdmin(dto);
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)

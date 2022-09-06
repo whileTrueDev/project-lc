@@ -1,5 +1,5 @@
 import { ExternalLinkIcon } from '@chakra-ui/icons';
-import { Box, Button, Link, Text, Tooltip, useDisclosure } from '@chakra-ui/react';
+import { Box, Button, Link, Text, useDisclosure } from '@chakra-ui/react';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { LiveShoppingDetailDialog } from '@project-lc/components-shared/LiveShoppingDetailDialog';
@@ -7,7 +7,6 @@ import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveSho
 import { useDisplaySize, useLiveShoppingList, useProfile } from '@project-lc/hooks';
 import { getLiveShoppingProgress, LiveShoppingWithGoods } from '@project-lc/shared-types';
 import { liveShoppingStateBoardWindowStore } from '@project-lc/stores';
-import { getCustomerWebHost } from '@project-lc/utils';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { memo, useCallback, useMemo, useState } from 'react';
@@ -116,16 +115,21 @@ export function BroadcasterLiveShoppingList({
         field: 'goods_name',
         headerName: '상품명',
         minWidth: 350,
-        renderCell: ({ row }) =>
-          new Date(row.sellEndDate) > new Date() ? (
-            <Tooltip label="상품페이지로 이동">
-              <Link href={`${getCustomerWebHost()}/goods/${row.goodsId}`} isExternal>
-                {row.goods.goods_name} <ExternalLinkIcon mx="2px" />
+        renderCell: ({ row }) => {
+          if (row.externalGoods) {
+            return (
+              <Link href={row.externalGoods.linkUrl} isExternal>
+                {row.externalGoods.name} <ExternalLinkIcon mx="2px" />
               </Link>
-            </Tooltip>
-          ) : (
-            <Text>{row.goods.goods_name}</Text>
-          ),
+            );
+          }
+
+          if (row.goods) {
+            return <Text>{row.goods.goods_name}</Text>;
+          }
+
+          return '';
+        },
       },
       {
         field: 'progress',

@@ -289,7 +289,10 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '라이브쇼핑',
     href: '/live-shopping',
-    children: [{ name: '라이브 쇼핑 목록', href: '/live-shopping', icon: FcVideoCall }],
+    children: [
+      { name: '라이브 쇼핑 목록', href: '/live-shopping', icon: FcVideoCall },
+      { name: '오버레이 테마', href: '/overlay-theme', icon: FcList },
+    ],
   },
   {
     name: '주문',
@@ -340,6 +343,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
         name: '크크쇼 쇼핑페이지',
         href: '/kkshow-main/kkshow-shopping',
         icon: FcBiohazard,
+      },
+      {
+        name: '크크쇼 방송인목록',
+        href: '/kkshow-main/kkshow-bc-list',
+        icon: FcBusinessman,
       },
     ],
   },

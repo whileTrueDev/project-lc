@@ -59,8 +59,8 @@ export function ShoppingCategories(): JSX.Element | null {
                   _groupHover={{ shadow: 'lg', transform: 'translateY(2px)' }}
                   _groupActive={{ shadow: 'lg', transform: 'translateY(2px)' }}
                 />
-                <Link href={`shopping/category/${category.categoryCode}`} passHref>
-                  <LinkOverlay href={`shopping/category/${category.categoryCode}`}>
+                <Link href={`/shopping/category/${category.categoryCode}`} passHref>
+                  <LinkOverlay href={`/shopping/category/${category.categoryCode}`}>
                     <Text fontSize={['xs', 'sm', 'md']} noOfLines={2} textAlign="center">
                       {category.name}
                     </Text>

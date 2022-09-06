@@ -413,18 +413,21 @@
             <button id='start-time-send-button' style='background-color: blue;'>
               시작 시간 전송
             </button>
+            <span id="etc-control-start-time"></span>
           </div>
           <div class='datetime-picker'>
             <input type='datetime-local' id='end-time-picker' />
             <button id='end-time-send-button' style='background-color: red;'>
               종료 시간 전송
             </button>
+            <span id="etc-control-end-time"></span>
           </div>
           <div class='datetime-picker'>
             <input type='datetime-local' id='fever-time-picker' />
             <button id='fever-time-send-button' style='background-color: purple;'>
               피버 시간 전송
             </button>
+            <span id="etc-control-fever-time"></span>
           </div>
         </div>
       </div>
@@ -587,85 +590,13 @@
             전송</button>
           <p>최대 22자까지 입력가능</p>
         </div>
-        <h2>
-          테마선택
-        </h2>
-        <div class='theme-selection-box'>
-          <h4>
-            계절
-          </h4>
-          <!--테마 추가시 버튼 수정하고, js파일에 이벤트 연결하면 됨 -->
-          <div class='theme-selction-box-season'>
-            <button
-              class='theme-selction-box-button'
-              id='spring'
-              style='background-color:green;'
-            >봄</button>
-            <button
-              class='theme-selction-box-button'
-              id='summer'
-              style='background-color:blue;'
-            >여름</button>
-            <button
-              class='theme-selction-box-button'
-              id='autumn'
-              style='background-color:red;'
-            >미사용</button>
-            <button
-              class='theme-selction-box-button'
-              id='winter'
-              style='background-color:orange;'
-            >미사용</button>
+
+        <div class="theme-control-section">
+          <h2>테마 선택</h2>
+          <button id="theme-load-button" style='background-color:orange;'>테마 불러오기</button>
+          <button id="theme-reset-button" style='background-color:skyblue;'>테마 초기화</button>
+          <div class="theme-control-button-container">
           </div>
-          <h4>
-            게임
-          </h4>
-          <div>
-            <button
-              class='theme-selction-box-button'
-              id='lol'
-              style='background-color:blue;'
-            >미사용</button>
-            <button
-              class='theme-selction-box-button'
-              id='elden-ring'
-              style='background-color:brown;'
-            >미사용</button>
-            <button
-              class='theme-selction-box-button'
-              id='over-watch'
-              style='background-color:white;'
-            >미사용</button>
-            <button
-              class='theme-selction-box-button'
-              id='maplestory'
-              style='background-color:orange;'
-            >미사용</button>
-          </div>
-          <h4>
-            음식
-          </h4>
-          <div>
-            <button
-              class='theme-selction-box-button'
-              id='chicken'
-              style='background-color:blue;'
-            >닭</button>
-            <button
-              class='theme-selction-box-button'
-              id='dumpling'
-              style='background-color:brown;'
-            >미사용</button>
-            <button
-              class='theme-selction-box-button'
-              id='some'
-              style='background-color:white;'
-            >미사용</button>
-            <button
-              class='theme-selction-box-button'
-              id='thing'
-              style='background-color:orange;'
-            >미사용</button>
           </div>
         </div>
       </div>

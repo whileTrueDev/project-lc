@@ -13,7 +13,6 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
-import { GoodsConfirmationStatuses } from '@prisma/client';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
 import { LiveShoppingWithGoods, LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -58,19 +57,7 @@ export function LiveShoppingDetailDialog(
                 />
               )}
 
-              {type === 'broadcaster' ? (
-                <GridTableItem title="상품명" value={liveShopping.goods.goods_name} />
-              ) : (
-                <GridTableItem
-                  title="상품명"
-                  value={
-                    (liveShopping.goods.confirmation?.status !==
-                    GoodsConfirmationStatuses.confirmed
-                      ? '(검수미완료) '
-                      : '') + liveShopping.goods.goods_name
-                  }
-                />
-              )}
+              <DisplayGoodsName type={type} liveShopping={liveShopping} />
 
               <GridTableItem
                 title="진행상태"
@@ -209,3 +196,26 @@ export function LiveShoppingDetailDialog(
 }
 
 export default LiveShoppingDetailDialog;
+
+function DisplayGoodsName({
+  type,
+  liveShopping,
+}: {
+  type: LiveShoppingDetailDialogProps['type'];
+  liveShopping: LiveShoppingWithGoods;
+}): JSX.Element {
+  let goodsName = '';
+  let goodsConfirmStatus = '';
+  if (liveShopping.goods) {
+    goodsName = liveShopping.goods.goods_name;
+    goodsConfirmStatus =
+      liveShopping.goods.confirmation?.status !== 'confirmed' ? '(검수미완료) ' : '';
+  }
+  if (liveShopping.externalGoods) {
+    goodsName = liveShopping.externalGoods.name;
+  }
+  if (type === 'broadcaster') {
+    <GridTableItem title="상품명" value={goodsName} />;
+  }
+  return <GridTableItem title="상품명" value={goodsConfirmStatus + goodsName} />;
+}
