@@ -94,6 +94,7 @@ export * from './lib/dto/mileageSetting.dto';
 export * from './lib/dto/order.dto';
 export * from './lib/dto/orderCancellation.dto';
 export * from './lib/dto/orderItem.dto';
+export * from './lib/dto/orderItemoption.dto';
 export * from './lib/dto/overlayTheme.dto';
 export * from './lib/dto/pagination.dto';
 export * from './lib/dto/passwordValidate.dto';

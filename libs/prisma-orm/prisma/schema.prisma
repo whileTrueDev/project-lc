@@ -1630,7 +1630,6 @@ model Order {
   // 연결된 소비자 삭제되는 경우 => 주문데이터는 유지, customerId는 null 이 됨
   customer                   Customer?                    @relation(fields: [customerId], references: [id], onDelete: SetNull)
   payment                    OrderPayment? // 주문결제정보
-  step                       OrderProcessStep             @default(orderReceived) // 주문상태
   createDate                 DateTime                     @default(now()) // 주문생성일시
   orderPrice                 Int // 주문금액 = 실제 주문 상품/상품옵션 의 금액 합
   paymentPrice               Int // 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한 금액

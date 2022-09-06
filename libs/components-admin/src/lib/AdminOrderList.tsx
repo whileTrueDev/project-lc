@@ -1,6 +1,5 @@
 import { Box, Icon, Link, Text, useDisclosure } from '@chakra-ui/react';
 import { GridColumns, GridRowData, GridRowId, GridToolbar } from '@material-ui/data-grid';
-import { OrderProcessStep } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { OrderToolbar } from '@project-lc/components-seller/kkshow-order/OrderList';
@@ -13,6 +12,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaTruck } from 'react-icons/fa';
 import { DownloadIcon } from '@chakra-ui/icons';
 import ExportManyDialog from '@project-lc/components-seller/ExportManyDialog';
+import { getOrderItemOptionSteps } from '@project-lc/utils';
 
 const columns: GridColumns = [
   {
@@ -53,11 +53,18 @@ const columns: GridColumns = [
   {
     field: 'step',
     headerName: '주문상태',
-    renderCell: ({ row }) => (
-      <Box lineHeight={2}>
-        <OrderStatusBadge step={row.step as OrderProcessStep} />
-      </Box>
-    ),
+    renderCell: ({ row }) => {
+      const orderItemOptionSteps = getOrderItemOptionSteps(
+        row as OrderListRes['orders'][number],
+      );
+      return (
+        <Box lineHeight={2}>
+          {orderItemOptionSteps.map((oios) => (
+            <OrderStatusBadge key={oios} step={oios} />
+          ))}
+        </Box>
+      );
+    },
   },
   {
     width: 120,

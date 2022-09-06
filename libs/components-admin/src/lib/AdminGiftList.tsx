@@ -4,9 +4,13 @@ import { OrderItemOption, OrderProcessStep } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import TooltipedText from '@project-lc/components-core/TooltipedText';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
-import { useAdminLiveShoppingGiftOrderList, useDisplaySize } from '@project-lc/hooks';
+import {
+  AdminLiveShoppingGiftOrderList,
+  useAdminLiveShoppingGiftOrderList,
+  useDisplaySize,
+} from '@project-lc/hooks';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
-import { getAdminHost } from '@project-lc/utils';
+import { getAdminHost, getOrderItemOptionSteps } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
@@ -53,7 +57,7 @@ const columns: GridColumns = [
   },
   {
     field: 'only-web_recipient_user_name',
-    headerName: '주문자/받는분',
+    headerName: '받는분/주문자',
     width: 120,
     disableColumnMenu: true,
     disableReorder: true,
@@ -93,11 +97,18 @@ const columns: GridColumns = [
     disableColumnMenu: true,
     disableReorder: true,
     width: 120,
-    renderCell: ({ value }) => (
-      <Box lineHeight={2}>
-        <OrderStatusBadge step={value as OrderProcessStep} />
-      </Box>
-    ),
+    renderCell: ({ row }) => {
+      const orderItemOptionSteps = getOrderItemOptionSteps(
+        row as AdminLiveShoppingGiftOrderList[number],
+      );
+      return (
+        <Box lineHeight={2}>
+          {orderItemOptionSteps.map((oios) => (
+            <OrderStatusBadge key={oios} step={oios} />
+          ))}
+        </Box>
+      );
+    },
   },
 ];
 

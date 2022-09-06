@@ -3,12 +3,21 @@ import {
   Avatar,
   Box,
   Button,
+  ButtonGroup,
   Center,
   Flex,
   Grid,
   GridItem,
   Heading,
+  Input,
   Link,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Select,
   Text,
   useColorModeValue,
@@ -25,13 +34,16 @@ import { ExportDialog } from '@project-lc/components-seller/ExportDialog';
 import {
   useAdminOrder,
   useAdminOrderPatchMutation,
+  useOrderItemOptionUpdateMutation,
   usePaymentByOrderCode,
 } from '@project-lc/hooks';
 import { orderProcessStepKoreanDict, UpdateOrderDto } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
-import { OrderProcessStep } from '@prisma/client';
+import { OrderItemOption, OrderProcessStep } from '@prisma/client';
+import { getOrderItemOptionSteps } from '@project-lc/utils';
+import { ArrowForwardIcon } from '@chakra-ui/icons';
 
 export function OrderDetail(): JSX.Element {
   const router = useRouter();
@@ -87,6 +99,7 @@ export function OrderDetail(): JSX.Element {
   };
 
   const exportDialog = useDisclosure();
+  const orderItemOptionSteps = getOrderItemOptionSteps(data);
   return (
     <AdminPageLayout>
       <Center>
@@ -123,13 +136,16 @@ export function OrderDetail(): JSX.Element {
               <Text>단계</Text>
               <Flex>
                 {!isEdit ? (
-                  <OrderStatusBadge step={data.step} />
+                  <>
+                    {orderItemOptionSteps.map((oios) => (
+                      <OrderStatusBadge key={oios} step={oios} />
+                    ))}
+                  </>
                 ) : (
                   <Box>
                     <Select
                       placeholder="Select option"
                       size="xs"
-                      defaultValue={data.step}
                       onChange={(e) =>
                         onSelectChange(e.target.value as UpdateOrderDto['step'])
                       }
@@ -150,7 +166,7 @@ export function OrderDetail(): JSX.Element {
                   </Box>
                 )}
                 <Button size="xs" onClick={handleButtonClick}>
-                  {!isEdit ? '변경' : '취소'}
+                  {!isEdit ? '상태일괄변경' : '취소'}
                 </Button>
               </Flex>
             </Flex>
@@ -185,56 +201,7 @@ export function OrderDetail(): JSX.Element {
                     <Text>{item.goods.seller.sellerShop.shopName}</Text>
                   </GridItem>
                   {item.options.map((option) => (
-                    <GridItem
-                      key={option.id}
-                      colSpan={6}
-                      p={1}
-                      rounded="md"
-                      borderWidth="thin"
-                    >
-                      <Grid templateColumns="repeat(10,1fr)" gap={1}>
-                        <GridItem bgColor={backgroundColor}>
-                          <Center>
-                            <Text>{option?.name}</Text>
-                          </Center>
-                        </GridItem>
-                        <GridItem>
-                          <Text>{option?.value}</Text>
-                        </GridItem>
-                        <GridItem bgColor={backgroundColor}>
-                          <Center>
-                            <Text>정가</Text>
-                          </Center>
-                        </GridItem>
-                        <GridItem>
-                          <Text>{option?.normalPrice}</Text>
-                        </GridItem>
-                        <GridItem bgColor={backgroundColor}>
-                          <Center>
-                            <Text>할인가</Text>
-                          </Center>
-                        </GridItem>
-                        <GridItem>
-                          <Text>{option?.discountPrice}</Text>
-                        </GridItem>
-                        <GridItem bgColor={backgroundColor}>
-                          <Center>
-                            <Text>수량</Text>
-                          </Center>
-                        </GridItem>
-                        <GridItem>
-                          <Text>{option?.quantity}</Text>
-                        </GridItem>
-                        <GridItem bgColor={backgroundColor}>
-                          <Center>
-                            <Text>상태</Text>
-                          </Center>
-                        </GridItem>
-                        <GridItem>
-                          <OrderStatusBadge step={option?.step} />
-                        </GridItem>
-                      </Grid>
-                    </GridItem>
+                    <OrderItemOptionGridItem key={option.id} {...option} />
                   ))}
                   {item.support && (
                     <>
@@ -366,15 +333,195 @@ export function OrderDetail(): JSX.Element {
         onClose={onClose}
         onConfirm={handleSubmit}
       >
-        <Text>
-          현재 상태: <OrderStatusBadge step={data?.step} />
-        </Text>
-        <Text>
-          변경될 상태 : <OrderStatusBadge step={orderStep} />
-        </Text>
+        {data?.orderItems.map((oi) => (
+          <Box key={oi.id}>
+            {oi.options.map((oio) => (
+              <Box key={oio.id}>
+                <Flex gap={2}>
+                  {oio.name && oio.value && (
+                    <Text>
+                      {oio.name} : {oio.value}{' '}
+                    </Text>
+                  )}
+                  <OrderStatusBadge step={oio.step} />
+                  <ArrowForwardIcon />
+                  <OrderStatusBadge step={orderStep} />
+                </Flex>
+              </Box>
+            ))}
+          </Box>
+        ))}
       </ConfirmDialog>
     </AdminPageLayout>
   );
 }
 
 export default OrderDetail;
+
+function OrderItemOptionGridItem(option: OrderItemOption): JSX.Element {
+  const backgroundColor = useColorModeValue('gray.200', 'gray.600');
+  const { isOpen, onClose, onOpen } = useDisclosure();
+  return (
+    <GridItem key={option.id} colSpan={6} p={1} rounded="md" borderWidth="thin">
+      <Grid templateColumns="repeat(10,1fr)" gap={1}>
+        <GridItem bgColor={backgroundColor}>
+          <Center>
+            <Text>{option?.name}</Text>
+          </Center>
+        </GridItem>
+        <GridItem>
+          <Text>{option?.value}</Text>
+        </GridItem>
+        <GridItem bgColor={backgroundColor}>
+          <Center>
+            <Text>정가</Text>
+          </Center>
+        </GridItem>
+        <GridItem>
+          <Text>{option?.normalPrice}</Text>
+        </GridItem>
+        <GridItem bgColor={backgroundColor}>
+          <Center>
+            <Text>할인가</Text>
+          </Center>
+        </GridItem>
+        <GridItem>
+          <Text>{option?.discountPrice}</Text>
+        </GridItem>
+        <GridItem bgColor={backgroundColor}>
+          <Center>
+            <Text>수량</Text>
+          </Center>
+        </GridItem>
+        <GridItem>
+          <Text>{option?.quantity}</Text>
+        </GridItem>
+        <GridItem bgColor={backgroundColor}>
+          <Center>
+            <Text>상태</Text>
+          </Center>
+        </GridItem>
+        <GridItem>
+          <OrderStatusBadge step={option?.step} />
+          <Button onClick={onOpen} size="xs">
+            변경
+          </Button>
+          <OrderItemOptionUpdateDialog
+            id={option.id}
+            name={option.name}
+            value={option.value}
+            currentStep={option.step}
+            isOpen={isOpen}
+            onClose={onClose}
+          />
+        </GridItem>
+      </Grid>
+    </GridItem>
+  );
+}
+
+interface OrderItemOptionUpdateDialogProps {
+  id: number;
+  name?: string;
+  value?: string;
+  currentStep: OrderProcessStep;
+  isOpen: boolean;
+  onClose: () => void;
+}
+function OrderItemOptionUpdateDialog({
+  id,
+  name,
+  value,
+  currentStep,
+  isOpen,
+  onClose,
+}: OrderItemOptionUpdateDialogProps): JSX.Element {
+  const changableStatuses = useMemo<OrderProcessStep[]>(
+    () =>
+      Object.keys(orderProcessStepKoreanDict).filter(
+        (k) =>
+          ![
+            'partialShipping',
+            'shipping',
+            'partialShippingDone',
+            'shippingDone',
+            'purchaseConfirmed',
+            // 출고상태
+            'exportReady',
+            'partialExportReady',
+            'exportDone',
+            'partialExportDone',
+          ].includes(k),
+      ) as OrderProcessStep[],
+    [],
+  );
+  const [selected, setSelected] = useState<OrderProcessStep | undefined>(undefined);
+  const onSelectChange = (targeValue: OrderProcessStep): void => {
+    setSelected(targeValue);
+  };
+
+  const toast = useToast();
+  const { mutateAsync: update } = useOrderItemOptionUpdateMutation();
+  const onSubmit = async (): Promise<void> => {
+    return update({ orderItemOptionId: id, step: selected })
+      .then(() => {
+        toast({ title: '수정성공', status: 'success' });
+        onClose();
+      })
+      .catch((err) => {
+        console.log(err);
+        toast({
+          title: '수정실패',
+          description: err.response?.data?.message,
+          status: 'error',
+        });
+      });
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} isCentered>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>주문상품옵션 변경</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Box>
+            <Text>변경상태 선택</Text>
+            <Select
+              value={selected}
+              placeholder="Select option"
+              onChange={(e) => onSelectChange(e.target.value as OrderProcessStep)}
+            >
+              {changableStatuses.map((key) => (
+                <option value={key} key={key}>
+                  {orderProcessStepKoreanDict[key]}
+                </option>
+              ))}
+            </Select>
+
+            {selected ? (
+              <Flex mt={4} gap={2} align="center" justify="center">
+                {name && value && (
+                  <Text>
+                    {name}: {value}{' '}
+                  </Text>
+                )}
+                <OrderStatusBadge step={currentStep} />
+                <ArrowForwardIcon />
+                <OrderStatusBadge step={selected} />
+              </Flex>
+            ) : null}
+          </Box>
+        </ModalBody>
+        <ModalFooter>
+          <ButtonGroup>
+            <Button colorScheme="blue" onClick={onSubmit}>
+              확인
+            </Button>
+            <Button onClick={onClose}>닫기</Button>
+          </ButtonGroup>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}

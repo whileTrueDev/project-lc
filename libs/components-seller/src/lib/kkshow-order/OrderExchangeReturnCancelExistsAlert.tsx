@@ -8,7 +8,7 @@ const temp: Record<
 > = {
   return: { text: '반품(환불)', status: 'error' },
   exchange: { text: '교환(재배송)', status: 'warning' },
-  cancel: { text: '주문취소', status: 'info' },
+  cancel: { text: '주문취소', status: 'error' },
 };
 
 export interface OrderExchangeReturnCancelExistsAlertProps {

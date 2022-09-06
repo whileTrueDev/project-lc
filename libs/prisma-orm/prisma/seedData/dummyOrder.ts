@@ -4,24 +4,21 @@ const prisma = new PrismaClient();
 
 type DummyOrderFundamentalDataProps = {
   orderCode: string;
-  step?: OrderProcessStep;
 };
 export const getDummyOrderFundamentalData = ({
   orderCode,
-  step,
 }: DummyOrderFundamentalDataProps): Prisma.OrderCreateInput => {
   return {
     orderCode,
-    step,
     orderPrice: 123123,
     paymentPrice: 123123,
-    recipientName: '받는사람이름',
+    recipientName: '크크쇼1',
     recipientPhone: '010-2323-2323',
     recipientEmail: 'reccipient@gasdf.com',
     recipientAddress: '서울특별시 종로구 무슨로 13',
     recipientDetailAddress: '494호',
     recipientPostalCode: '1234',
-    ordererName: '주문자이름',
+    ordererName: '주문자1',
     ordererPhone: '010-2023-4848',
     ordererEmail: 'orderer@gmao.com',
     memo: '빠른배송요망',
@@ -43,6 +40,7 @@ const dummyOrderItemData = [
 
 const dummyOrderItemOptionData = [
   {
+    goodsName: '테스트상품명',
     name: '맛',
     value: '매운맛',
     quantity: 1,
@@ -51,6 +49,7 @@ const dummyOrderItemOptionData = [
     goodsOptionId: 1,
   },
   {
+    goodsName: '테스트상품명',
     name: '맛',
     value: '순한맛',
     quantity: 1,
@@ -62,6 +61,7 @@ const dummyOrderItemOptionData = [
 
 type CreateDummyOrderOpts = DummyOrderFundamentalDataProps & {
   withSupportData?: boolean;
+  step: OrderProcessStep;
 };
 export const createDummyOrder = async ({
   orderCode,
@@ -78,7 +78,6 @@ export const createDummyOrder = async ({
       supportOrderIncludeFlag: !!withSupportData,
       ...getDummyOrderFundamentalData({
         orderCode,
-        step,
       }),
     },
   });
@@ -149,7 +148,6 @@ export const createDummyOrder = async ({
 export const normalOrder: Prisma.OrderCreateInput = {
   customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
-    step: 'paymentConfirmed',
     orderCode: '20220613154618378F9hUFA',
   }),
   shippings: {
@@ -214,7 +212,6 @@ export const nonMemberOrder: Prisma.OrderCreateInput = {
 export const purchaseConfirmedOrder: Prisma.OrderCreateInput = {
   ...normalOrder,
   orderCode: '20220516141608459wupcUq',
-  step: 'purchaseConfirmed' as const,
   shippings: {
     create: [
       {
@@ -251,7 +248,6 @@ export const purchaseConfirmedOrder: Prisma.OrderCreateInput = {
 export const shippingDoneOrder: Prisma.OrderCreateInput = {
   ...normalOrder,
   orderCode: '20220516144652907Hq1RMm',
-  step: 'shippingDone' as const,
   shippings: {
     create: [
       {
@@ -289,7 +285,6 @@ export const orderExportReady: Prisma.OrderCreateInput = {
   customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
     orderCode: '20220516154059927Mx-60e',
-    step: 'exportReady',
   }),
   shippings: {
     create: [

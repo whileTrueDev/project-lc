@@ -5,6 +5,7 @@ export * from './lib/checkOrderDuringLiveShopping';
 export * from './lib/fileUtil';
 export * from './lib/getHostUrl';
 export * from './lib/getImgSrcListFromHtmlStringList';
+export * from './lib/getOrderItemOptionSteps';
 export * from './lib/kkshowMainDataJsonToObject';
 export * from './lib/kkshowShoppingDataJsonToObject';
 export * from './lib/parseJsonToGenericType';
