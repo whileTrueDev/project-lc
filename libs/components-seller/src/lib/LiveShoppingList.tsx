@@ -144,15 +144,23 @@ export function LiveShoppingList(): JSX.Element {
       renderCell: ({ row }) => {
         // 크크쇼 상품이 연결된 라이브쇼핑인 경우
         if (row.goods) {
+          // 검수 안된 상품인 경우 링크x
+          if (
+            !row.goods?.confirmation ||
+            row.goods?.confirmation?.status !== 'confirmed'
+          ) {
+            return (
+              <Text>
+                <Text as="span" fontSize="xs">
+                  (검수미완료)
+                </Text>{' '}
+                {row.goods.goods_name}
+              </Text>
+            );
+          }
           return (
             <Tooltip label="상품페이지로 이동">
               <Link href={`${getCustomerWebHost()}/goods/${row.goodsId}`} isExternal>
-                <Text as="span" fontSize="xs">
-                  {row.goods?.confirmation &&
-                  row.goods?.confirmation?.status !== 'confirmed'
-                    ? '(검수미완료) '
-                    : ''}
-                </Text>
                 {row.goods.goods_name} <ExternalLinkIcon mx="2px" />{' '}
               </Link>
             </Tooltip>
