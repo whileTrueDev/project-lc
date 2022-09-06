@@ -7,9 +7,9 @@ CREATE TABLE `OverlayTheme` (
     `category` VARCHAR(191) NULL,
     `data` JSON NOT NULL,
 
+    UNIQUE INDEX `OverlayTheme_key_key`(`key`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 
 -- 기존 테마 추가
 INSERT INTO `OverlayTheme` (`id`, `name`, `key`, `category`, `data`)
