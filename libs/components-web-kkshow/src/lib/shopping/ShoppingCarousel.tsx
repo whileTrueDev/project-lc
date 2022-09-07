@@ -1,5 +1,4 @@
-import { Flex, LinkBox, LinkOverlay, useBreakpointValue } from '@chakra-ui/react';
-import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import { Flex, Image, LinkBox, LinkOverlay, useBreakpointValue } from '@chakra-ui/react';
 import { useKkshowShopping } from '@project-lc/hooks';
 import { KkshowShoppingTabCarouselItem } from '@project-lc/shared-types';
 import Link from 'next/link';
@@ -65,15 +64,13 @@ const ShoppingCarouselItem = ({
       onSlideNext={onSlideNext}
       onSlidePrev={onSlidePrev}
     >
-      <LinkBox position="relative" h="500px" w="100%">
+      <LinkBox position="relative" h="100%" w="100%">
         <Link href={linkUrl} passHref>
           <LinkOverlay>
-            <ChakraNextImage
-              layout="fixed"
-              width="1000px"
-              height="500px"
-              quality={100}
+            <Image
               src={imageUrl}
+              w={{ base: 'unset', lg: 1000 }}
+              h={{ base: 'unset', lg: 500 }}
               objectFit="contain"
             />
           </LinkOverlay>
