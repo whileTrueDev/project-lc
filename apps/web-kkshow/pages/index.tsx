@@ -1,5 +1,8 @@
 import { Box } from '@chakra-ui/react';
-import { EventPopup } from '@project-lc/components-web-kkshow/EventPopup';
+import {
+  ChuseokDeliveryPopup,
+  SignupEventPopup,
+} from '@project-lc/components-web-kkshow/EventPopup';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { KkshowMainBestBroadcaster } from '@project-lc/components-web-kkshow/main/KkshowMainBestBroadcaster';
 import { KkshowMainBestLive } from '@project-lc/components-web-kkshow/main/KkshowMainBestLive';
@@ -65,7 +68,9 @@ export default function Index(): JSX.Element {
       </Box>
 
       {/* 신규가입 이벤트 팝업 */}
-      <EventPopup />
+      <SignupEventPopup />
+      {/* 추석 배송 안내 팝업 */}
+      <ChuseokDeliveryPopup />
 
       <KkshowLayout>
         <KkshowMainCarousel />

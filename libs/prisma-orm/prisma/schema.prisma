@@ -753,7 +753,7 @@ model LiveShopping {
 model LiveShoppingExternalGoods {
   id             Int          @id @default(autoincrement())
   name           String
-  linkUrl        String
+  linkUrl        String       @db.Text // 외부 url 이 매우 긴 경우를 대비
   liveShoppingId Int          @unique
   liveShopping   LiveShopping @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
 }
