@@ -1,4 +1,4 @@
-import { Flex, useBreakpointValue } from '@chakra-ui/react';
+import { Flex, LinkBox, LinkOverlay, useBreakpointValue } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { useKkshowShopping } from '@project-lc/hooks';
 import { KkshowShoppingTabCarouselItem } from '@project-lc/shared-types';
@@ -7,16 +7,16 @@ import { Autoplay, Navigation, Pagination } from 'swiper';
 import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
 import SwiperSlideItem from '../SwiperSlideItem';
 
-export function ShoppingCarousel(): JSX.Element {
-  const slidesPerView = useBreakpointValue<'auto' | number>({ base: 1, lg: 'auto' });
+export function ShoppingCarousel(): JSX.Element | null {
   const { data } = useKkshowShopping();
-
+  const slidesPerView = useBreakpointValue<'auto' | number>({ base: 1, lg: 'auto' });
+  if (!data) return null;
   return (
     <Flex h="100%" bgColor="blue.500">
       <Swiper
         updateOnWindowResize
         spaceBetween={120}
-        slidesPerView={slidesPerView}
+        slidesPerView={slidesPerView || 'auto'}
         centeredSlides
         loop
         grabCursor
@@ -65,18 +65,20 @@ const ShoppingCarouselItem = ({
       onSlideNext={onSlideNext}
       onSlidePrev={onSlidePrev}
     >
-      <Link href={linkUrl} passHref>
-        <a>
-          <ChakraNextImage
-            layout="intrinsic"
-            width="1000px"
-            height="500px"
-            quality={100}
-            src={imageUrl}
-            objectFit="contain"
-          />
-        </a>
-      </Link>
+      <LinkBox position="relative" h="500px" w="100%">
+        <Link href={linkUrl} passHref>
+          <LinkOverlay>
+            <ChakraNextImage
+              layout="fixed"
+              width="1000px"
+              height="500px"
+              quality={100}
+              src={imageUrl}
+              objectFit="contain"
+            />
+          </LinkOverlay>
+        </Link>
+      </LinkBox>
     </SwiperSlideItem>
   );
 };
