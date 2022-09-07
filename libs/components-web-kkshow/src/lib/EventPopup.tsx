@@ -41,12 +41,12 @@ export function SignupEventPopup(): JSX.Element {
 const DELIVERY_IMAGE_KEY = 'public/delivery_popup.jpg';
 const DELIVERY_POPUP_COOKIE = 'kkshow-dv';
 /** 추석배송 이벤트 팝업 */
-export function ChuseokDeliveryPopup(): React.ReactNode {
+export function ChuseokDeliveryPopup(): JSX.Element {
   const endDateOfChuseokHoliday = '2022-9-12';
   const todayIsAfterChuseokHoliday = dayjs().isAfter(endDateOfChuseokHoliday, 'day');
   if (todayIsAfterChuseokHoliday) {
     // 9월 13일부터 안뜸
-    return null;
+    return <></>;
   }
   return (
     <EventPopup
