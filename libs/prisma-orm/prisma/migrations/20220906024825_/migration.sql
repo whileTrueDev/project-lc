@@ -8,7 +8,7 @@ ALTER TABLE `LiveShopping` MODIFY `goodsId` INTEGER NULL;
 CREATE TABLE `LiveShoppingExternalGoods` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `linkUrl` VARCHAR(191) NOT NULL,
+    `linkUrl` TEXT NOT NULL,
     `liveShoppingId` INTEGER NOT NULL,
 
     UNIQUE INDEX `LiveShoppingExternalGoods_liveShoppingId_key`(`liveShoppingId`),
