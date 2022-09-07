@@ -21,6 +21,7 @@ import {
   OrderDataWithRelations,
 } from '@project-lc/shared-types';
 import { sellerExportStore, useSellerOrderStore } from '@project-lc/stores';
+import { getOrderItemOptionSteps } from '@project-lc/utils';
 import { useCallback } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ExportBundleDialog } from './ExportBundleDialog';
@@ -147,7 +148,10 @@ export function ExportManyDialog({
             {selectedOrders.map((orderId, orderIndex) => {
               const _order = orders.find((_o) => _o.id === orderId);
               if (!_order) return null;
-              const isExportable = exportableSteps.includes(_order.step);
+              const orderItemOptionSteps = getOrderItemOptionSteps(_order);
+              const isExportable = orderItemOptionSteps.some((oios) =>
+                exportableSteps.includes(oios),
+              );
               if (!isExportable) return null;
               return (
                 <Box key={orderId} mt={2}>

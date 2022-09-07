@@ -1,8 +1,9 @@
-import { Order } from '@prisma/client';
+import { Order, OrderItemOption } from '@prisma/client';
 import {
   CreateOrderDto,
   CreateOrderShippingDto,
   UpdateOrderDto,
+  UpdateOrderItemOptionDto,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
@@ -24,6 +25,8 @@ export const useOrderUpdateMutation = (): UseMutationResult<
       onSuccess: (data) => {
         queryClient.invalidateQueries('OrderDetail');
         queryClient.invalidateQueries('SellerOrderList', { refetchInactive: true });
+        queryClient.invalidateQueries('getAdminOrder');
+        queryClient.invalidateQueries('AdminOrderList', { refetchInactive: true });
       },
     },
   );
@@ -47,6 +50,35 @@ export const useOrderCreateMutation = (): UseMutationResult<
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('Cart', { refetchInactive: true }); // 주문 생성 후 주문에 포함되었던 장바구니 상품 삭제함
+      },
+    },
+  );
+};
+
+type UpdateOrderItemOptionMutationDto = UpdateOrderItemOptionDto & {
+  orderItemOptionId: number;
+};
+/** 주문상품옵션 변경 */
+export const useOrderItemOptionUpdateMutation = (): UseMutationResult<
+  OrderItemOption,
+  AxiosError,
+  UpdateOrderItemOptionMutationDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<OrderItemOption, AxiosError, UpdateOrderItemOptionMutationDto>(
+    async (dto: UpdateOrderItemOptionMutationDto) => {
+      const { orderItemOptionId, ..._dto } = dto;
+      return axios
+        .patch<OrderItemOption>(`/order-item-option/${orderItemOptionId}`, _dto)
+        .then((res) => res.data);
+    },
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('Cart', { refetchInactive: true });
+        queryClient.invalidateQueries('OrderDetail');
+        queryClient.invalidateQueries('getAdminOrder');
+        queryClient.invalidateQueries('AdminOrderList', { refetchInactive: true });
+        queryClient.invalidateQueries('SellerOrderList', { refetchInactive: true });
       },
     },
   );

@@ -44,9 +44,9 @@ export function GoodsReviewDisplay({
           src={review.imageUrl}
           alt={review.title}
           withArrowIcon={false}
-          imageProps={{
-            variants: { hover: { scale: 1.05 } },
-          }}
+          // imageProps={{
+          //   variants: { hover: { scale: 1.05 } },
+          // }}
         />
         <GoodsReviewDisplayContainer
           maxH={150}

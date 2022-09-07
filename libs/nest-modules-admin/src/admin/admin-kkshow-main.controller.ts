@@ -10,15 +10,18 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { KkshowShoppingTabCategory } from '@prisma/client';
-import { HttpCacheInterceptor, CacheClearKeys } from '@project-lc/nest-core';
+import { KkshowBcList, KkshowShoppingTabCategory } from '@prisma/client';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
+  KkshowBcListService,
   KkshowMainService,
   KkshowShoppingCategoryService,
   KkshowShoppingService,
 } from '@project-lc/nest-modules-kkshow-main';
 import {
+  CreateKkshowBcListDto,
+  DeleteKkshowBcListDto,
   KkshowMainDto,
   KkshowMainResData,
   KkshowShoppingDto,
@@ -33,6 +36,7 @@ export class AdminKkshowMainController {
     private readonly kkshowMainService: KkshowMainService,
     private readonly kkshowShoppingService: KkshowShoppingService,
     private readonly kkshowShoppingCategoryService: KkshowShoppingCategoryService,
+    private readonly kkshowBcListService: KkshowBcListService,
   ) {}
 
   /** ================================= */
@@ -81,5 +85,32 @@ export class AdminKkshowMainController {
     @Param(new ValidationPipe({ transform: true })) dto: KkshowShoppingTabCategoryDto,
   ): Promise<boolean> {
     return this.kkshowShoppingCategoryService.remove(dto.categoryCode);
+  }
+
+  /** ===================== */
+  /** 크크쇼 방송인 목록 관리 */
+  /** ===================== */
+  @UseInterceptors(HttpCacheInterceptor)
+  @Get('kkshow-bc-list')
+  public async getKkshowBcList(): Promise<KkshowBcList[]> {
+    return this.kkshowBcListService.findAll();
+  }
+
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('kkshow-bc-list')
+  @Post('kkshow-bc-list')
+  public async createKkshowBcList(
+    @Body(new ValidationPipe({ transform: true })) dto: CreateKkshowBcListDto,
+  ): Promise<KkshowBcList> {
+    return this.kkshowBcListService.create(dto);
+  }
+
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('kkshow-bc-list')
+  @Delete('kkshow-bc-list/:id')
+  public async deleteKkshowBcList(
+    @Param(new ValidationPipe({ transform: true })) dto: DeleteKkshowBcListDto,
+  ): Promise<KkshowBcList> {
+    return this.kkshowBcListService.delete(dto.id);
   }
 }

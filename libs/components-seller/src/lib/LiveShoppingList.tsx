@@ -142,19 +142,41 @@ export function LiveShoppingList(): JSX.Element {
       minWidth: 350,
       flex: 1,
       renderCell: ({ row }) => {
-        return (
-          <Tooltip label="상품페이지로 이동">
-            <Link href={`${getCustomerWebHost()}/goods/${row.goodsId}`} isExternal>
-              <Text as="span" fontSize="xs">
-                {row.goods?.confirmation &&
-                row.goods?.confirmation?.status !== 'confirmed'
-                  ? '(검수미완료) '
-                  : ''}
+        // 크크쇼 상품이 연결된 라이브쇼핑인 경우
+        if (row.goods) {
+          // 검수 안된 상품인 경우 링크x
+          if (
+            !row.goods?.confirmation ||
+            row.goods?.confirmation?.status !== 'confirmed'
+          ) {
+            return (
+              <Text>
+                <Text as="span" fontSize="xs">
+                  (검수미완료)
+                </Text>{' '}
+                {row.goods.goods_name}
               </Text>
-              {row.goods.goods_name} <ExternalLinkIcon mx="2px" />{' '}
-            </Link>
-          </Tooltip>
-        );
+            );
+          }
+          return (
+            <Tooltip label="상품페이지로 이동">
+              <Link href={`${getCustomerWebHost()}/goods/${row.goodsId}`} isExternal>
+                {row.goods.goods_name} <ExternalLinkIcon mx="2px" />{' '}
+              </Link>
+            </Tooltip>
+          );
+        }
+        // 외부상품인 경우
+        if (row.externalGoods) {
+          return (
+            <Tooltip label="상품페이지로 이동">
+              <Link href={row.externalGoods.linkUrl} isExternal>
+                {row.externalGoods.name} <ExternalLinkIcon mx="2px" />{' '}
+              </Link>
+            </Tooltip>
+          );
+        }
+        return '';
       },
     },
     {

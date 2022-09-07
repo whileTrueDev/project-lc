@@ -168,3 +168,29 @@ export class LiveShoppingImageDto {
   @IsString()
   imageUrl: string;
 }
+
+export class CreateLiveShoppingExternalGoodsDto {
+  @IsString() name: string;
+
+  @IsString() linkUrl: string;
+}
+
+/** 관리자로 라이브쇼핑 등록 dto
+ * 판매자
+ * 판매자의 상품 | 외부상품
+ */
+export class LiveShoppingRegistByAdminDto {
+  @IsNumber()
+  sellerId: LiveShopping['sellerId'];
+
+  @ValidateIf((dto) => !dto.externalGoods)
+  @IsOptional()
+  goodsId?: LiveShopping['goodsId'];
+
+  @ValidateIf((dto) => !dto.goodsId)
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CreateLiveShoppingExternalGoodsDto)
+  externalGoods?: CreateLiveShoppingExternalGoodsDto;
+}

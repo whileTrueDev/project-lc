@@ -15,6 +15,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { Goods, GoodsStatus } from '@prisma/client';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { GoodsStatusBadge } from '@project-lc/components-shared/GoodsStatusBadge';
 import ShippingGroupSets from '@project-lc/components-shared/shipping/ShippingGroupSets';
 import { useGoodsById, useLiveShoppingNowOnLive } from '@project-lc/hooks';
@@ -147,7 +148,7 @@ export function GoodsViewImages({
             key={i.id}
             src={i.image}
             alt={goodsName + i.id}
-            maxW="45px"
+            width="45px"
             mb={2}
             rounded="md"
             onMouseEnter={() => setSelectedImageIdx(idx)}
@@ -155,7 +156,8 @@ export function GoodsViewImages({
         ))}
       </Box>
       <AspectRatio ratio={1 / 1} w="100%" rounded="md">
-        <Image
+        <ChakraNextImage
+          layout="fill"
           draggable={false}
           src={images[selectedImageIdx].image}
           alt={goodsName}

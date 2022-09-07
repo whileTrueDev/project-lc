@@ -275,11 +275,6 @@ export class ReturnService {
       where: { id: { in: targetOptionIds } },
       data: { step: targetState },
     });
-
-    // 변경된 주문상품옵션 바탕으로 주문 상태 업데이트
-    await this.orderService.updateOrderStepByOrderItemOptionsSteps({
-      orderId,
-    });
   }
 
   /** 반품요청 삭제 */

@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Export, Order, OrderProcessStep, Prisma } from '@prisma/client';
+import { Export, OrderProcessStep, Prisma } from '@prisma/client';
+import { OrderService } from '@project-lc/nest-modules-order';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateKkshowExportDto,
@@ -13,7 +14,6 @@ import {
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
-import { OrderService } from '@project-lc/nest-modules-order';
 
 type ExportCodeType = 'normal' | 'bundle'; // 일반출고코드 | 합포장출고코드
 const exportCodePrefix: Record<ExportCodeType, string> = {
@@ -130,14 +130,6 @@ export class ExportService {
     return true;
   }
 
-  /** 연결된 주문 상태변경
-   */
-  async updateOrderStatus(dto: Pick<CreateKkshowExportDto, 'orderId'>): Promise<Order> {
-    return this.orderService.updateOrderStepByOrderItemOptionsSteps({
-      orderId: dto.orderId,
-    });
-  }
-
   /** 단일 출고처리 */
   public async exportOne({
     dto,
@@ -154,14 +146,11 @@ export class ExportService {
       exportCode,
       bundleExportCode,
     });
-
     /** 재고차감 */
     await this.updateGoodsSupplies(dto);
     /** 주문상품옵션의 상태변경 -> 주문상태변경보다 먼저 진행 */
     await this.updateOrderItemOptionsStatus(dto.items);
-    /** 주문의 상태변경 -> 주문상품옵션 상태변경 후 진행 */
-    const order = await this.updateOrderStatus(dto);
-
+    const order = await this.orderService.findOneOrder({ id: dto.orderId });
     return { orderId: order.id, orderCode: order.orderCode, exportCode };
   }
 

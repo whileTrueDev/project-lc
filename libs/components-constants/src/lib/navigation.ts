@@ -289,7 +289,10 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '라이브쇼핑',
     href: '/live-shopping',
-    children: [{ name: '라이브 쇼핑 목록', href: '/live-shopping', icon: FcVideoCall }],
+    children: [
+      { name: '라이브 쇼핑 목록', href: '/live-shopping', icon: FcVideoCall },
+      { name: '오버레이 테마', href: '/overlay-theme', icon: FcList },
+    ],
   },
   {
     name: '주문',
@@ -341,6 +344,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
         href: '/kkshow-main/kkshow-shopping',
         icon: FcBiohazard,
       },
+      {
+        name: '크크쇼 방송인목록',
+        href: '/kkshow-main/kkshow-bc-list',
+        icon: FcBusinessman,
+      },
     ],
   },
 ];
@@ -378,6 +386,11 @@ const customerMypageActivityChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
 ];
 /** 크크쇼 소비자 마이페이지 사이드바 - "정보" 하위 탭 */
 const customerMypageInfoChildrenNavLinks: MypageLink[] = [
+  {
+    name: '공지사항',
+    href: '/mypage/notice',
+    checkIsActive: defaultIsActiveChecker,
+  },
   {
     name: '회원 정보 수정',
     href: '/mypage/info',

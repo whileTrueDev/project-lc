@@ -1,5 +1,6 @@
 import { OrderProcessStep } from '@prisma/client';
-import { IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsIn, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
 export class DeliveryDto {
   @IsNotEmpty()
@@ -14,4 +15,11 @@ export class DeliveryDto {
     OrderProcessStep.partialShippingDone,
   ])
   status: OrderProcessStep;
+}
+
+export class DeliveryManyDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => DeliveryDto)
+  deliveryDTOs: DeliveryDto[];
 }

@@ -32,7 +32,15 @@ export class CustomerCouponService {
           },
         },
         coupon: {
-          include: { goods: { select: { id: true } } },
+          include: {
+            goods: {
+              select: {
+                id: true,
+                goods_name: true,
+                image: { take: 1, orderBy: { cut_number: 'asc' } },
+              },
+            },
+          },
         },
       },
     });

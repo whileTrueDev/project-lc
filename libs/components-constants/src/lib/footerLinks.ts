@@ -30,6 +30,10 @@ export const commonFooterLinkList: FooterLinkListItem[] = [
         title: 'FAQ',
         href: 'https://whiletrue.notion.site/FAQ-f182f90b7e984badb031a62ddd1bd00d',
       },
+      {
+        title: '공지사항',
+        href: 'https://whiletrue.notion.site/624da834257946dd91c0c4bcb7d8ab67',
+      },
     ],
   },
 ];

@@ -28,10 +28,8 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
-import {
-  KkshowOrderStatusExtended,
-  KkshowOrderCancelEnum,
-} from '../constants/kkshowOrderStatuses';
+import { KkshowOrderStatusExtended } from '../constants/kkshowOrderStatuses';
+import { CreateOrderItemOptionDto } from './orderItemoption.dto';
 
 // ------------------생성 dto--------------------
 
@@ -57,43 +55,6 @@ export class CreateOrderItemSupportDto {
   @IsOptional() @IsNumber() liveShoppingId?: LiveShopping['id'];
   /** 후원이 발생된 productPromotion 고유번호 */
   @IsOptional() @IsNumber() productPromotionId?: ProductPromotion['id'];
-}
-
-/** 주문상품옵션 OrderItemOption 생성 dto */
-export class CreateOrderItemOptionDto {
-  /**  주문했을 당시 옵션명 */
-  @IsString()
-  name: OrderItemOption['name'];
-
-  /** 주문했을 당시 옵션값 */
-  @IsString()
-  value: OrderItemOption['value'];
-
-  /**  옵션 선택 수량(개수) */
-  @IsNumber()
-  quantity: OrderItemOption['quantity'];
-
-  /** 주문했을 당시 소비자가 (미할인가)  @db.Decimal(10, 2)  */
-  @IsNumber()
-  @Type(() => Number)
-  normalPrice: number;
-
-  /** 주문했을 당시 판매가 (할인가) @db.Decimal(10, 2)  */
-  @IsNumber()
-  @Type(() => Number)
-  discountPrice: number;
-
-  /** 주문했을 당시 옵션 개당 무게 (단위 kg) Float? */
-  @IsNumber()
-  @IsOptional()
-  weight?: OrderItemOption['weight'];
-
-  /** 참조하는 상품옵션 고유번호 */
-  @IsNumber()
-  goodsOptionId: OrderItemOption['goodsOptionId'];
-
-  /** 라이브쇼핑 특가로 주문한 경우 라이브쇼핑 특가정보 */
-  @IsOptional() @IsNumber() liveShoppingSpecialPriceId?: number;
 }
 
 /** 주문상품 OrderItem 생성 dto */
@@ -404,7 +365,7 @@ export class UpdateOrderDto {
   /** 주문상태 */
   @IsEnum(OrderProcessStep)
   @IsOptional()
-  step?: Order['step'];
+  step?: OrderProcessStep;
 
   /** 비회원 주문인 경우 true로 보냄. @default(false) */
   @IsBoolean()

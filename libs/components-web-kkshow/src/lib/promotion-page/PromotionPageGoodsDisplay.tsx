@@ -39,9 +39,11 @@ export function PromotinoPageGoodsDisplay({
           alt={item.goods.goods_name}
           src={item.goods.image.find((i) => i.image)?.image || ''}
           ratio={1}
-          imageProps={{
-            variants: { hover: { scale: 1.05 } },
-          }}
+          imageProps={
+            {
+              // variants: { hover: { scale: 1.05 } },
+            }
+          }
         />
 
         <Box py={2} px={1}>

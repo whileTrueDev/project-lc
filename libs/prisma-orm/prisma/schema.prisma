@@ -552,6 +552,7 @@ model Broadcaster {
   orderItemSupport  OrderItemSupport[] // 주문된 상품의 후원정보 => 방송인이 후원받은 내역 조회시 사용할듯
   followers         CustomerFollowBroadcaster[] // 팔로우하는 소비자
   productPromotions ProductPromotion[] // 홍보중인상품
+  kkshowBcList      KkshowBcList?
 
   @@fulltext([userNickname])
 }
@@ -716,13 +717,14 @@ model LiveShopping {
   broadcasterId               Int? //방송인의 아이디 
   liveShoppingName            String? // 라이브 쇼핑의 이름 
   sellerId                    Int // 판매자 ID
-  goodsId                     Int // 상품 ID (project-lc goods Id)
+  goodsId                     Int? // 상품 ID (project-lc goods Id)
   fmGoodsSeq                  Int?                          @unique // 퍼스트몰 상품 ID 라이브쇼핑진행을 위해 생성한 퍼스트몰 상품의 고유번호 (fm_goods.goods_seq)
   videoId                     Int?
   contactId                   Int? // 판매자 등록된 연락처 ID
   requests                    String?                       @db.LongText // 요청사항
   progress                    LiveShopppingProgressType     @default(registered) // 진행상태
   messageSetting              LiveShoppingMessageSetting?
+  externalGoods               LiveShoppingExternalGoods? // 판매자가 크크쇼 외부에서 판매하는 상품으로 라이브커머스 진행하는 경우
   broadcastStartDate          DateTime? // 라이브 방송 시작 시간
   broadcastEndDate            DateTime? // 라이브 방송 종료 시간
   sellStartDate               DateTime? // 라이브커머스 상품판매 시작 시간
@@ -735,7 +737,7 @@ model LiveShopping {
   desiredPeriod               String?                       @default("무관") // 희망 진행 기간
   sellerContacts              SellerContacts?               @relation(fields: [contactId], references: [id])
   seller                      Seller                        @relation(fields: [sellerId], references: [id])
-  goods                       Goods                         @relation(fields: [goodsId], references: [id])
+  goods                       Goods?                        @relation(fields: [goodsId], references: [id])
   broadcaster                 Broadcaster?                  @relation(fields: [broadcasterId], references: [id])
   liveShoppingVideo           LiveShoppingVideo?            @relation(fields: [videoId], references: [id])
   SellerSettlementItems       SellerSettlementItems[]
@@ -746,6 +748,14 @@ model LiveShopping {
   orderItemSupport            OrderItemSupport[]
   cartItemSupport             CartItemSupport[]
   liveShoppingSpecialPrices   LiveShoppingSpecialPrice[] // 라이브쇼핑에 적용되는 특가정보
+}
+
+model LiveShoppingExternalGoods {
+  id             Int          @id @default(autoincrement())
+  name           String
+  linkUrl        String       @db.Text // 외부 url 이 매우 긴 경우를 대비
+  liveShoppingId Int          @unique
+  liveShopping   LiveShopping @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
 }
 
 // 라이브쇼핑 구매 메시지 Text to speech 세팅 enum
@@ -838,11 +848,19 @@ model SellCommission {
 // 공지사항
 // -------------------------------------------------
 model Notice {
-  id          Int      @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   title       String // 공지사항 글의 제목
   url         String // 공지사항 글의 notion URL
-  postingFlag Boolean  @default(false) // 공지사항 글 게시여부
-  postingDate DateTime @default(now()) // 공지사항 글 게시시간
+  postingFlag Boolean      @default(false) // 공지사항 글 게시여부
+  postingDate DateTime     @default(now()) // 공지사항 글 게시시간
+  target      NoticeTarget @default(all) // 공지사항 대상(전체, 판매자, 방송인, 구매자)
+}
+
+enum NoticeTarget {
+  all // 전체
+  seller // 판매자
+  broadcaster // 방송인
+  customer // 구매자
 }
 
 // 전자 결제 수수료 정보 (퍼스트몰의 fm_account_payment_fee와 유사함, 와일트루 정책에 따르기위해 따로 구현)
@@ -1220,6 +1238,16 @@ model KkshowShoppingTabCategory {
 
   category          GoodsCategory @relation(fields: [goodsCategoryCode], references: [categoryCode], onDelete: Cascade)
   goodsCategoryCode String        @unique
+}
+
+// 크크쇼 방송인 목록
+model KkshowBcList {
+  id            Int          @id @default(autoincrement())
+  nickname      String       @unique // 닉네임
+  profileImage  String // 프로필사진
+  href          String // 링크
+  broadcasterId Int?         @unique // 가입한 방송인과 연결하는 경우
+  broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 }
 
 enum UserType {
@@ -1602,7 +1630,6 @@ model Order {
   // 연결된 소비자 삭제되는 경우 => 주문데이터는 유지, customerId는 null 이 됨
   customer                   Customer?                    @relation(fields: [customerId], references: [id], onDelete: SetNull)
   payment                    OrderPayment? // 주문결제정보
-  step                       OrderProcessStep             @default(orderReceived) // 주문상태
   createDate                 DateTime                     @default(now()) // 주문생성일시
   orderPrice                 Int // 주문금액 = 실제 주문 상품/상품옵션 의 금액 합
   paymentPrice               Int // 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한 금액
@@ -2084,4 +2111,14 @@ model GoodsCategory {
   informationSubject   GoodsInformationSubject? @relation(fields: [informationSubjectId], references: [id]) // 해당되는 정보제공고시 품목
 
   kkshowShoppingTabCategory KkshowShoppingTabCategory?
+}
+
+// 오버레이 테마
+model OverlayTheme {
+  id         Int      @id @default(autoincrement())
+  createDate DateTime @default(now())
+  name       String // 테마 이름
+  key        String   @unique // 테마 식별 키
+  category   String? // 테마 분류(게임, 계절..)
+  data       Json // OverlayThemeType 형태의 객체 string
 }

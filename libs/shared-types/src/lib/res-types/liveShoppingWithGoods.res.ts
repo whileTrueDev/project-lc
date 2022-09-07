@@ -7,6 +7,7 @@ import {
   GoodsImages,
   GoodsOptions,
   LiveShopping,
+  LiveShoppingExternalGoods,
   LiveShoppingImage,
   LiveShoppingMessageSetting,
   LiveShoppingSpecialPrice,
@@ -14,15 +15,17 @@ import {
   SellerShop,
 } from '@prisma/client';
 
+export interface LiveShoppingKkshowGoodsData {
+  goods_name: string;
+  summary: string;
+  image: GoodsImages[];
+  options: GoodsOptions[];
+  confirmation?: Pick<GoodsConfirmation, 'status'>;
+}
+
 export interface LiveShoppingWithGoods extends LiveShopping {
   messageSetting?: LiveShoppingMessageSetting;
-  goods: {
-    goods_name: string;
-    summary: string;
-    image: GoodsImages[];
-    options: GoodsOptions[];
-    confirmation?: Pick<GoodsConfirmation, 'status'>;
-  };
+  goods: LiveShoppingKkshowGoodsData | null;
   seller: {
     sellerShop: SellerShop;
   };
@@ -41,6 +44,7 @@ export interface LiveShoppingWithGoods extends LiveShopping {
     };
   }[];
   liveShoppingSpecialPrices?: LiveShoppingSpecialPrice[];
+  externalGoods?: null | LiveShoppingExternalGoods;
 }
 
 export type SpecialPriceItem = Pick<

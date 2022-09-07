@@ -268,18 +268,18 @@ export class AdminService {
     });
     if (!liveShoppingUpdate) throw new InternalServerErrorException(`업데이트 실패`);
 
-    // 방송인을 등록하는 경우 => 해당방송인의 상품홍보페이지에 라이브쇼핑 진행상품 등록
-    if (dto.broadcasterId) {
+    // 방송인을 등록하는 경우 && 라이브쇼핑 연결된 상품이 크크쇼에 등록된 상품인 경우  => 해당방송인의 상품홍보페이지에 라이브쇼핑 진행상품 등록
+    if (dto.broadcasterId && liveShoppingUpdate?.goodsId) {
       try {
-        const liveshoppingGoodsId = liveShoppingUpdate.goodsId;
+        const liveshoppingKkshowGoodsId = liveShoppingUpdate.goodsId;
         const { broadcasterId } = dto;
         await this.productPromotionService.createProductPromotion({
-          goodsId: liveshoppingGoodsId,
+          goodsId: liveshoppingKkshowGoodsId,
           broadcasterId,
         });
       } catch (e) {
         throw new InternalServerErrorException(
-          e,
+          // e,
           `방송인의 상품홍보페이지에 라이브쇼핑 진행상품 등록 오류, 방송인 고유번호 : ${dto.broadcasterId}`,
         );
       }
@@ -449,22 +449,31 @@ export class AdminService {
           gte: sellStartDate ? new Date(sellStartDate) : undefined,
           lte: sellEndDate ? new Date(sellEndDate) : undefined,
         },
-        orderItems: { some: { goodsId, support: { broadcasterId } } },
-        step: {
-          in: [
-            'orderReceived',
-            'paymentConfirmed',
-            'goodsReady',
-            'partialExportReady',
-            'exportReady',
-            'partialExportDone',
-            'exportDone',
-            'partialShipping',
-            'shipping',
-            'partialShippingDone',
-            'shippingDone',
-            'purchaseConfirmed',
-          ],
+        orderItems: {
+          some: {
+            goodsId,
+            support: { broadcasterId },
+            options: {
+              some: {
+                step: {
+                  in: [
+                    'orderReceived',
+                    'paymentConfirmed',
+                    'goodsReady',
+                    'partialExportReady',
+                    'exportReady',
+                    'partialExportDone',
+                    'exportDone',
+                    'partialShipping',
+                    'shipping',
+                    'partialShippingDone',
+                    'shippingDone',
+                    'purchaseConfirmed',
+                  ],
+                },
+              },
+            },
+          },
         },
         giftFlag: true,
       },

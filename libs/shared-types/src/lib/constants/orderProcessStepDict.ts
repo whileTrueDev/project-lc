@@ -185,9 +185,9 @@ export const sellerOrderSteps = {
     'exportReady',
     'partialExportDone',
     'exportDone',
-  ],
-  shipping: ['partialShipping', 'shipping', 'partialShippingDone'],
-  shippingDone: ['shippingDone'],
+  ] as OrderProcessStep[],
+  shipping: ['partialShipping', 'shipping', 'partialShippingDone'] as OrderProcessStep[],
+  shippingDone: ['shippingDone'] as OrderProcessStep[],
 };
 
 export const orderProcessStepKoreanDict = {

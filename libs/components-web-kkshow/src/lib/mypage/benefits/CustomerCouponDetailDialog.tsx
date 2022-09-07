@@ -17,6 +17,7 @@ import {
 } from '@project-lc/components-shared/CouponBadge';
 import { CustomerCouponRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
+import CouponApplicableGoodsList from './CustomerCouponApplyGoodsList';
 
 type CustomerCouponDetailDialogProps = {
   isOpen: boolean;
@@ -70,6 +71,18 @@ export function CustomerCouponDetailDialog({
                   <GridItem colSpan={3} textAlign="right">
                     {DiscountApplyTypeBadge(customerCoupon.coupon.applyType)}
                   </GridItem>
+
+                  {/* 특정상품에만 적용가능한 쿠폰인 경우에만 표시 */}
+                  {customerCoupon.coupon.applyType === 'selectedGoods' && (
+                    <GridItem colSpan={4}>
+                      <Text>적용 가능한 상품 목록</Text>
+
+                      <CouponApplicableGoodsList
+                        goodsList={customerCoupon.coupon.goods}
+                        maxHeight="150px"
+                      />
+                    </GridItem>
+                  )}
 
                   <GridItem>
                     <Text>최소주문액</Text>

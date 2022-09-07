@@ -9,6 +9,7 @@ import { useCustomerCouponList } from '@project-lc/hooks';
 import { CustomerCouponRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
+import { CouponApplicableGoodsListDialog } from './CustomerCouponApplyGoodsList';
 import { CustomerCouponDetailDialog } from './CustomerCouponDetailDialog';
 
 /** 소비자 쿠폰 중 사용가능한 상태(사용하지 않음, 사용기간 지나지 않음)의 쿠폰만 필터링하는 훅 */
@@ -72,7 +73,13 @@ export function CustomerCouponList(): JSX.Element {
       headerName: '적용대상',
       width: 100,
       sortable: false,
-      renderCell: ({ row }) => DiscountApplyTypeBadge(row.coupon.applyType),
+      renderCell: ({ row }) => {
+        if (row.coupon.applyType !== 'selectedGoods') {
+          return DiscountApplyTypeBadge(row.coupon.applyType);
+        }
+        // '선택상품' 인 경우에만 버튼으로 감싸서 렌더링
+        return <CouponApplicableGoodsListDialog coupon={row.coupon} />;
+      },
     },
     {
       field: 'endDate',

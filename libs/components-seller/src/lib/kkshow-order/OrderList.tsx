@@ -2,6 +2,7 @@ import { DownloadIcon, Icon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
+  Flex,
   Link,
   Stack,
   Text,
@@ -21,6 +22,7 @@ import {
   orderProcessStepDict,
 } from '@project-lc/shared-types';
 import { useSellerOrderStore } from '@project-lc/stores';
+import { getOrderItemOptionSteps } from '@project-lc/utils';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
@@ -88,7 +90,7 @@ const columns: GridColumns = [
   },
   {
     field: 'only-web_recipient_user_name',
-    headerName: '주문자/받는분',
+    headerName: '받는분/주문자',
     width: 120,
     disableColumnMenu: true,
     disableReorder: true,
@@ -96,10 +98,11 @@ const columns: GridColumns = [
     sortable: false,
     disableExport: true,
     renderCell: (params) => (
-      <Text>
-        {params.row.recipientName}
-        {params.row.ordererName ? `/${params.row.ordererName}` : ''}
-      </Text>
+      <TooltipedText
+        text={`${params.row.recipientName} ${
+          params.row.ordererName ? `/${params.row.ordererName}` : ''
+        }`}
+      />
     ),
   },
   {
@@ -149,9 +152,12 @@ function OrderStatusBadge(row: OrderDataWithRelations): JSX.Element {
     row.orderCancellations.length > 0 &&
     !row.orderCancellations.every((c) => c.status === ProcessStatus.complete);
 
+  const orderItemOptionSteps = useMemo(() => getOrderItemOptionSteps(row), [row]);
   return (
-    <>
-      <KkshowOrderStatusBadge orderStatus={row.step} />
+    <Flex gap={1}>
+      {orderItemOptionSteps.map((step) => (
+        <KkshowOrderStatusBadge key={step} orderStatus={step} />
+      ))}
       {hasUncompletedReturnRequest && <KkshowOrderStatusBadge orderStatus="returns" />}
       {hasUncompletedExchangeRequest && (
         <KkshowOrderStatusBadge orderStatus="exchanges" />
@@ -159,7 +165,7 @@ function OrderStatusBadge(row: OrderDataWithRelations): JSX.Element {
       {hasUncompletedCancelRequest && (
         <KkshowOrderStatusBadge orderStatus="orderCancellations" />
       )}
-    </>
+    </Flex>
   );
 }
 
@@ -209,7 +215,12 @@ export function OrderList(): JSX.Element {
       sellerOrderStates.selectedOrders.includes(o.id),
     );
     return (
-      _so.filter((so) => isOrderExportable(orderProcessStepDict[so.step])).length > 0
+      _so.filter((so) => {
+        const orderItemOptionSteps = getOrderItemOptionSteps(so);
+        return orderItemOptionSteps.some((oios) =>
+          isOrderExportable(orderProcessStepDict[oios]),
+        );
+      }).length > 0
     );
   }, [sellerOrderStates.selectedOrders, orders.data]);
 

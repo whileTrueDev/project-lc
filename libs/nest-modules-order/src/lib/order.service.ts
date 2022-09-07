@@ -53,7 +53,7 @@ import {
   skipSteps,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
-import { calculateShippingCost } from '@project-lc/utils';
+import { calculateShippingCost, getOrderItemOptionSteps } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
@@ -370,7 +370,6 @@ export class OrderService {
         ...createInput,
         supportOrderIncludeFlag:
           supportOrderIncludeFlag || this.hasSupportOrderItem(orderDto),
-        step: orderStep,
         orderItems: { create: orderItemsCreateInput },
       },
     });
@@ -592,7 +591,14 @@ export class OrderService {
 
     // 특정 주문상태로 조회시
     if (searchStatuses) {
-      OR.push({ step: { in: searchStatuses } });
+      OR.push({
+        orderItems: {
+          some: {
+            goods: sellerId ? { sellerId } : undefined,
+            options: { some: { step: { in: dto.searchStatuses } } },
+          },
+        },
+      });
     }
 
     // 교환, 반품, 환불 조회
@@ -661,6 +667,8 @@ export class OrderService {
   /** 주문에 포함된 상품옵션의 상태에 따라 표시될 주문의 상태 구하는 함수
    * - 판매자의 주문조회시 주문에 포함된 판매자의 상품옵션의 상태에 따라 표시될 주문의 상태 구하는 경우 사용
    * - 주문에 포함된 상품옵션 일부의 상태 변경 후 주문 상태 업데이트 시 사용
+   * @deprecated by hwasurr 20220902.
+   * Order.step 필드 제거 일감에서 자세한 내용 확인 (https://www.notion.so/whiletrue/db-api-Order-4020533acaaf4d3890d623d15ebdef3f)
    */
   public getOrderRealStep(
     originOrderStep: OrderProcessStep,
@@ -818,15 +826,7 @@ export class OrderService {
       const sellerGoodsOrderItems = orderItems.filter(
         (oi) => oi.goods.sellerId === sellerId,
       );
-      // 판매자 본인의 상품옵션 상태에 기반한 주문상태 표시
-      let displaySellerOrderStep: OrderProcessStep = o.step;
-
-      if (sellerGoodsOrderItems.length > 0) {
-        displaySellerOrderStep = this.getOrderRealStep(
-          o.step,
-          sellerGoodsOrderItems.flatMap((oi) => oi.options),
-        );
-      } // * 판매자 본인의 배송비정책과 연결된 주문배송비정보만 보내기
+      // * 판매자 본인의 배송비정책과 연결된 주문배송비정보만 보내기
       let sellerShippings = shippings;
 
       if (sellerShippingGroupList.length > 0) {
@@ -882,7 +882,6 @@ export class OrderService {
 
       return {
         ...orderRestData,
-        step: displaySellerOrderStep,
         orderItems: sellerGoodsOrderItems,
         exchanges: sellerExchanges,
         returns: sellerReturns,
@@ -1080,14 +1079,6 @@ export class OrderService {
       const sellerGoodsOrderItems = orderItems.filter(
         (oi) => oi.goods.sellerId === dto.sellerId,
       );
-      // * 판매자 본인의 상품옵션 상태에 기반한 주문상태 표시
-      let displaySellerOrderStep: OrderProcessStep = result.step;
-      if (sellerGoodsOrderItems.length > 0) {
-        displaySellerOrderStep = this.getOrderRealStep(
-          result.step,
-          sellerGoodsOrderItems.flatMap((oi) => oi.options),
-        );
-      }
 
       // * 판매자 본인의 배송비정책과 연결된 주문배송비정보만 보내기
       let sellerShippings = shippings;
@@ -1148,7 +1139,6 @@ export class OrderService {
       result = {
         ...orderRestData,
         shippings: sellerShippings,
-        step: displaySellerOrderStep,
         orderItems: sellerGoodsOrderItems,
         exchanges: sellerExchanges,
         orderCancellations: sellerOrderCancellations,
@@ -1168,6 +1158,7 @@ export class OrderService {
     }
 
     if (result.payment && result.payment.method === 'virtualAccount') {
+      if (!result.payment.account) return result;
       const encryptedComplexAccountText = result.payment.account; // `은행명_암호화된가상계좌` 형태로 저장되어 있음 PaymentService.createPayment 참고
       const [bankName, realEncryptedVirtualAccountText] =
         encryptedComplexAccountText.split('_'); // => _로 분리 [은행명, 암호화된 가상계좌번호]
@@ -1214,7 +1205,7 @@ export class OrderService {
     // 주문이 존재하는지 확인
     await this.findOneOrder({ id: orderId });
 
-    const { customerId, sellerId, ...rest } = dto;
+    const { customerId, sellerId, step, ...rest } = dto;
 
     let updateInput: Prisma.OrderUpdateInput = { ...rest };
 
@@ -1233,33 +1224,20 @@ export class OrderService {
     });
 
     // 주문 상태를 바꾸는 경우 -> 주문에 포함된 주문상품 옵션도 같이 변경한다
-    if (rest.step) {
+    if (step) {
       // 판매자가 주문상태를 변경하는 경우(주문에는 다른 판매자의 상품이 포함되어 있을수 있으므로, 자신의 상품상태만 변경해야함)
       if (sellerId) {
-        await this.updateOrderItemOptionsStepBySeller({
-          orderId,
-          sellerId,
-          step: rest.step,
-        });
+        await this.updateOrderItemOptionsStepBySeller({ orderId, sellerId, step });
         return true;
       }
       // 주문상태를 결제확인/결제취소/결제실패/주문무효로 바꾸는경우 (웹훅에서 처리 등)
       // => 해당 주문에 포함된 주문상품옵션의 상태도 일괄적으로 주문 상태와 동일하게 변경
       // (220713 기준 결제를 여러번 나눠서 할 수는 없으므로 결제확인시에도 일괄적으로 주문상품옵션 상태 변경함)
-      if (
-        [
-          'paymentConfirmed',
-          'paymentCanceled',
-          'paymentFailed',
-          'orderInvalidated',
-        ].includes(rest.step)
-      ) {
-        await this.prisma.orderItemOption.updateMany({
-          where: { orderItem: { orderId } },
-          data: { step: rest.step },
-        });
-        return true;
-      }
+      await this.prisma.orderItemOption.updateMany({
+        where: { orderItem: { orderId } },
+        data: { step },
+      });
+      return true;
     }
 
     return true;
@@ -1269,15 +1247,14 @@ export class OrderService {
    * 데이터 삭제x, deleteFlag를 true로 설정함) */
   async deleteOrder(orderId: number): Promise<boolean> {
     // 주문이 존재하는지 확인
-    const order = await this.findOneOrder({ id: orderId, deleteFlag: false });
+    const order = await this.findOneOrderDetail({ id: orderId, deleteFlag: false });
 
+    const orderItemOptionSteps = getOrderItemOptionSteps(order);
     // 완료된 주문이 아닌경우 403 에러
-    if (order.step !== OrderProcessStep.shippingDone) {
+    if (!orderItemOptionSteps.every((step) => step === OrderProcessStep.shippingDone)) {
       throw new ForbiddenException(`완료된 주문만 삭제 가능합니다`);
     }
-
     await this.updateOrder(orderId, { deleteFlag: true });
-
     return true;
   }
 
@@ -1346,9 +1323,6 @@ export class OrderService {
         shippings: { include: { items: { select: { id: true } } } }, // 주문배송비에 연겨된 주무상품id들(주문상품옵션이 아님)
       },
     });
-
-    // 주문에 포함된 모든 주문상품옵션이 구매확정 되었다면 주문의 상태도 구매확정으로 변경
-    await this.updateOrderStepByOrderItemOptionsSteps({ orderId: order.id });
 
     // * ---- 구매확정된 상품에 대한 마일리지 적립 ----
     if (order.customerId) {
@@ -1460,44 +1434,39 @@ export class OrderService {
       };
     });
 
-    // 판매자 상품인 주문상품옵션의 상태에 기반한 주문상태 표시
-    const ordersWithRealStep = ordersWithFilteredItems.map((order) => {
-      const { orderItems, step, ...orderData } = order;
-      const newStep = this.getOrderRealStep(
-        step,
-        orderItems.flatMap((item) => item.options),
-      );
-      return { ...orderData, step: newStep, orderItems };
-    });
     // 주문상태별 개수 카운트
     const orderStats = {
       shippingReady: 0, // 상품준비 + 부분출고준비 + 출고준비 + 부분출고완료 + 출고완료
       shipping: 0, // 부분배송중 + 배송중 + 부분배송완료
       shippingDone: 0, //  배송완료
     };
-    ordersWithRealStep.forEach((order) => {
-      if (sellerOrderSteps.shippingReady.includes(order.step)) {
+    ordersWithFilteredItems.forEach((order) => {
+      const orderItemOptionSteps = getOrderItemOptionSteps(order);
+      if (sellerOrderSteps.shippingReady.some((x) => orderItemOptionSteps.includes(x))) {
         orderStats.shippingReady += 1;
       }
-      if (sellerOrderSteps.shipping.includes(order.step)) {
+      if (sellerOrderSteps.shipping.some((x) => orderItemOptionSteps.includes(x))) {
         orderStats.shipping += 1;
       }
-      if (sellerOrderSteps.shippingDone.includes(order.step)) {
+      if (sellerOrderSteps.shippingDone.some((x) => orderItemOptionSteps.includes(x))) {
         orderStats.shippingDone += 1;
       }
     });
 
     // * 판매자의 오늘매출현황 -> 1달치 조회했던 주문데이터 활용
     // 1달치 조회한 주문 중 오늘 생성된 주문 && 주문상태가 결제확인 단계 이상인 주문 필터링
-    const sellerOrdersToday = ordersWithRealStep.filter((order) => {
+    const sellerOrdersToday = ordersWithFilteredItems.filter((order) => {
+      const orderItemOptionSteps = getOrderItemOptionSteps(order);
       return (
         dayjs(order.createDate).isToday() &&
-        ![
-          'orderReceived',
-          'paymentCanceled',
-          'orderInvalidated',
-          'paymentFailed',
-        ].includes(order.step)
+        !(
+          [
+            'orderReceived',
+            'paymentCanceled',
+            'orderInvalidated',
+            'paymentFailed',
+          ] as OrderProcessStep[]
+        ).some((x) => orderItemOptionSteps.includes(x))
       );
     });
 
@@ -1572,7 +1541,6 @@ export class OrderService {
       orderBy: { createDate: 'desc' },
       select: {
         orderCode: true,
-        step: true,
         orderPrice: true,
         paymentPrice: true,
         giftFlag: true,
@@ -1584,6 +1552,7 @@ export class OrderService {
             channel: true,
             review: true,
             support: true,
+            options: true,
             goods: {
               select: {
                 goods_name: true,
@@ -1709,30 +1678,6 @@ export class OrderService {
     return tempResult;
   }
 
-  /** 주문 "상태" 업데이트 - 주문상품 상태에 기반하여 주문 자체의 상태를 업데이트함 */
-  public async updateOrderStepByOrderItemOptionsSteps({
-    orderId,
-  }: {
-    orderId: Order['id'];
-  }): Promise<Order> {
-    // 주문에 포함된 모든 상품옵션들
-    const allOptions = await this.prisma.orderItemOption.findMany({
-      where: { orderItem: { orderId } },
-      select: { id: true, step: true },
-    });
-
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-    });
-
-    const orderNewStep = this.getOrderRealStep(order.step, allOptions);
-
-    return this.prisma.order.update({
-      where: { id: orderId },
-      data: { step: orderNewStep },
-    });
-  }
-
   /** 주문에 포함된 상품 중 "특정 판매자 상품"의 상태 변경 => 주문상품옵션 상태에 따라 주문상태 업데이트 */
   public async updateOrderItemOptionsStepBySeller({
     orderId,
@@ -1748,9 +1693,6 @@ export class OrderService {
       where: { orderItem: { orderId, goods: { sellerId } } },
       data: { step },
     });
-
-    // 변경된 주문상품옵션 상태에 따라 주문 상태 업데이트
-    await this.updateOrderStepByOrderItemOptionsSteps({ orderId });
 
     return true;
   }

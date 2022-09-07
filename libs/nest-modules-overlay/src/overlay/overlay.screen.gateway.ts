@@ -17,6 +17,7 @@ import {
   StartSetting,
   ObjectiveMessage,
   NewsMessage,
+  OverlayThemeDataType,
 } from '@project-lc/shared-types';
 import { OverlayService } from './overlay.service';
 
@@ -282,14 +283,21 @@ export class OverlayScreenGateway
     this.server.to(roomName).emit('delete virtual character audio from server');
   }
 
-  // 오버레이 테마전환
+  // 오버레이 테마전환 with themeData
   @SubscribeMessage('change theme from admin')
-  changeTheme(
-    @MessageBody() roomNameAndThemeType: { roomName: string; themeType: string },
+  changeThemeTemp(
+    @MessageBody()
+    {
+      roomName,
+      themeType,
+      themeData,
+    }: {
+      roomName: string;
+      themeType: string;
+      themeData?: OverlayThemeDataType;
+    },
   ): void {
-    const { roomName } = roomNameAndThemeType;
-    const { themeType } = roomNameAndThemeType;
-    this.server.to(roomName).emit('change theme from server', themeType);
+    this.server.to(roomName).emit('change theme from server', { themeType, themeData });
   }
 
   // 치킨 테마 크크쇼 이벤트 알림 애니메이션 전송 (최소 10초 간격 두고 사용)

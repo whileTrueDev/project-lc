@@ -28,11 +28,8 @@ const orderCancelSectionTitle = '주문취소 정보';
 export function OrderDetail(): JSX.Element {
   const router = useRouter();
   const { data: profileData } = useProfile();
-
   const orderCode = router.query.orderCode as string; // 주문코드
-
   const order = useOrderDetail({ orderCode, sellerId: profileData?.id });
-
   const { isMobileSize } = useDisplaySize();
 
   // 현재 주문이 조회 가능한 주문인지 확인
@@ -82,7 +79,9 @@ export function OrderDetail(): JSX.Element {
         </Box>
 
         {/* 반품(환불), 교환(재배송) 요청 여부 알림 문구 */}
-        {(order.data.returns.length > 0 || order.data.exchanges.length > 0) && (
+        {(order.data.returns.length > 0 ||
+          order.data.exchanges.length > 0 ||
+          order.data.orderCancellations.length > 0) && (
           <Stack as="section">
             {order.data.returns.length > 0 && (
               <OrderExchangeReturnCancelExistsAlert
@@ -94,6 +93,12 @@ export function OrderDetail(): JSX.Element {
               <OrderExchangeReturnCancelExistsAlert
                 alertTypeKey="exchange"
                 targetSectionTitle={exchangeSectionTitle}
+              />
+            )}
+            {order.data.orderCancellations.length > 0 && (
+              <OrderExchangeReturnCancelExistsAlert
+                alertTypeKey="cancel"
+                targetSectionTitle={orderCancelSectionTitle}
               />
             )}
           </Stack>

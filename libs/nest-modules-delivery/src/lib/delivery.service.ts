@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Export, ExportItem } from '@prisma/client';
-import { ExportService } from '@project-lc/nest-modules-export';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { DeliveryDto } from '@project-lc/shared-types';
 
@@ -9,10 +8,7 @@ import { DeliveryDto } from '@project-lc/shared-types';
  */
 @Injectable()
 export class DeliveryService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly expService: ExportService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /** 배송시작(배송중)/완료 처리 핸들러 */
   private async handleDelivery(dto: DeliveryDto): Promise<Export> {
@@ -69,16 +65,6 @@ export class DeliveryService {
       where: { id: { in: oioIds } },
       data: { step: status },
     });
-    /** 주문상품옵션상태변경 후 해당 주문의 상태변경 */
-    if (bundleExports.length > 0) {
-      Promise.all(
-        bundleExports.map((bexp) =>
-          this.expService.updateOrderStatus({ orderId: bexp.orderId }),
-        ),
-      );
-    } else {
-      await this.expService.updateOrderStatus(_exp);
-    }
     return _exp;
   }
 
@@ -88,9 +74,19 @@ export class DeliveryService {
     return this.handleDelivery(dto);
   }
 
+  /** 배송시작 이벤트 핸들러 - 일괄처리 */
+  public async deliveryStartMany(dto: DeliveryDto[]): Promise<Export[]> {
+    return Promise.all(dto.map((deliveryDto) => this.handleDelivery(deliveryDto)));
+  }
+
   /** 배송완료 이벤트 핸들러 */
   public async deliveryDone(dto: DeliveryDto): Promise<Export> {
     // 향후 Noti 알림처리 등 handleDelivery와 독립적인 작업을 여기에 추가할 수 있을 것.
     return this.handleDelivery(dto);
+  }
+
+  /** 배송완료 이벤트 핸들러 - 일괄처리 */
+  public async deliveryDoneMany(dto: DeliveryDto[]): Promise<Export[]> {
+    return Promise.all(dto.map((deliveryDto) => this.handleDelivery(deliveryDto)));
   }
 }

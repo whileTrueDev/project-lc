@@ -9,7 +9,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { GridCellParams, GridColumns, GridRowData } from '@material-ui/data-grid';
-import { Notice } from '@prisma/client';
+import { Notice, NoticeTarget } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import {
   useDeleteNoticeMutation,
@@ -19,11 +19,23 @@ import {
 import dayjs from 'dayjs';
 import { AdminNoticeDialog } from './AdminNoticeDialog';
 
+const noticeTargetKr: Record<NoticeTarget, string> = {
+  all: '전체',
+  seller: '판매자',
+  broadcaster: '방송인',
+  customer: '소비자',
+};
+
 const columns = (
   handleChange: any,
   handleDelete: (id: number) => Promise<void>,
 ): GridColumns => {
   return [
+    {
+      field: 'id',
+      headerName: 'id',
+      width: 30,
+    },
     {
       field: 'posting',
       headerName: '포스팅하기',
@@ -39,13 +51,19 @@ const columns = (
       },
     },
     {
+      field: 'target',
+      headerName: '대상',
+      minWidth: 80,
+      valueFormatter: ({ row }) => noticeTargetKr[row.target as NoticeTarget],
+    },
+    {
       field: 'title',
       headerName: '제목',
-      minWidth: 800,
+      minWidth: 400,
     },
     {
       field: 'date',
-      headerName: '날짜',
+      headerName: '포스팅 한 날짜',
       valueFormatter: ({ row }) =>
         dayjs(row.postingDate as Date).format('YYYY/MM/DD HH:mm:ss'),
       minWidth: 200,
@@ -151,14 +169,14 @@ export function AdminNoticeSection(): JSX.Element {
         headerHeight={40}
         minHeight={100}
         autoHeight
-        hideFooter
+        // hideFooter
         density="compact"
         columns={columns(handleFlagChange, handleDelete)}
         rows={makeListRow(notices)}
         rowsPerPageOptions={[25, 50]}
         onCellClick={handleClick}
-        rowCount={5}
-        pageSize={5}
+        pageSize={25}
+        pagination
         disableColumnMenu
         disableColumnFilter
         disableSelectionOnClick
