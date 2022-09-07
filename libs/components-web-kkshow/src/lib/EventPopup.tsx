@@ -20,6 +20,7 @@ import { useProfile } from '@project-lc/hooks';
 import { getKkshowWebHost } from '@project-lc/utils';
 import { deleteCookie, getCookie, setCookie } from '@project-lc/utils-frontend';
 import { s3 } from '@project-lc/utils-s3';
+import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useEffect } from 'react';
 
@@ -41,6 +42,12 @@ const DELIVERY_IMAGE_KEY = 'public/delivery_popup.jpg';
 const DELIVERY_POPUP_COOKIE = 'kkshow-dv';
 /** 추석배송 이벤트 팝업 */
 export function ChuseokDeliveryPopup(): JSX.Element {
+  const endDateOfChuseokHoliday = '2022-9-12';
+  const todayIsAfterChuseokHoliday = dayjs().isAfter(endDateOfChuseokHoliday, 'day');
+  if (todayIsAfterChuseokHoliday) {
+    // 9월 13일부터 안뜸
+    return <></>;
+  }
   return (
     <EventPopup
       s3ImageKey={DELIVERY_IMAGE_KEY}
