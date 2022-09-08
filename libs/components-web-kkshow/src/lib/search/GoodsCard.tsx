@@ -16,7 +16,7 @@ export function GoodsCard({ item }: { item: SearchResultItem }): JSX.Element {
               <GoodsDisplayImage
                 rounded="xl"
                 src={item.imageUrl}
-                imageProps={{ variants: { hover: { scale: 1.1 } } }}
+                // imageProps={{ variants: { hover: { scale: 1.1 } } }} // 이미지 컴포넌트를 motion.img에서 ChakraNextImage로 변경이후, hover시 이미지 사라지는 현상으로 임시 제거
               />
               <Text fontFamily="Gmarket Sans" textAlign="center">
                 {item.title}

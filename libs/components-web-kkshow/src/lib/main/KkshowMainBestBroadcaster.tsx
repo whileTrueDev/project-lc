@@ -82,10 +82,8 @@ export function BestBroadcasterItem(props: BestBroadcasterItemProps): JSX.Elemen
       >
         <Avatar
           size="2xl"
-          width="100%"
-          height="100%"
-          maxW={{ base: 120, md: 160 }}
-          maxH={{ base: 120, md: 160 }}
+          width={{ base: 120, md: 160 }}
+          height={{ base: 120, md: 160 }}
           src={props.avatarUrl}
           cursor="pointer"
           border={isNowLive ? '2px solid red' : undefined}
