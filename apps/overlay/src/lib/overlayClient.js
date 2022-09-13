@@ -555,8 +555,20 @@ socket.on('get objective message', async (data) => {
   );
   $('.news-banner').show();
   $('.bottom-area-text').text(`${data.users} 구매 감사합니다!`);
+
   $('.bottom-area-right').css({ opacity: 1 });
   $('.bottom-area-text').css({ opacity: 1 });
+
+  // .bottom-area-text 의 너비 (px)
+  const userNicknamesWidth = $('.bottom-area-text').width();
+  // 초당 보여질 너비 (px)
+  const displayPixelPerSec = 250;
+  // 0 -> -100% 이동하는 애니메이션을 몇초동안 보여줄것인지 (animationDuration 설정 css 상으로는 기존 10s)
+  const animationDurationInSec = Math.floor(userNicknamesWidth / displayPixelPerSec);
+  $('.bottom-area-text').css({ animationDuration: `${animationDurationInSec}s` });
+  // onaminationEnd => hide(). removeAnimationEndEvent
+
+  // animationIterationCount 설정 현재 infinite => 한번만
 
   // 중간금액 알림 tts를 위한 이벤트
   socket.emit('send objective notification signal', data);
