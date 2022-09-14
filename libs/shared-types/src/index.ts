@@ -136,6 +136,7 @@ export * from './lib/inactive-handler-type/inactive-handler-types';
 export * from './lib/overlay-controller/overlay-controller-types';
 export * from './lib/overlay/overlay-types';
 export * from './lib/res-types/adminGoodsList.res';
+export * from './lib/res-types/adminNotiCount.res';
 export * from './lib/res-types/broadcasterPromotionPage.res';
 export * from './lib/res-types/broadcasterSettlementInfoList.res';
 export * from './lib/res-types/broadcasterSettlementReceivableAmount.res';

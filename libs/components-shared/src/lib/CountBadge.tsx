@@ -18,6 +18,7 @@ export function CountBadge({ count, top = 0, right = 0 }: CountBadgeProps): JSX.
       fontSize="0.5rem"
       bgColor="red"
       borderRadius="full"
+      textAlign="center"
       w={4}
     >
       {count > 5 ? `5+` : count}

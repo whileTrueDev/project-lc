@@ -126,6 +126,7 @@ export * from './lib/queries/useAdminProductPromotion';
 export * from './lib/queries/useAdminReturnList';
 export * from './lib/queries/useAdminSellerList';
 export * from './lib/queries/useAdminSettlementDoneList';
+export * from './lib/queries/useAdminSidebarNotiCounts';
 export * from './lib/queries/useApprovedGoodsList';
 export * from './lib/queries/useBcSettlementTargets';
 export * from './lib/queries/useBroadcaster';

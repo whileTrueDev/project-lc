@@ -13,10 +13,12 @@ import {
   SidebarMenuLink,
 } from '@project-lc/components-constants/navigation';
 import { NavbarToggleButton } from '@project-lc/components-shared/navbar/NavbarToggleButton';
+import { CountBadge } from '@project-lc/components-shared/CountBadge';
 import { motion, Variants } from 'framer-motion';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
+import { useAdminSidebarNotiCounts } from '@project-lc/hooks';
 
 const sidebarVaraints: Variants = {
   open: { width: '240px', opacity: 1 },
@@ -61,7 +63,13 @@ export interface AdminSidebarProps {
   onToggle: () => void;
 }
 
-function SidebarMenuLinkItem({ menu }: { menu: SidebarMenuLink }): JSX.Element {
+function SidebarMenuLinkItem({
+  menu,
+  count,
+}: {
+  menu: SidebarMenuLink;
+  count?: number;
+}): JSX.Element {
   const router = useRouter();
   const { href, name, children, icon } = menu;
 
@@ -78,9 +86,10 @@ function SidebarMenuLinkItem({ menu }: { menu: SidebarMenuLink }): JSX.Element {
         textDecoration={match ? 'underline' : 'none'}
         textDecorationColor={match ? 'red.400' : 'none'}
       >
-        <Flex alignItems="center">
+        <Flex alignItems="center" position="relative">
           {icon && <Icon as={icon} mr={1} />}
           {name}
+          {count && <CountBadge count={count} top={1} />}
         </Flex>
       </Link>
     </NextLink>
@@ -89,6 +98,8 @@ function SidebarMenuLinkItem({ menu }: { menu: SidebarMenuLink }): JSX.Element {
 
 function SidebarMenuGroup({ menu }: { menu: SidebarMenuLink }): JSX.Element {
   const { children } = menu;
+
+  const { data } = useAdminSidebarNotiCounts();
 
   return (
     <Stack spacing={2}>
@@ -101,7 +112,11 @@ function SidebarMenuGroup({ menu }: { menu: SidebarMenuLink }): JSX.Element {
       {children && (
         <Stack pl={2}>
           {children.map((child) => (
-            <SidebarMenuLinkItem key={child.href} menu={child} />
+            <SidebarMenuLinkItem
+              key={child.href}
+              menu={child}
+              count={data?.[child.href] || undefined}
+            />
           ))}
         </Stack>
       )}
