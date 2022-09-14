@@ -554,7 +554,7 @@ socket.on('get objective message', async (data) => {
     `,
   );
   $('.news-banner').show();
-  $('.bottom-area-text').text(`구매 감사합니다! ${data.users} 구매 감사합니다!`);
+  $('.bottom-area-text').text(`${data.users} 구매 감사합니다!`);
 
   $('.bottom-area-right').css({ opacity: 1 });
   $('.bottom-area-text').css({ opacity: 1 });
@@ -565,16 +565,13 @@ socket.on('get objective message', async (data) => {
   const movingPixelPerSec = 150;
   // 0 -> -100% 이동하는 애니메이션(marquee)을 몇 초동안 보여줄것인지 (animationDuration 설정 css 상으로는 기존 10s)
   const animationDurationInSec = Math.floor(userNicknamesWidth / movingPixelPerSec);
-  const keyframeName = 'marquee'; // layout.css 에 작성되어 있음;
-  const easingFunction = 'linear';
   const duration = `${Math.max(animationDurationInSec, 10)}s`; // 최소 10초
-  $('.bottom-area-text').css({
-    animation: `${keyframeName} ${easingFunction} ${duration}`,
-  });
-  // 구매자 닉네임 보여주는 애니메이션 종료 후 하단띠 숨기기
-  $('.bottom-area-text').on('animationend', () => {
-    hideBottomAreaText();
-  });
+  $('.bottom-area-text')
+    .addClass('animation-marquee')
+    .css({ animationDuration: `${duration}` })
+    .on('animationend', () => {
+      hideBottomAreaText();
+    }); // 구매자 닉네임 보여주는 애니메이션 종료 후 하단띠 숨기기
 
   // 중간금액 알림 tts를 위한 이벤트
   socket.emit('send objective notification signal', data);
@@ -668,9 +665,11 @@ socket.on('get bottom fever message', (data) => {
 
 /** 하단 띠 숨기기(& 애니메이션 해제) */
 function hideBottomAreaText() {
-  $('.bottom-area-text').text('');
   $('.bottom-area-right').css({ opacity: 0 });
-  $('.bottom-area-text').css({ animation: null });
+  $('.bottom-area-text')
+    .text('')
+    .css({ animationDuration: '' })
+    .removeClass('animation-marquee');
   $('.bottom-area-right-fever-wrapper').hide();
 }
 

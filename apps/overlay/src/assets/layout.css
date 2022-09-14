@@ -205,7 +205,7 @@ body {
 }
 
 .bottom-timer.urgent {
-  color: #ac0000;
+  color: #ff4d4d;
 }
 
 .bottom-timer span {
@@ -829,6 +829,9 @@ span.objective-value {
   padding-left: 1000px;
   display: inline-block;
   white-space: nowrap;
+}
+
+.animation-marquee {
   -webkit-animation-name: marquee;
   -webkit-animation-timing-function: linear;
   -moz-animation-name: marquee;
@@ -840,6 +843,7 @@ span.objective-value {
   animation-name: marquee;
   animation-timing-function: linear;
 }
+
 @-webkit-keyframes marquee {
   from {
     -webkit-transform: translate(0%);
