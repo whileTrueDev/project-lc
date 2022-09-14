@@ -5,6 +5,7 @@ import React from 'react';
 import { NavbarToggleButton } from '@project-lc/components-shared/navbar/NavbarToggleButton';
 import { AdminNav } from './AdminNav';
 import AdminSidebar from './AdminSidebar';
+import { AdminTabAlarmResetButton } from './AdminTabAlarmResetButton';
 
 interface MypageLayoutProps {
   children: React.ReactNode;
@@ -30,6 +31,7 @@ export function AdminPageLayout({ children }: MypageLayoutProps): JSX.Element {
       <Flex as="main" minH="calc(100vh - 60px - 60px - 60px)" direction="row">
         <AdminSidebar isOpen={isOpen} onClose={onClose} onToggle={onToggle} />
         <Box flex="1" p={4} h="calc(100vh - 60px)" overflow="auto">
+          <AdminTabAlarmResetButton />
           {children}
         </Box>
       </Flex>
