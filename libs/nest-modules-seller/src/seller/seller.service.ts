@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InactiveSeller, Prisma, Seller, SellerSocialAccount } from '@prisma/client';
-import { UserPwManager } from '@project-lc/nest-core';
+import { ImageResizer, UserPwManager } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminSellerListRes,
@@ -15,6 +15,7 @@ export class SellerService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userPwManager: UserPwManager,
+    private readonly imageResizer: ImageResizer,
   ) {}
 
   /**
@@ -209,9 +210,11 @@ export class SellerService {
     email: Seller['email'],
     file: Express.Multer.File,
   ): Promise<boolean> {
+    const size = 200;
+    const resized = await this.imageResizer.resize(file.buffer, size);
     const avatarUrl = await s3.uploadProfileImage({
-      key: file.originalname,
-      file: file.buffer,
+      key: `${size}x${size}_${file.originalname}`,
+      file: resized,
       email,
       userType: 'seller',
     });

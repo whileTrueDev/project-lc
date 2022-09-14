@@ -7,7 +7,7 @@ import {
   InactiveBroadcaster,
   Prisma,
 } from '@prisma/client';
-import { UserPwManager } from '@project-lc/nest-core';
+import { ImageResizer, UserPwManager } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BroadcasterAddressDto,
@@ -19,12 +19,14 @@ import {
   SignUpDto,
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
+import sharp from 'sharp';
 
 @Injectable()
 export class BroadcasterService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userPwManager: UserPwManager,
+    private readonly imageResizer: ImageResizer,
   ) {}
 
   async getBroadcasterEmail(overlayUrl: string): Promise<BroadcasterWithoutUserNickName> {
@@ -291,9 +293,11 @@ export class BroadcasterService {
     email: Broadcaster['email'],
     file: Express.Multer.File,
   ): Promise<boolean> {
+    const size = 200;
+    const resizedBuffer = await this.imageResizer.resize(file.buffer, size);
     const avatarUrl = await s3.uploadProfileImage({
-      key: file.originalname,
-      file: file.buffer,
+      key: `${size}x${size}_${file.originalname}`,
+      file: resizedBuffer,
       email,
       userType: 'broadcaster',
     });

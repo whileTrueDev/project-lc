@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Customer, Prisma } from '@prisma/client';
-import { UserPwManager } from '@project-lc/nest-core';
+import { ImageResizer, UserPwManager } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CustomerStatusRes,
@@ -15,6 +15,7 @@ export class CustomerService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly pwManager: UserPwManager,
+    private readonly imageResizer: ImageResizer,
   ) {}
 
   /** 소비자 생성 (회원가입) */
@@ -206,9 +207,11 @@ export class CustomerService {
     email: Customer['email'],
     file: Express.Multer.File,
   ): Promise<boolean> {
+    const size = 200;
+    const resized = await this.imageResizer.resize(file.buffer, size);
     const avatarUrl = await s3.uploadProfileImage({
-      key: file.originalname,
-      file: file.buffer,
+      key: `${size}x${size}_${file.originalname}`,
+      file: resized,
       email,
       userType: 'customer',
     });
