@@ -1,15 +1,19 @@
-import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
-import * as route53 from '@aws-cdk/aws-route53';
-import * as route53Targets from '@aws-cdk/aws-route53-targets';
-import * as cdk from '@aws-cdk/core';
+import { Construct } from 'constructs';
+import {
+  Stack,
+  StackProps,
+  aws_elasticloadbalancingv2 as elbv2,
+  aws_route53 as route53,
+  aws_route53_targets as route53Targets,
+} from 'aws-cdk-lib';
 import { constants } from '../../constants';
 
-interface LCDomainStackProps extends cdk.StackProps {
+interface LCDomainStackProps extends StackProps {
   prodALB: elbv2.ApplicationLoadBalancer;
   devALB?: elbv2.ApplicationLoadBalancer;
 }
 
-export class LCDomainStack extends cdk.Stack {
+export class LCDomainStack extends Stack {
   private readonly DOMAIN = constants.DOMAIN;
   private readonly PUNYCODE_DOMAIN = constants.PUNYCODE_DOMAIN;
 
@@ -18,7 +22,7 @@ export class LCDomainStack extends cdk.Stack {
 
   public hostedzone: route53.PublicHostedZone;
 
-  constructor(scope: cdk.Construct, id: string, props: LCDomainStackProps) {
+  constructor(scope: Construct, id: string, props: LCDomainStackProps) {
     super(scope, id, props);
 
     const { prodALB, devALB } = props;

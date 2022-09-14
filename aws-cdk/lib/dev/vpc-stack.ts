@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import * as cdk from '@aws-cdk/core';
-import * as ec2 from '@aws-cdk/aws-ec2';
+import { aws_ec2 as ec2, Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import { constants } from '../../constants';
 
 // CONSTANTS
 const ID_PREFIX = 'LC-DEV-';
 const DATABASE_PORT = 3306;
 
-export class LCDevVpcStack extends cdk.Stack {
+export class LCDevVpcStack extends Stack {
   public readonly vpc: ec2.Vpc;
   public albSecGrp: ec2.SecurityGroup;
   public dbSecGrp: ec2.SecurityGroup;
@@ -19,7 +19,7 @@ export class LCDevVpcStack extends cdk.Stack {
   public mailerSecGrp: ec2.SecurityGroup;
   public inactiveBatchSecGrp: ec2.SecurityGroup;
 
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     // *********************************************

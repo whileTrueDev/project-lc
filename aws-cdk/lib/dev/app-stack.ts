@@ -1,16 +1,22 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import * as acm from '@aws-cdk/aws-certificatemanager';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as ecs from '@aws-cdk/aws-ecs';
-import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
-import * as logs from '@aws-cdk/aws-logs';
-import * as ssm from '@aws-cdk/aws-ssm';
-import * as cdk from '@aws-cdk/core';
-import * as ecr from '@aws-cdk/aws-ecr';
+import { Construct } from 'constructs';
+import {
+  Stack,
+  StackProps,
+  RemovalPolicy,
+  Duration,
+  aws_ec2 as ec2,
+  aws_ssm as ssm,
+  aws_elasticloadbalancingv2 as elbv2,
+  aws_ecs as ecs,
+  aws_ecr as ecr,
+  aws_logs as logs,
+  aws_certificatemanager as acm,
+} from 'aws-cdk-lib';
 import { constants } from '../../constants';
 import { loadSsmParam } from '../../util/loadSsmParam';
 
-interface LCDevAppStackProps extends cdk.StackProps {
+interface LCDevAppStackProps extends StackProps {
   vpc: ec2.Vpc;
   apiSecGrp: ec2.SecurityGroup;
   overlaySecGrp: ec2.SecurityGroup;
@@ -21,7 +27,7 @@ interface LCDevAppStackProps extends cdk.StackProps {
 
 const PREFIX = 'LC-DEV-APP';
 
-export class LCDevAppStack extends cdk.Stack {
+export class LCDevAppStack extends Stack {
   private readonly ACM_ARN = process.env.ACM_CERTIFICATE_ARN!;
 
   private DBURL_PARAMETER: ssm.IStringParameter;
@@ -50,7 +56,7 @@ export class LCDevAppStack extends cdk.Stack {
   public readonly alb: elbv2.ApplicationLoadBalancer;
   public readonly cluster: ecs.Cluster;
 
-  constructor(scope: cdk.Construct, id: string, props: LCDevAppStackProps) {
+  constructor(scope: Construct, id: string, props: LCDevAppStackProps) {
     super(scope, id, props);
 
     const {
@@ -105,7 +111,7 @@ export class LCDevAppStack extends cdk.Stack {
       lifecycleRules: [
         { maxImageCount: 1, tagStatus: ecr.TagStatus.ANY },
         {
-          maxImageAge: cdk.Duration.days(1),
+          maxImageAge: Duration.days(1),
           tagStatus: ecr.TagStatus.UNTAGGED,
         },
       ],
@@ -152,7 +158,7 @@ export class LCDevAppStack extends cdk.Stack {
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}LogGroup`, {
           logGroupName: constants.DEV.ECS_API_LOG_GLOUP_NAME,
-          removalPolicy: cdk.RemovalPolicy.DESTROY,
+          removalPolicy: RemovalPolicy.DESTROY,
         }),
         streamPrefix: 'ecs',
       }),
@@ -179,7 +185,7 @@ export class LCDevAppStack extends cdk.Stack {
       lifecycleRules: [
         { maxImageCount: 1, tagStatus: ecr.TagStatus.ANY },
         {
-          maxImageAge: cdk.Duration.days(1),
+          maxImageAge: Duration.days(1),
           tagStatus: ecr.TagStatus.UNTAGGED,
         },
       ],
@@ -217,7 +223,7 @@ export class LCDevAppStack extends cdk.Stack {
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}OverlayLogGroup`, {
           logGroupName: constants.DEV.ECS_OVERLAY_LOG_GLOUP_NAME,
-          removalPolicy: cdk.RemovalPolicy.DESTROY,
+          removalPolicy: RemovalPolicy.DESTROY,
         }),
         streamPrefix: 'ecs',
       }),
@@ -247,7 +253,7 @@ export class LCDevAppStack extends cdk.Stack {
       lifecycleRules: [
         { maxImageCount: 1, tagStatus: ecr.TagStatus.ANY },
         {
-          maxImageAge: cdk.Duration.days(1),
+          maxImageAge: Duration.days(1),
           tagStatus: ecr.TagStatus.UNTAGGED,
         },
       ],
@@ -291,7 +297,7 @@ export class LCDevAppStack extends cdk.Stack {
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}OverlayControllerLogGroup`, {
           logGroupName: constants.DEV.ECS_OVERLAY_CONTROLLER_LOG_GLOUP_NAME,
-          removalPolicy: cdk.RemovalPolicy.DESTROY,
+          removalPolicy: RemovalPolicy.DESTROY,
         }),
         streamPrefix: 'ecs',
       }),
@@ -338,7 +344,7 @@ export class LCDevAppStack extends cdk.Stack {
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}RealtimeApiLogGroup`, {
           logGroupName: constants.DEV.ECS_REALTIME_API_LOG_GROUP_NAME,
-          removalPolicy: cdk.RemovalPolicy.DESTROY,
+          removalPolicy: RemovalPolicy.DESTROY,
         }),
         streamPrefix: 'ecs',
       }),
@@ -400,7 +406,7 @@ export class LCDevAppStack extends cdk.Stack {
         healthCheck: {
           enabled: true,
           path: '/',
-          interval: cdk.Duration.minutes(1),
+          interval: Duration.minutes(1),
         },
         targets: [apiService],
       },
@@ -432,7 +438,7 @@ export class LCDevAppStack extends cdk.Stack {
         healthCheck: {
           enabled: true,
           path: '/',
-          interval: cdk.Duration.minutes(1),
+          interval: Duration.minutes(1),
         },
         targets: [overlayService],
       },
@@ -458,7 +464,7 @@ export class LCDevAppStack extends cdk.Stack {
         healthCheck: {
           enabled: true,
           path: '/health-check',
-          interval: cdk.Duration.minutes(1),
+          interval: Duration.minutes(1),
         },
         targets: [overlayControllerService],
       },
@@ -487,7 +493,7 @@ export class LCDevAppStack extends cdk.Stack {
         healthCheck: {
           enabled: true,
           path: '/',
-          interval: cdk.Duration.minutes(1),
+          interval: Duration.minutes(1),
         },
         targets: [realtimeApiService],
       },

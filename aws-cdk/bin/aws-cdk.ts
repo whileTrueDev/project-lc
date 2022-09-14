@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-import * as cdk from '@aws-cdk/core';
+import { App } from 'aws-cdk-lib';
 import * as dotenv from 'dotenv';
 import 'source-map-support/register';
 import { LCDevAppStack } from '../lib/dev/app-stack';
 import { LCDevDatabaseStack } from '../lib/dev/database-stack';
+// import { LCDevLambdaStack } from '../lib/dev/lambda-stack';
 import { LCDevPrivateAppStack } from '../lib/dev/private-app-stack';
 import { LCDevRedisStack } from '../lib/dev/redis-stack';
 import { LCDevVpcStack } from '../lib/dev/vpc-stack';
@@ -19,7 +20,7 @@ import { envCheck } from '../util/env-check';
 dotenv.config();
 envCheck();
 
-const app = new cdk.App();
+const app = new App();
 
 // ************************************
 // * Dev / Test 환경
@@ -51,6 +52,10 @@ new LCDevPrivateAppStack(app, 'LC-DEV-PRIVATE-APP', {
   mailerSecGrp: devVpcStack.mailerSecGrp,
   inactiveBatchSecGrp: devVpcStack.inactiveBatchSecGrp,
 });
+
+// Serverless lambda functions
+// new LCDevLambdaStack(app, 'LC-DEV-LAMBDA', {});
+
 // ************************************
 // * Production 환경
 // VPC
