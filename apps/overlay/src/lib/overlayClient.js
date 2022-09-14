@@ -668,9 +668,8 @@ socket.on('get bottom fever message', (data) => {
 
 /** 하단 띠 숨기기(& 애니메이션 해제) */
 function hideBottomAreaText() {
-  $('.bottom-area-text').text('');
   $('.bottom-area-right').css({ opacity: 0 });
-  $('.bottom-area-text').css({ animation: null });
+  $('.bottom-area-text').css({ opacity: 0, animation: '' }).text('');
   $('.bottom-area-right-fever-wrapper').hide();
 }
 
