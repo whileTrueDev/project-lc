@@ -554,21 +554,27 @@ socket.on('get objective message', async (data) => {
     `,
   );
   $('.news-banner').show();
-  $('.bottom-area-text').text(`${data.users} 구매 감사합니다!`);
+  $('.bottom-area-text').text(`구매 감사합니다! ${data.users} 구매 감사합니다!`);
 
   $('.bottom-area-right').css({ opacity: 1 });
   $('.bottom-area-text').css({ opacity: 1 });
 
-  // .bottom-area-text 의 너비 (px)
+  // .bottom-area-text 의 너비 (px단위)
   const userNicknamesWidth = $('.bottom-area-text').width();
-  // 초당 보여질 너비 (px)
-  const displayPixelPerSec = 250;
-  // 0 -> -100% 이동하는 애니메이션을 몇초동안 보여줄것인지 (animationDuration 설정 css 상으로는 기존 10s)
-  const animationDurationInSec = Math.floor(userNicknamesWidth / displayPixelPerSec);
-  $('.bottom-area-text').css({ animationDuration: `${animationDurationInSec}s` });
-  // onaminationEnd => hide(). removeAnimationEndEvent
-
-  // animationIterationCount 설정 현재 infinite => 한번만
+  // 초당 이동할 거리 (px단위) => 속도를 빠르게 하려면 초당이동거리를 증가시키면 됨
+  const movingPixelPerSec = 150;
+  // 0 -> -100% 이동하는 애니메이션(marquee)을 몇 초동안 보여줄것인지 (animationDuration 설정 css 상으로는 기존 10s)
+  const animationDurationInSec = Math.floor(userNicknamesWidth / movingPixelPerSec);
+  const keyframeName = 'marquee'; // layout.css 에 작성되어 있음;
+  const easingFunction = 'linear';
+  const duration = `${Math.max(animationDurationInSec, 10)}s`; // 최소 10초
+  $('.bottom-area-text').css({
+    animation: `${keyframeName} ${easingFunction} ${duration}`,
+  });
+  // 구매자 닉네임 보여주는 애니메이션 종료 후 하단띠 숨기기
+  $('.bottom-area-text').on('animationend', () => {
+    hideBottomAreaText();
+  });
 
   // 중간금액 알림 tts를 위한 이벤트
   socket.emit('send objective notification signal', data);
@@ -660,12 +666,18 @@ socket.on('get bottom fever message', (data) => {
 //   bottomMessages = data;
 // });
 
+/** 하단 띠 숨기기(& 애니메이션 해제) */
+function hideBottomAreaText() {
+  $('.bottom-area-text').text('');
+  $('.bottom-area-right').css({ opacity: 0 });
+  $('.bottom-area-text').css({ animation: null });
+  $('.bottom-area-right-fever-wrapper').hide();
+}
+
 // 하단 띠 배너 영역 토글
 socket.on('handle bottom area to client', () => {
   if ($('.bottom-area-right').css('opacity') === '1') {
-    $('.bottom-area-text').text('');
-    $('.bottom-area-right').css({ opacity: 0 });
-    $('.bottom-area-right-fever-wrapper').hide();
+    hideBottomAreaText();
   } else {
     $('.bottom-area-right').css({ opacity: 1 }).fadeIn(2000);
   }
