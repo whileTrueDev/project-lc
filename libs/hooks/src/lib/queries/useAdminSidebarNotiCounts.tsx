@@ -7,7 +7,7 @@ export type AdminSidebarNotiCounts = AdminNotiCountRes;
 
 export const getAdminSidebarNotiCounts = async (): Promise<AdminSidebarNotiCounts> => {
   return axios
-    .get<AdminSidebarNotiCounts>('/admin/sidebar-noti-counts')
+    .get<AdminSidebarNotiCounts>('/admin/tab-alarm/sidebar-noti-counts')
     .then((res) => res.data);
 };
 

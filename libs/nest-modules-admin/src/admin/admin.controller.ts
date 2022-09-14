@@ -465,11 +465,4 @@ export class AdminController {
   ): Promise<AdminReturnRes> {
     return this.returnService.getAdminReturnList(dto);
   }
-
-  /** 관리자페이지 사이드바에 표시할 탭별 신규 데이터 개수 */
-  @UseGuards(JwtAuthGuard, AdminGuard)
-  @Get('/sidebar-noti-counts')
-  async getAdminNotiCounts(): Promise<AdminNotiCountRes> {
-    return this.adminService.getAdminNotiCounts();
-  }
 }
