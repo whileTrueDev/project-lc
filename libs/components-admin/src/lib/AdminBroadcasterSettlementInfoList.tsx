@@ -3,9 +3,15 @@ import { GridCellParams, GridColumns } from '@material-ui/data-grid';
 import { TaxationType } from '@prisma/client';
 import { TAX_TYPE } from '@project-lc/components-constants/taxType';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { useAdminBroadcasterSettlementInfoList, useDisplaySize } from '@project-lc/hooks';
+import {
+  useAdminBroadcasterSettlementInfoList,
+  useAdminLatestCheckedData,
+  useAdminLatestCheckedDataMutation,
+  useDisplaySize,
+} from '@project-lc/hooks';
 import { BroadcasterSettlementInfoListRes } from '@project-lc/shared-types';
 import { s3KeyType } from '@project-lc/utils-s3';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import AdminBroadcasterSettlementInfoConfirmationDialog from './AdminBroadcasterSettlementInfoConfirmationDialog';
 import AdminBroadcasterSettlementInfoRejectionDialog from './AdminBroadcasterSettlementInfoRejectionDialog';
@@ -15,6 +21,7 @@ import AdminDatagridWrapper, {
   useLatestCheckedDataId,
 } from './AdminDatagridWrapper';
 import { AdminImageDownloadModal } from './AdminImageDownloadModal';
+import AdminTabAlarmResetButton from './AdminTabAlarmResetButton';
 
 const columns: GridColumns = [
   {
@@ -146,8 +153,24 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
       onDownloadOpen();
     }
   };
+
+  // 알림초기화 핸들러
+  const router = useRouter();
+  const { data: adminCheckedData } = useAdminLatestCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLatestCheckedDataMutation();
+
+  const onResetButtonClick = async (): Promise<void> => {
+    if (!data || !data[0]) return;
+    // 가장 최근 데이터 = id 가장 큰값
+    const latestId = data[0].id;
+
+    const dto = { ...adminCheckedData, [router.pathname]: latestId }; // pathname 을 키로 사용
+    adminCheckMutation(dto).catch((e) => console.error(e));
+  };
+
   return (
     <AdminDatagridWrapper>
+      <AdminTabAlarmResetButton onClick={onResetButtonClick} />
       <ChakraDataGrid
         borderWidth={0}
         hideFooter

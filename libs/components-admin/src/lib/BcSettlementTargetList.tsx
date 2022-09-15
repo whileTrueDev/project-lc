@@ -29,6 +29,8 @@ import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
 import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
 import {
+  useAdminLatestCheckedData,
+  useAdminLatestCheckedDataMutation,
   useBcSettlementTargets,
   useBroadcasterSettlementTotalInfo,
   useCreateSettleBcManyMutation,
@@ -40,11 +42,13 @@ import {
 import { settlementHistoryStore } from '@project-lc/stores';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
 import AdminDatagridWrapper, {
   NOT_CHECKED_BY_ADMIN_CLASS_NAME,
   useLatestCheckedDataId,
 } from './AdminDatagridWrapper';
+import AdminTabAlarmResetButton from './AdminTabAlarmResetButton';
 
 export function calcSettleAmount(
   price: number,
@@ -185,9 +189,23 @@ export function BcSettlementTargetList(): JSX.Element {
     await mutateAsync({ round, items: dtoItems }).then(onSuccess).catch(onFail);
   };
 
+  const router = useRouter();
+  const { data: adminCheckedData } = useAdminLatestCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLatestCheckedDataMutation();
+
+  const onResetButtonClick = async (): Promise<void> => {
+    if (!targets.data || !targets.data?.[0]) return;
+    // 가장 최근 데이터 = id 가장 큰값
+    const latestId = targets?.data?.[0].id;
+
+    const dto = { ...adminCheckedData, [router.pathname]: latestId }; // pathname 을 키로 사용
+    adminCheckMutation(dto).catch((e) => console.error(e));
+  };
+
   return (
     <Box minHeight={{ base: 300, md: 400 }} mt={3}>
       <AdminDatagridWrapper>
+        <AdminTabAlarmResetButton onClick={onResetButtonClick} />
         <ChakraDataGrid
           bg={useColorModeValue('inherit', 'gray.300')}
           autoHeight
