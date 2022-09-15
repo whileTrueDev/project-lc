@@ -1,20 +1,19 @@
-import { Button, Text, useDisclosure, Box } from '@chakra-ui/react';
+import { Button, Text, useDisclosure } from '@chakra-ui/react';
 import { GridCellParams, GridColumns } from '@material-ui/data-grid';
 import { TaxationType } from '@prisma/client';
 import { TAX_TYPE } from '@project-lc/components-constants/taxType';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import {
-  useAdminBroadcasterSettlementInfoList,
-  useAdminLatestCheckedData,
-  useDisplaySize,
-} from '@project-lc/hooks';
+import { useAdminBroadcasterSettlementInfoList, useDisplaySize } from '@project-lc/hooks';
 import { BroadcasterSettlementInfoListRes } from '@project-lc/shared-types';
-import { useState } from 'react';
 import { s3KeyType } from '@project-lc/utils-s3';
-import { useRouter } from 'next/router';
+import { useState } from 'react';
 import AdminBroadcasterSettlementInfoConfirmationDialog from './AdminBroadcasterSettlementInfoConfirmationDialog';
 import AdminBroadcasterSettlementInfoRejectionDialog from './AdminBroadcasterSettlementInfoRejectionDialog';
 import { ConfirmationBadge, makeListRow } from './AdminBusinessRegistrationList';
+import AdminDatagridWrapper, {
+  NOT_CHECKED_BY_ADMIN_CLASS_NAME,
+  useLatestCheckedDataId,
+} from './AdminDatagridWrapper';
 import { AdminImageDownloadModal } from './AdminImageDownloadModal';
 
 const columns: GridColumns = [
@@ -104,10 +103,7 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { data, isLoading } = useAdminBroadcasterSettlementInfoList();
 
-  const { data: adminCheckedData } = useAdminLatestCheckedData();
-  const router = useRouter();
-  const { pathname } = router;
-  const latestCheckedDataId = adminCheckedData?.[pathname] || -1; // 관리자가 이전에 확인 한 값이 없는경우 -1
+  const latestCheckedDataId = useLatestCheckedDataId();
 
   const [selectedRow, setSelectedRow] = useState({});
   const [selectedType, setSelectedType] = useState<s3KeyType>('broadcaster-id-card');
@@ -151,13 +147,7 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
     }
   };
   return (
-    <Box
-      sx={{
-        '.not-checked-by-admin-data': {
-          bg: 'red.200',
-        },
-      }}
-    >
+    <AdminDatagridWrapper>
       <ChakraDataGrid
         borderWidth={0}
         hideFooter
@@ -168,7 +158,7 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
         rows={makeListRow<BroadcasterSettlementInfoListRes>(data)}
         getRowClassName={(params) => {
           if (params.row.id > latestCheckedDataId) {
-            return 'not-checked-by-admin-data';
+            return NOT_CHECKED_BY_ADMIN_CLASS_NAME;
           }
           return '';
         }}
@@ -196,7 +186,7 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
         type={selectedType}
         row={selectedRow}
       />
-    </Box>
+    </AdminDatagridWrapper>
   );
 }
 
