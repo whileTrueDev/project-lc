@@ -103,9 +103,13 @@ export class AdminTabAlarmSevice {
     const sellerOrderCancelRequest = await this.prisma.sellerOrderCancelRequest.count({
       where: { status: 'waiting' },
     });
-    // 주문목록 : 신규 주문 건수에 따라 알림이 뜬다.
-    // TODO: 관리자가 확인한 이후 주문목록 개수
-    const orders = 0;
+    // 주문목록 : 신규 주문 건수에 따라 알림이 뜬다. (관리자가 알림 초기화로 )
+    const latestCheckedOrderId = checkedData?.['/order/list'];
+    const orders = await this.prisma.order.count({
+      where: {
+        id: latestCheckedOrderId ? { gt: latestCheckedOrderId } : undefined,
+      },
+    });
     // 환불요청 : 미승인 환불 목록 수에 따라 알림이 뜬다.
     // => 소비자의 환불요청이란, 물품반환 없는 반품요청이다.(현재 크크쇼는 물건 반품하는 절차가 없고 바로 환불만 받는다)
     const customerReturnRequest = await this.prisma.return.count({

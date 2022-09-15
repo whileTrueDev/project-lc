@@ -3,7 +3,11 @@ import { GridColumns, GridRowData, GridRowId, GridToolbar } from '@material-ui/d
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { OrderToolbar } from '@project-lc/components-seller/kkshow-order/OrderList';
-import { useAdminOrderList } from '@project-lc/hooks';
+import {
+  useAdminLatestCheckedData,
+  useAdminLatestCheckedDataMutation,
+  useAdminOrderList,
+} from '@project-lc/hooks';
 import { convertPaymentMethodToKrString, OrderListRes } from '@project-lc/shared-types';
 import { useSellerOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
@@ -13,6 +17,12 @@ import { FaTruck } from 'react-icons/fa';
 import { DownloadIcon } from '@chakra-ui/icons';
 import ExportManyDialog from '@project-lc/components-seller/ExportManyDialog';
 import { getOrderItemOptionSteps } from '@project-lc/utils';
+import { useRouter } from 'next/router';
+import AdminDatagridWrapper, {
+  NOT_CHECKED_BY_ADMIN_CLASS_NAME,
+  useLatestCheckedDataId,
+} from './AdminDatagridWrapper';
+import AdminTabAlarmResetButton from './AdminTabAlarmResetButton';
 
 const columns: GridColumns = [
   {
@@ -143,8 +153,24 @@ export function AdminOrderList(): JSX.Element {
       data?.count ? data.count : prevRowCountState,
     );
   }, [data, setRowCountState]);
+
+  const latestCheckedDataId = useLatestCheckedDataId();
+
+  const router = useRouter();
+  const { data: adminCheckedData } = useAdminLatestCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLatestCheckedDataMutation();
+
+  const onResetButtonClick = async (): Promise<void> => {
+    if (!data || !data?.orders || !data.orders?.[0]) return;
+    // 가장 최근 데이터 = id 가장 큰값
+    const latestId = data.orders[0].id;
+
+    const dto = { ...adminCheckedData, [router.pathname]: latestId }; // pathname 을 키로 사용
+    adminCheckMutation(dto).catch((e) => console.error(e));
+  };
   return (
-    <>
+    <AdminDatagridWrapper>
+      <AdminTabAlarmResetButton onClick={onResetButtonClick} />
       <ChakraDataGrid
         checkboxSelection
         selectionModel={sellerOrderStates.selectedOrders}
@@ -174,6 +200,12 @@ export function AdminOrderList(): JSX.Element {
         rowsPerPageOptions={rowsPerPageOptions.current}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
         rows={data?.orders || []}
+        getRowClassName={(params) => {
+          if (params.row.id > latestCheckedDataId) {
+            return NOT_CHECKED_BY_ADMIN_CLASS_NAME;
+          }
+          return '';
+        }}
         minH={500}
         autoHeight
         loading={isLoading}
@@ -191,6 +223,6 @@ export function AdminOrderList(): JSX.Element {
         onClose={exportManyDialog.onClose}
         orders={data?.orders || []}
       />
-    </>
+    </AdminDatagridWrapper>
   );
 }
