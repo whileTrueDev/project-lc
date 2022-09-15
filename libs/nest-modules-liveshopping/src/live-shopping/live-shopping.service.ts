@@ -125,6 +125,7 @@ export class LiveShoppingService {
     const broadcasterId = dto?.broadcasterId;
     const sellerId = dto?.sellerId;
     return this.prisma.liveShopping.findMany({
+      orderBy: { id: 'desc' },
       where: {
         id: id || undefined,
         broadcasterId: broadcasterId || undefined,

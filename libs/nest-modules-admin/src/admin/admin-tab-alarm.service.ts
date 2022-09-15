@@ -85,18 +85,26 @@ export class AdminTabAlarmSevice {
     });
 
     // * 상품  -------------------------------- *
-    // 상품목록/검수 : 검수 승인 ‘대기중’인 상품 수에 따라 숫자 알림이 뜬다. => 관리자 상품검수목록은 필터적용시 id순으로 정렬되지 않아 관리자가 확인한 마지막 id를 특정할 수 없어 검수 상태로만 알림개수를 구함
+    // 상품목록/검수 : 검수 승인 ‘대기중’인 상품 수에 따라 숫자 알림이 뜬다.
+    // => 관리자 상품검수목록은 필터적용시 id순으로 정렬되지 않음. 관리자가 확인한 마지막 id를 특정할 수 없어 검수 상태로만 알림개수를 구함
     const goods = await this.prisma.goods.count({
       where: { confirmation: { status: { in: ['waiting', 'needReconfirmation'] } } },
     });
     // 상품 문의 관리 : 답변이 필요한 문의 수에 따라 숫자 알림이 뜬다.
+    // => 상품문의는 테이블형태로 표시되지 않음. 답변이 필요한 문의만 볼 수 있으므로 관리자가 확인한 마지막 데이터 id를 저장하지 않는다
     const goodsInquiry = await this.prisma.goodsInquiry.count({
       where: { status: 'requested' },
     });
     // * 라이브 쇼핑  -------------------------------- *
     // 신규 라이브 쇼핑 등록시 숫자 알림이 뜬다. => 신규 라이브쇼핑 등록시 status : registered
+    const latestCheckedLiveShoppingtId = checkedData?.['/live-shopping'];
     const liveShopping = await this.prisma.liveShopping.count({
-      where: { progress: 'registered' },
+      where: {
+        progress: 'registered',
+        id: latestCheckedLiveShoppingtId
+          ? { gt: latestCheckedLiveShoppingtId }
+          : undefined,
+      },
     });
     // * 주문  -------------------------------- *
     // 결제 취소 요청 : 신규 결제 취소 요청 수에 따라 알림이 뜬다. => 판매자의 결제취소요청
@@ -112,6 +120,7 @@ export class AdminTabAlarmSevice {
     });
     // 환불요청 : 미승인 환불 목록 수에 따라 알림이 뜬다.
     // => 소비자의 환불요청이란, 물품반환 없는 반품요청이다.(현재 크크쇼는 물건 반품하는 절차가 없고 바로 환불만 받는다)
+    // 기간필터가 존재하여 알림초기화를 위해 관리자가 마지막으로 확인한 데이터 id를 특정하기 어렵다
     const customerReturnRequest = await this.prisma.return.count({
       where: { status: { in: ['requested', 'canceled'] } },
     });
