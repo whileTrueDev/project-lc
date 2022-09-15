@@ -10,13 +10,24 @@ import {
 } from '@material-ui/data-grid';
 import { SellerBusinessRegistration } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { useDisplaySize, useAdminSettlementInfo } from '@project-lc/hooks';
+import {
+  useDisplaySize,
+  useAdminSettlementInfo,
+  useAdminLatestCheckedData,
+  useAdminLatestCheckedDataMutation,
+} from '@project-lc/hooks';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
 import { useState, ChangeEvent } from 'react';
 import { s3KeyType } from '@project-lc/utils-s3';
+import { useRouter } from 'next/router';
 import { AdminBusinessRegistrationConfirmationDialog } from './AdminBusinessRegistrationConfirmationDialog';
 import { AdminBusinessRegistrationRejectionDialog } from './AdminBusinessRegistrationRejectionDialog';
 import { AdminImageDownloadModal } from './AdminImageDownloadModal';
+import AdminDatagridWrapper, {
+  NOT_CHECKED_BY_ADMIN_CLASS_NAME,
+  useLatestCheckedDataId,
+} from './AdminDatagridWrapper';
+import AdminTabAlarmResetButton from './AdminTabAlarmResetButton';
 
 const columns: GridColumns = [
   {
@@ -234,10 +245,31 @@ export function AdminBusinessRegistrationList(): JSX.Element {
     };
   }
 
+  const latestCheckedDataId = useLatestCheckedDataId();
+
+  const router = useRouter();
+  const { data: adminCheckedData } = useAdminLatestCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLatestCheckedDataMutation();
+
+  const onResetButtonClick = async (): Promise<void> => {
+    if (
+      !settlementData ||
+      !settlementData.sellerBusinessRegistration ||
+      !settlementData.sellerBusinessRegistration[0]
+    )
+      return;
+    // 가장 최근 데이터 = id 가장 큰값
+    const latestId = settlementData.sellerBusinessRegistration[0].id;
+
+    const dto = { ...adminCheckedData, [router.pathname]: latestId }; // pathname 을 키로 사용
+    adminCheckMutation(dto).catch((e) => console.error(e));
+  };
+
   return (
     <>
       {settlementData && (
-        <>
+        <AdminDatagridWrapper>
+          <AdminTabAlarmResetButton onClick={onResetButtonClick} />
           <ChakraDataGrid
             borderWidth={0}
             hideFooter
@@ -248,6 +280,12 @@ export function AdminBusinessRegistrationList(): JSX.Element {
             rows={makeListRow<SellerBusinessRegistration>(
               settlementData.sellerBusinessRegistration,
             )}
+            getRowClassName={(params) => {
+              if (params.row.id > latestCheckedDataId) {
+                return NOT_CHECKED_BY_ADMIN_CLASS_NAME;
+              }
+              return '';
+            }}
             components={{
               Toolbar: CustomToolbar,
             }}
@@ -259,7 +297,7 @@ export function AdminBusinessRegistrationList(): JSX.Element {
             disableSelectionOnClick
             disableColumnMenu
           />
-        </>
+        </AdminDatagridWrapper>
       )}
       <AdminBusinessRegistrationRejectionDialog
         isOpen={isRejectionOpen}

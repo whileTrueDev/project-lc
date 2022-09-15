@@ -52,18 +52,25 @@ export class AdminTabAlarmSevice {
 
     // * 판매자  -------------------------------- *
     // 계좌정보 목록 : 신규 계좌 등록이 있을 경우 계좌수에 따라 숫자 알림이 뜬다.
-    const latestCheckedsellerAccountId = checkedData?.['/seller/account'];
+    const latestCheckedSellerAccountId = checkedData?.['/seller/account'];
     const sellerAccounts = await this.prisma.sellerSettlementAccount.count({
       where: {
-        id: latestCheckedsellerAccountId
-          ? { gt: latestCheckedsellerAccountId }
+        id: latestCheckedSellerAccountId
+          ? { gt: latestCheckedSellerAccountId }
           : undefined,
       },
     });
     // 사업자 등록정보 검수 : 검수상태가 ‘대기중’인 사업자 등록정보 수에 따라 숫자 알림이 뜬다.
+    const latestCheckedSellerBusinessRegistrationId =
+      checkedData?.['/seller/business-registration'];
     const sellerBusinessRegistration = await this.prisma.sellerBusinessRegistration.count(
       {
-        where: { confirmHistory: { some: { status: 'waiting' } } },
+        where: {
+          BusinessRegistrationConfirmation: { status: 'waiting' },
+          id: latestCheckedSellerBusinessRegistrationId
+            ? { gt: latestCheckedSellerBusinessRegistrationId }
+            : undefined,
+        },
       },
     );
     // 정산 : 신규 정산 대상 목록 수에 따라 숫자 알림이 뜬다.
