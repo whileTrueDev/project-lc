@@ -74,9 +74,15 @@ export class AdminTabAlarmSevice {
       },
     );
     // 정산 : 신규 정산 대상 목록 수에 따라 숫자 알림이 뜬다.
-    const sellerSettlementTargets = (
-      await this.sellerSettlementService.findAllSettleTargetList()
-    ).length;
+    const latestCheckedSellerSettlementTargetId = checkedData?.['/seller/settlement'];
+    const sellerSettlementTargets = await this.prisma.export.count({
+      where: {
+        sellerSettlementsId: null,
+        id: latestCheckedSellerSettlementTargetId
+          ? { gt: latestCheckedSellerSettlementTargetId }
+          : undefined,
+      },
+    });
 
     // * 상품  -------------------------------- *
     // 상품목록/검수 : 검수 승인 ‘대기중’인 상품 수에 따라 숫자 알림이 뜬다.
