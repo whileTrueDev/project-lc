@@ -52,8 +52,14 @@ export class AdminTabAlarmSevice {
 
     // * 판매자  -------------------------------- *
     // 계좌정보 목록 : 신규 계좌 등록이 있을 경우 계좌수에 따라 숫자 알림이 뜬다.
-    // TODO: 판매자 계좌 정보는 검수x => 관리자가 확인한 id 이후의 개수
-    const sellerAccounts = 0;
+    const latestCheckedsellerAccountId = checkedData?.['/seller/account'];
+    const sellerAccounts = await this.prisma.sellerSettlementAccount.count({
+      where: {
+        id: latestCheckedsellerAccountId
+          ? { gt: latestCheckedsellerAccountId }
+          : undefined,
+      },
+    });
     // 사업자 등록정보 검수 : 검수상태가 ‘대기중’인 사업자 등록정보 수에 따라 숫자 알림이 뜬다.
     const sellerBusinessRegistration = await this.prisma.sellerBusinessRegistration.count(
       {

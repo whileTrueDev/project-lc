@@ -77,6 +77,9 @@ export class AdminService {
       }
     });
 
+    // id desc 기준으로 정렬
+    result.sellerSettlementAccount.sort((a, b) => b.id - a.id);
+    result.sellerBusinessRegistration.sort((a, b) => b.id - a.id);
     return result;
   }
 
