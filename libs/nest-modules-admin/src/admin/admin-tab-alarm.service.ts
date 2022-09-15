@@ -14,7 +14,7 @@ export class AdminTabAlarmSevice {
 
   /** 관리자페이지 사이드바에 표시할 탭별 신규 데이터 개수 조회 */
   async getAdminNotiCounts(): Promise<AdminNotiCountRes> {
-    const checkedData = await this.getLatestCheckedData();
+    const checkedData = await this.getLatestCheckedData(); // router.pathname 값(admin pages 경로)을 키로 사용함
 
     // * 방송인  -------------------------------- *
     // 정산정보 검수 : 대기중인 방송인 수에 따라 숫자 알림이 뜬다. (& 관리자가 확인한 마지막 데이터 이후 추가된)
@@ -27,9 +27,28 @@ export class AdminTabAlarmSevice {
           : undefined,
       },
     });
-    // 정산 : 신규 정산 대상 목록 수에 따라 숫자 알림이 뜬다.
-    const bcSettlementTargets = (await this.settlementService.findSettlementTargets())
-      .length;
+    // 정산 : 신규 정산 대상 목록 수에 따라 숫자 알림이 뜬다. (& 관리자가 확인한 마지막 데이터 이후 추가된)
+    const latestCheckedbcSettlementTargetsId = checkedData?.['/broadcaster/settlement'];
+    // BroadcasterSettlementService.findSettlementTargets 함수에서 export 조회할때와 동일한 where절을 사용한다 & 관리자가 확인한 마지막id보다 큰 데이터
+    const bcSettlementTargets = await this.prisma.export.count({
+      where: {
+        broadcasterSettlementItems: null,
+        buyConfirmSubject: { not: null },
+        buyConfirmDate: { not: null },
+        order: {
+          deleteFlag: false,
+          supportOrderIncludeFlag: true,
+          orderItems: {
+            some: {
+              support: { broadcasterId: { not: null } },
+            },
+          },
+        },
+        id: latestCheckedbcSettlementTargetsId
+          ? { gt: latestCheckedbcSettlementTargetsId }
+          : undefined,
+      },
+    });
 
     // * 판매자  -------------------------------- *
     // 계좌정보 목록 : 신규 계좌 등록이 있을 경우 계좌수에 따라 숫자 알림이 뜬다.

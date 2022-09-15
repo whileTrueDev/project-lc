@@ -41,6 +41,10 @@ import { settlementHistoryStore } from '@project-lc/stores';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useCallback, useMemo, useState } from 'react';
+import AdminDatagridWrapper, {
+  NOT_CHECKED_BY_ADMIN_CLASS_NAME,
+  useLatestCheckedDataId,
+} from './AdminDatagridWrapper';
 
 export function calcSettleAmount(
   price: number,
@@ -59,6 +63,7 @@ function TotalAmountCell({ row }: GridCellParams): JSX.Element {
 
 /** 방송인 수익 정산 대상 목록 */
 export function BcSettlementTargetList(): JSX.Element {
+  const latestCheckedDataId = useLatestCheckedDataId();
   const targets = useBcSettlementTargets();
 
   // * 상세보기 관련
@@ -182,34 +187,42 @@ export function BcSettlementTargetList(): JSX.Element {
 
   return (
     <Box minHeight={{ base: 300, md: 400 }} mt={3}>
-      <ChakraDataGrid
-        bg={useColorModeValue('inherit', 'gray.300')}
-        autoHeight
-        columns={columns}
-        rows={targets.data || []}
-        rowsPerPageOptions={[10, 20, 50, 100]}
-        disableSelectionOnClick
-        disableColumnMenu
-        checkboxSelection
-        selectionModel={selectedRows}
-        onSelectionModelChange={handleRowSelected}
-        density="compact"
-        components={{
-          Toolbar: () => (
-            <Box py={2}>
-              <Button
-                size="sm"
-                isDisabled={selectedRows.length <= 0}
-                rightIcon={<ExternalLinkIcon />}
-                colorScheme="blue"
-                onClick={confirmDialog.onOpen}
-              >
-                일괄정산처리
-              </Button>
-            </Box>
-          ),
-        }}
-      />
+      <AdminDatagridWrapper>
+        <ChakraDataGrid
+          bg={useColorModeValue('inherit', 'gray.300')}
+          autoHeight
+          columns={columns}
+          rows={targets.data || []}
+          getRowClassName={(params) => {
+            if (params.row.id > latestCheckedDataId) {
+              return NOT_CHECKED_BY_ADMIN_CLASS_NAME;
+            }
+            return '';
+          }}
+          rowsPerPageOptions={[10, 20, 50, 100]}
+          disableSelectionOnClick
+          disableColumnMenu
+          checkboxSelection
+          selectionModel={selectedRows}
+          onSelectionModelChange={handleRowSelected}
+          density="compact"
+          components={{
+            Toolbar: () => (
+              <Box py={2}>
+                <Button
+                  size="sm"
+                  isDisabled={selectedRows.length <= 0}
+                  rightIcon={<ExternalLinkIcon />}
+                  colorScheme="blue"
+                  onClick={confirmDialog.onOpen}
+                >
+                  일괄정산처리
+                </Button>
+              </Box>
+            ),
+          }}
+        />
+      </AdminDatagridWrapper>
 
       {/* 일괄 정산 처리 확인 다이얼로그 */}
       <ConfirmDialog
