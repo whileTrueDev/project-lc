@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 import 'source-map-support/register';
 import { LCDevAppStack } from '../lib/dev/app-stack';
 import { LCDevDatabaseStack } from '../lib/dev/database-stack';
-// import { LCDevLambdaStack } from '../lib/dev/lambda-stack';
+import { LCDevLambdaStack } from '../lib/dev/lambda-stack';
 import { LCDevPrivateAppStack } from '../lib/dev/private-app-stack';
 import { LCDevRedisStack } from '../lib/dev/redis-stack';
 import { LCDevVpcStack } from '../lib/dev/vpc-stack';
@@ -54,7 +54,7 @@ new LCDevPrivateAppStack(app, 'LC-DEV-PRIVATE-APP', {
 });
 
 // Serverless lambda functions
-// new LCDevLambdaStack(app, 'LC-DEV-LAMBDA', {});
+new LCDevLambdaStack(app, 'LC-DEV-LAMBDA', {});
 
 // ************************************
 // * Production 환경

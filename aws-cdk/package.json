@@ -26,7 +26,6 @@
     "constructs": "^10.1.102",
     "dotenv": "^10.0.0",
     "joi": "^17.4.2",
-    "sharp": "^0.31.0",
     "source-map-support": "^0.5.16"
   }
 }
