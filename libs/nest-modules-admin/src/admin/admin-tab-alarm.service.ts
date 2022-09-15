@@ -85,7 +85,7 @@ export class AdminTabAlarmSevice {
     });
 
     // * 상품  -------------------------------- *
-    // 상품목록/검수 : 검수 승인 ‘대기중’인 상품 수에 따라 숫자 알림이 뜬다.
+    // 상품목록/검수 : 검수 승인 ‘대기중’인 상품 수에 따라 숫자 알림이 뜬다. => 관리자 상품검수목록은 필터적용시 id순으로 정렬되지 않아 관리자가 확인한 마지막 id를 특정할 수 없어 검수 상태로만 알림개수를 구함
     const goods = await this.prisma.goods.count({
       where: { confirmation: { status: { in: ['waiting', 'needReconfirmation'] } } },
     });

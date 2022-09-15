@@ -29,6 +29,9 @@ import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 import { ConfirmationBadge } from './AdminBusinessRegistrationList';
+import AdminDatagridWrapper, {
+  NOT_CHECKED_BY_ADMIN_CLASS_NAME,
+} from './AdminDatagridWrapper';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
 import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
 
@@ -326,10 +329,19 @@ export function AdminGoodsList(): JSX.Element {
   } = useAdminGoodsConfirmList({ sort, direction });
 
   return (
-    <>
+    <AdminDatagridWrapper>
       <ChakraDataGrid
         loading={isLoading}
         rows={rows}
+        getRowClassName={(params) => {
+          if (
+            params.row.confirmation?.status === 'waiting' ||
+            params.row.confirmation?.status === 'needReconfirmation'
+          ) {
+            return NOT_CHECKED_BY_ADMIN_CLASS_NAME;
+          }
+          return '';
+        }}
         autoHeight
         columns={columns}
         disableSelectionOnClick
@@ -387,7 +399,7 @@ export function AdminGoodsList(): JSX.Element {
         onClose={rejectionDialog.onClose}
         row={selectedRow}
       />
-    </>
+    </AdminDatagridWrapper>
   );
 }
 
