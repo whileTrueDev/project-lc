@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { BroadcasterSettlementService } from '@project-lc/nest-modules-broadcaster';
 import { SellerSettlementService } from '@project-lc/nest-modules-seller';
-import { AdminNotiCountRes } from '@project-lc/shared-types';
+import { AdminNotiCountRes, LatestCheckedDataRes } from '@project-lc/shared-types';
 
 @Injectable()
 export class AdminTabAlarmSevice {
@@ -14,10 +14,18 @@ export class AdminTabAlarmSevice {
 
   /** 관리자페이지 사이드바에 표시할 탭별 신규 데이터 개수 조회 */
   async getAdminNotiCounts(): Promise<AdminNotiCountRes> {
+    const checkedData = await this.getLatestCheckedData();
+
     // * 방송인  -------------------------------- *
-    // 정산정보 검수 : 대기중인 방송인 수에 따라 숫자 알림이 뜬다.
+    // 정산정보 검수 : 대기중인 방송인 수에 따라 숫자 알림이 뜬다. (& 관리자가 확인한 마지막 데이터 이후 추가된)
+    const latestCheckedBcSettlementInfoId = checkedData?.['/broadcaster/settlement-info'];
     const bcSettlementInfo = await this.prisma.broadcasterSettlementInfo.count({
-      where: { confirmation: { status: 'waiting' } },
+      where: {
+        confirmation: { status: 'waiting' },
+        id: latestCheckedBcSettlementInfoId
+          ? { gt: latestCheckedBcSettlementInfoId }
+          : undefined,
+      },
     });
     // 정산 : 신규 정산 대상 목록 수에 따라 숫자 알림이 뜬다.
     const bcSettlementTargets = (await this.settlementService.findSettlementTargets())
@@ -86,5 +94,19 @@ export class AdminTabAlarmSevice {
       '/order/refund': customerReturnRequest,
       '/general/inquiry': generalInquiry,
     };
+  }
+
+  async updateLatestCheckedData(dto: Record<string, number>): Promise<boolean> {
+    await this.prisma.adminLatestCheckedData.update({
+      where: { id: 1 },
+      data: { data: dto },
+    });
+    return true;
+  }
+
+  async getLatestCheckedData(): Promise<LatestCheckedDataRes> {
+    const data = await this.prisma.adminLatestCheckedData.findFirst();
+    if (!data) return {};
+    return JSON.parse(JSON.stringify(data.data));
   }
 }
