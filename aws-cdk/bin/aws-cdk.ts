@@ -12,6 +12,7 @@ import { LCDomainStack } from '../lib/env-agnostic/domain-stack';
 import { LCProdAppStack } from '../lib/prod/app-stack';
 import { LCBatchAppStack } from '../lib/prod/batch-app-stack';
 import { LCProdDatabaseStack } from '../lib/prod/database-stack';
+import { LCProdLambdaStack } from '../lib/prod/lambda-stack';
 import { LCProdPrivateAppStack } from '../lib/prod/private-app-stack';
 import { LCRedisStack } from '../lib/prod/redis-stack';
 import { LCProdVpcStack } from '../lib/prod/vpc-stack';
@@ -96,6 +97,9 @@ new LCBatchAppStack(app, 'LC-PROD-BATCH-APP', {
   inactiveBatchSecGrp: prodVpcStack.inactiveBatchSecGrp,
   virtualAccountBatchSecGrp: prodVpcStack.virtualAccountBatchSecGrp,
 });
+
+// Serverless lambda functions
+new LCProdLambdaStack(app, 'LC-PROD-LAMBDA', {});
 
 // ************************************
 // * 퍼블릭 도메인
