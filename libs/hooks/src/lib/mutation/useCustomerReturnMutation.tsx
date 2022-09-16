@@ -78,6 +78,9 @@ export const useUpdateReturnMutation = (): UseMutationResult<
         queryClient.invalidateQueries('OrderDetail');
         queryClient.invalidateQueries('customerReturnDetail');
         queryClient.invalidateQueries('AdminReturnList');
+        queryClient.invalidateQueries('AdminSidebarNotiCounts', {
+          refetchInactive: true,
+        });
       },
     },
   );
