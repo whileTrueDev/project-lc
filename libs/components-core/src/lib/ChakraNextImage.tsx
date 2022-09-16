@@ -20,6 +20,7 @@ export const ChakraNextImageBase = chakra(Image, {
       'blurDataURL',
       'lazyBoundray',
       'lazyRoot',
+      'onError',
     ].includes(prop),
 });
 

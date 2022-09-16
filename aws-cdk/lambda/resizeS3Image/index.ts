@@ -11,11 +11,11 @@ type Prefixes = Array<{ key: string; size: Size }>;
 const prefixes: Prefixes = [
   { key: 'avatar/', size: 200 },
   { key: 'goods-category/', size: 200 },
-  { key: 'kkshow-main-carousel-images/', size: { x: 1000, y: 500 } },
-  { key: 'kkshow-shopping-carousel-images/', size: { x: 1000, y: 500 } },
-  { key: 'kkshow-shopping-banner-images/', size: 200 },
+  // { key: 'kkshow-main-carousel-images/', size: { x: 1000, y: 500 } },
+  // { key: 'kkshow-shopping-carousel-images/', size: { x: 1000, y: 500 } },
+  // { key: 'kkshow-shopping-banner-images/', size: 200 },
   { key: 'goods-review-images/', size: 200 },
-  { key: 'goods/', size: 300 },
+  { key: 'goods/', size: 450 },
 ];
 
 const generateResizedKey = (targetKey: string): string => {

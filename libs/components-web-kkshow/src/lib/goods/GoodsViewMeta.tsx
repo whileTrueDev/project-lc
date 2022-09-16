@@ -18,7 +18,11 @@ import { Goods, GoodsStatus } from '@prisma/client';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { GoodsStatusBadge } from '@project-lc/components-shared/GoodsStatusBadge';
 import ShippingGroupSets from '@project-lc/components-shared/shipping/ShippingGroupSets';
-import { useGoodsById, useLiveShoppingNowOnLive } from '@project-lc/hooks';
+import {
+  useGoodsById,
+  useLiveShoppingNowOnLive,
+  useResizedImage,
+} from '@project-lc/hooks';
 import { GoodsByIdRes } from '@project-lc/shared-types';
 import { useGoodsViewStore } from '@project-lc/stores';
 import {
@@ -139,18 +143,11 @@ export function GoodsViewImages({
     <Flex gap={2} flexDir={{ base: 'column-reverse', md: 'row' }}>
       <Box display={{ base: 'flex', md: 'block' }} gap={2} flexWrap="wrap">
         {images.map((i, idx) => (
-          <Image
-            cursor="pointer"
-            _hover={{ outline: '2px solid', outlineColor: 'blue.400' }}
-            outline={selectedImageIdx === idx ? '2px solid' : undefined}
-            outlineColor={selectedImageIdx === idx ? 'blue.400' : undefined}
-            draggable={false}
+          <GoodsViewImagesItem
             key={i.id}
+            isSeleceted={selectedImageIdx === idx}
             src={i.image}
             alt={goodsName + i.id}
-            width="45px"
-            mb={2}
-            rounded="md"
             onMouseEnter={() => setSelectedImageIdx(idx)}
           />
         ))}
@@ -166,6 +163,35 @@ export function GoodsViewImages({
         />
       </AspectRatio>
     </Flex>
+  );
+}
+interface GoodsViewImagesItemProps {
+  src: string;
+  alt: string;
+  isSeleceted?: boolean;
+  onMouseEnter: () => void;
+}
+function GoodsViewImagesItem({
+  src,
+  alt,
+  isSeleceted,
+  onMouseEnter,
+}: GoodsViewImagesItemProps): JSX.Element {
+  const resizedImageProps = useResizedImage(src);
+  return (
+    <Image
+      cursor="pointer"
+      _hover={{ outline: '2px solid', outlineColor: 'blue.400' }}
+      outline={isSeleceted ? '2px solid' : undefined}
+      outlineColor={isSeleceted ? 'blue.400' : undefined}
+      draggable={false}
+      alt={alt}
+      width="45px"
+      mb={2}
+      rounded="md"
+      onMouseEnter={onMouseEnter}
+      {...resizedImageProps}
+    />
   );
 }
 
