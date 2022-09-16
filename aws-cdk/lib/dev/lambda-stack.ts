@@ -15,13 +15,9 @@ export class LCDevLambdaStack extends Stack {
     const fn = new NodejsFunction(this, `${PREFIX}resizeImage2`, {
       entry: 'lambda/resizeS3Image/index.ts',
       handler: 'handler',
-      bundling: {
-        nodeModules: ['sharp'],
-      },
-      environment: {
-        S3_BUCKET_REGION: 'ap-northeast-2',
-      },
-      logRetention: RetentionDays.ONE_WEEK,
+      bundling: { nodeModules: ['sharp'] },
+      environment: { S3_BUCKET_REGION: 'ap-northeast-2' },
+      logRetention: RetentionDays.ONE_DAY,
       timeout: Duration.seconds(15),
     });
 

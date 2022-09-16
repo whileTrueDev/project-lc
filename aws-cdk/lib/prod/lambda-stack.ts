@@ -14,14 +14,10 @@ export class LCProdLambdaStack extends Stack {
     const fn = new NodejsFunction(this, `${constants.PROD.ID_PREFIX}resizeImage`, {
       entry: 'lambda/resizeS3Image/index.ts',
       handler: 'handler',
-      bundling: {
-        nodeModules: ['sharp'],
-      },
-      environment: {
-        S3_BUCKET_REGION: 'ap-northeast-2',
-      },
+      bundling: { nodeModules: ['sharp'] },
+      environment: { S3_BUCKET_REGION: 'ap-northeast-2' },
       logRetention: RetentionDays.ONE_WEEK,
-      timeout: Duration.seconds(15),
+      timeout: Duration.seconds(20), // prod는 더 관대한 timeout을 가지도록 구성
     });
 
     const bucket = Bucket.fromBucketName(
