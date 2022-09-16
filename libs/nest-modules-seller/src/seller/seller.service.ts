@@ -210,11 +210,9 @@ export class SellerService {
     email: Seller['email'],
     file: Express.Multer.File,
   ): Promise<boolean> {
-    const size = 200;
-    const resized = await this.imageResizer.resize(file.buffer, size);
     const avatarUrl = await s3.uploadProfileImage({
-      key: `${size}x${size}_${file.originalname}`,
-      file: resized,
+      key: file.originalname,
+      file: file.buffer,
       email,
       userType: 'seller',
     });
