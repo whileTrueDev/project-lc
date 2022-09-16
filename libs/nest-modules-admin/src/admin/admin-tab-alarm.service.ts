@@ -107,10 +107,6 @@ export class AdminTabAlarmSevice {
       },
     });
     // * 주문  -------------------------------- *
-    // 결제 취소 요청 : 신규 결제 취소 요청 수에 따라 알림이 뜬다. => 판매자의 결제취소요청
-    const sellerOrderCancelRequest = await this.prisma.sellerOrderCancelRequest.count({
-      where: { status: 'waiting' },
-    });
     // 주문목록 : 신규 주문 건수에 따라 알림이 뜬다. (관리자가 알림 초기화로 )
     const latestCheckedOrderId = checkedData?.['/order/list'];
     const orders = await this.prisma.order.count({
@@ -122,7 +118,7 @@ export class AdminTabAlarmSevice {
     // => 소비자의 환불요청이란, 물품반환 없는 반품요청이다.(현재 크크쇼는 물건 반품하는 절차가 없고 바로 환불만 받는다)
     // 기간필터가 존재하여 알림초기화를 위해 관리자가 마지막으로 확인한 데이터 id를 특정하기 어렵다
     const customerReturnRequest = await this.prisma.return.count({
-      where: { status: { in: ['requested', 'canceled'] } },
+      where: { NOT: { status: 'complete' } },
     });
     // * 일반 관리  -------------------------------- *
     // 문의하기 : 신규 문의 수에 따라 숫자 알림이 뜬다.
@@ -140,7 +136,6 @@ export class AdminTabAlarmSevice {
       '/goods/confirmation': goods,
       '/goods/inquiry': goodsInquiry,
       '/live-shopping': liveShopping,
-      '/order/order-cancel': sellerOrderCancelRequest,
       '/order/list': orders,
       '/order/refund': customerReturnRequest,
       '/general/inquiry': generalInquiry,
