@@ -6,26 +6,38 @@ import { S3PutEvent } from './S3PutEvent';
 const S3_BUCKET_REGION = process.env.S3_BUCKET_REGION || 'ap-northeast-2';
 const s3 = new S3({ region: S3_BUCKET_REGION });
 
-const generateResizedKey = (targetKey: string, size: number): string => {
+type Size = number | Record<'x' | 'y', number>;
+type Prefixes = Array<{ key: string; size: Size }>;
+const prefixes: Prefixes = [
+  { key: 'avatar/', size: 200 },
+  { key: 'goods-category/', size: 200 },
+  { key: 'kkshow-main-carousel-images/', size: { x: 1000, y: 500 } },
+  { key: 'kkshow-shopping-carousel-images/', size: { x: 1000, y: 500 } },
+  { key: 'kkshow-shopping-banner-images/', size: 200 },
+  { key: 'goods-review-images/', size: 200 },
+  { key: 'goods/', size: 300 },
+];
+
+const generateResizedKey = (targetKey: string): string => {
   const resized = 'resized-';
-  const dotIdx = targetKey.lastIndexOf('.');
-  const filenameWithoutExt = targetKey.slice(0, dotIdx);
-  const ext = targetKey.slice(dotIdx, targetKey.length);
-  const sizes = `${size}x${size}`;
-  return resized + filenameWithoutExt + sizes + ext;
+  return resized + targetKey;
 };
 
 export const handler = async (event: S3PutEvent, _context: Context): Promise<any> => {
   console.log('event: ', event);
-
   const result = await Promise.all(
     event.Records?.map(async (record) => {
-      const size = 200;
+      console.log('record: ', record);
+
       const bucket = record.s3.bucket.name;
       const srcKey = decodeURIComponent(record.s3.object.key.replace(/\+/g, ' '));
-      const resultKey = generateResizedKey(srcKey, size);
-
-      console.log('record: ', record);
+      const target = prefixes.find((p) => srcKey.startsWith(p.key));
+      if (!target) {
+        console.log(`${srcKey} is not in target prefixes`);
+        return;
+      }
+      const { size } = target;
+      const resultKey = generateResizedKey(srcKey);
 
       const imageExtMatch = srcKey.match(/\.([^.]*)$/);
       if (!imageExtMatch) {
@@ -41,10 +53,23 @@ export const handler = async (event: S3PutEvent, _context: Context): Promise<any
           console.log('s3object.Body is not defined');
           return;
         }
-        const buffer = await sharp(image.Body as Buffer)
-          .resize(size)
-          .toBuffer();
-        console.log('sharped buffer: ', buffer);
+        const resizeSize: [number, number] =
+          typeof size === 'number' ? [size, size] : [size.x, size.y];
+        let buffer: Buffer | null = null;
+        try {
+          buffer = await sharp(image.Body as Buffer)
+            .resize(...resizeSize, { fit: 'fill' })
+            .toBuffer();
+          console.log('sharped buffer: ', buffer);
+        } catch (e) {
+          console.log('err occurred during resizing image - ', e);
+          return;
+        }
+
+        if (!buffer) {
+          console.log('err occurred during resizing image');
+          return;
+        }
 
         const putResult = await s3
           .putObject({
@@ -61,7 +86,11 @@ export const handler = async (event: S3PutEvent, _context: Context): Promise<any
         return putResult;
       } catch (err) {
         console.log('error occurred - ', err);
-        throw err;
+        // eslint-disable-next-line consistent-return
+        return {
+          statusCode: 500,
+          body: err,
+        };
       }
     }),
   );

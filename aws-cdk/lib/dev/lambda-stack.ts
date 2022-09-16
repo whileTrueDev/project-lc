@@ -1,4 +1,4 @@
-import { Stack } from 'aws-cdk-lib';
+import { Duration, Stack } from 'aws-cdk-lib';
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
@@ -22,6 +22,7 @@ export class LCDevLambdaStack extends Stack {
         S3_BUCKET_REGION: 'ap-northeast-2',
       },
       logRetention: RetentionDays.ONE_WEEK,
+      timeout: Duration.seconds(15),
     });
 
     const bucket = Bucket.fromBucketName(
@@ -39,20 +40,6 @@ export class LCDevLambdaStack extends Stack {
     );
 
     // Nodejs-lambda
-    bucket.addObjectCreatedNotification(
-      new LambdaDestination(fn),
-      // ...filters
-      { prefix: 'avatar/' },
-      { prefix: 'goods-category/' },
-      { prefix: 'kkshow-main-carousel-images/' },
-      { prefix: 'kkshow-shopping-carousel-images' },
-      { prefix: 'kkshow-shopping-banner-images' },
-      { prefix: 'kkshow-shopping-carousel-images' },
-      { prefix: 'kkshow-shopping-goods' },
-      { prefix: 'kkshow-shopping-keywords-theme-images' },
-      { prefix: 'manual' },
-      { prefix: 'goods-review-images' },
-      { prefix: 'goods' },
-    );
+    bucket.addObjectCreatedNotification(new LambdaDestination(fn));
   }
 }
