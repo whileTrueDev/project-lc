@@ -2,4 +2,4 @@
 export type AdminNotiCountRes = Record<string, number>;
 
 // {adminSidebarMenuList.href : 마지막으로 확인한 데이터의 id } 형태
-export type LatestCheckedDataRes = Record<string, number>;
+export type LastCheckedDataRes = Record<string, number>;

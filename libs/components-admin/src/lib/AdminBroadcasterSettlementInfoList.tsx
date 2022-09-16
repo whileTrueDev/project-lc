@@ -5,8 +5,8 @@ import { TAX_TYPE } from '@project-lc/components-constants/taxType';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import {
   useAdminBroadcasterSettlementInfoList,
-  useAdminLatestCheckedData,
-  useAdminLatestCheckedDataMutation,
+  useAdminLastCheckedData,
+  useAdminLastCheckedDataMutation,
   useDisplaySize,
 } from '@project-lc/hooks';
 import { BroadcasterSettlementInfoListRes } from '@project-lc/shared-types';
@@ -156,8 +156,8 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
 
   // 알림초기화 핸들러
   const router = useRouter();
-  const { data: adminCheckedData } = useAdminLatestCheckedData();
-  const { mutateAsync: adminCheckMutation } = useAdminLatestCheckedDataMutation();
+  const { data: adminCheckedData } = useAdminLastCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLastCheckedDataMutation();
 
   const onResetButtonClick = async (): Promise<void> => {
     if (!data || !data[0]) return;

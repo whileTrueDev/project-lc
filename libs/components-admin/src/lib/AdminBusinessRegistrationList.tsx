@@ -13,8 +13,8 @@ import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import {
   useDisplaySize,
   useAdminSettlementInfo,
-  useAdminLatestCheckedData,
-  useAdminLatestCheckedDataMutation,
+  useAdminLastCheckedData,
+  useAdminLastCheckedDataMutation,
 } from '@project-lc/hooks';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
 import { useState, ChangeEvent } from 'react';
@@ -248,8 +248,8 @@ export function AdminBusinessRegistrationList(): JSX.Element {
   const latestCheckedDataId = useLatestCheckedDataId();
 
   const router = useRouter();
-  const { data: adminCheckedData } = useAdminLatestCheckedData();
-  const { mutateAsync: adminCheckMutation } = useAdminLatestCheckedDataMutation();
+  const { data: adminCheckedData } = useAdminLastCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLastCheckedDataMutation();
 
   const onResetButtonClick = async (): Promise<void> => {
     if (

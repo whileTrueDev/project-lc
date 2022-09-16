@@ -4,8 +4,8 @@ import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { OrderToolbar } from '@project-lc/components-seller/kkshow-order/OrderList';
 import {
-  useAdminLatestCheckedData,
-  useAdminLatestCheckedDataMutation,
+  useAdminLastCheckedData,
+  useAdminLastCheckedDataMutation,
   useAdminOrderList,
 } from '@project-lc/hooks';
 import { convertPaymentMethodToKrString, OrderListRes } from '@project-lc/shared-types';
@@ -157,8 +157,8 @@ export function AdminOrderList(): JSX.Element {
   const latestCheckedDataId = useLatestCheckedDataId();
 
   const router = useRouter();
-  const { data: adminCheckedData } = useAdminLatestCheckedData();
-  const { mutateAsync: adminCheckMutation } = useAdminLatestCheckedDataMutation();
+  const { data: adminCheckedData } = useAdminLastCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLastCheckedDataMutation();
 
   const onResetButtonClick = async (): Promise<void> => {
     if (!data || !data?.orders || !data.orders?.[0]) return;

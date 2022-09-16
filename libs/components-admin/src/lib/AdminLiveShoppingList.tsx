@@ -5,8 +5,8 @@ import { GoodsConfirmationStatuses } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
 import {
-  useAdminLatestCheckedData,
-  useAdminLatestCheckedDataMutation,
+  useAdminLastCheckedData,
+  useAdminLastCheckedDataMutation,
   useAdminLiveShoppingList,
   useProfile,
 } from '@project-lc/hooks';
@@ -204,8 +204,8 @@ export function AdminLiveShoppingList({
   const latestCheckedDataId = useLatestCheckedDataId();
 
   const router = useRouter();
-  const { data: adminCheckedData } = useAdminLatestCheckedData();
-  const { mutateAsync: adminCheckMutation } = useAdminLatestCheckedDataMutation();
+  const { data: adminCheckedData } = useAdminLastCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLastCheckedDataMutation();
 
   const onResetButtonClick = async (): Promise<void> => {
     if (!data || !data[0]) return;

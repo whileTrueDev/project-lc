@@ -29,8 +29,8 @@ import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
 import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
 import {
-  useAdminLatestCheckedData,
-  useAdminLatestCheckedDataMutation,
+  useAdminLastCheckedData,
+  useAdminLastCheckedDataMutation,
   useBcSettlementTargets,
   useBroadcasterSettlementTotalInfo,
   useCreateSettleBcManyMutation,
@@ -190,8 +190,8 @@ export function BcSettlementTargetList(): JSX.Element {
   };
 
   const router = useRouter();
-  const { data: adminCheckedData } = useAdminLatestCheckedData();
-  const { mutateAsync: adminCheckMutation } = useAdminLatestCheckedDataMutation();
+  const { data: adminCheckedData } = useAdminLastCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLastCheckedDataMutation();
 
   const onResetButtonClick = async (): Promise<void> => {
     if (!targets.data || !targets.data?.[0]) return;

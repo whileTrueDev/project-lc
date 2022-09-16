@@ -31,8 +31,8 @@ import { SellType } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { CommissionInfo } from '@project-lc/components-shared/CommissionInfo';
 import {
-  useAdminLatestCheckedData,
-  useAdminLatestCheckedDataMutation,
+  useAdminLastCheckedData,
+  useAdminLastCheckedDataMutation,
   useCreateSettlementMutation,
   useSellCommission,
   useSellerSettlementTargets,
@@ -144,8 +144,8 @@ export function SettlementTargetList(): JSX.Element | null {
   const latestCheckedDataId = useLatestCheckedDataId();
 
   const router = useRouter();
-  const { data: adminCheckedData } = useAdminLatestCheckedData();
-  const { mutateAsync: adminCheckMutation } = useAdminLatestCheckedDataMutation();
+  const { data: adminCheckedData } = useAdminLastCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLastCheckedDataMutation();
 
   const onResetButtonClick = async (): Promise<void> => {
     if (!targets.data || !targets.data?.[0]) return;

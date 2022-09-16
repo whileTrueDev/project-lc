@@ -1,8 +1,8 @@
 import { GridColumns, GridCellParams } from '@material-ui/data-grid';
 import { SellerSettlementAccount } from '@prisma/client';
 import {
-  useAdminLatestCheckedData,
-  useAdminLatestCheckedDataMutation,
+  useAdminLastCheckedData,
+  useAdminLastCheckedDataMutation,
   useDisplaySize,
 } from '@project-lc/hooks';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
@@ -78,8 +78,8 @@ export function AdminAccountList(props: {
   const latestCheckedDataId = useLatestCheckedDataId();
 
   const router = useRouter();
-  const { data: adminCheckedData } = useAdminLatestCheckedData();
-  const { mutateAsync: adminCheckMutation } = useAdminLatestCheckedDataMutation();
+  const { data: adminCheckedData } = useAdminLastCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLastCheckedDataMutation();
 
   const onResetButtonClick = async (): Promise<void> => {
     if (!sellerSettlementAccount || !sellerSettlementAccount[0]) return;
