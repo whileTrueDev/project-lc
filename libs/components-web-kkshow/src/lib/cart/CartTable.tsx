@@ -28,6 +28,7 @@ import {
   CartItemOption as CartItemOptionType,
 } from '@prisma/client';
 import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
+import CustomAvatar from '@project-lc/components-core/CustomAvatar';
 import {
   useCart,
   useCartItemDeleteMutation,
@@ -38,6 +39,7 @@ import {
   useIsThisGoodsNowOnLive,
   useLiveShoppingSpecialPriceListNowOnLiveByBroadcaster,
   useProductPromotions,
+  useResizedImage,
 } from '@project-lc/hooks';
 import { CartItemRes } from '@project-lc/shared-types';
 import { useCartStore } from '@project-lc/stores';
@@ -366,8 +368,8 @@ export function CartItemDisplay({
             {nowAvailablePp && cartItem.support && cartItem.support.broadcaster && (
               <Flex alignItems="center" gap={1} color="GrayText">
                 <Badge>후원방송인</Badge>
-                <Avatar
-                  src={cartItem.support.broadcaster.avatar || undefined}
+                <CustomAvatar
+                  src={cartItem?.support?.broadcaster.avatar || ''}
                   size="sm"
                 />
                 <Text fontSize="sm" noOfLines={1}>

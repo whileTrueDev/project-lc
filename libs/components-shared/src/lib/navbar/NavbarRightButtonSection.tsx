@@ -16,7 +16,13 @@ import {
 } from '@chakra-ui/react';
 import { QuickMenuLink } from '@project-lc/components-constants/quickMenu';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
-import { useDisplaySize, useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
+import {
+  useDisplaySize,
+  useIsLoggedIn,
+  useLogout,
+  useProfile,
+  useResizedImage,
+} from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { AiOutlineSetting } from 'react-icons/ai';
 import { FaMoon, FaSun } from 'react-icons/fa';
@@ -104,12 +110,12 @@ export function PersonalPopoverMenu({
   const { isMobileSize } = useDisplaySize();
   const { colorMode, toggleColorMode } = useColorMode();
   const SwitchIcon = useColorModeValue(FaMoon, FaSun);
-
+  const resizedImageProps = useResizedImage(profileData?.avatar);
   return (
     <Menu>
       {({ onClose }) => (
         <>
-          <MenuButton as={Avatar} size="sm" cursor="pointer" src={profileData?.avatar} />
+          <MenuButton as={Avatar} size="sm" cursor="pointer" {...resizedImageProps} />
 
           <Portal>
             <MenuList w={{ base: 280, sm: 300 }} zIndex="popover">

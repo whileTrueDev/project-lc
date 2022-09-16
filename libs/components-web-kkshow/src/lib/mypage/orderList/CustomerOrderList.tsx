@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Button,
   Center,
   Spinner,
@@ -7,15 +6,16 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
+import CustomAvatar from '@project-lc/components-core/CustomAvatar';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { INFINITE_ORDER_LIST_QUERY_KEY, useInfiniteOrderList } from '@project-lc/hooks';
 import { GetOrderListDto, OrderDataWithRelations } from '@project-lc/shared-types';
-import dayjs from 'dayjs';
-import { useEffect, useMemo, useState } from 'react';
-import { useQueryClient } from 'react-query';
-import { useInView } from 'react-intersection-observer';
-import { useRouter } from 'next/router';
 import { getFilteredCustomerOrderItems } from '@project-lc/utils-frontend';
+import dayjs from 'dayjs';
+import { useRouter } from 'next/router';
+import { useEffect, useMemo, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+import { useQueryClient } from 'react-query';
 import { OrderItem } from './CustomerOrderItem';
 import CustomerOrderPeriodFilter, { PeriodInputs } from './CustomerOrderPeriodFilter';
 
@@ -155,7 +155,7 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
       </Stack>
       {order.giftFlag && giftBroadcaster && (
         <Stack direction="row" alignItems="center" px={1}>
-          <Avatar size="xs" src={giftBroadcaster.avatar || ''} />
+          <CustomAvatar size="xs" src={giftBroadcaster?.avatar || ''} />
           <Text fontWeight="bold">{giftBroadcaster.userNickname}</Text>
           <Text>님께 보낸 선물 🎁</Text>
         </Stack>

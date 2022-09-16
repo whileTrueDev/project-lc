@@ -203,5 +203,6 @@ export * from './lib/useManualMainCategories';
 export * from './lib/useMyLocationOrigin';
 export * from './lib/useNextpageUrlParam';
 export * from './lib/useOrderExportableCheck';
+export * from './lib/useResizedImage';
 export * from './lib/useSocialLoginFailAlarm';
 export * from './lib/useTerms';

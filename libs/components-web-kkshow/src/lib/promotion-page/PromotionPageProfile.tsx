@@ -1,6 +1,5 @@
 /* eslint-disable react/no-array-index-key */
 import {
-  Avatar,
   Box,
   Flex,
   Grid,
@@ -14,6 +13,7 @@ import {
   Tabs,
   Text,
 } from '@chakra-ui/react';
+import CustomAvatar from '@project-lc/components-core/CustomAvatar';
 import {
   useBroadcaster,
   useBroadcasterChannels,
@@ -56,7 +56,7 @@ export function PromotionPageProfile({
         flexDir="column"
         gap={2}
       >
-        <Avatar
+        <CustomAvatar
           h={{ base: 20, md: 40 }}
           w={{ base: 20, md: 40 }}
           src={bc.data?.avatar || ''}
