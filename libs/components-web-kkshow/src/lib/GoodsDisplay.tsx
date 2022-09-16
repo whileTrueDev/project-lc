@@ -111,7 +111,7 @@ export const GoodsDisplayImage = ({
           draggable={false}
           style={{
             transition: 'all 0.5s ease',
-            transform: mouseEnter ? 'scale(1.05)' : undefined,
+            transform: mouseEnter ? 'scale(1.1)' : undefined,
           }}
         />
 
