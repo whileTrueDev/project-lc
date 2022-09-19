@@ -2,6 +2,7 @@ import {
   Broadcaster,
   BroadcasterChannel,
   BroadcasterPromotionPage,
+  BroadcasterSettlementItems,
   Goods,
   GoodsConfirmation,
   GoodsImages,
@@ -45,6 +46,7 @@ export interface LiveShoppingWithGoods extends LiveShopping {
   }[];
   liveShoppingSpecialPrices?: LiveShoppingSpecialPrice[];
   externalGoods?: null | LiveShoppingExternalGoods;
+  BroadcasterSettlementItems?: BroadcasterSettlementItems[];
 }
 
 export type SpecialPriceItem = Pick<

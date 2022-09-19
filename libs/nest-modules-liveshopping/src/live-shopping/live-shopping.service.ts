@@ -170,6 +170,7 @@ export class LiveShoppingService {
         },
         liveShoppingSpecialPrices: true,
         externalGoods: true,
+        BroadcasterSettlementItems: true,
       },
     });
   }
