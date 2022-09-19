@@ -113,6 +113,7 @@ export class BroadcasterSettlementService {
       },
       skip: paginationDto?.skip || 0,
       take: paginationDto?.take || 5,
+      orderBy: { id: 'desc' },
     });
 
     return result;

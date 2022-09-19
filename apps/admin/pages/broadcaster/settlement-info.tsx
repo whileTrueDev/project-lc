@@ -1,6 +1,6 @@
-import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
 import { Box, Heading, Text } from '@chakra-ui/react';
 import AdminBroadcasterSettlementInfoList from '@project-lc/components-admin/AdminBroadcasterSettlementInfoList';
+import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
 import { useCheckAdminClass } from '@project-lc/hooks';
 
 export function SettlementInfo(): JSX.Element {
@@ -14,7 +14,7 @@ export function SettlementInfo(): JSX.Element {
     <AdminPageLayout>
       <Box position="relative">
         <Box as="main" minH="calc(100vh - 60px - 60px - 60px)">
-          <Heading mt={4}>방송인</Heading>
+          <Heading>방송인</Heading>
 
           <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
             <Text fontSize="lg" fontWeight="medium" pb={1}>

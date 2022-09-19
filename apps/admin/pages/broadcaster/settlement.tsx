@@ -14,6 +14,7 @@ export function BroadcasterSettlement(): JSX.Element {
         <Heading as="h3" size="lg">
           정산 대상 목록
         </Heading>
+
         <BcSettlementTargetList />
       </Stack>
 

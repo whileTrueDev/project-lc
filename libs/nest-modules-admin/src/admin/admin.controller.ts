@@ -52,6 +52,7 @@ import {
   AdminClassDto,
   AdminGoodsListRes,
   AdminLiveShoppingGiftOrder,
+  AdminNotiCountRes,
   AdminReturnListDto,
   AdminReturnRes,
   AdminSellerListRes,

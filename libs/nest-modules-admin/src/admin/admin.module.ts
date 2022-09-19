@@ -35,6 +35,8 @@ import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
 import { AdminProductPromotionController } from './admin-product-promotion.controller';
 import { AdminPromotionPageController } from './admin-promotion-page.controller';
 import { AdminSettlementService } from './admin-settlement.service';
+import { AdminTabAlarmController } from './admin-tab-alarm.controller';
+import { AdminTabAlarmSevice } from './admin-tab-alarm.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 
@@ -45,6 +47,7 @@ export class AdminModule {
     AdminSettlementService,
     AdminAccountService,
     AdminPrivacyApproachSevice,
+    AdminTabAlarmSevice,
   ];
 
   private static readonly exports = [
@@ -67,6 +70,7 @@ export class AdminModule {
     AdminCustomerCouponController,
     AdminOrderController,
     AdminOverlayThemeController,
+    AdminTabAlarmController,
   ];
 
   private static readonly imports = [

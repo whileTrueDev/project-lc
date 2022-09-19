@@ -10,7 +10,6 @@ import {
   FcBiohazard,
   FcBusinessman,
   FcCloseUpMode,
-  FcDislike,
   FcFaq,
   FcFinePrint,
   FcInspection,
@@ -298,7 +297,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '주문',
     href: 'order',
     children: [
-      { name: '결제취소 요청', href: '/order/order-cancel', icon: FcDislike },
+      // { name: '결제취소 요청', href: '/order/order-cancel', icon: FcDislike }, // 220916 기준. 판매자의 결제취소요청 기능은 사용하지 않아서(퍼스트몰db랑 연동해서 사용하던 때 필요했던 기능) 주석처리함
       { name: '주문 목록', href: '/order/list', icon: FcList },
       { name: '출고 목록', href: '/order/exports', icon: FcList },
       { name: '환불요청 처리', href: '/order/refund', icon: FcMoneyTransfer },

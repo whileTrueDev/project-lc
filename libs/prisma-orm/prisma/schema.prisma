@@ -2122,3 +2122,11 @@ model OverlayTheme {
   category   String? // 테마 분류(게임, 계절..)
   data       Json // OverlayThemeType 형태의 객체 string
 }
+
+// 테이블 별로 관리자가 확인한 마지막 데이터의 id값(number) 저장
+model AdminLastCheckedData {
+  id         Int      @id @default(autoincrement())
+  createDate DateTime @default(now())
+  updateDate DateTime @default(now()) @updatedAt
+  data       Json
+}

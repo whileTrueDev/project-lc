@@ -21,6 +21,9 @@ import { useAdminInquiry, useChangeInquiryReadFlagMutation } from '@project-lc/h
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useQueryClient } from 'react-query';
+import AdminDatagridWrapper, {
+  NOT_CHECKED_BY_ADMIN_CLASS_NAME,
+} from './AdminDatagridWrapper';
 
 export function InquiryTable(): JSX.Element {
   const { data, isLoading } = useAdminInquiry();
@@ -58,6 +61,36 @@ export function InquiryTable(): JSX.Element {
 
   const columns: GridColumns = [
     {
+      field: '',
+      headerName: '',
+      renderCell: ({ row }: GridRowData) =>
+        row.readFlag ? null : (
+          <Button
+            colorScheme="blue"
+            size="sm"
+            onClick={() => {
+              handleUpdateReadFlag(row.id);
+            }}
+          >
+            읽음처리
+          </Button>
+        ),
+    },
+    {
+      field: 'readFlag',
+      headerName: '상태',
+      renderCell: ({ row }: GridRowData) =>
+        row.readFlag ? (
+          <Box lineHeight={2}>
+            <Badge colorScheme="green">읽음</Badge>
+          </Box>
+        ) : (
+          <Box lineHeight={2}>
+            <Badge>읽지않음</Badge>
+          </Box>
+        ),
+    },
+    {
       field: 'type',
       headerName: '타입',
       renderCell: ({ row }: GridRowData) =>
@@ -90,6 +123,13 @@ export function InquiryTable(): JSX.Element {
         </Tooltip>
       ),
     },
+    {
+      field: 'createDate',
+      headerName: '문의날짜',
+      minWidth: 150,
+      renderCell: ({ row }: GridRowData) =>
+        `${dayjs(row.createDate).format('YYYY/MM/DD HH:mm')}`,
+    },
     { field: 'email', headerName: '이메일', minWidth: 200 },
     { field: 'phoneNumber', headerName: '휴대전화', minWidth: 150 },
     {
@@ -105,68 +145,40 @@ export function InquiryTable(): JSX.Element {
           ''
         ),
     },
-    {
-      field: 'createDate',
-      headerName: '문의날짜',
-      minWidth: 150,
-      renderCell: ({ row }: GridRowData) =>
-        `${dayjs(row.createDate).format('YYYY/MM/DD HH:mm')}`,
-    },
-    {
-      field: 'readFlag',
-      headerName: '상태',
-      renderCell: ({ row }: GridRowData) =>
-        row.readFlag ? (
-          <Box lineHeight={2}>
-            <Badge colorScheme="green">읽음</Badge>
-          </Box>
-        ) : (
-          <Box lineHeight={2}>
-            <Badge>읽지않음</Badge>
-          </Box>
-        ),
-    },
-    {
-      field: '',
-      headerName: '',
-      renderCell: ({ row }: GridRowData) =>
-        row.readFlag ? null : (
-          <Button
-            colorScheme="blue"
-            size="sm"
-            onClick={() => {
-              handleUpdateReadFlag(row.id);
-            }}
-          >
-            읽음처리
-          </Button>
-        ),
-    },
   ];
 
   return (
     <Box minHeight={{ base: 300, md: 600 }} p={10} mb={24}>
       {data && !isLoading && (
         <>
-          <ChakraDataGrid
-            width="100%"
-            disableExtendRowFullWidth
-            autoHeight
-            pagination
-            autoPageSize
-            pageSize={pageSize}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            rowsPerPageOptions={[5, 10, 15]}
-            disableSelectionOnClick
-            disableColumnMenu
-            disableColumnSelector
-            components={{
-              Toolbar: GridToolbar,
-            }}
-            loading={isLoading}
-            columns={columns}
-            rows={data}
-          />
+          <AdminDatagridWrapper>
+            <ChakraDataGrid
+              width="100%"
+              disableExtendRowFullWidth
+              autoHeight
+              pagination
+              autoPageSize
+              pageSize={pageSize}
+              onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+              rowsPerPageOptions={[5, 10, 15]}
+              disableSelectionOnClick
+              disableColumnMenu
+              disableColumnSelector
+              components={{
+                Toolbar: GridToolbar,
+              }}
+              loading={isLoading}
+              columns={columns}
+              rows={data}
+              getRowClassName={(params) => {
+                // 읽음처리 하지 않은경우
+                if (!params.row.readFlag) {
+                  return NOT_CHECKED_BY_ADMIN_CLASS_NAME;
+                }
+                return '';
+              }}
+            />
+          </AdminDatagridWrapper>
           <Modal isOpen={isOpen} onClose={onClose} size="lg">
             <ModalOverlay />
             <ModalContent>
