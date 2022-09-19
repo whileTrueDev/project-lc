@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Flex,
   Icon,
   LinkBox,
@@ -9,6 +8,7 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
+import CustomAvatar from '@project-lc/components-core/CustomAvatar';
 import { useDisplaySize, useKkshowShoppingCategories } from '@project-lc/hooks';
 import Link from 'next/link';
 import { useMemo } from 'react';
@@ -19,6 +19,7 @@ export function ShoppingCategories(): JSX.Element | null {
   const { data: categories, isLoading } = useKkshowShoppingCategories();
   const sliceUnit = useMemo(() => (isMobileSize ? 10 : 12), [isMobileSize]);
 
+  // const resizedImageProps = useResizedImage();
   const categoryImagePlaceholderColor = useColorModeValue(
     'blackAlpha.100',
     'whiteAlpha.800',
@@ -46,7 +47,7 @@ export function ShoppingCategories(): JSX.Element | null {
           .map((category) => (
             <LinkBox key={category.id} role="group">
               <Stack justify="start" align="center">
-                <Avatar
+                <CustomAvatar
                   icon={<Icon as={IoFastFoodOutline} fontSize={['1rem', '1.75rem']} />}
                   backgroundColor={categoryImagePlaceholderColor}
                   draggable={false}

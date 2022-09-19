@@ -1,6 +1,6 @@
-import { Schedule } from '@aws-cdk/aws-applicationautoscaling';
-import { SecurityGroup, Vpc } from '@aws-cdk/aws-ec2';
-import { Repository, TagStatus } from '@aws-cdk/aws-ecr';
+import { Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import { SecurityGroup, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { Repository, TagStatus } from 'aws-cdk-lib/aws-ecr';
 import {
   AwsLogDriver,
   Cluster,
@@ -8,10 +8,11 @@ import {
   FargatePlatformVersion,
   FargateTaskDefinition,
   Secret,
-} from '@aws-cdk/aws-ecs';
-import { ScheduledFargateTask } from '@aws-cdk/aws-ecs-patterns';
-import { LogGroup } from '@aws-cdk/aws-logs';
-import { Construct, Duration, RemovalPolicy, Stack, StackProps } from '@aws-cdk/core';
+} from 'aws-cdk-lib/aws-ecs';
+import { ScheduledFargateTask } from 'aws-cdk-lib/aws-ecs-patterns';
+import { Schedule } from 'aws-cdk-lib/aws-events';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { Construct } from 'constructs';
 import { constants } from '../../constants';
 import { loadSsmParam } from '../../util/loadSsmParam';
 

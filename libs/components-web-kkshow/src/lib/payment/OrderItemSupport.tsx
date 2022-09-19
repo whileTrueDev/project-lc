@@ -1,6 +1,5 @@
 import { RepeatIcon } from '@chakra-ui/icons';
 import {
-  Avatar,
   AvatarProps,
   Box,
   Button,
@@ -13,6 +12,7 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
+import CustomAvatar from '@project-lc/components-core/CustomAvatar';
 import { useBroadcaster } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
@@ -50,7 +50,7 @@ export function OrderItemSupport({
   }
   return (
     <Flex>
-      <Avatar size={avatarSize} src={broadcaster?.avatar || ''} mr={2} />
+      <CustomAvatar size={avatarSize} src={broadcaster?.avatar || ''} mr={2} />
       <Box>
         <Text mt={2} fontWeight="semibold">
           {broadcaster?.userNickname}

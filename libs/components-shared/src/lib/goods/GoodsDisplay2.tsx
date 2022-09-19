@@ -8,6 +8,7 @@ import {
   SellerShop,
 } from '@prisma/client';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import CustomAvatar from '@project-lc/components-core/CustomAvatar';
 import NextLink from 'next/link';
 import { OrderStatusBadge } from '../order/OrderStatusBadge';
 
@@ -93,7 +94,7 @@ export function GoodsDisplay2({
 
         {goods.seller && (
           <Flex gap={1} alignItems="center">
-            {goods.seller.avatar && <Avatar src={goods.seller.avatar} size="xs" />}
+            {goods.seller.avatar && <CustomAvatar src={goods.seller?.avatar} size="xs" />}
             <Text fontSize="sm">{goods.seller.sellerShop?.shopName}</Text>
           </Flex>
         )}

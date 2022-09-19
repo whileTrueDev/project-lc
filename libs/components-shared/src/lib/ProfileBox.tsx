@@ -1,4 +1,5 @@
-import { Avatar, Grid, GridItem, Text } from '@chakra-ui/react';
+import { Grid, GridItem, Text } from '@chakra-ui/react';
+import CustomAvatar from '@project-lc/components-core/CustomAvatar';
 import { useProfile } from '@project-lc/hooks';
 import { AvatarChangeButton } from './AvatarChangeButton';
 
@@ -29,7 +30,7 @@ export function ProfileBox({
         {allowAvatarChange ? (
           <AvatarChangeButton onClick={onAvatarChangeButtonClick} />
         ) : (
-          <Avatar src={data?.avatar} />
+          <CustomAvatar src={data?.avatar} />
         )}
       </GridItem>
       <GridItem colSpan={3} isTruncated>

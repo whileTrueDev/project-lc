@@ -1,5 +1,6 @@
-import { SecurityGroup } from '@aws-cdk/aws-ec2';
-import { Repository, TagStatus } from '@aws-cdk/aws-ecr';
+import { Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import { SecurityGroup } from 'aws-cdk-lib/aws-ec2';
+import { Repository, TagStatus } from 'aws-cdk-lib/aws-ecr';
 import {
   AwsLogDriver,
   Cluster,
@@ -8,10 +9,10 @@ import {
   FargateService,
   FargateTaskDefinition,
   Secret,
-} from '@aws-cdk/aws-ecs';
-import { ApplicationLoadBalancer } from '@aws-cdk/aws-elasticloadbalancingv2';
-import { LogGroup } from '@aws-cdk/aws-logs';
-import { Construct, Duration, RemovalPolicy, Stack, StackProps } from '@aws-cdk/core';
+} from 'aws-cdk-lib/aws-ecs';
+import { ApplicationLoadBalancer } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { Construct } from 'constructs';
 import { constants } from '../../constants';
 import { loadSsmParam } from '../../util/loadSsmParam';
 

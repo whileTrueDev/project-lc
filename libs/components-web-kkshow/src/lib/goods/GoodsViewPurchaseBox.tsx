@@ -6,7 +6,6 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
-  Avatar,
   Badge,
   Box,
   Button,
@@ -38,6 +37,7 @@ import {
 } from '@chakra-ui/react';
 import { SellType } from '@prisma/client';
 import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUnderlinedText';
+import CustomAvatar from '@project-lc/components-core/CustomAvatar';
 import {
   useCartMutation,
   useCustomerInfo,
@@ -292,7 +292,6 @@ export function GoodsViewPurchaseBox({
     </Grid>
   );
 }
-
 function GoodsViewBroadcasterSupportBox({
   goods,
 }: GoodsViewPurchaseBoxProps): JSX.Element | null {
@@ -368,7 +367,7 @@ function GoodsViewBroadcasterSupportBox({
             <Text fontSize={{ base: 'sm', md: 'md' }}>방송인 후원하기</Text>
             {selectedBc && selectedBc.userNickname && (
               <Flex key={selectedBc.userNickname} gap={2}>
-                <Avatar size="xs" src={selectedBc.avatar || ''} />
+                <CustomAvatar size="xs" src={selectedBc.avatar || ''} />
                 <Text fontSize="sm">
                   {selectedBc.userNickname.length <= 3
                     ? selectedBc.userNickname
@@ -386,7 +385,7 @@ function GoodsViewBroadcasterSupportBox({
               <Text mb={2}>후원가능한 방송인</Text>
               {relatedBroadcasters.map((bc) => (
                 <Flex key={bc.userNickname} gap={2} alignItems="center">
-                  <Avatar size="xs" src={bc.avatar || ''} />
+                  <CustomAvatar size="xs" src={bc.avatar || ''} />
                   {ls.data?.some((l) => l.broadcasterId === bc.id) && (
                     <Badge colorScheme="red" variant="solid">
                       현재 LIVE 판매중
@@ -412,7 +411,7 @@ function GoodsViewBroadcasterSupportBox({
                     icon={<CloseIcon />}
                   />
                 </Flex>
-                <Avatar src={selectedBc.avatar || ''} />
+                <CustomAvatar src={selectedBc.avatar || ''} />
                 <Text>{selectedBc.userNickname}</Text>
                 {ls.data?.some((l) => l.broadcasterId === selectedBc.id) && (
                   <Badge colorScheme="red" variant="solid">
