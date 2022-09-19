@@ -3,6 +3,7 @@ import {
   Box,
   CloseButton,
   FormControl,
+  FormControlProps,
   FormLabel,
   Heading,
   IconButton,
@@ -26,6 +27,7 @@ export interface ChakraAutoCompleteProps<T> {
   isDisabled?: boolean;
   getOptionLabel: (opt: T | null) => string;
   onChange: (newValue: T | null) => void;
+  width?: FormControlProps['width'];
 }
 export function ChakraAutoComplete<T = any>({
   label,
@@ -35,6 +37,7 @@ export function ChakraAutoComplete<T = any>({
   isDisabled,
   getOptionLabel,
   onChange,
+  width = '300px',
 }: ChakraAutoCompleteProps<T>): JSX.Element {
   const {
     getRootProps,
@@ -62,7 +65,7 @@ export function ChakraAutoComplete<T = any>({
   const backgroundColor = useColorModeValue('white', 'gray.700');
   const hoverListItemColor = useColorModeValue('gray.100', 'gray.600');
   return (
-    <FormControl width="300px">
+    <FormControl width={width}>
       <Box {...getRootProps()}>
         {label ? (
           <FormLabel {...getInputLabelProps()}>

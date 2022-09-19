@@ -258,6 +258,32 @@ async function createDummyLiveShopping(
     },
   });
 }
+/** 종료된 외부상품 라이브쇼핑 생성 */
+async function createDummyPastExternalGoodsLiveShopping(
+  seller: SellerAccountType,
+  broadcaster: Broadcaster,
+): Promise<void> {
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - 7);
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() - 6);
+  await prisma.liveShopping.create({
+    data: {
+      seller: { connect: { id: seller.id } },
+      broadcaster: { connect: { id: broadcaster.id } },
+      externalGoods: {
+        create: { name: '먹보소고기', linkUrl: 'www.google.com' },
+      },
+      liveShoppingName: '먹보소고기국밥~',
+      progress: 'confirmed',
+      broadcastStartDate: startDate.toISOString(),
+      broadcastEndDate: endDate.toISOString(),
+      sellStartDate: startDate.toISOString(),
+      sellEndDate: endDate.toISOString(),
+      broadcasterCommissionRate: '15',
+    },
+  });
+}
 
 /** 더미 방송인 주소 생성 */
 async function createDummyBroadcasterAddress(broadcaster: Broadcaster): Promise<void> {
@@ -467,6 +493,8 @@ async function main(): Promise<void> {
 
   // 테스트상품4의 라이브쇼핑 생성
   await createDummyLiveShopping(seller, testbroadcaster, goods4);
+  // 종료된 외부상품 라이브쇼핑 생성
+  await createDummyPastExternalGoodsLiveShopping(seller, testbroadcaster);
 
   // 더미 상품홍보페이지 생성
   const promotionPage = await createBroadcasterPromotionPage(testbroadcaster.id);
