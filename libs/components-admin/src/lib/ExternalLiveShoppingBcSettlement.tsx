@@ -186,12 +186,13 @@ function ExternalLiveShoppingBcSettlementForm(): JSX.Element {
           getOptionLabel={(option) => {
             if (!option) return '';
             const liveShoppingId = option.id;
-            const liveShoppingNamae = option?.liveShoppingName || '방송명 미정';
+            const liveShoppingName = option?.liveShoppingName || '방송명 미정';
+            const externalGoodsName = option?.externalGoods?.name || '상품 미정';
             const broadcasterId = option?.broadcaster.id || '방송인 미정';
             const broadcasterNickname =
               option?.broadcaster?.userNickname || '활동명 없음';
 
-            return `${liveShoppingNamae}( id: ${liveShoppingId} ), 방송인 : ${broadcasterNickname}( id: ${broadcasterId} ) `;
+            return `${liveShoppingName}( id: ${liveShoppingId} ) / 판매상품: ${externalGoodsName} / 방송인 : ${broadcasterNickname}( id: ${broadcasterId} ) `;
           }}
           onChange={(newV) => {
             if (newV) {
