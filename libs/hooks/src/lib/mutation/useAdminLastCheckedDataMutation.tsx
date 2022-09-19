@@ -18,7 +18,7 @@ export const useAdminLastCheckedDataMutation = (): UseMutationResult<
   >(
     (dto: useAdminLastCheckedDataMutationDto) =>
       axios
-        .post<useAdminLastCheckedDataMutationRes>('admin/tab-alarm/checkedData', dto)
+        .put<useAdminLastCheckedDataMutationRes>('admin/tab-alarm/checkedData', dto)
         .then((res) => res.data),
     {
       onSuccess: (data) => {
