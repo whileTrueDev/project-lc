@@ -1,5 +1,6 @@
 import { Button, Flex, Input, Text, useToast } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
+import { getOverlayHost } from '@project-lc/utils';
 import { useState } from 'react';
 
 export interface UrlCardProps {
@@ -56,7 +57,7 @@ export function OverlayUrlCard(): JSX.Element {
 
   // 10초간 overlayUrl을 보여주는 함수
   const handleShowOverlayUrl = (): void => {
-    const overlayUrl = `https://live.크크쇼.com${profileData?.overlayUrl}` || '';
+    const overlayUrl = `${getOverlayHost()}${profileData?.overlayUrl}` || '';
     setOverlayUrlValue(overlayUrl);
 
     // 클립보드 복사
