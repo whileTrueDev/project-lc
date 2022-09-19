@@ -41,6 +41,7 @@ export * from './lib/mutation/useCreateGoodsCommonInfo';
 export * from './lib/mutation/useCreateLiveShopping';
 export * from './lib/mutation/useCreateSellerContacts';
 export * from './lib/mutation/useCreateSettleBcManyMutation';
+export * from './lib/mutation/useCreateSettlementBcWithExternalItem';
 export * from './lib/mutation/useCreateSettlementMutation';
 export * from './lib/mutation/useCreateShippingGroup';
 export * from './lib/mutation/useCustomerAddressMutation';
