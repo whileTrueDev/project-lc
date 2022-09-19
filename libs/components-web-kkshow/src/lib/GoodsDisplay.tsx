@@ -6,16 +6,13 @@ import {
   Heading,
   HeadingProps,
   Icon,
-  LinkBox,
-  LinkOverlay,
   Text,
+  useBoolean,
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
-import MotionBox from '@project-lc/components-core/MotionBox';
 import { KkshowShoppingTabGoodsData } from '@project-lc/shared-types';
 import { getDiscountedRate, getLocaleNumber } from '@project-lc/utils-frontend';
-import { HTMLMotionProps, motion } from 'framer-motion';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { useMemo } from 'react';
 
 export interface GoodsDisplayDetailProps {
@@ -87,7 +84,7 @@ interface GoodsDisplayImageProps extends BoxProps {
   alt?: string;
   hasShadow?: boolean;
   withArrowIcon?: boolean;
-  imageProps?: HTMLMotionProps<'img'>;
+  mouseEnter?: boolean;
 }
 export const GoodsDisplayImage = ({
   src,
@@ -95,16 +92,16 @@ export const GoodsDisplayImage = ({
   ratio = 1,
   hasShadow,
   withArrowIcon = true,
-  imageProps,
+  mouseEnter = false,
   ...rest
-}: GoodsDisplayImageProps): JSX.Element => (
-  <AspectRatio ratio={ratio}>
-    <Box
-      maxWidth={{ base: 'unset', md: 340 }}
-      borderRadius={rest.borderRadius || 'xl'}
-      {...rest}
-    >
-      <motion.div {...imageProps}>
+}: GoodsDisplayImageProps): JSX.Element => {
+  return (
+    <AspectRatio ratio={ratio}>
+      <Box
+        maxWidth={{ base: 'unset', md: 340 }}
+        borderRadius={rest.borderRadius || 'xl'}
+        {...rest}
+      >
         <ChakraNextImage
           layout="fill"
           shadow={hasShadow ? 'md' : 'none'}
@@ -112,13 +109,17 @@ export const GoodsDisplayImage = ({
           alt={alt}
           src={src}
           draggable={false}
+          style={{
+            transition: 'all 0.5s ease',
+            transform: mouseEnter ? 'scale(1.1)' : undefined,
+          }}
         />
-      </motion.div>
 
-      {withArrowIcon && <GoodsDisplayArrowIcon />}
-    </Box>
-  </AspectRatio>
-);
+        {withArrowIcon && <GoodsDisplayArrowIcon />}
+      </Box>
+    </AspectRatio>
+  );
+};
 
 export interface GoodsDisplayProps extends GoodsDisplayDetailProps {
   goods: KkshowShoppingTabGoodsData;
@@ -159,30 +160,27 @@ export function GoodsDisplay({
     return <Box {...props} />;
   };
 
+  const [mouseEnter, { on, off }] = useBoolean();
+
   return (
-    <LinkBox w="100%">
-      <MotionBox whileHover="hover">
+    <NextLink href={goods.linkUrl}>
+      <Box cursor="pointer" onMouseEnter={on} onMouseLeave={off}>
         <GoodsDisplayImage
           alt={goods.name}
           src={goods.imageUrl}
           ratio={ratio}
           borderBottomRadius={variant === 'card' ? 'none' : undefined}
-          // 이미지 컴포넌트를 motion.img에서 ChakraNextImage로 변경이후, hover시 이미지 사라지는 현상으로 임시 제거
-          // imageProps={{ variants: { hover: { scale: 1.05 } } }}
+          mouseEnter={mouseEnter}
         />
 
         <GoodsDisplayContainer
           p={2}
           color={variant === 'card' ? 'blackAlpha.900' : undefined}
         >
-          <Link href={goods.linkUrl} passHref>
-            <LinkOverlay href={goods.linkUrl}>
-              <GoodsDisplayDetail goods={goods} {...detailProps} />
-            </LinkOverlay>
-          </Link>
+          <GoodsDisplayDetail goods={goods} {...detailProps} />
         </GoodsDisplayContainer>
-      </MotionBox>
-    </LinkBox>
+      </Box>
+    </NextLink>
   );
 }
 
