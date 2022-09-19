@@ -622,8 +622,8 @@ model BroadcasterSettlements {
 // 방송인 정산 내역 - 주문(출고)정보
 model BroadcasterSettlementItems {
   id                        Int     @id @default(autoincrement())
-  orderId                   String // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
-  exportCode                String // 이 정산의 출고 고유번호 (퍼스트몰 fm_goods_export.export_code)
+  orderId                   String? // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
+  exportCode                String? // 이 정산의 출고 고유번호 (퍼스트몰 fm_goods_export.export_code)
   amount                    Int     @default(0) // 총 정산 수익 금액
   broadcasterCommissionRate Decimal @default("0.00") @db.Decimal(10, 2) // 방송인 수수료율 (0%~100% 사이값)
 
