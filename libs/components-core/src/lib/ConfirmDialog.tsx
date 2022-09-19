@@ -17,7 +17,7 @@ export interface ConfirmDialogProps
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => Promise<any>;
-  onFail?: () => Promise<any>;
+  onFail?: (e?: any) => Promise<any>;
   isLoading?: boolean;
   cancelString?: string;
   confirmString?: string;
@@ -40,7 +40,7 @@ export function ConfirmDialog({
     return onConfirm()
       .then(() => onClose())
       .catch((err) => {
-        if (onFail) return onFail();
+        if (onFail) return onFail(err);
         return console.log(err);
       });
   };
