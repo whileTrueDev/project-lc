@@ -1,13 +1,4 @@
-import {
-  Box,
-  BoxProps,
-  Flex,
-  Heading,
-  LinkBox,
-  LinkOverlay,
-  Text,
-} from '@chakra-ui/react';
-import MotionBox from '@project-lc/components-core/MotionBox';
+import { Box, BoxProps, Flex, Heading, Text, useBoolean } from '@chakra-ui/react';
 import { StarRating } from '@project-lc/components-core/StarRating';
 import { KkshowShoppingTabReviewData } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -37,16 +28,15 @@ export function GoodsReviewDisplay({
       );
     return <Box {...props} />;
   };
+  const [mouseEnter, { on, off }] = useBoolean();
   return (
-    <MotionBox whileHover="hover">
-      <LinkBox>
+    <Link href={review.linkUrl} passHref>
+      <Box cursor="pointer" onMouseEnter={on} onMouseLeave={off}>
         <GoodsDisplayImage
           src={review.imageUrl}
           alt={review.title}
           withArrowIcon={false}
-          // imageProps={{
-          //   variants: { hover: { scale: 1.05 } },
-          // }}
+          mouseEnter={mouseEnter}
         />
         <GoodsReviewDisplayContainer
           maxH={150}
@@ -60,19 +50,17 @@ export function GoodsReviewDisplay({
             <StarRating rating={review.rating} />
             <Text fontSize="xs">{dayjs(review.createDate).format('YYYY.MM.DD')}</Text>
           </Flex>
-          <Link href={review.linkUrl} passHref>
-            <LinkOverlay href={review.linkUrl}>
-              <Heading mb={3} fontSize="md">
-                {review.title}
-              </Heading>
-            </LinkOverlay>
-          </Link>
+
+          <Heading mb={3} fontSize="md">
+            {review.title}
+          </Heading>
+
           <Text fontSize="xs" noOfLines={3}>
             {review.contents}
           </Text>
         </GoodsReviewDisplayContainer>
-      </LinkBox>
-    </MotionBox>
+      </Box>
+    </Link>
   );
 }
 
