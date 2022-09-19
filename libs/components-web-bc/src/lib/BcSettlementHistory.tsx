@@ -195,6 +195,10 @@ export function SettlementHistoryDetail({
       <>
         <GridTableItem title="라이브쇼핑 고유번호" value={item.liveShopping.id} />
         <GridTableItem
+          title="라이브쇼핑명"
+          value={item.liveShopping?.liveShoppingName || ''}
+        />
+        <GridTableItem
           title="판매기간"
           value={
             <Box>
