@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Broadcaster, SellType } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  CreateBcSettleHistoryWithExternalItemDto,
   CreateManyBroadcasterSettlementHistoryDto,
   FindBcSettlementHistoriesRes,
 } from '@project-lc/shared-types';
@@ -111,5 +112,43 @@ export class BroadcasterSettlementHistoryService {
       where: { settlements: { broadcasterId } },
       _sum: { amount: true },
     });
+  }
+
+  public async createBcSettleHistoryWithExternalItem(
+    dto: CreateBcSettleHistoryWithExternalItemDto,
+  ): Promise<boolean> {
+    const today = dayjs().format('YYYY/MM');
+    const round = `${today}/${dto.round}차`;
+
+    const existSettlement = await this.prisma.broadcasterSettlements.findFirst({
+      where: { round, broadcasterId: dto.broadcasterId },
+    });
+
+    if (existSettlement) {
+      await this.prisma.broadcasterSettlementItems.create({
+        data: {
+          amount: dto.amount,
+          liveShoppingId: dto.liveShoppingId,
+          broadcasterSettlementsId: existSettlement.id,
+          sellType: 'liveShopping',
+        },
+      });
+    } else {
+      await this.prisma.broadcasterSettlements.create({
+        data: {
+          round,
+          broadcasterId: dto.broadcasterId,
+          broadcasterSettlementItems: {
+            create: {
+              amount: dto.amount,
+              liveShoppingId: dto.liveShoppingId,
+              sellType: 'liveShopping',
+            },
+          },
+        },
+      });
+    }
+
+    return true;
   }
 }
