@@ -1,5 +1,6 @@
 /* eslint-disable react/no-array-index-key */
-import { Avatar, Box, Flex, Text } from '@chakra-ui/react';
+import { Box, Flex, Text } from '@chakra-ui/react';
+import { CustomAvatar } from '@project-lc/components-core/CustomAvatar';
 import dayjs from 'dayjs';
 import 'suneditor/dist/css/suneditor.min.css';
 
@@ -18,7 +19,7 @@ export function ReplyText({
   return (
     <Box>
       <Flex gap={2} alignItems="center">
-        {avatar && <Avatar size="sm" src={avatar || ''} />}
+        {avatar && <CustomAvatar size="sm" src={avatar} />}
         <Box>
           <Text fontSize="sm" fontWeight="bold">
             {name}

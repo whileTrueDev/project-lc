@@ -20,6 +20,8 @@ export const ChakraNextImageBase = chakra(Image, {
       'blurDataURL',
       'lazyBoundray',
       'lazyRoot',
+      'onError',
+      'style', // 대부분 스타일 적용은 chakra style props로 전달하므로, 스타일 적용 위한 style prop은 NextImage 컴포넌트로 전달
     ].includes(prop),
 });
 

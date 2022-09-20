@@ -1,5 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { UserPwManager } from '@project-lc/nest-core';
+import { ImageResizer, UserPwManager } from '@project-lc/nest-core';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { MailVerificationModule } from '@project-lc/nest-modules-mail-verification';
 import { SellerContactsController } from './seller-contacts.controller';
@@ -20,6 +20,7 @@ export class SellerModule {
     SellerShopService,
     SellerContactsService,
     UserPwManager,
+    ImageResizer,
   ];
 
   private static readonly exports = [

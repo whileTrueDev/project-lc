@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Button,
   Flex,
@@ -10,6 +9,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { GoodsReview } from '@prisma/client';
+import CustomAvatar from '@project-lc/components-core/CustomAvatar';
 import TextDotConnector from '@project-lc/components-core/TextDotConnector';
 import ReviewCreateDialog, {
   ReviewCreateDialogProps,
@@ -145,7 +145,7 @@ export function OrderInfoGoodsSupport({
     <Box fontSize="sm" mt={4}>
       <Text fontWeight="bold">후원 정보</Text>
       <Box>
-        <Avatar src={support.broadcaster.avatar || ''} />
+        <CustomAvatar src={support?.broadcaster?.avatar || ''} />
         <Text>{support.broadcaster.userNickname}</Text>
       </Box>
       <Text>후원 닉네임: {support.nickname}</Text>

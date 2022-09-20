@@ -4,11 +4,22 @@ import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import { GoodsConfirmationStatuses } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
-import { useAdminLiveShoppingList, useProfile } from '@project-lc/hooks';
+import {
+  useAdminLastCheckedData,
+  useAdminLastCheckedDataMutation,
+  useAdminLiveShoppingList,
+  useProfile,
+} from '@project-lc/hooks';
 import { getLiveShoppingProgress, LiveShoppingWithGoods } from '@project-lc/shared-types';
 import { getCustomerWebHost } from '@project-lc/utils';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/router';
 import { forwardRef } from 'react';
+import AdminDatagridWrapper, {
+  useLatestCheckedDataId,
+  NOT_CHECKED_BY_ADMIN_CLASS_NAME,
+} from './AdminDatagridWrapper';
+import AdminTabAlarmResetButton from './AdminTabAlarmResetButton';
 
 /** Tooltip 이 functional component 감싸는 경우 forwardRef 사용해 ref 전달하도록 해야한다고 함
  * https://chakra-ui.com/docs/components/tooltip/usage#usage
@@ -190,11 +201,27 @@ export function AdminLiveShoppingList({
     return ['판매종료', '방송진행중', '방송종료', '확정됨'].includes(progress);
   }
 
+  const latestCheckedDataId = useLatestCheckedDataId();
+
+  const router = useRouter();
+  const { data: adminCheckedData } = useAdminLastCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLastCheckedDataMutation();
+
+  const onResetButtonClick = async (): Promise<void> => {
+    if (!data || !data[0]) return;
+    // 가장 최근 데이터 = id 가장 큰값
+    const latestId = data[0].id;
+
+    const dto = { ...adminCheckedData, [router.pathname]: latestId }; // pathname 을 키로 사용
+    adminCheckMutation(dto).catch((e) => console.error(e));
+  };
+
   return (
     <Box p={5}>
       <Heading size="md">라이브 쇼핑 리스트</Heading>
       {data && (
-        <>
+        <AdminDatagridWrapper>
+          <AdminTabAlarmResetButton onClick={onResetButtonClick} />
           <ChakraDataGrid
             disableExtendRowFullWidth
             autoHeight
@@ -206,8 +233,14 @@ export function AdminLiveShoppingList({
             loading={isLoading}
             columns={columns}
             rows={data}
+            getRowClassName={(params) => {
+              if (params.row.id > latestCheckedDataId) {
+                return NOT_CHECKED_BY_ADMIN_CLASS_NAME;
+              }
+              return '';
+            }}
           />
-        </>
+        </AdminDatagridWrapper>
       )}
     </Box>
   );

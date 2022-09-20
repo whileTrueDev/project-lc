@@ -17,19 +17,20 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
+import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import CustomAvatar from '@project-lc/components-core/CustomAvatar';
 import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
 import {
   useAvatarMutation,
   useAvatarRemoveMutation,
   useProfile,
 } from '@project-lc/hooks';
+import { getCroppedImage } from '@project-lc/utils-frontend';
 import { useRef, useState } from 'react';
 import { FaCamera } from 'react-icons/fa';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
-import { getCroppedImage } from '@project-lc/utils-frontend';
 
 interface AvatarChangeButtonProps {
   onClick?: () => void;
@@ -166,7 +167,7 @@ export function AvatarChangeButton({ onClick }: AvatarChangeButtonProps): JSX.El
         onMouseEnter={() => setBackdropShow(true)}
         onMouseLeave={() => setBackdropShow(false)}
       >
-        <Avatar src={profileData?.avatar} />
+        <CustomAvatar src={profileData?.avatar} />
         {backdropShow && (
           <Center position="absolute" width="100%" height="100%" left="0" top="0">
             <Avatar

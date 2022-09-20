@@ -4,8 +4,10 @@ import {
   Administrator,
   GoodsConfirmation,
 } from '@prisma/client';
+
 import { CipherService } from '@project-lc/nest-modules-cipher';
 import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
+
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminClassDto,
@@ -75,6 +77,9 @@ export class AdminService {
       }
     });
 
+    // id desc 기준으로 정렬
+    result.sellerSettlementAccount.sort((a, b) => b.id - a.id);
+    result.sellerBusinessRegistration.sort((a, b) => b.id - a.id);
     return result;
   }
 

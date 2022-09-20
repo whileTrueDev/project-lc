@@ -30,6 +30,7 @@ import {
   useGoodsReviewComments,
   useInfiniteReviews,
   useProfile,
+  useResizedImage,
 } from '@project-lc/hooks';
 import {
   FindManyGoodsReviewDto,
@@ -234,17 +235,11 @@ export function ReviewDetail({
 
         <Flex gap={1} my={2} flexWrap="wrap">
           {review.images.slice(0, 5).map((i, idx) => (
-            <button key={i.id} onClick={() => handleImageClick(idx)} type="button">
-              <ChakraNextImage
-                rounded="md"
-                height="90px"
-                width="90px"
-                objectFit="cover"
-                src={i.imageUrl}
-                draggable={false}
-                cursor="pointer"
-              />
-            </button>
+            <ReviewImageListItem
+              key={i.id}
+              handleImageClick={() => handleImageClick(idx)}
+              imageUrl={i.imageUrl}
+            />
           ))}
         </Flex>
         <Box>
@@ -365,6 +360,32 @@ export function ReviewDetail({
         </ModalContent>
       </Modal>
     </>
+  );
+}
+
+interface ReviewImageListItemProps {
+  imageUrl: string;
+  handleImageClick: () => void;
+}
+function ReviewImageListItem({
+  imageUrl,
+  handleImageClick,
+}: ReviewImageListItemProps): JSX.Element | null {
+  const resizedImageProps = useResizedImage(imageUrl);
+  if (!resizedImageProps.src) return null;
+  return (
+    <button onClick={handleImageClick} type="button">
+      <ChakraNextImage
+        rounded="md"
+        height="90px"
+        width="90px"
+        objectFit="cover"
+        src={resizedImageProps.src || ''}
+        onError={resizedImageProps.onError}
+        draggable={false}
+        cursor="pointer"
+      />
+    </button>
   );
 }
 

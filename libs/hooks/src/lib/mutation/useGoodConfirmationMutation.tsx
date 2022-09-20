@@ -20,6 +20,9 @@ export const useGoodConfirmationMutation = (): UseMutationResult<
         queryClient.invalidateQueries('AdminLiveShoppingGiftOrderList', {
           refetchInactive: true,
         });
+        queryClient.invalidateQueries('AdminSidebarNotiCounts', {
+          refetchInactive: true,
+        });
       },
     },
   );

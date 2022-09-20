@@ -31,6 +31,8 @@ import { SellType } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { CommissionInfo } from '@project-lc/components-shared/CommissionInfo';
 import {
+  useAdminLastCheckedData,
+  useAdminLastCheckedDataMutation,
   useCreateSettlementMutation,
   useSellCommission,
   useSellerSettlementTargets,
@@ -38,7 +40,10 @@ import {
 import { SellerSettlementTarget } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
+import { useLatestCheckedDataId } from './AdminDatagridWrapper';
+import AdminTabAlarmResetButton from './AdminTabAlarmResetButton';
 
 /** 판매자 정산 대상 목록 */
 export function SettlementTargetList(): JSX.Element | null {
@@ -136,9 +141,25 @@ export function SettlementTargetList(): JSX.Element | null {
     [dialog],
   );
 
+  const latestCheckedDataId = useLatestCheckedDataId();
+
+  const router = useRouter();
+  const { data: adminCheckedData } = useAdminLastCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLastCheckedDataMutation();
+
+  const onResetButtonClick = async (): Promise<void> => {
+    if (!targets.data || !targets.data?.[0]) return;
+    // 가장 최근 데이터 = id 가장 큰값
+    const latestId = targets.data[0].id;
+
+    const dto = { ...adminCheckedData, [router.pathname]: latestId }; // pathname 을 키로 사용
+    adminCheckMutation(dto).catch((e) => console.error(e));
+  };
+
   if (!targets.data) return null;
   return (
     <Box>
+      <AdminTabAlarmResetButton onClick={onResetButtonClick} />
       <Table size="sm">
         <Thead>
           <Tr>
@@ -149,7 +170,14 @@ export function SettlementTargetList(): JSX.Element | null {
         </Thead>
         <Tbody>
           {targets.data.map((target) => {
-            return <Tr key={target.exportCode}>{data.map((d) => d.render(target))}</Tr>;
+            return (
+              <Tr
+                key={target.exportCode}
+                bg={target.id > latestCheckedDataId ? 'red.200' : undefined}
+              >
+                {data.map((d) => d.render(target))}
+              </Tr>
+            );
           })}
         </Tbody>
         {targets.data.length > 30 && (

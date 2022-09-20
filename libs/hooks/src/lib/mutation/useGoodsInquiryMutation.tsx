@@ -43,6 +43,9 @@ export const useGoodsInquiryDeleteMutation = (): UseMutationResult<
       onSuccess: () => {
         queryClient.invalidateQueries(INFINITE_INQUIRIES_KEY);
         queryClient.invalidateQueries('GoodsInquiryComment');
+        queryClient.invalidateQueries('AdminSidebarNotiCounts', {
+          refetchInactive: true,
+        });
       },
     },
   );

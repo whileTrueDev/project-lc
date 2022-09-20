@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Button,
   Flex,
@@ -15,6 +14,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { CustomerAddress } from '@prisma/client';
+import CustomAvatar from '@project-lc/components-core/CustomAvatar';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import {
   getOrderShippingCheck,
@@ -351,7 +351,7 @@ export function SuccessDeliveryAddress(props: SuccessDeliveryAddressProps): JSX.
           <Text>선물하기 주문 🎁</Text>
           <Stack direction="row" alignItems="center">
             {support.broadcaster.avatar && (
-              <Avatar src={support.broadcaster.avatar} mr={2} />
+              <CustomAvatar src={support.broadcaster.avatar} mr={2} />
             )}
             <Text fontWeight="bold">{support.broadcaster.userNickname}</Text>
             <Text>님께 발송됩니다</Text>

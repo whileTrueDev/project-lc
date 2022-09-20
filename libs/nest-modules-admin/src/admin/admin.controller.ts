@@ -52,6 +52,7 @@ import {
   AdminClassDto,
   AdminGoodsListRes,
   AdminLiveShoppingGiftOrder,
+  AdminNotiCountRes,
   AdminReturnListDto,
   AdminReturnRes,
   AdminSellerListRes,
@@ -64,6 +65,7 @@ import {
   BusinessRegistrationRejectionDto,
   ChangeSellCommissionDto,
   ConfirmHistoryDto,
+  CreateBcSettleHistoryWithExternalItemDto,
   CreateManyBroadcasterSettlementHistoryDto,
   EmailDupCheckDto,
   ExecuteSettlementDto,
@@ -177,6 +179,17 @@ export class AdminController {
     @Query(new ValidationPipe({ transform: true })) dto: FindManyDto,
   ): Promise<BroadcasterSettlementTargets> {
     return this.settlementService.findSettlementTargets(undefined, dto);
+  }
+
+  /** 방송인 외부상품으로 진행한 라이브쇼핑에 대한 정산내역 생성하기 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('/settlement/broadcaster/external-item')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('settlement-history')
+  async createBcSettleHistoryWithExternalItem(
+    @Body(ValidationPipe) dto: CreateBcSettleHistoryWithExternalItemDto,
+  ): Promise<boolean> {
+    return this.bcSettlementHistoryService.createBcSettleHistoryWithExternalItem(dto);
   }
 
   /** 방송인 단일 정산처리 */

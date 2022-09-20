@@ -3,14 +3,25 @@ import { GridCellParams, GridColumns } from '@material-ui/data-grid';
 import { TaxationType } from '@prisma/client';
 import { TAX_TYPE } from '@project-lc/components-constants/taxType';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { useAdminBroadcasterSettlementInfoList, useDisplaySize } from '@project-lc/hooks';
+import {
+  useAdminBroadcasterSettlementInfoList,
+  useAdminLastCheckedData,
+  useAdminLastCheckedDataMutation,
+  useDisplaySize,
+} from '@project-lc/hooks';
 import { BroadcasterSettlementInfoListRes } from '@project-lc/shared-types';
-import { useState } from 'react';
 import { s3KeyType } from '@project-lc/utils-s3';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 import AdminBroadcasterSettlementInfoConfirmationDialog from './AdminBroadcasterSettlementInfoConfirmationDialog';
 import AdminBroadcasterSettlementInfoRejectionDialog from './AdminBroadcasterSettlementInfoRejectionDialog';
 import { ConfirmationBadge, makeListRow } from './AdminBusinessRegistrationList';
+import AdminDatagridWrapper, {
+  NOT_CHECKED_BY_ADMIN_CLASS_NAME,
+  useLatestCheckedDataId,
+} from './AdminDatagridWrapper';
 import { AdminImageDownloadModal } from './AdminImageDownloadModal';
+import AdminTabAlarmResetButton from './AdminTabAlarmResetButton';
 
 const columns: GridColumns = [
   {
@@ -99,6 +110,8 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { data, isLoading } = useAdminBroadcasterSettlementInfoList();
 
+  const latestCheckedDataId = useLatestCheckedDataId();
+
   const [selectedRow, setSelectedRow] = useState({});
   const [selectedType, setSelectedType] = useState<s3KeyType>('broadcaster-id-card');
 
@@ -140,8 +153,24 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
       onDownloadOpen();
     }
   };
+
+  // 알림초기화 핸들러
+  const router = useRouter();
+  const { data: adminCheckedData } = useAdminLastCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLastCheckedDataMutation();
+
+  const onResetButtonClick = async (): Promise<void> => {
+    if (!data || !data[0]) return;
+    // 가장 최근 데이터 = id 가장 큰값
+    const latestId = data[0].id;
+
+    const dto = { ...adminCheckedData, [router.pathname]: latestId }; // pathname 을 키로 사용
+    adminCheckMutation(dto).catch((e) => console.error(e));
+  };
+
   return (
-    <>
+    <AdminDatagridWrapper>
+      <AdminTabAlarmResetButton onClick={onResetButtonClick} />
       <ChakraDataGrid
         borderWidth={0}
         hideFooter
@@ -150,6 +179,12 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
         density="compact"
         columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
         rows={makeListRow<BroadcasterSettlementInfoListRes>(data)}
+        getRowClassName={(params) => {
+          if (params.row.id > latestCheckedDataId) {
+            return NOT_CHECKED_BY_ADMIN_CLASS_NAME;
+          }
+          return '';
+        }}
         rowCount={5}
         rowsPerPageOptions={[25, 50]}
         onCellClick={handleClick}
@@ -174,7 +209,7 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
         type={selectedType}
         row={selectedRow}
       />
-    </>
+    </AdminDatagridWrapper>
   );
 }
 

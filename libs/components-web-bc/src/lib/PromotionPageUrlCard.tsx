@@ -123,19 +123,17 @@ export function PromotionPageUrlInformationModal({
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={10}>
-              <Box>
+              <Text>
+                해당 페이지에서 판매가 발생하면 일정 수수료가 지급됩니다. <br />팬
+                여러분들이 볼 수 있는 공간 (방송국 정보란, 개인 SNS 등)에 해당 URL을
+                게시하고 상품을 홍보해보세요!
+              </Text>
+              <Box pos="relative" w="100%" h="600px">
                 <ChakraNextImage
-                  layout="responsive"
-                  width="1000"
-                  height="1000"
-                  objectFit="fill"
+                  layout="fill"
+                  objectFit="contain"
                   src={`${BASE_BANNER_IMAGE_S3_PATH}promotion-page-example.png`}
                 />
-                <Text>
-                  해당 페이지에서 판매가 발생하면 일정 수수료가 지급됩니다. <br />팬
-                  여러분들이 볼 수 있는 공간 (방송국 정보란, 개인 SNS 등)에 해당 URL을
-                  게시하고 상품을 홍보해보세요!
-                </Text>
               </Box>
 
               <Box>

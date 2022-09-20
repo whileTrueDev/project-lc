@@ -34,6 +34,9 @@ export const useGoodsInquiryCommentMutation = (): UseMutationResult<
         queryClient.invalidateQueries(['GoodsInquiryComment', data.goodsInquiryId], {
           refetchInactive: true,
         });
+        queryClient.invalidateQueries('AdminSidebarNotiCounts', {
+          refetchInactive: true,
+        });
       },
     },
   );

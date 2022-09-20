@@ -79,14 +79,22 @@ export function AdminReturnRequestList(): JSX.Element {
     <Stack spacing={10}>
       {/* 미승인 목록(요청됨, 거절됨) */}
       <AdminReturnListComponent
-        title="미승인 목록(요청됨, 거절됨)"
+        title={
+          <Text fontWeight="bold" fontSize="lg" color="blue">
+            판매자가 승인하지 않은 환불요청 목록(요청됨, 거절됨)
+          </Text>
+        }
         rows={notConfirmed}
         onRowClick={handleRowClick}
       />
 
       {/* 승인됨 */}
       <AdminReturnListComponent
-        title="판매자가 승인한 소비자 환불요청 목록(환불처리 해야 할 목록)"
+        title={
+          <Text fontWeight="bold" fontSize="lg" color="red">
+            관리자가 환불처리 해야 할 환불요청 목록(판매자 혹은 관리자에 의해 승인됨)
+          </Text>
+        }
         rows={confirmed}
         onRowClick={handleRowClick}
       />
@@ -198,7 +206,7 @@ function AdminReturnListComponent({
   rows,
   onRowClick,
 }: {
-  title: string;
+  title: string | JSX.Element;
   rows: DataGridProps['rows'];
   onRowClick: DataGridProps['onRowClick'];
 }): JSX.Element {
@@ -206,9 +214,8 @@ function AdminReturnListComponent({
   return (
     <Stack>
       <Stack direction="row" alignItems="center" justifyContent="center">
-        <Text fontWeight="bold" fontSize="lg">
-          {title}
-        </Text>
+        {typeof title === 'string' ? <Text>{title}</Text> : title}
+
         <Button onClick={toggle} size="xs">
           {isOpen ? '닫기' : '열기'}
         </Button>

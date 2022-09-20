@@ -1,10 +1,20 @@
 import { GridColumns, GridCellParams } from '@material-ui/data-grid';
 import { SellerSettlementAccount } from '@prisma/client';
-import { useDisplaySize } from '@project-lc/hooks';
+import {
+  useAdminLastCheckedData,
+  useAdminLastCheckedDataMutation,
+  useDisplaySize,
+} from '@project-lc/hooks';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useDisclosure, Button } from '@chakra-ui/react';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import { AdminImageDownloadModal } from './AdminImageDownloadModal';
+import AdminDatagridWrapper, {
+  NOT_CHECKED_BY_ADMIN_CLASS_NAME,
+  useLatestCheckedDataId,
+} from './AdminDatagridWrapper';
+import AdminTabAlarmResetButton from './AdminTabAlarmResetButton';
 
 function makeListRow(
   sellerSettlementAccount: SellerSettlementAccount[] | undefined,
@@ -13,7 +23,7 @@ function makeListRow(
     return [];
   }
   return sellerSettlementAccount.map((element, index: number) => {
-    return { ...element, id: index, isRowSelectable: false };
+    return { ...element, id: index, isRowSelectable: false, originId: element.id };
   });
 }
 
@@ -65,8 +75,24 @@ export function AdminAccountList(props: {
     },
   ];
 
+  const latestCheckedDataId = useLatestCheckedDataId();
+
+  const router = useRouter();
+  const { data: adminCheckedData } = useAdminLastCheckedData();
+  const { mutateAsync: adminCheckMutation } = useAdminLastCheckedDataMutation();
+
+  const onResetButtonClick = async (): Promise<void> => {
+    if (!sellerSettlementAccount || !sellerSettlementAccount[0]) return;
+    // 가장 최근 데이터 = id 가장 큰값
+    const latestId = sellerSettlementAccount[0].id;
+
+    const dto = { ...adminCheckedData, [router.pathname]: latestId }; // pathname 을 키로 사용
+    adminCheckMutation(dto).catch((e) => console.error(e));
+  };
+
   return (
-    <>
+    <AdminDatagridWrapper>
+      <AdminTabAlarmResetButton onClick={onResetButtonClick} />
       <ChakraDataGrid
         borderWidth={0}
         hideFooter
@@ -75,6 +101,12 @@ export function AdminAccountList(props: {
         density="compact"
         columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
         rows={makeListRow(sellerSettlementAccount)}
+        getRowClassName={(params) => {
+          if (params.row.originId > latestCheckedDataId) {
+            return NOT_CHECKED_BY_ADMIN_CLASS_NAME;
+          }
+          return '';
+        }}
         onCellClick={handleClick}
         rowCount={5}
         rowsPerPageOptions={[25, 50]}
@@ -88,6 +120,6 @@ export function AdminAccountList(props: {
         type="settlement-account"
         row={selectedRow}
       />
-    </>
+    </AdminDatagridWrapper>
   );
 }

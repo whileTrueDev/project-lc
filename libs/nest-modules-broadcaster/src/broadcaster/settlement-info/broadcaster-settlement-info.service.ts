@@ -185,6 +185,7 @@ export class BroadcasterSettlementInfoService {
         broadcasterId: true,
         broadcaster: { select: { email: true, userNickname: true } },
       },
+      orderBy: { id: 'desc' },
     });
     return data.map((d) => ({
       ...d,

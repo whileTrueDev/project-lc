@@ -157,6 +157,7 @@ export class SellerSettlementService {
   ): Promise<SellerSettlementTargetRes> {
     return this.prisma.export.findMany({
       where: { sellerId, sellerSettlementsId: null },
+      orderBy: { id: 'desc' },
       include: {
         items: {
           select: {

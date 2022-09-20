@@ -1,6 +1,14 @@
-import * as acm from '@aws-cdk/aws-certificatemanager';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import { Repository, TagStatus } from '@aws-cdk/aws-ecr';
+import { Construct } from 'constructs';
+import { Stack, StackProps, RemovalPolicy, Duration } from 'aws-cdk-lib';
+import {
+  ApplicationLoadBalancer,
+  ApplicationProtocol,
+  ApplicationTargetGroup,
+  ListenerAction,
+  ListenerCondition,
+  SslPolicy,
+} from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import { SecurityGroup, Vpc } from 'aws-cdk-lib/aws-ec2';
 import {
   AwsLogDriver,
   Cluster,
@@ -9,39 +17,32 @@ import {
   FargateService,
   FargateTaskDefinition,
   Secret,
-} from '@aws-cdk/aws-ecs';
-import {
-  ApplicationLoadBalancer,
-  ApplicationProtocol,
-  ApplicationTargetGroup,
-  ListenerAction,
-  ListenerCondition,
-  SslPolicy,
-} from '@aws-cdk/aws-elasticloadbalancingv2';
-import * as logs from '@aws-cdk/aws-logs';
-import * as ssm from '@aws-cdk/aws-ssm';
-import * as cdk from '@aws-cdk/core';
+} from 'aws-cdk-lib/aws-ecs';
+import { Repository, TagStatus } from 'aws-cdk-lib/aws-ecr';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
+import { IStringParameter, StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { constants } from '../../constants';
 
-interface LCProdAppStackProps extends cdk.StackProps {
-  vpc: ec2.Vpc;
-  albSecGrp: ec2.SecurityGroup;
-  apiSecGrp: ec2.SecurityGroup;
-  overlaySecGrp: ec2.SecurityGroup;
-  overlayControllerSecGrp: ec2.SecurityGroup;
-  realtimeApiSecGrp: ec2.SecurityGroup;
+interface LCProdAppStackProps extends StackProps {
+  vpc: Vpc;
+  albSecGrp: SecurityGroup;
+  apiSecGrp: SecurityGroup;
+  overlaySecGrp: SecurityGroup;
+  overlayControllerSecGrp: SecurityGroup;
+  realtimeApiSecGrp: SecurityGroup;
 }
 
-export class LCProdAppStack extends cdk.Stack {
+export class LCProdAppStack extends Stack {
   private readonly ACM_ARN = process.env.ACM_CERTIFICATE_ARN!;
 
   private readonly PREFIX = constants.PROD.ID_PREFIX;
-  private readonly vpc: ec2.Vpc;
-  private readonly albSecGrp: ec2.SecurityGroup;
-  private readonly apiSecGrp: ec2.SecurityGroup;
-  private readonly overlaySecGrp: ec2.SecurityGroup;
-  private readonly overlayControllerSecGrp: ec2.SecurityGroup;
-  private readonly realtimeApiSecGrp: ec2.SecurityGroup;
+  private readonly vpc: Vpc;
+  private readonly albSecGrp: SecurityGroup;
+  private readonly apiSecGrp: SecurityGroup;
+  private readonly overlaySecGrp: SecurityGroup;
+  private readonly overlayControllerSecGrp: SecurityGroup;
+  private readonly realtimeApiSecGrp: SecurityGroup;
 
   private readonly parameters: ReturnType<LCProdAppStack['loadSsmParamters']>;
 
@@ -53,7 +54,7 @@ export class LCProdAppStack extends cdk.Stack {
 
   public readonly alb: ApplicationLoadBalancer;
 
-  constructor(scope: cdk.Construct, id: string, props: LCProdAppStackProps) {
+  constructor(scope: Construct, id: string, props: LCProdAppStackProps) {
     super(scope, id, props);
     const {
       vpc,
@@ -97,17 +98,17 @@ export class LCProdAppStack extends cdk.Stack {
       repositoryName: repoName,
       lifecycleRules: [
         {
-          maxImageAge: cdk.Duration.days(60),
+          maxImageAge: Duration.days(60),
           description: 'only 60 days for prod images',
           tagPrefixList: ['prod-'],
         },
         {
-          maxImageAge: cdk.Duration.days(365),
+          maxImageAge: Duration.days(365),
           description: 'only 365 days for "latest" image',
           tagPrefixList: ['latest'],
         },
         {
-          maxImageAge: cdk.Duration.days(1),
+          maxImageAge: Duration.days(1),
           tagStatus: TagStatus.UNTAGGED,
         },
       ],
@@ -159,9 +160,9 @@ export class LCProdAppStack extends cdk.Stack {
         NODE_ENV: 'production',
       },
       logging: new AwsLogDriver({
-        logGroup: new logs.LogGroup(this, `${this.PREFIX}ApiLogGroup`, {
+        logGroup: new LogGroup(this, `${this.PREFIX}ApiLogGroup`, {
           logGroupName: constants.PROD.ECS_API_LOG_GLOUP_NAME,
-          removalPolicy: cdk.RemovalPolicy.DESTROY,
+          removalPolicy: RemovalPolicy.DESTROY,
         }),
         streamPrefix: 'ecs',
       }),
@@ -187,13 +188,13 @@ export class LCProdAppStack extends cdk.Stack {
     });
     autoScalingGroup.scaleOnCpuUtilization('CpuScaling', {
       targetUtilizationPercent: 70, // CPU 사용량 70% 이상일때
-      scaleInCooldown: cdk.Duration.seconds(150),
-      scaleOutCooldown: cdk.Duration.seconds(150),
+      scaleInCooldown: Duration.seconds(150),
+      scaleOutCooldown: Duration.seconds(150),
     });
     autoScalingGroup.scaleOnMemoryUtilization('MemoryScaling', {
       targetUtilizationPercent: 70, // Memory 사용량 70% 이상일 때
-      scaleInCooldown: cdk.Duration.seconds(150),
-      scaleOutCooldown: cdk.Duration.seconds(150),
+      scaleInCooldown: Duration.seconds(150),
+      scaleOutCooldown: Duration.seconds(150),
     });
 
     return service;
@@ -235,9 +236,9 @@ export class LCProdAppStack extends cdk.Stack {
         NODE_ENV: 'production',
       },
       logging: new AwsLogDriver({
-        logGroup: new logs.LogGroup(this, `${this.PREFIX}OverlayLogGroup`, {
+        logGroup: new LogGroup(this, `${this.PREFIX}OverlayLogGroup`, {
           logGroupName: constants.PROD.ECS_OVERLAY_LOG_GLOUP_NAME,
-          removalPolicy: cdk.RemovalPolicy.DESTROY,
+          removalPolicy: RemovalPolicy.DESTROY,
         }),
         streamPrefix: 'ecs',
       }),
@@ -301,9 +302,9 @@ export class LCProdAppStack extends cdk.Stack {
         NODE_ENV: 'production',
       },
       logging: new AwsLogDriver({
-        logGroup: new logs.LogGroup(this, `${this.PREFIX}OverlayControllerLogGroup`, {
+        logGroup: new LogGroup(this, `${this.PREFIX}OverlayControllerLogGroup`, {
           logGroupName: constants.PROD.ECS_OVERLAY_CONTROLLER_LOG_GLOUP_NAME,
-          removalPolicy: cdk.RemovalPolicy.DESTROY,
+          removalPolicy: RemovalPolicy.DESTROY,
         }),
         streamPrefix: 'ecs',
       }),
@@ -351,9 +352,9 @@ export class LCProdAppStack extends cdk.Stack {
         CACHE_REDIS_URL: Secret.fromSsmParameter(p.CACHE_REDIS_URL_KEY),
       },
       logging: new AwsLogDriver({
-        logGroup: new logs.LogGroup(this, `${this.PREFIX}RealtimeApiLogGroup`, {
+        logGroup: new LogGroup(this, `${this.PREFIX}RealtimeApiLogGroup`, {
           logGroupName: constants.PROD.ECS_REALTIME_API_LOG_GLOUP_NAME,
-          removalPolicy: cdk.RemovalPolicy.DESTROY,
+          removalPolicy: RemovalPolicy.DESTROY,
         }),
         streamPrefix: 'ecs',
       }),
@@ -399,17 +400,13 @@ export class LCProdAppStack extends cdk.Stack {
         healthCheck: {
           enabled: true,
           path: '/',
-          interval: cdk.Duration.minutes(1),
+          interval: Duration.minutes(1),
         },
         targets: [this.apiService],
       },
     );
 
-    const sslCert = acm.Certificate.fromCertificateArn(
-      this,
-      'DnsCertificates',
-      this.ACM_ARN,
-    );
+    const sslCert = Certificate.fromCertificateArn(this, 'DnsCertificates', this.ACM_ARN);
     const httpsListener = alb.addListener(`${this.PREFIX}ALBHttpsListener`, {
       port: 443,
       certificates: [sslCert],
@@ -433,7 +430,7 @@ export class LCProdAppStack extends cdk.Stack {
         healthCheck: {
           enabled: true,
           path: '/',
-          interval: cdk.Duration.minutes(1),
+          interval: Duration.minutes(1),
         },
         targets: [this.overlayService],
       },
@@ -464,7 +461,7 @@ export class LCProdAppStack extends cdk.Stack {
         healthCheck: {
           enabled: true,
           path: '/health-check',
-          interval: cdk.Duration.minutes(1),
+          interval: Duration.minutes(1),
         },
         targets: [this.overlayControllerService],
       },
@@ -492,7 +489,7 @@ export class LCProdAppStack extends cdk.Stack {
         healthCheck: {
           enabled: true,
           path: '/',
-          interval: cdk.Duration.minutes(1),
+          interval: Duration.minutes(1),
         },
         targets: [this.realtimeAPIService],
       },
@@ -512,11 +509,8 @@ export class LCProdAppStack extends cdk.Stack {
   private loadSsmParamters() {
     const c = constants.PROD;
 
-    const __loadSsmParmeter = (
-      parameterName: string,
-      version = 1,
-    ): ssm.IStringParameter => {
-      return ssm.StringParameter.fromSecureStringParameterAttributes(
+    const __loadSsmParmeter = (parameterName: string, version = 1): IStringParameter => {
+      return StringParameter.fromSecureStringParameterAttributes(
         this,
         constants.PROD.ID_PREFIX + parameterName,
         { parameterName, version },

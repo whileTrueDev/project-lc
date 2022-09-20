@@ -1,16 +1,15 @@
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as rds from '@aws-cdk/aws-rds';
-import * as cdk from '@aws-cdk/core';
+import { Construct } from 'constructs';
+import { Stack, StackProps, aws_ec2 as ec2, aws_rds as rds } from 'aws-cdk-lib';
 
-interface LCDevDatabaseStackProps extends cdk.StackProps {
+interface LCDevDatabaseStackProps extends StackProps {
   vpc: ec2.Vpc;
   dbSecGrp: ec2.SecurityGroup;
 }
 
-export class LCDevDatabaseStack extends cdk.Stack {
+export class LCDevDatabaseStack extends Stack {
   public readonly db: rds.DatabaseInstance;
 
-  constructor(scope: cdk.Construct, id: string, props: LCDevDatabaseStackProps) {
+  constructor(scope: Construct, id: string, props: LCDevDatabaseStackProps) {
     super(scope, id, props);
 
     const { vpc, dbSecGrp } = props;

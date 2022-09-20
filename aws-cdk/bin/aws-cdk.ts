@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-import * as cdk from '@aws-cdk/core';
+import { App } from 'aws-cdk-lib';
 import * as dotenv from 'dotenv';
 import 'source-map-support/register';
 import { LCDevAppStack } from '../lib/dev/app-stack';
 import { LCDevDatabaseStack } from '../lib/dev/database-stack';
+import { LCDevLambdaStack } from '../lib/dev/lambda-stack';
 import { LCDevPrivateAppStack } from '../lib/dev/private-app-stack';
 import { LCDevRedisStack } from '../lib/dev/redis-stack';
 import { LCDevVpcStack } from '../lib/dev/vpc-stack';
@@ -11,6 +12,7 @@ import { LCDomainStack } from '../lib/env-agnostic/domain-stack';
 import { LCProdAppStack } from '../lib/prod/app-stack';
 import { LCBatchAppStack } from '../lib/prod/batch-app-stack';
 import { LCProdDatabaseStack } from '../lib/prod/database-stack';
+import { LCProdLambdaStack } from '../lib/prod/lambda-stack';
 import { LCProdPrivateAppStack } from '../lib/prod/private-app-stack';
 import { LCRedisStack } from '../lib/prod/redis-stack';
 import { LCProdVpcStack } from '../lib/prod/vpc-stack';
@@ -19,7 +21,7 @@ import { envCheck } from '../util/env-check';
 dotenv.config();
 envCheck();
 
-const app = new cdk.App();
+const app = new App();
 
 // ************************************
 // * Dev / Test 환경
@@ -51,6 +53,10 @@ new LCDevPrivateAppStack(app, 'LC-DEV-PRIVATE-APP', {
   mailerSecGrp: devVpcStack.mailerSecGrp,
   inactiveBatchSecGrp: devVpcStack.inactiveBatchSecGrp,
 });
+
+// Serverless lambda functions
+new LCDevLambdaStack(app, 'LC-DEV-LAMBDA', {});
+
 // ************************************
 // * Production 환경
 // VPC
@@ -91,6 +97,9 @@ new LCBatchAppStack(app, 'LC-PROD-BATCH-APP', {
   inactiveBatchSecGrp: prodVpcStack.inactiveBatchSecGrp,
   virtualAccountBatchSecGrp: prodVpcStack.virtualAccountBatchSecGrp,
 });
+
+// Serverless lambda functions
+new LCProdLambdaStack(app, 'LC-PROD-LAMBDA', {});
 
 // ************************************
 // * 퍼블릭 도메인

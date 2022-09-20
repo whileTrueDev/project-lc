@@ -1,15 +1,19 @@
-import * as cdk from '@aws-cdk/core';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as elasticache from '@aws-cdk/aws-elasticache';
+import {
+  aws_ec2 as ec2,
+  aws_elasticache as elasticache,
+  Stack,
+  StackProps,
+} from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import { constants } from '../../constants';
 
-interface LCDevRedisStackProps extends cdk.StackProps {
+interface LCDevRedisStackProps extends StackProps {
   vpc: ec2.Vpc;
   redisSecGrp: ec2.SecurityGroup;
 }
 
-export class LCDevRedisStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props: LCDevRedisStackProps) {
+export class LCDevRedisStack extends Stack {
+  constructor(scope: Construct, id: string, props: LCDevRedisStackProps) {
     super(scope, id, props);
 
     const { vpc, redisSecGrp } = props;

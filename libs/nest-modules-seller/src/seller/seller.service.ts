@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InactiveSeller, Prisma, Seller, SellerSocialAccount } from '@prisma/client';
-import { UserPwManager } from '@project-lc/nest-core';
+import { ImageResizer, UserPwManager } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminSellerListRes,
@@ -15,6 +15,7 @@ export class SellerService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userPwManager: UserPwManager,
+    private readonly imageResizer: ImageResizer,
   ) {}
 
   /**

@@ -1,6 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import { Badge, Box, Flex, LinkBox, LinkOverlay, Text } from '@chakra-ui/react';
-import MotionBox from '@project-lc/components-core/MotionBox';
+import { Badge, Box, Flex, Text, useBoolean } from '@chakra-ui/react';
 import RedLinedText from '@project-lc/components-core/RedLinedText';
 
 import { PromotionPagePromotionGoods } from '@project-lc/shared-types';
@@ -26,39 +25,33 @@ export function PromotinoPageGoodsDisplay({
   item,
   isLive,
 }: PromotinoPageGoodsDisplayProps): JSX.Element | null {
+  const [mouseEnter, { on, off }] = useBoolean();
+
   const defaultOpt = item.goods.options.find((x) => x.default_option === 'y');
   if (!defaultOpt) return null;
 
   const isDiscounted = defaultOpt.consumer_price > defaultOpt.price;
 
   return (
-    <LinkBox pos="relative">
-      <MotionBox whileHover="hover">
+    <NextLink href={`/goods/${item.goods.id}?bc=${broadcasterId}`} passHref>
+      <Box cursor="pointer" onMouseEnter={on} onMouseLeave={off}>
         <GoodsDisplayImage
           border={isLive ? '2px solid red' : undefined}
           alt={item.goods.goods_name}
           src={item.goods.image.find((i) => i.image)?.image || ''}
           ratio={1}
-          imageProps={
-            {
-              // variants: { hover: { scale: 1.05 } },
-            }
-          }
+          mouseEnter={mouseEnter}
         />
 
         <Box py={2} px={1}>
-          <NextLink href={`/goods/${item.goods.id}?bc=${broadcasterId}`} passHref>
-            <LinkOverlay>
-              <Text noOfLines={2} fontSize={['sm', 'md']}>
-                {isLive && (
-                  <Badge variant="solid" colorScheme="red" mr={1}>
-                    LIVE
-                  </Badge>
-                )}
-                {item.goods.goods_name}
-              </Text>
-            </LinkOverlay>
-          </NextLink>
+          <Text noOfLines={2} fontSize={['sm', 'md']}>
+            {isLive && (
+              <Badge variant="solid" colorScheme="red" mr={1}>
+                LIVE
+              </Badge>
+            )}
+            {item.goods.goods_name}
+          </Text>
           <Text
             color="GrayText"
             fontSize="sm"
@@ -90,8 +83,8 @@ export function PromotinoPageGoodsDisplay({
             </Flex>
           </Box>
         </Box>
-      </MotionBox>
-    </LinkBox>
+      </Box>
+    </NextLink>
   );
 }
 

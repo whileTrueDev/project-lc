@@ -1,4 +1,4 @@
-import { useMutation, UseMutationResult } from 'react-query';
+import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import { InquiryDto } from '@project-lc/shared-types';
 import { Inquiry } from '@prisma/client';
 import { AxiosError } from 'axios';
@@ -19,7 +19,18 @@ export const useChangeInquiryReadFlagMutation = (): UseMutationResult<
   AxiosError,
   number
 > => {
-  return useMutation(async (inquiryId: number) => {
-    return axios.patch('/inquiry', { inquiryId }).then((res) => res.data);
-  });
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    async (inquiryId: number) => {
+      return axios.patch('/inquiry', { inquiryId }).then((res) => res.data);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('AdminSidebarNotiCounts', {
+          refetchInactive: true,
+        });
+      },
+    },
+  );
 };

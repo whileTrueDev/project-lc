@@ -2,6 +2,7 @@ import {
   Broadcaster,
   BroadcasterSettlementItems,
   BroadcasterSettlements,
+  LiveShopping,
   ProductPromotion,
 } from '@prisma/client';
 import { Type } from 'class-transformer';
@@ -34,4 +35,11 @@ export class CreateManyBroadcasterSettlementHistoryDto {
   @ValidateNested()
   @Type(() => CreateBroadcasterSettlementHistoryItem)
   items: Array<CreateBroadcasterSettlementHistoryItem>;
+}
+
+export class CreateBcSettleHistoryWithExternalItemDto {
+  @IsString() round: BroadcasterSettlements['round'];
+  @IsNumber() broadcasterId: Broadcaster['id'];
+  @IsNumber() amount: BroadcasterSettlementItems['amount'];
+  @IsNumber() liveShoppingId: LiveShopping['id'];
 }

@@ -622,8 +622,8 @@ model BroadcasterSettlements {
 // 방송인 정산 내역 - 주문(출고)정보
 model BroadcasterSettlementItems {
   id                        Int     @id @default(autoincrement())
-  orderId                   String // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
-  exportCode                String // 이 정산의 출고 고유번호 (퍼스트몰 fm_goods_export.export_code)
+  orderId                   String? // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
+  exportCode                String? // 이 정산의 출고 고유번호 (퍼스트몰 fm_goods_export.export_code)
   amount                    Int     @default(0) // 총 정산 수익 금액
   broadcasterCommissionRate Decimal @default("0.00") @db.Decimal(10, 2) // 방송인 수수료율 (0%~100% 사이값)
 
@@ -2121,4 +2121,12 @@ model OverlayTheme {
   key        String   @unique // 테마 식별 키
   category   String? // 테마 분류(게임, 계절..)
   data       Json // OverlayThemeType 형태의 객체 string
+}
+
+// 테이블 별로 관리자가 확인한 마지막 데이터의 id값(number) 저장
+model AdminLastCheckedData {
+  id         Int      @id @default(autoincrement())
+  createDate DateTime @default(now())
+  updateDate DateTime @default(now()) @updatedAt
+  data       Json
 }

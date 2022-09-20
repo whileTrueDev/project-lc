@@ -1,5 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { UserPwManager } from '@project-lc/nest-core';
+import { ImageResizer, UserPwManager } from '@project-lc/nest-core';
 import { CouponModule } from '@project-lc/nest-modules-coupon';
 import { MailVerificationModule } from '@project-lc/nest-modules-mail-verification';
 import { CustomerAddressController } from './address/customer-address.controller';
@@ -13,6 +13,7 @@ export class CustomerModule {
     UserPwManager,
     CustomerService,
     CustomerAddressService,
+    ImageResizer,
   ];
 
   private static readonly exports = [CustomerService];
