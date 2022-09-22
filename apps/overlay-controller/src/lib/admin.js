@@ -16,6 +16,12 @@ const liveShoppingStateSocket = io(
     withCredentials: true,
   },
 );
+liveShoppingStateSocket.on('playOutro', (roomName) => {
+  console.log({ roomName }, '종료요청 받음');
+  if (roomName) {
+    playOutro(roomName);
+  }
+});
 
 socket.on('creator list from server', (data) => {
   if (data && data.length !== 0) {
@@ -24,6 +30,12 @@ socket.on('creator list from server', (data) => {
     $('#connection-status').text('❌ 연결되지 않음');
   }
 });
+
+/** roomName */
+function playOutro(roomName) {
+  console.log('playoutro 함수 실행', { roomName });
+  socket.emit('show video from admin', { roomName, type: 'outro' });
+}
 
 $(document).ready(function ready() {
   let liveShoppingStateBoardController; // 관리자 메시지 보내기(방송인 현황판 표시) 컨트롤러, liveShoppingId 할당될때 생성
@@ -283,7 +295,8 @@ $(document).ready(function ready() {
   });
 
   $('#show-outro-video-button').click(function showOutroVideoButtonClickEvent() {
-    socket.emit('show video from admin', { roomName, type: 'outro' });
+    playOutro(roomName);
+    // socket.emit('show video from admin', { roomName, type: 'outro' });
   });
 
   $('#hide-video-button').click(function HideVideoButtonClickEvent() {
