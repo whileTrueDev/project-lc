@@ -12,21 +12,29 @@ export function LiveShoppingCurrentState(): JSX.Element {
     broadcasterId: profileData?.id,
   });
 
-  const { title } = useMemo(() => {
+  const { title, broadcastEndDate } = useMemo(() => {
     if (!liveShoppingList) return { title: '' };
     const currentLiveShopping = liveShoppingList.find(
       (shopping) => shopping.id === liveShoppingId,
     );
     if (!currentLiveShopping) return { title: '' };
     const liveShoppingTitle = currentLiveShopping.liveShoppingName || '';
+
     return {
       title: liveShoppingTitle,
+      broadcastEndDate: currentLiveShopping.broadcastEndDate,
     };
   }, [liveShoppingId, liveShoppingList]);
 
   if (!liveShoppingId) return <p>loading...</p>;
 
-  return <LiveShoppingCurrentStateBoard liveShoppingId={liveShoppingId} title={title} />;
+  return (
+    <LiveShoppingCurrentStateBoard
+      liveShoppingId={liveShoppingId}
+      title={title}
+      broadcastEndDate={broadcastEndDate}
+    />
+  );
 }
 
 export default LiveShoppingCurrentState;
