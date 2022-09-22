@@ -60,4 +60,13 @@ export class LiveShoppingStateGateway {
     const roomId = liveShoppingId.toString();
     this.socket.to(roomId).emit('purchaseMessageUpdated');
   }
+
+  @SubscribeMessage('setLiveShoppingEndDateTime')
+  setLiveShoppingEndDateTime(
+    @MessageBody()
+    { liveShoppingId, endDateTime }: { liveShoppingId: number; endDateTime: string },
+  ): void {
+    const roomId = liveShoppingId.toString();
+    this.socket.to(roomId).emit('endDateTimeChanged', endDateTime);
+  }
 }

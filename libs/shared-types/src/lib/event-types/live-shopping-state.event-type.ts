@@ -8,6 +8,7 @@ export interface LiveShoppingStateServerToClientEvents {
   adminMessageCreated: (data: AdminMessage) => void;
   adminAlertCreated: () => void;
   purchaseMessageUpdated: () => void;
+  endDateTimeChanged: (endDateTime: string) => void;
   playOutro: (roomName?: string) => void;
 }
 
@@ -27,4 +28,5 @@ export interface OverlayControllerToServerEvents {
   createAdminMessage: (data: AdminMessage) => void;
   createAdminAlert: (liveShoppingId: number) => void;
   updatePurchaseMessage: (liveShoppingId: number) => void;
+  setLiveShoppingEndDateTime: ({ liveShoppingId: number, endDateTime: string }) => void;
 }

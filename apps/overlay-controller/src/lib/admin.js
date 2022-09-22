@@ -17,10 +17,7 @@ const liveShoppingStateSocket = io(
   },
 );
 liveShoppingStateSocket.on('playOutro', (roomName) => {
-  console.log({ roomName }, '종료요청 받음');
-  if (roomName) {
-    playOutro(roomName);
-  }
+  if (roomName) playOutro(roomName);
 });
 
 socket.on('creator list from server', (data) => {
@@ -33,7 +30,6 @@ socket.on('creator list from server', (data) => {
 
 /** roomName */
 function playOutro(roomName) {
-  console.log('playoutro 함수 실행', { roomName });
   socket.emit('show video from admin', { roomName, type: 'outro' });
 }
 
@@ -380,7 +376,13 @@ $(document).ready(function ready() {
 
   $('#end-time-send-button').click(function endTimeSendButtonClickEvent() {
     const selectedTime = $('#end-time-picker').val();
+    // 오버레이로 종료시간 전송
     socket.emit('get d-day', { roomName, date: selectedTime });
+    // 현황판으로 종료시간 전송 (liveShoppingId 의 현황판에서 설정된 종료시간에 따라 라이브종료버튼 활성화함)
+    liveShoppingStateSocket.emit('setLiveShoppingEndDateTime', {
+      liveShoppingId,
+      endDateTime: selectedTime,
+    });
     const sel = `현재 전송된 종료 시간: ${selectedTime}`;
     $('#etc-control-end-time').text(sel);
   });
