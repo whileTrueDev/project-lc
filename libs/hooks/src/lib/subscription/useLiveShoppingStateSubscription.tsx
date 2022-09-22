@@ -43,7 +43,10 @@ type UseLiveShoppingStateSubscriptionReturn = {
   alert: boolean;
   setAlert: Dispatch<SetStateAction<boolean>>;
   requestOutroPlay: () => void;
+  endTimeFromSocketServer?: string;
 };
+
+export const LIVE_SHOPPING_END_TIME_KEY = 'kkshow-ls';
 
 /** 방송인 현황판 실시간 메시지, 알림 위한 소켓연결
  * @return message:string 방송인 현황판으로 보내진 관리자 메시지
@@ -56,6 +59,9 @@ export const useLiveShoppingStateSubscription = (
   const { data: profileData } = useProfile();
   const [message, setMessage] = useState<string>('');
   const [alert, setAlert] = useState<boolean>(false);
+  const [endTimeFromSocketServer, setEndTimeFromSocketServer] = useState<
+    string | undefined
+  >(undefined);
   const queryClient = useQueryClient();
   const client =
     useRef<
@@ -97,11 +103,20 @@ export const useLiveShoppingStateSubscription = (
       queryClient.invalidateQueries('PurchaseMessages');
     });
 
+    _client.on('endDateTimeChanged', (endDateTime) => {
+      setEndTimeFromSocketServer(endDateTime);
+      window.localStorage.setItem(
+        LIVE_SHOPPING_END_TIME_KEY,
+        JSON.stringify({ liveShoppingId, endDateTime }),
+      );
+    });
+
     return () => {
       _client.off('subscribed');
       _client.off('adminMessageCreated');
       _client.off('adminAlertCreated');
       _client.off('purchaseMessageUpdated');
+      _client.off('endDateTimeChanged');
       _client.close();
     };
   }, [client, liveShoppingId, queryClient]);
@@ -116,10 +131,15 @@ export const useLiveShoppingStateSubscription = (
       : undefined;
 
     _client.emit('requestOutroPlay', roomName);
-    console.log('_clientEmit', { roomName });
   };
 
-  return { message, alert, setAlert, requestOutroPlay };
+  return {
+    message,
+    alert,
+    setAlert,
+    requestOutroPlay,
+    endTimeFromSocketServer,
+  };
 };
 
 export default useLiveShoppingStateSubscription;
