@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Grid,
   GridItem,
   Heading,
@@ -17,14 +18,17 @@ import { useCallback, useMemo } from 'react';
 
 export interface LiveShoppingCurrentStateBoardProps {
   liveShoppingId: number;
+  broadcastEndDate?: Date | null;
   title: string;
 }
 
 export function LiveShoppingCurrentStateBoard({
   liveShoppingId,
   title,
+  broadcastEndDate,
 }: LiveShoppingCurrentStateBoardProps): JSX.Element {
-  const { message, alert, setAlert } = useLiveShoppingStateSubscription(liveShoppingId);
+  const { message, alert, setAlert, requestOutroPlay } =
+    useLiveShoppingStateSubscription(liveShoppingId);
   // * 후원메시지 데이터
   const { data, status, error } = usePurchaseMessages({
     liveShoppingId,
@@ -69,6 +73,13 @@ export function LiveShoppingCurrentStateBoard({
     },
   };
 
+  const handleLiveShoppingClose = (): void => {
+    console.log('컨트롤러로 종료요청 이벤트 emit');
+    requestOutroPlay();
+  };
+
+  const closeButtonDisabled = false;
+
   if (status === 'loading') return <Box>Loading...</Box>;
   if (status === 'error') {
     console.error(error);
@@ -87,6 +98,17 @@ export function LiveShoppingCurrentStateBoard({
       <Stack h="100vh" p={4}>
         {/* 라이브쇼핑명 - 제목 */}
         <Heading textAlign="center">{title}</Heading>
+
+        {/* 라이브쇼핑 종료 버튼  // TODO : 종료시간 10초전 활성화 */}
+        <Box>
+          <Button onClick={handleLiveShoppingClose} disabled={closeButtonDisabled}>
+            라이브 종료
+          </Button>
+          <Text color="GrayText" size="sm" as="span">
+            라이브쇼핑 종료 10초 전 활성화
+          </Text>
+          {broadcastEndDate}
+        </Box>
 
         {/* 관리자메시지 */}
         <SectionWithTitle variant="outlined" title="관리자 메시지">

@@ -1,6 +1,6 @@
 import {
   AdminMessage,
-  LiveShoppingStateClientToServerEvents,
+  LiveShoppingStateServerSubscribeEvents,
   LiveShoppingStateServerToClientEvents,
 } from '@project-lc/shared-types';
 import { getRealtimeApiHost } from '@project-lc/utils';
@@ -15,6 +15,7 @@ import {
 import { useQueryClient } from 'react-query';
 import { io, Socket } from 'socket.io-client';
 import axiosInstance from '../../axios';
+import { useProfile } from '../queries/useProfile';
 
 export function useAlarmAudio(): {
   audio: HTMLAudioElement | null;
@@ -41,6 +42,7 @@ type UseLiveShoppingStateSubscriptionReturn = {
   message: string;
   alert: boolean;
   setAlert: Dispatch<SetStateAction<boolean>>;
+  requestOutroPlay: () => void;
 };
 
 /** 방송인 현황판 실시간 메시지, 알림 위한 소켓연결
@@ -51,12 +53,16 @@ type UseLiveShoppingStateSubscriptionReturn = {
 export const useLiveShoppingStateSubscription = (
   liveShoppingId: number,
 ): UseLiveShoppingStateSubscriptionReturn => {
+  const { data: profileData } = useProfile();
   const [message, setMessage] = useState<string>('');
   const [alert, setAlert] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const client =
     useRef<
-      Socket<LiveShoppingStateServerToClientEvents, LiveShoppingStateClientToServerEvents>
+      Socket<
+        LiveShoppingStateServerToClientEvents,
+        LiveShoppingStateServerSubscribeEvents
+      >
     >();
 
   const { playAudio } = useAlarmAudio();
@@ -75,8 +81,10 @@ export const useLiveShoppingStateSubscription = (
     });
     const _client = client.current;
 
+    /** 오버레이 컨트롤러로 이벤트 발생 */
     _client.emit('subscribe', liveShoppingId);
 
+    /** 오버레이 컨트롤러에서 받은 이벤트 핸들러 */
     _client.on('adminMessageCreated', (data: AdminMessage) => {
       setMessage(data.text);
     });
@@ -98,7 +106,20 @@ export const useLiveShoppingStateSubscription = (
     };
   }, [client, liveShoppingId, queryClient]);
 
-  return { message, alert, setAlert };
+  const requestOutroPlay = (): void => {
+    const _client = client.current;
+    if (!_client || !profileData) return;
+
+    // overlayUrl 에서 '/' 를 제거한 상태로 전달해야한다
+    const roomName = profileData.overlayUrl
+      ? profileData.overlayUrl.split('/').pop()
+      : undefined;
+
+    _client.emit('requestOutroPlay', roomName);
+    console.log('_clientEmit', { roomName });
+  };
+
+  return { message, alert, setAlert, requestOutroPlay };
 };
 
 export default useLiveShoppingStateSubscription;
