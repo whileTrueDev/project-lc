@@ -28,7 +28,7 @@ socket.on('creator list from server', (data) => {
   }
 });
 
-/** roomName */
+/** roomName(overlayUrl)로 아웃트로 송출 이벤트 발생 */
 function playOutro(roomName) {
   socket.emit('show video from admin', { roomName, type: 'outro' });
 }
@@ -292,7 +292,6 @@ $(document).ready(function ready() {
 
   $('#show-outro-video-button').click(function showOutroVideoButtonClickEvent() {
     playOutro(roomName);
-    // socket.emit('show video from admin', { roomName, type: 'outro' });
   });
 
   $('#hide-video-button').click(function HideVideoButtonClickEvent() {
