@@ -28,5 +28,11 @@ export interface OverlayControllerToServerEvents {
   createAdminMessage: (data: AdminMessage) => void;
   createAdminAlert: (liveShoppingId: number) => void;
   updatePurchaseMessage: (liveShoppingId: number) => void;
-  setLiveShoppingEndDateTime: ({ liveShoppingId: number, endDateTime: string }) => void;
+  setLiveShoppingEndDateTime: ({
+    liveShoppingId,
+    endDateTime,
+  }: {
+    liveShoppingId: number;
+    endDateTime: string;
+  }) => void;
 }
