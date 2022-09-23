@@ -45,14 +45,24 @@ function PromotionPageVideoItem({
   );
   // 라이브 쇼핑명
   const liveShoppingTitle = liveShopping.liveShoppingName;
-  // 상품이미지 url (외부상품으로 진행한 경우 상품이미지가 없다)
-  const goodsImageUrl = liveShopping.goods
-    ? liveShopping.goods.image[0]?.image
-    : undefined;
-  // 상품페이지 url
-  const goodsLinkUrl = liveShopping.goods
-    ? `${getKkshowWebHost()}/goods/${liveShopping.goodsId}`
-    : liveShopping.externalGoods?.linkUrl;
+
+  const { imageUrl, linkUrl } = useMemo(() => {
+    const goodsData = {
+      imageUrl: '',
+      linkUrl: '',
+    };
+    // 크크쇼 상품으로 진행한 라이브쇼핑
+    if (liveShopping.goods) {
+      goodsData.imageUrl = liveShopping.goods.image[0]?.image;
+      goodsData.linkUrl = `${getKkshowWebHost()}/goods/${liveShopping.goodsId}`;
+    } else if (liveShopping.externalGoods) {
+      // 외부상품으로 진행한 라이브쇼핑
+      goodsData.imageUrl = liveShopping.externalGoods?.imageUrl || '';
+      goodsData.linkUrl = liveShopping.externalGoods?.linkUrl;
+    }
+    return goodsData;
+  }, [liveShopping.externalGoods, liveShopping.goods, liveShopping.goodsId]);
+
   return (
     <Center>
       <Box
@@ -71,8 +81,8 @@ function PromotionPageVideoItem({
           <Heading fontSize={{ base: 'lg', md: '2xl' }} noOfLines={2}>
             {liveShoppingTitle}
           </Heading>
-          <Link href={goodsLinkUrl} isExternal>
-            <BorderedAvatar src={goodsImageUrl} size="lg" />
+          <Link href={linkUrl} isExternal>
+            <BorderedAvatar src={imageUrl} size="lg" />
           </Link>
         </Stack>
       </Box>
