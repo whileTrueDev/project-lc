@@ -1250,6 +1250,18 @@ model KkshowBcList {
   broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 }
 
+// 크크쇼 이벤트 팝업
+model KkshowEventPopup {
+  id          Int      @id @default(autoincrement())
+  createDate  DateTime @default(now())
+  key         String   @unique // 식별자
+  name        String
+  priority    Int // 우선순위
+  linkUrl     String? // 클릭시 이동할 url
+  imageUrl    String // 팝업에 표시될 이미지 url
+  displayPath Json // 팝업이 표시될 크크쇼 페이지 경로
+}
+
 enum UserType {
   seller // 판매자
   broadcaster // 방송인
