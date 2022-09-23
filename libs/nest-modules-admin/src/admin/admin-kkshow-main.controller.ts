@@ -27,6 +27,7 @@ import {
   KkshowShoppingService,
 } from '@project-lc/nest-modules-kkshow-main';
 import {
+  CreateEventPopupDto,
   CreateKkshowBcListDto,
   DeleteKkshowBcListDto,
   KkshowMainDto,
@@ -34,6 +35,7 @@ import {
   KkshowShoppingDto,
   KkshowShoppingTabCategoryDto,
   KkshowShoppingTabResData,
+  UpdateEventPopupDto,
 } from '@project-lc/shared-types';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
@@ -128,14 +130,16 @@ export class AdminKkshowMainController {
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('kkshow-event-popup')
   @Post('kkshow-event-popup')
-  public async createEventPopup(@Body(ValidationPipe) dto: any): Promise<any> {
+  public async createEventPopup(
+    @Body(ValidationPipe) dto: CreateEventPopupDto,
+  ): Promise<KkshowEventPopup> {
     return this.eventPopupService.createEventPopup(dto);
   }
 
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('kkshow-event-popup')
   @Delete('kkshow-event-popup/:id')
-  public async deleteEventPopup(@Param(ParseIntPipe) id: number): Promise<any> {
+  public async deleteEventPopup(@Param(ParseIntPipe) id: number): Promise<boolean> {
     return this.eventPopupService.deleteEventPopup(id);
   }
 
@@ -144,8 +148,8 @@ export class AdminKkshowMainController {
   @Patch('kkshow-event-popup/:id')
   public async updateEventPopup(
     @Param(ParseIntPipe) id: number,
-    @Body(ValidationPipe) dto: any,
-  ): Promise<any> {
-    return this.eventPopupService.createEventPopup({ id, dto });
+    @Body(ValidationPipe) dto: UpdateEventPopupDto,
+  ): Promise<boolean> {
+    return this.eventPopupService.updateEventPopup({ id, dto });
   }
 }
