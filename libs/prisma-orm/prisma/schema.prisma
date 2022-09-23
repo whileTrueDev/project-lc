@@ -754,6 +754,7 @@ model LiveShoppingExternalGoods {
   id             Int          @id @default(autoincrement())
   name           String
   linkUrl        String       @db.Text // 외부 url 이 매우 긴 경우를 대비
+  imageUrl       String?      @db.Text
   liveShoppingId Int          @unique
   liveShopping   LiveShopping @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
 }
