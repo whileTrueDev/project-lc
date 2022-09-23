@@ -4,17 +4,24 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
+  Patch,
   Post,
   Put,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { KkshowBcList, KkshowShoppingTabCategory } from '@prisma/client';
+import {
+  KkshowBcList,
+  KkshowEventPopup,
+  KkshowShoppingTabCategory,
+} from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   KkshowBcListService,
+  KkshowEventPopupService,
   KkshowMainService,
   KkshowShoppingCategoryService,
   KkshowShoppingService,
@@ -37,6 +44,7 @@ export class AdminKkshowMainController {
     private readonly kkshowShoppingService: KkshowShoppingService,
     private readonly kkshowShoppingCategoryService: KkshowShoppingCategoryService,
     private readonly kkshowBcListService: KkshowBcListService,
+    private readonly eventPopupService: KkshowEventPopupService,
   ) {}
 
   /** ================================= */
@@ -112,5 +120,32 @@ export class AdminKkshowMainController {
     @Param(new ValidationPipe({ transform: true })) dto: DeleteKkshowBcListDto,
   ): Promise<KkshowBcList> {
     return this.kkshowBcListService.delete(dto.id);
+  }
+
+  /** ===================== */
+  /** 크크쇼 이벤트팝업 관리 */
+  /** ===================== */
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('kkshow-event-popup')
+  @Post('kkshow-event-popup')
+  public async createEventPopup(@Body(ValidationPipe) dto: any): Promise<any> {
+    return this.eventPopupService.createEventPopup(dto);
+  }
+
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('kkshow-event-popup')
+  @Delete('kkshow-event-popup/:id')
+  public async deleteEventPopup(@Param(ParseIntPipe) id: number): Promise<any> {
+    return this.eventPopupService.deleteEventPopup(id);
+  }
+
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('kkshow-event-popup')
+  @Patch('kkshow-event-popup/:id')
+  public async updateEventPopup(
+    @Param(ParseIntPipe) id: number,
+    @Body(ValidationPipe) dto: any,
+  ): Promise<any> {
+    return this.eventPopupService.createEventPopup({ id, dto });
   }
 }

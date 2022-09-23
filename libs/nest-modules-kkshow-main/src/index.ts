@@ -1,5 +1,7 @@
 export * from './kkshow-bc-list/kkshow-bc-list.module';
 export * from './kkshow-bc-list/kkshow-bc-list.service';
+export * from './kkshow-event-popup/kkshow-event-popup.module';
+export * from './kkshow-event-popup/kkshow-event-popup.service';
 export * from './kkshow-main/kkshow-main.module';
 export * from './kkshow-main/kkshow-main.service';
 export * from './kkshow-shopping/kkshow-shopping-category.service';
