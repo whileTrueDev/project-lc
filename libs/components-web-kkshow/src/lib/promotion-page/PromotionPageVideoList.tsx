@@ -21,6 +21,10 @@ export function PromotionPageVideoList({
     if (!liveShoppingList || !liveShoppingList.length) return [];
     return liveShoppingList.filter((ls) => !!ls.liveShoppingVideo);
   }, [liveShoppingList]);
+
+  if (lsHavingVideo.length === 0) {
+    return <Center py={{ base: 10, md: 20 }}>아직 등록된 영상이 없습니다</Center>;
+  }
   return (
     <Stack>
       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
