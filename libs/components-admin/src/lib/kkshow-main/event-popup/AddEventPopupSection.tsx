@@ -1,7 +1,11 @@
 import {
-  useDisclosure,
+  Avatar,
   Box,
   Button,
+  Checkbox,
+  CheckboxGroup,
+  Divider,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -10,24 +14,21 @@ import {
   ModalOverlay,
   Stack,
   Text,
-  Input,
-  Checkbox,
-  CheckboxGroup,
-  Divider,
-  Avatar,
+  useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { nanoid } from 'nanoid';
-import { ImageInputErrorTypes, ImageInput } from '@project-lc/components-core/ImageInput';
+import { ErrorText } from '@project-lc/components-core/ErrorText';
+import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
 import {
   ImageInputFileReadData,
   readAsDataURL,
 } from '@project-lc/components-core/ImageInputDialog';
-import { ErrorText } from '@project-lc/components-core/ErrorText';
-import { s3 } from '@project-lc/utils-s3';
+import { useAdminCreateEventPopupMutation } from '@project-lc/hooks';
 import { getExtension } from '@project-lc/utils';
+import { s3 } from '@project-lc/utils-s3';
+import { nanoid } from 'nanoid';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 export function AddEventPopupSection(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -84,17 +85,17 @@ function AddEventPopupForm({
 
   const [imagePreview, setImagePreview] = useState<ImageInputFileReadData | null>(null);
 
+  const { mutateAsync, isLoading } = useAdminCreateEventPopupMutation();
+
   const onSubmit = async (formData: CreateEventPopupFormData): Promise<void> => {
     // 입력값 확인 (이름, 순서, 키, 페이지)
     if (!formData.key || !imagePreview) return;
-
     if (formData.displayPath.length <= 0) {
       toast({ title: '팝업이 표시될 페이지를 1개이상 선택해주세요', status: 'warning' });
       return;
     }
 
-    console.log('이름, 순서, 키, 페이지 확인 완료');
-
+    let imageUrl = '';
     // 이미지 s3에 업로드 => imageUrl 받기
     try {
       const extension = getExtension(imagePreview.file.name);
@@ -105,12 +106,30 @@ function AddEventPopupForm({
         ContentType: imagePreview.file.type,
         ACL: 'public-read',
       });
+      if (!objectUrl) throw new Error('image upload failed');
+      imageUrl = objectUrl;
     } catch (s3UploadError) {
       console.error(s3UploadError);
       toast({ title: '이미지 업로드 에러', status: 'error' });
     }
 
     // 생성요청
+    try {
+      const dto = {
+        key: formData.key,
+        name: formData.name,
+        priority: formData.priority,
+        imageUrl,
+        displayPath: formData.displayPath,
+        linkUrl: formData.linkUrl,
+      };
+      await mutateAsync(dto);
+      toast({ title: '팝업 생성 성공', status: 'success' });
+      onSubmitSuccess(); // 팝업 닫기
+    } catch (createPopupError) {
+      console.error(createPopupError);
+      toast({ title: '팝업 생성 에러', status: 'error' });
+    }
   };
 
   const handleSuccess = async (fileName: string, file: File): Promise<void> => {
@@ -184,7 +203,9 @@ function AddEventPopupForm({
         <Input {...register('linkUrl')} />
       </Box>
 
-      <Button type="submit">생성하기</Button>
+      <Button type="submit" isLoading={isLoading}>
+        생성하기
+      </Button>
     </Stack>
   );
 }

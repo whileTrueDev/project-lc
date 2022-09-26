@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { IsOptional, IsString, IsNumber, IsJSON } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsJSON, isString } from 'class-validator';
 
 export class CreateEventPopupDto {
   @IsString()
@@ -18,7 +18,7 @@ export class CreateEventPopupDto {
   @IsString()
   imageUrl: string; // s3에 저장된 팝업에 표시될 이미지 url
 
-  @IsJSON()
+  @IsString({ each: true })
   displayPath: Prisma.JsonArray; // 팝업이 표시될 크크쇼 페이지 경로 ['/bc','goods'] 이런형태
 }
 
@@ -39,7 +39,7 @@ export class UpdateEventPopupDto {
   @IsOptional()
   imageUrl?: string; // s3에 저장된 팝업에 표시될 이미지 url
 
-  @IsJSON()
+  @IsString({ each: true })
   @IsOptional()
   displayPath?: Prisma.JsonArray; // 팝업이 표시될 크크쇼 페이지 경로 ['/bc','goods'] 이런형태
 }
