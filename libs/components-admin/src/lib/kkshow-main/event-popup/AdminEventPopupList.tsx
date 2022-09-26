@@ -8,6 +8,7 @@ import {
   Text,
   useDisclosure,
   useToast,
+  Link,
 } from '@chakra-ui/react';
 import { KkshowEventPopup } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
@@ -118,6 +119,14 @@ function EventPopupDisplayItem({
             })
             .join(', ')}
         </Text>
+        {item.linkUrl && (
+          <Text>
+            연결링크 :{' '}
+            <Link href={item.linkUrl} isExternal={item.linkUrl.startsWith('http')}>
+              {item.linkUrl}
+            </Link>
+          </Text>
+        )}
       </Stack>
     </Stack>
   );

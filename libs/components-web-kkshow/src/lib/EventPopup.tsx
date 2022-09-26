@@ -15,7 +15,6 @@ import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { useKkshowEventPopup, useProfile } from '@project-lc/hooks';
 import { deleteCookie, getCookie, setCookie } from '@project-lc/utils-frontend';
 import { s3 } from '@project-lc/utils-s3';
-import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
 
@@ -100,9 +99,9 @@ export function EventPopup({
       <ModalContent borderRadius="md" overflow="hidden">
         {/* 이미지배너 링크 */}
         {href ? (
-          <NextLink href={href} passHref>
-            <Link>{popupImageComponent}</Link>
-          </NextLink>
+          <Link href={href} isExternal={href.startsWith('http')}>
+            {popupImageComponent}
+          </Link>
         ) : (
           <>{popupImageComponent}</>
         )}
