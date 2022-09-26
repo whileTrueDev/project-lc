@@ -139,7 +139,7 @@ export class AdminKkshowMainController {
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('kkshow-event-popup')
   @Delete('kkshow-event-popup/:id')
-  public async deleteEventPopup(@Param(ParseIntPipe) id: number): Promise<boolean> {
+  public async deleteEventPopup(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
     return this.eventPopupService.deleteEventPopup(id);
   }
 
@@ -147,7 +147,7 @@ export class AdminKkshowMainController {
   @CacheClearKeys('kkshow-event-popup')
   @Patch('kkshow-event-popup/:id')
   public async updateEventPopup(
-    @Param(ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) dto: UpdateEventPopupDto,
   ): Promise<boolean> {
     return this.eventPopupService.updateEventPopup({ id, dto });
