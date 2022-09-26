@@ -16,12 +16,13 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
-import { useProfile } from '@project-lc/hooks';
+import { useKkshowEventPopup, useProfile } from '@project-lc/hooks';
 import { getKkshowWebHost } from '@project-lc/utils';
 import { deleteCookie, getCookie, setCookie } from '@project-lc/utils-frontend';
 import { s3 } from '@project-lc/utils-s3';
 import NextLink from 'next/link';
-import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useMemo } from 'react';
 
 // s3에 저장된 배너이미지
 const KKSHOW_OPEN_EVENT_IMAGE_KEY = 'public/kks_open_event.jpeg';
@@ -58,6 +59,13 @@ export function EventPopup({
   const { data: profile, isLoading } = useProfile();
   const { isOpen, onClose, onOpen } = useDisclosure();
   const [checked, { toggle }] = useBoolean(false);
+
+  const imageSrc = useMemo(() => {
+    if (s3ImageKey.startsWith(s3.bucketDomain)) {
+      return s3ImageKey;
+    }
+    return s3.getSavedObjectUrl(s3ImageKey);
+  }, [s3ImageKey]);
 
   const onCheckBoxChange = (): void => {
     if (!checked) {
@@ -102,7 +110,7 @@ export function EventPopup({
                       quality={100}
                       objectFit={imageFit}
                       priority
-                      src={s3.getSavedObjectUrl(s3ImageKey)}
+                      src={imageSrc}
                       borderTopRadius="md"
                     />
                   </Box>
@@ -115,7 +123,7 @@ export function EventPopup({
                   quality={100}
                   objectFit={imageFit}
                   priority
-                  src={s3.getSavedObjectUrl(s3ImageKey)}
+                  src={imageSrc}
                   borderTopRadius="md"
                 />
               </Box>
@@ -144,3 +152,42 @@ export function EventPopup({
 }
 
 export default EventPopup;
+
+export function KkshowEventPopupsSection(): JSX.Element {
+  const router = useRouter();
+  const { data } = useKkshowEventPopup();
+
+  const popupListToDisplay = useMemo(() => {
+    const currentPath = router.pathname;
+    if (!data || !currentPath) return [];
+
+    // 현재 메인페이지('/')인 경우 => displayPath에 '/'가 포함되어 있는지 확인
+    if (currentPath === '/') {
+      return data
+        .filter((popup) => JSON.parse(JSON.stringify(popup.displayPath)).includes('/'))
+        .reverse();
+    }
+
+    // 현재 메인페이지가 아닌경우, 현재 pathname이 '/' 를 제외한 나머지 displayPath로 시작하는지 확인
+    return data
+      .filter((popup) =>
+        JSON.parse(JSON.stringify(popup.displayPath))
+          .filter((path: string) => path !== '/')
+          .some((path: string) => currentPath.startsWith(path)),
+      )
+      .reverse();
+  }, [data, router.pathname]);
+
+  return (
+    <>
+      {popupListToDisplay.map((popup) => (
+        <EventPopup
+          key={popup.id}
+          s3ImageKey={popup.imageUrl}
+          cookieKey={popup.key}
+          href={popup.linkUrl || undefined}
+        />
+      ))}
+    </>
+  );
+}
