@@ -31,6 +31,7 @@ import {
   KkshowMainModule,
   KkshowShoppingModule,
   KkshowSubNavModule,
+  KkshowLiveEmbedModule,
 } from '@project-lc/nest-modules-kkshow-main';
 import { KkshowSearchModule } from '@project-lc/nest-modules-kkshow-search';
 import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
@@ -79,6 +80,7 @@ import { AppController } from './app.controller';
     KkshowShoppingModule.withControllers(),
     KkshowSubNavModule.withControllers(),
     KkshowBcListModule.withControllers(),
+    KkshowLiveEmbedModule.withControllers(),
     CustomerModule.withControllers(),
     PaymentModule.withControllers(),
     OrderModule.withControllers(),

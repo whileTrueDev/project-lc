@@ -117,6 +117,50 @@ export class LiveShoppingService {
     return result;
   }
 
+  /** 라이브 쇼핑 개별 조회 */
+  async findLiveShopping(id: number): Promise<LiveShoppingWithGoods> {
+    return this.prisma.liveShopping.findUnique({
+      where: { id },
+      include: {
+        messageSetting: true,
+        goods: {
+          select: {
+            goods_name: true,
+            summary: true,
+            image: true,
+            options: true,
+            confirmation: { select: { status: true } },
+          },
+        },
+        seller: { select: { sellerShop: true } },
+        broadcaster: {
+          select: {
+            id: true,
+            userName: true,
+            userNickname: true,
+            email: true,
+            avatar: true,
+            BroadcasterPromotionPage: true,
+            channels: true,
+          },
+        },
+        liveShoppingVideo: { select: { youtubeUrl: true } },
+        images: true,
+        orderItemSupport: {
+          select: {
+            orderItem: {
+              select: {
+                options: { select: { discountPrice: true, quantity: true } },
+              },
+            },
+          },
+        },
+        liveShoppingSpecialPrices: true,
+        externalGoods: true,
+      },
+    });
+  }
+
   /** 라이브 쇼핑 목록 조회 */
   async findLiveShoppings(dto?: FindLiveShoppingDto): Promise<LiveShoppingWithGoods[]> {
     // 자신의 id를 반환하는 쿼리 수행하기

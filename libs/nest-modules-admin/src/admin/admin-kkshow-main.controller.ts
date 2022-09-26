@@ -4,23 +4,30 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { KkshowBcList, KkshowShoppingTabCategory } from '@prisma/client';
+import {
+  KkshowBcList,
+  KkshowShoppingTabCategory,
+  LiveShoppingEmbed,
+} from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   KkshowBcListService,
+  KkshowLiveEmbedService,
   KkshowMainService,
   KkshowShoppingCategoryService,
   KkshowShoppingService,
 } from '@project-lc/nest-modules-kkshow-main';
 import {
   CreateKkshowBcListDto,
+  CreateKkshowLiveEmbedDto,
   DeleteKkshowBcListDto,
   KkshowMainDto,
   KkshowMainResData,
@@ -37,6 +44,7 @@ export class AdminKkshowMainController {
     private readonly kkshowShoppingService: KkshowShoppingService,
     private readonly kkshowShoppingCategoryService: KkshowShoppingCategoryService,
     private readonly kkshowBcListService: KkshowBcListService,
+    private readonly kkshowLiveEmbedService: KkshowLiveEmbedService,
   ) {}
 
   /** ================================= */
@@ -112,5 +120,29 @@ export class AdminKkshowMainController {
     @Param(new ValidationPipe({ transform: true })) dto: DeleteKkshowBcListDto,
   ): Promise<KkshowBcList> {
     return this.kkshowBcListService.delete(dto.id);
+  }
+
+  /**
+   * 라이브 임베드 레코드 생성
+   */
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('kkshow-live-embed')
+  @Post('kkshow-live-embed')
+  public async create(
+    @Body(new ValidationPipe({ transform: true })) dto: CreateKkshowLiveEmbedDto,
+  ): Promise<LiveShoppingEmbed> {
+    return this.kkshowLiveEmbedService.create(dto);
+  }
+
+  /**
+   * 라이브 임베드 레코드 삭제
+   */
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('kkshow-live-embed')
+  @Delete('kkshow-live-embed/:id')
+  public async delete(
+    @Param('id', ParseIntPipe) id: LiveShoppingEmbed['id'],
+  ): Promise<boolean> {
+    return this.kkshowLiveEmbedService.delete(id);
   }
 }

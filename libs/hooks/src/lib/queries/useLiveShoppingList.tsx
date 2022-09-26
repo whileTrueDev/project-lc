@@ -51,3 +51,23 @@ export const useLiveShoppingNowOnLive = (
     { enabled: !(!dto.broadcasterId && !dto.goodsId && !dto.goodsIds) },
   );
 };
+
+// *********************************
+// * 라이브쇼핑 개별 조회
+export const getLiveShopping = async (id: number): Promise<LiveShoppingWithGoods> => {
+  return axios
+    .get<LiveShoppingWithGoods>(`/live-shoppings/${id}`)
+    .then((res) => res.data);
+};
+
+/** 특ㅈ어 라이브쇼핑 정보 조회 */
+export const useLiveShopping = (
+  id: number,
+): UseQueryResult<LiveShoppingWithGoods, AxiosError> => {
+  const queryKey = ['LiveShopping', id];
+  return useQuery<LiveShoppingWithGoods, AxiosError>(
+    queryKey,
+    () => getLiveShopping(id),
+    { enabled: !!id },
+  );
+};

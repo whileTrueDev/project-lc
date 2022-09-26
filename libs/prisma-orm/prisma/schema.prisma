@@ -748,6 +748,7 @@ model LiveShopping {
   orderItemSupport            OrderItemSupport[]
   cartItemSupport             CartItemSupport[]
   liveShoppingSpecialPrices   LiveShoppingSpecialPrice[] // 라이브쇼핑에 적용되는 특가정보
+  LiveShoppingEmbed           LiveShoppingEmbed?
 }
 
 model LiveShoppingExternalGoods {
@@ -2129,4 +2130,18 @@ model AdminLastCheckedData {
   createDate DateTime @default(now())
   updateDate DateTime @default(now()) @updatedAt
   data       Json
+}
+
+model LiveShoppingEmbed {
+  id               Int              @id @default(autoincrement())
+  streamingService StreamingService // twitch / afreeca
+  UID              String // 임베드 영상 고유 ID (트위치->트위치유저ID(ex. zilioner), 아프리카->아프리카유저Id/방송고유ID (ex. arinbbidol/242803647))
+
+  liveShoppingId Int?          @unique
+  liveShopping   LiveShopping? @relation(fields: [liveShoppingId], references: [id], onDelete: SetNull)
+}
+
+enum StreamingService {
+  twitch
+  afreeca
 }
