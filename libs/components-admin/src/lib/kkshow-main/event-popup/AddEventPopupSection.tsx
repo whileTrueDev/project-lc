@@ -52,6 +52,12 @@ export function AddEventPopupSection(): JSX.Element {
 
 export default AddEventPopupSection;
 
+export const pathNames: Record<string, string> = {
+  '/': '메인',
+  '/bc/': '방송인 홍보페이지',
+  '/shopping': '크크마켓(쇼핑탭)',
+};
+
 type CreateEventPopupFormData = {
   key: string;
   name: string;
@@ -186,9 +192,11 @@ function AddEventPopupForm({
           }
         >
           <Stack spacing={[1, 5]} direction={['column', 'row']}>
-            <Checkbox value="/">메인</Checkbox>
-            <Checkbox value="/bc/">방송인 홍보페이지</Checkbox>
-            <Checkbox value="/shopping">크크마켓(쇼핑탭)</Checkbox>
+            {Object.keys(pathNames).map((p) => (
+              <Checkbox key={p} value={p}>
+                {pathNames[p]}
+              </Checkbox>
+            ))}
           </Stack>
         </CheckboxGroup>
       </Box>
