@@ -1260,6 +1260,8 @@ model KkshowEventPopup {
   linkUrl     String? // 클릭시 이동할 url
   imageUrl    String // 팝업에 표시될 이미지 url
   displayPath Json // 팝업이 표시될 크크쇼 페이지 경로
+  width       Int?
+  height      Int?
 }
 
 enum UserType {

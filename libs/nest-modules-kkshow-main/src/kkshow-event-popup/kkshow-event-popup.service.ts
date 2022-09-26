@@ -9,9 +9,12 @@ export class KkshowEventPopupService {
 
   /** 이벤트팝업 추가 */
   public async createEventPopup(dto: CreateEventPopupDto): Promise<KkshowEventPopup> {
+    const { imageWidth: width, imageHeight: height, ...rest } = dto;
     return this.prisma.kkshowEventPopup.create({
       data: {
-        ...dto,
+        ...rest,
+        width,
+        height,
       },
     });
   }

@@ -65,6 +65,8 @@ type CreateEventPopupFormData = {
   linkUrl?: string; // 클릭시 이동할 url. 없으면 일반 이미지 팝업
   imageUrl: string; // s3에 저장된 팝업에 표시될 이미지 url
   displayPath: string[]; // 팝업이 표시될 크크쇼 페이지 경로 ['/bc','goods'] 이런형태
+  imageWidth?: number;
+  imageHeight?: number;
 };
 
 function AddEventPopupForm({
@@ -77,7 +79,6 @@ function AddEventPopupForm({
     register,
     handleSubmit,
     setValue,
-    setError,
     formState: { errors },
   } = useForm<CreateEventPopupFormData>({
     defaultValues: {
@@ -125,9 +126,11 @@ function AddEventPopupForm({
         key: formData.key,
         name: formData.name,
         priority: formData.priority,
-        imageUrl,
         displayPath: formData.displayPath,
         linkUrl: formData.linkUrl,
+        imageUrl,
+        imageWidth: formData.imageWidth,
+        imageHeight: formData.imageHeight,
       };
       await mutateAsync(dto);
       toast({ title: '팝업 생성 성공', status: 'success' });
@@ -162,6 +165,7 @@ function AddEventPopupForm({
           * 우선 순위 (등록된 팝업이 여러개인 경우, 우선순위 순으로 표시됩니다)
         </Text>
         <Input
+          width="auto"
           type="number"
           {...register('priority', {
             required: '우선순위를 입력해주세요',
@@ -174,7 +178,35 @@ function AddEventPopupForm({
       <Box>
         <Text fontWeight="bold">* 이벤트팝업 이미지 등록</Text>
         <ImageInput handleSuccess={handleSuccess} handleError={handleError} />
-        {imagePreview && <Avatar src={imagePreview.url as string} />}
+        {imagePreview && <Avatar src={imagePreview.url as string} borderRadius="base" />}
+      </Box>
+
+      <Box>
+        <Text>이미지 너비(가로), 높이(세로)</Text>
+        <Text fontSize="sm" color="GrayText">
+          이미지 비율에 맞게 표시하기 위해 필요한 값입니다. 팝업 이미지는 최대 576px
+          너비로 표시됩니다
+        </Text>
+        <Stack direction="row">
+          <Text>너비(px)</Text>
+          <Input
+            width="auto"
+            {...register('imageWidth', {
+              required: '이미지 너비를 입력해주세요',
+              valueAsNumber: true,
+            })}
+          />
+          <Text>높이(px)</Text>
+          <Input
+            width="auto"
+            {...register('imageHeight', {
+              required: '이미지 높이를 입력해주세요',
+              valueAsNumber: true,
+            })}
+          />
+        </Stack>
+        {errors.imageWidth && <ErrorText>{errors.imageWidth.message}</ErrorText>}
+        {errors.imageHeight && <ErrorText>{errors.imageHeight.message}</ErrorText>}
       </Box>
 
       <Divider />

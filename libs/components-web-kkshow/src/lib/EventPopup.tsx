@@ -1,13 +1,14 @@
 import {
+  AspectRatio,
   Box,
   BoxProps,
   Button,
   Checkbox,
   ImageProps,
+  Link,
   LinkBox,
   LinkOverlay,
   Modal,
-  ModalBody,
   ModalContent,
   ModalOverlay,
   ModalProps,
@@ -41,20 +42,20 @@ export function SignupEventPopup(): JSX.Element {
 export interface EventPopupProps {
   s3ImageKey: string;
   cookieKey: string;
-  imageHeight?: BoxProps['h'];
   /** 이미지 클릭시 이동할 링크 */
   href?: string;
   modalSize?: ModalProps['size']; // 이미지 layout=fill 이므로 이미지 가로사이즈 대신 modalSize로 가로길이 지정
-  imageFit?: ImageProps['objectFit']; // 이미지 objectFit 기본값 : fill
+  imageWidth?: number | null;
+  imageHeight?: number | null;
 }
 
 export function EventPopup({
   s3ImageKey,
   cookieKey,
   href,
-  imageHeight = [300, 400, 500],
-  imageFit = 'fill',
-  modalSize = 'lg',
+  modalSize = 'xl',
+  imageWidth,
+  imageHeight,
 }: EventPopupProps): JSX.Element {
   const { data: profile, isLoading } = useProfile();
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -66,6 +67,25 @@ export function EventPopup({
     }
     return s3.getSavedObjectUrl(s3ImageKey);
   }, [s3ImageKey]);
+
+  const ratio = useMemo(() => {
+    if (!imageWidth || !imageHeight) return 1;
+    return imageWidth / imageHeight;
+  }, [imageWidth, imageHeight]);
+
+  const popupImageComponent = useMemo(() => {
+    return (
+      <AspectRatio maxW={modalSize} ratio={ratio}>
+        <ChakraNextImage
+          layout="fill"
+          quality={100}
+          objectFit="scale-down"
+          priority
+          src={imageSrc}
+        />
+      </AspectRatio>
+    );
+  }, [imageSrc, modalSize, ratio]);
 
   const onCheckBoxChange = (): void => {
     if (!checked) {
@@ -97,55 +117,31 @@ export function EventPopup({
       size={modalSize}
     >
       <ModalOverlay bg="blackAlpha.400" />
-      <ModalContent>
-        <ModalBody pt={0} px={0}>
-          {/* 이미지배너 링크 */}
-          <LinkBox>
-            {href ? (
-              <NextLink href={href} passHref>
-                <LinkOverlay>
-                  <Box h={imageHeight} pos="relative">
-                    <ChakraNextImage
-                      layout="fill"
-                      quality={100}
-                      objectFit={imageFit}
-                      priority
-                      src={imageSrc}
-                      borderTopRadius="md"
-                    />
-                  </Box>
-                </LinkOverlay>
-              </NextLink>
-            ) : (
-              <Box h={imageHeight} pos="relative">
-                <ChakraNextImage
-                  layout="fill"
-                  quality={100}
-                  objectFit={imageFit}
-                  priority
-                  src={imageSrc}
-                  borderTopRadius="md"
-                />
-              </Box>
-            )}
-          </LinkBox>
+      <ModalContent borderRadius="md" overflow="hidden">
+        {/* 이미지배너 링크 */}
+        {href ? (
+          <NextLink href={href} passHref>
+            <Link>{popupImageComponent}</Link>
+          </NextLink>
+        ) : (
+          <>{popupImageComponent}</>
+        )}
 
-          <Stack
-            pt={2}
-            px={1}
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            {/* 체크박스 */}
-            <Checkbox isChecked={checked} onChange={onCheckBoxChange}>
-              오늘 하루동안 안보기
-            </Checkbox>
-            <Button size="sm" colorScheme="blue" mr={3} onClick={onClose}>
-              닫기
-            </Button>
-          </Stack>
-        </ModalBody>
+        <Stack
+          py={1}
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          background="white"
+        >
+          {/* 체크박스 */}
+          <Checkbox isChecked={checked} onChange={onCheckBoxChange}>
+            오늘 하루동안 안보기
+          </Checkbox>
+          <Button size="sm" colorScheme="blue" mr={3} onClick={onClose}>
+            닫기
+          </Button>
+        </Stack>
       </ModalContent>
     </Modal>
   );
@@ -186,6 +182,8 @@ export function KkshowEventPopupsSection(): JSX.Element {
           s3ImageKey={popup.imageUrl}
           cookieKey={popup.key}
           href={popup.linkUrl || undefined}
+          imageWidth={popup.width}
+          imageHeight={popup.height}
         />
       ))}
     </>
