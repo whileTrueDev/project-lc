@@ -1,13 +1,8 @@
 import {
   AspectRatio,
-  Box,
-  BoxProps,
   Button,
   Checkbox,
-  ImageProps,
   Link,
-  LinkBox,
-  LinkOverlay,
   Modal,
   ModalContent,
   ModalOverlay,
@@ -18,26 +13,11 @@ import {
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { useKkshowEventPopup, useProfile } from '@project-lc/hooks';
-import { getKkshowWebHost } from '@project-lc/utils';
 import { deleteCookie, getCookie, setCookie } from '@project-lc/utils-frontend';
 import { s3 } from '@project-lc/utils-s3';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
-
-// s3에 저장된 배너이미지
-const KKSHOW_OPEN_EVENT_IMAGE_KEY = 'public/kks_open_event.jpeg';
-const EVENT_POPUP_COOKIE = 'kkshow-event-popup';
-/** 신규 회원가입 이벤트 팝업 */
-export function SignupEventPopup(): JSX.Element {
-  return (
-    <EventPopup
-      s3ImageKey={KKSHOW_OPEN_EVENT_IMAGE_KEY}
-      cookieKey={EVENT_POPUP_COOKIE}
-      href={`${getKkshowWebHost()}/signup`}
-    />
-  );
-}
 
 export interface EventPopupProps {
   s3ImageKey: string;

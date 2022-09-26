@@ -1,5 +1,4 @@
 import { Box } from '@chakra-ui/react';
-import { SignupEventPopup } from '@project-lc/components-web-kkshow/EventPopup';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { ShoppingCarousel } from '@project-lc/components-web-kkshow/shopping/ShoppingCarousel';
 import { ShoppingCategories } from '@project-lc/components-web-kkshow/shopping/ShoppingCategories';
@@ -45,9 +44,6 @@ export const getStaticProps: GetStaticProps<KkshowShippingProps> = async () => {
 export default function Shopping(): JSX.Element {
   return (
     <Box position="relative">
-      {/* 신규가입 이벤트 팝업 */}
-      <SignupEventPopup />
-
       <KkshowLayout navbarFirstLink="kkmarket">
         <ShoppingCarousel />
         <ShoppingCategories />

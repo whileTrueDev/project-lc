@@ -11,7 +11,6 @@ import {
   Tabs,
   Text,
 } from '@chakra-ui/react';
-import { SignupEventPopup } from '@project-lc/components-web-kkshow/EventPopup';
 import KkshowLayout from '@project-lc/components-web-kkshow/KkshowLayout';
 import { PromotionPageGoodsList } from '@project-lc/components-web-kkshow/promotion-page/PromotionPageGoodsList';
 import { PromotionPageProfile } from '@project-lc/components-web-kkshow/promotion-page/PromotionPageProfile';
@@ -67,9 +66,6 @@ export function BroadcasterPromotionPage(): JSX.Element {
 
   return (
     <Box>
-      {/* 신규가입 이벤트 팝업 */}
-      <SignupEventPopup />
-
       <KkshowLayout navbarFirstLink="kkmarket">
         <Box m="auto" maxW="5xl" p={2} minH="80vh" mt={[5, 10, 20]}>
           <PromotionPageProfile broadcasterId={broadcasterId} />
