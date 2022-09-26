@@ -114,7 +114,7 @@ function AddEventPopupForm({
         ACL: 'public-read',
       });
       if (!objectUrl) throw new Error('image upload failed');
-      imageUrl = objectUrl;
+      imageUrl = key;
     } catch (s3UploadError) {
       console.error(s3UploadError);
       toast({ title: '이미지 업로드 에러', status: 'error' });

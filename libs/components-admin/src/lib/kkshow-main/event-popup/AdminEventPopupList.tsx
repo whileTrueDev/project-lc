@@ -103,7 +103,7 @@ function EventPopupDisplayItem({
         size="sm"
         onClick={onButtonClick}
       />
-      <Avatar src={item.imageUrl} borderRadius="base" size="lg" />
+      <Avatar src={s3.getSavedObjectUrl(item.imageUrl)} borderRadius="base" size="lg" />
       <Stack>
         <Divider />
         <Text>우선순위 : {item.priority}</Text>
