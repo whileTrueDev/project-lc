@@ -1,5 +1,7 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
+import { LiveShoppingVideoController } from './live-shopping-video.controller';
+import { LiveShoppingVideoService } from './live-shopping-video.service';
 import { LiveShoppingController } from './live-shopping.controller';
 import { LiveShoppingService } from './live-shopping.service';
 import { PurchaseMessageService } from './purchase-message.service';
@@ -7,9 +9,13 @@ import { PurchaseMessageService } from './purchase-message.service';
 @Module({})
 export class LiveShoppingModule {
   private static imports = [GoodsModule.withoutControllers()];
-  private static providers = [LiveShoppingService, PurchaseMessageService];
+  private static providers = [
+    LiveShoppingService,
+    PurchaseMessageService,
+    LiveShoppingVideoService,
+  ];
 
-  private static controllers = [LiveShoppingController];
+  private static controllers = [LiveShoppingController, LiveShoppingVideoController];
   private static exports = [LiveShoppingService, PurchaseMessageService];
 
   static withoutControllers(): DynamicModule {

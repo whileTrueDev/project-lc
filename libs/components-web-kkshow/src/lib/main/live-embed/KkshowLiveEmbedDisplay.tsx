@@ -1,4 +1,3 @@
-import { Box } from '@chakra-ui/react';
 import { StreamingService } from '@prisma/client';
 import { useMemo } from 'react';
 
@@ -28,18 +27,15 @@ export function KkshowLiveEmbedDisplay({
 
   if (!url) return null;
   return (
-    <Box pos="relative" paddingTop="56.5%" width="100%">
-      <iframe
-        title={`${streamingService}/${UID}/임베드`}
-        src={url}
-        frameBorder="0"
-        allowFullScreen
-        scrolling="no"
-        height="100%"
-        width="100%"
-        style={{ position: 'absolute', top: 0, left: 0 }}
-      />
-    </Box>
+    <iframe
+      title={`${streamingService}/${UID}/임베드`}
+      src={url}
+      frameBorder="0"
+      allowFullScreen
+      scrolling="no"
+      height="100%"
+      width="100%"
+    />
   );
 }
 

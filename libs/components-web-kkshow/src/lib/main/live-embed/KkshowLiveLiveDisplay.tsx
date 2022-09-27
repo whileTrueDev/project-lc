@@ -24,22 +24,19 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { StreamingService } from '@prisma/client';
-import { GoodsViewAdditionalInfo } from '@project-lc/components-web-kkshow/goods/GoodsViewAdditionalInfo';
-import GoodsViewBottomMenu from '@project-lc/components-web-kkshow/goods/GoodsViewBottomMenu';
-import { GoodsViewDetail } from '@project-lc/components-web-kkshow/goods/GoodsViewDetail';
-import { GoodsViewFloatingButtons } from '@project-lc/components-web-kkshow/goods/GoodsViewFloatingButtons';
-import { GoodsViewInquiries } from '@project-lc/components-web-kkshow/goods/GoodsViewInquiries';
-import GoodsViewMeta from '@project-lc/components-web-kkshow/goods/GoodsViewMeta';
-import { GoodsViewReviews } from '@project-lc/components-web-kkshow/goods/GoodsViewReviews';
-import GoodsViewNavBar from '@project-lc/components-web-kkshow/goods/nav/GoodsViewNavBar';
-import { GoodsViewStickyNav } from '@project-lc/components-web-kkshow/goods/nav/GoodsViewStickyNav';
-import OrderPaymentForm from '@project-lc/components-web-kkshow/payment/OrderPaymentForm';
 import { useLiveShopping } from '@project-lc/hooks';
 import { getKkshowWebHost } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { MdPhotoCameraFront } from 'react-icons/md';
+import { GoodsViewAdditionalInfo } from '../../goods/GoodsViewAdditionalInfo';
+import GoodsViewBottomMenu from '../../goods/GoodsViewBottomMenu';
+import { GoodsViewDetail } from '../../goods/GoodsViewDetail';
+import { GoodsViewInquiries } from '../../goods/GoodsViewInquiries';
+import GoodsViewMeta from '../../goods/GoodsViewMeta';
+import { GoodsViewReviews } from '../../goods/GoodsViewReviews';
+import { GoodsViewStickyNav } from '../../goods/nav/GoodsViewStickyNav';
 
 export interface KkshowLiveLiveDisplayProps {
   liveShoppingId: number;
@@ -56,12 +53,12 @@ export function KkshowLiveLiveDisplay({
   const drawerDialog = useDisclosure();
   const { data } = useLiveShopping(liveShoppingId);
 
-  // router.query 에 goodsId 추가
+  // router.query 에 goodsId, bc 추가
   useEffect(() => {
-    if (data && data.goodsId && !router.query.goodsId) {
+    if (data && data.goodsId && !router.query.goodsId && !router.query.bc) {
       router.push({
         pathname: router.pathname,
-        query: { ...router.query, goodsId: data.goodsId },
+        query: { ...router.query, goodsId: data.goodsId, bc: data.broadcasterId },
       });
     }
   }, [data, router]);
@@ -71,7 +68,11 @@ export function KkshowLiveLiveDisplay({
   };
 
   const onPurchaseClick = (): void => {
-    drawerDialog.onOpen();
+    if (data?.externalGoods) {
+      window.open(data.externalGoods.linkUrl);
+    } else {
+      drawerDialog.onOpen();
+    }
   };
 
   const onShareClick = (): void => {
@@ -194,7 +195,7 @@ function KkshowPurchaseDrawer({
 
         <DrawerBody py={0} px={2}>
           <>
-            <GoodsViewMeta />
+            <GoodsViewMeta pageTransferType="window_open" />
             <GoodsViewStickyNav topMargin={0} />
             <GoodsViewDetail />
             <GoodsViewReviews />

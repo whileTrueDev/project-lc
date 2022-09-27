@@ -804,10 +804,11 @@ enum LiveShopppingProgressType {
 }
 
 model LiveShoppingVideo {
-  id           Int            @id @default(autoincrement())
-  youtubeUrl   String?        @unique
-  createDate   DateTime       @default(now())
-  LiveShopping LiveShopping[]
+  id              Int            @id @default(autoincrement())
+  youtubeUrl      String?        @unique
+  youtubeEmbedUrl String?        @unique
+  createDate      DateTime       @default(now())
+  LiveShopping    LiveShopping[]
 }
 
 enum LiveShoppingImageType {

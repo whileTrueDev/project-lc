@@ -167,6 +167,7 @@ export * from './lib/queries/useKkshowShopping';
 export * from './lib/queries/useKkshowSubNav';
 export * from './lib/queries/useLiveEmbedList';
 export * from './lib/queries/useLiveShoppingList';
+export * from './lib/queries/useLiveShoppingVideo';
 export * from './lib/queries/useManual';
 export * from './lib/queries/useNotice';
 export * from './lib/queries/useNotifications';
