@@ -1226,6 +1226,22 @@ model KkshowShoppingTab {
   keywords        Json // 쇼핑탭 테마별 키워드 영역 아이템[]
 }
 
+// 크크쇼 쇼핑탭 섹션 순서 저장
+model KkshowShoppingTabSectionOrder {
+  id    Int  @id @default(autoincrement())
+  order Json // KkshowShoppingSectionItem.id[]
+}
+
+// 크크쇼 쇼핑탭에 표시될 섹션들 정보 저장
+model KkshowShoppingSectionItem {
+  id          Int     @id @default(autoincrement())
+  layoutType  String
+  title       String
+  description String?
+  data        Json // 섹션에 표시될 데이터(주로 상품정보), 레이아웃타입에 따라 다른 형태의 데이터
+  link        String? // 더보기 등 버튼이 있는 경우, 클릭가능한 배너인 경우 이동할 페이지
+}
+
 model KkshowSubNavLink {
   id    Int    @id @default(autoincrement())
   index Int

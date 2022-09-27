@@ -9,11 +9,14 @@ import { ShoppingNewLineUp } from '@project-lc/components-web-kkshow/shopping/Sh
 import { ShoppingPopularGoods } from '@project-lc/components-web-kkshow/shopping/ShoppingPopularGoods';
 import { ShoppingRecommendations } from '@project-lc/components-web-kkshow/shopping/ShoppingRecommendations';
 import { ShoppingReviews } from '@project-lc/components-web-kkshow/shopping/ShoppingReviews';
+import { ShoppingSectionsContainer } from '@project-lc/components-web-kkshow/shopping/ShoppingSectionsContainer';
 import {
   getKkshowShopping,
   getKkshowShoppingCategories,
+  getKkshowShoppingtemp,
   kkshowShoppingCategoriesKey,
   kkshowShoppingQueryKey,
+  tempkkshowShoppingQueryKey,
 } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
@@ -26,6 +29,12 @@ export const getStaticProps: GetStaticProps<KkshowShippingProps> = async () => {
   const queryClient = createQueryClient();
   await queryClient
     .prefetchQuery(kkshowShoppingQueryKey, getKkshowShopping)
+    .catch((err) => {
+      throw new Error(`Failed to fetch KkshowShopping data - ${err}`);
+    });
+
+  await queryClient
+    .prefetchQuery(tempkkshowShoppingQueryKey, getKkshowShoppingtemp)
     .catch((err) => {
       throw new Error(`Failed to fetch KkshowShopping data - ${err}`);
     });
@@ -49,14 +58,15 @@ export default function Shopping(): JSX.Element {
       <SignupEventPopup />
 
       <KkshowLayout navbarFirstLink="kkmarket">
-        <ShoppingCarousel />
+        <ShoppingSectionsContainer />
+        {/* <ShoppingCarousel />
         <ShoppingCategories />
         <ShoppingGoodsOfTheWeek />
         <ShoppingNewLineUp />
         <ShoppingPopularGoods />
         <ShoppingEventBanner />
         <ShoppingRecommendations />
-        <ShoppingReviews />
+        <ShoppingReviews /> */}
         {/* <ShoppingKeywords /> */}
       </KkshowLayout>
     </Box>

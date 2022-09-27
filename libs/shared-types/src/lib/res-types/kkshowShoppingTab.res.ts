@@ -1,3 +1,5 @@
+import { KkshowShoppingSectionItem } from '@prisma/client';
+
 export interface ImageCard {
   imageUrl: string; // 이미지 url
   linkUrl: string; // 이미지 클릭시 이동할 주소 url (optional)
@@ -38,6 +40,17 @@ export interface KkshowShoppingTab extends ImageCard {
   message: string;
 }
 
+export interface KkshowShoppingTabBannerData {
+  message?: string;
+  link?: string;
+  imageUrl?: string;
+  fontColor?: string;
+  backgroundColor?: string;
+  backgroundRepeat?: string;
+  backgroundPosition?: string;
+  backgroundSize?: string;
+}
+
 // 크크쇼 쇼핑탭 데이터 리턴타입
 export interface KkshowShoppingTabResData {
   // carousel ; 캐러셀
@@ -59,3 +72,9 @@ export interface KkshowShoppingTabResData {
 }
 
 export default KkshowShoppingTabResData;
+
+export interface KkshowShoppingTabResDataTemp {
+  // carousel ; 캐러셀데이터
+  carousel: KkshowShoppingSectionItem;
+  sectionItems: KkshowShoppingSectionItem[];
+}

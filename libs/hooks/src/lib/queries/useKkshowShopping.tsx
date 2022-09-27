@@ -1,6 +1,7 @@
 import {
   GoodsCategoryWithFamily,
   KkshowShoppingTabResData,
+  KkshowShoppingTabResDataTemp,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
@@ -24,6 +25,27 @@ export const useKkshowShopping = (): UseQueryResult<
     getKkshowShopping,
   );
 };
+
+// -----temp
+export const tempkkshowShoppingQueryKey = 'tempKkshowShopping';
+export const getKkshowShoppingtemp = async (): Promise<KkshowShoppingTabResDataTemp> => {
+  const url =
+    process.env.NEXT_PUBLIC_APP_TYPE === 'admin'
+      ? '/admin/kkshow-shopping/temp'
+      : 'kkshow-shopping/temp';
+  return axios.get<KkshowShoppingTabResDataTemp>(url).then((res) => res.data);
+};
+
+export const useKkshowShoppingtemp = (): UseQueryResult<
+  KkshowShoppingTabResDataTemp,
+  AxiosError
+> => {
+  return useQuery<KkshowShoppingTabResDataTemp, AxiosError>(
+    tempkkshowShoppingQueryKey,
+    getKkshowShoppingtemp,
+  );
+};
+// -----temp
 
 // 크크마켓 전시 카테고리 목록 조회
 export const kkshowShoppingCategoriesKey = 'KkshowShoppingCategories';
