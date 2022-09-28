@@ -25,6 +25,7 @@ export const useAdminKkshowShoppingMutation = (): UseMutationResult<
   );
 };
 
+/** 특정 섹션데이터 수정 */
 export type AdminUpdateKkshowShoppingSectionDataDto = {
   id: number;
   dto: Omit<KkshowShoppingSectionItem, 'id'>;
@@ -50,6 +51,7 @@ export const useAdminUpdateKkshowShoppingSectionData = (): UseMutationResult<
   );
 };
 
+/** 특정 섹션데이터 삭제 */
 export type AdminDeleteKkshowShoppingSectionDataDto = {
   id: number;
 };
@@ -69,6 +71,29 @@ export const useAdminDeleteKkshowShoppingSectionData = (): UseMutationResult<
         queryClient.invalidateQueries('KkshowShopping');
         queryClient.invalidateQueries('tempKkshowShopping');
         queryClient.invalidateQueries('AdminKkshowShoppingSections');
+      },
+    },
+  );
+};
+
+/** 섹선 순서 수정 */
+export type AdminUpdateKkshowShoppingSectionOrderDto = {
+  order: number[];
+};
+export const useAdminUpdateKkshowShoppingSectionOrder = (): UseMutationResult<
+  boolean,
+  AxiosError,
+  AdminUpdateKkshowShoppingSectionOrderDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<boolean, AxiosError, AdminUpdateKkshowShoppingSectionOrderDto>(
+    (dto: AdminUpdateKkshowShoppingSectionOrderDto) =>
+      axios.put<boolean>(`/admin/kkshow-shopping/order`, dto).then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('KkshowShopping');
+        queryClient.invalidateQueries('tempKkshowShopping');
+        queryClient.invalidateQueries('AdminShoppingSectionOrder');
       },
     },
   );

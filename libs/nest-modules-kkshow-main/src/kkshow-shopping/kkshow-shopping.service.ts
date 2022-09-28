@@ -75,7 +75,23 @@ export class KkshowShoppingService {
     if (!data) return [];
     return parseJsonToGenericType(data.order);
   }
+
   /** 섹션 순서 수정 */
+  public async updateSectionOrder(order: number[]): Promise<boolean> {
+    const data = await this.prisma.kkshowShoppingTabSectionOrder.findFirst();
+    if (!data) {
+      await this.prisma.kkshowShoppingTabSectionOrder.create({
+        data: { order },
+      });
+      return true;
+    }
+    console.log('exist data', data, order);
+    await this.prisma.kkshowShoppingTabSectionOrder.update({
+      where: { id: data.id },
+      data: { order },
+    });
+    return true;
+  }
 
   /** 섹션 데이터 조회
    * @params ids : KkshowShoppingSectionItem['id'][]
@@ -101,6 +117,7 @@ export class KkshowShoppingService {
     return sortedList;
   }
 
+  /** 캐러셀 섹션 데이터 조회 */
   public async getCarouselSection(): Promise<KkshowShoppingSectionItem> {
     return this.prisma.kkshowShoppingSectionItem.findFirst({
       where: { layoutType: LAYOUT_CAROUSEL },
@@ -119,6 +136,7 @@ export class KkshowShoppingService {
     return true;
   }
 
+  /** 섹션데이터 삭제 */
   public async deleteSectionData(id: number): Promise<boolean> {
     await this.prisma.kkshowShoppingSectionItem.delete({ where: { id } });
     return true;

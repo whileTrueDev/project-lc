@@ -88,6 +88,11 @@ export class AdminKkshowMainController {
     return this.kkshowShoppingService.getSectionOrder();
   }
 
+  @Put('kkshow-shopping/order')
+  async updateShoppingSectionOrder(@Body() dto: { order: number[] }): Promise<boolean> {
+    return this.kkshowShoppingService.updateSectionOrder(dto.order);
+  }
+
   @Put('kkshow-shopping')
   async upsertShoppingPageData(
     @Body() data: KkshowShoppingDto,
