@@ -28,7 +28,7 @@ export function ShoppingBannerLayout({
             position="relative"
             backgroundImage={imageUrl ? `url(${imageUrl})` : undefined}
             backgroundPosition={backgroundPosition}
-            backgroundRepeat={backgroundRepeat}
+            backgroundRepeat={backgroundRepeat || 'no-repeat'}
             backgroundSize={backgroundSize}
             overflow="hidden"
             _before={{

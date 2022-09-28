@@ -1,3 +1,4 @@
+import { KkshowShoppingSectionItem } from '@prisma/client';
 import {
   GoodsCategoryWithFamily,
   KkshowShoppingTabResData,
@@ -26,14 +27,12 @@ export const useKkshowShopping = (): UseQueryResult<
   );
 };
 
-// -----temp
+// -----temp, admin
 export const tempkkshowShoppingQueryKey = 'tempKkshowShopping';
 export const getKkshowShoppingtemp = async (): Promise<KkshowShoppingTabResDataTemp> => {
-  const url =
-    process.env.NEXT_PUBLIC_APP_TYPE === 'admin'
-      ? '/admin/kkshow-shopping/temp'
-      : 'kkshow-shopping/temp';
-  return axios.get<KkshowShoppingTabResDataTemp>(url).then((res) => res.data);
+  return axios
+    .get<KkshowShoppingTabResDataTemp>('kkshow-shopping/temp')
+    .then((res) => res.data);
 };
 
 export const useKkshowShoppingtemp = (): UseQueryResult<
@@ -43,6 +42,34 @@ export const useKkshowShoppingtemp = (): UseQueryResult<
   return useQuery<KkshowShoppingTabResDataTemp, AxiosError>(
     tempkkshowShoppingQueryKey,
     getKkshowShoppingtemp,
+  );
+};
+
+export const getAdminKkshowShoppingSections = async (): Promise<
+  KkshowShoppingSectionItem[]
+> => {
+  return axios
+    .get<KkshowShoppingSectionItem[]>('/admin/kkshow-shopping/temp')
+    .then((res) => res.data);
+};
+
+export const useAdminKkshowShoppingSections = (): UseQueryResult<
+  KkshowShoppingSectionItem[],
+  AxiosError
+> => {
+  return useQuery<KkshowShoppingSectionItem[], AxiosError>(
+    'AdminKkshowShoppingSections',
+    getAdminKkshowShoppingSections,
+  );
+};
+
+export const getAdminShoppingSectionOrder = async (): Promise<number[]> => {
+  return axios.get<number[]>('/admin/kkshow-shopping/order').then((res) => res.data);
+};
+export const useAdminShoppingSectionOrder = (): UseQueryResult<number[], AxiosError> => {
+  return useQuery<number[], AxiosError>(
+    'AdminShoppingSectionOrder',
+    getAdminShoppingSectionOrder,
   );
 };
 // -----temp

@@ -40,6 +40,7 @@ export interface KkshowShoppingTab extends ImageCard {
   message: string;
 }
 
+// 배너 레이아웃 data type
 export interface KkshowShoppingTabBannerData {
   message?: string;
   link?: string;

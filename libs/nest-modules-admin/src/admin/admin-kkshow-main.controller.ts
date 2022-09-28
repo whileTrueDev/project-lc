@@ -4,13 +4,18 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { KkshowBcList, KkshowShoppingTabCategory } from '@prisma/client';
+import {
+  KkshowBcList,
+  KkshowShoppingSectionItem,
+  KkshowShoppingTabCategory,
+} from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -58,6 +63,24 @@ export class AdminKkshowMainController {
   @Get('kkshow-shopping')
   async getShoppingPageData(): Promise<KkshowShoppingTabResData | null> {
     return this.kkshowShoppingService.read();
+  }
+
+  @Get('kkshow-shopping/temp')
+  async getShoppingPageDataTemp(): Promise<KkshowShoppingSectionItem[]> {
+    return this.kkshowShoppingService.getSections();
+  }
+
+  @Put('kkshow-shopping/section/:id')
+  async updateSectionData(
+    @Param('id', ParseIntPipe) id,
+    @Body(ValidationPipe) dto: Omit<KkshowShoppingSectionItem, 'id'>,
+  ): Promise<boolean> {
+    return this.kkshowShoppingService.updateSectionData(id, dto);
+  }
+
+  @Get('kkshow-shopping/order')
+  async getShoppingPageSectionOrder(): Promise<number[]> {
+    return this.kkshowShoppingService.getSectionOrder();
   }
 
   @Put('kkshow-shopping')

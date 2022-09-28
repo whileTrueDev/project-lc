@@ -106,4 +106,16 @@ export class KkshowShoppingService {
       where: { layoutType: LAYOUT_CAROUSEL },
     });
   }
+
+  /** 섹션데이터 수정 */
+  public async updateSectionData(
+    id: number,
+    dto: Omit<KkshowShoppingSectionItem, 'id'>,
+  ): Promise<boolean> {
+    await this.prisma.kkshowShoppingSectionItem.update({
+      where: { id },
+      data: dto,
+    });
+    return true;
+  }
 }
