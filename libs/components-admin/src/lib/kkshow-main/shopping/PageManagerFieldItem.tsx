@@ -75,6 +75,7 @@ export function PageManagerFieldItem({
   removeHandler,
   moveUp,
   moveDown,
+  variant = 'only-icon',
 }: {
   children: React.ReactNode;
   isMoveUpDisabled?: boolean;
@@ -82,6 +83,7 @@ export function PageManagerFieldItem({
   removeHandler?: () => void;
   moveUp?: () => void;
   moveDown?: () => void;
+  variant?: 'only-icon' | 'with-text';
 }): JSX.Element {
   return (
     <Flex
@@ -103,6 +105,7 @@ export function PageManagerFieldItem({
         removeHandler={removeHandler}
         moveUp={moveUp}
         moveDown={moveDown}
+        variant={variant}
       />
     </Flex>
   );
