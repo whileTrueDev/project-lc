@@ -78,6 +78,11 @@ export class AdminKkshowMainController {
     return this.kkshowShoppingService.updateSectionData(id, dto);
   }
 
+  @Delete('kkshow-shopping/section/:id')
+  async deleteSectionData(@Param('id', ParseIntPipe) id): Promise<boolean> {
+    return this.kkshowShoppingService.deleteSectionData(id);
+  }
+
   @Get('kkshow-shopping/order')
   async getShoppingPageSectionOrder(): Promise<number[]> {
     return this.kkshowShoppingService.getSectionOrder();

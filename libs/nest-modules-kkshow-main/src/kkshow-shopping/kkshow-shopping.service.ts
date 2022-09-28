@@ -118,4 +118,9 @@ export class KkshowShoppingService {
     });
     return true;
   }
+
+  public async deleteSectionData(id: number): Promise<boolean> {
+    await this.prisma.kkshowShoppingSectionItem.delete({ where: { id } });
+    return true;
+  }
 }

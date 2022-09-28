@@ -49,3 +49,27 @@ export const useAdminUpdateKkshowShoppingSectionData = (): UseMutationResult<
     },
   );
 };
+
+export type AdminDeleteKkshowShoppingSectionDataDto = {
+  id: number;
+};
+export const useAdminDeleteKkshowShoppingSectionData = (): UseMutationResult<
+  boolean,
+  AxiosError,
+  AdminDeleteKkshowShoppingSectionDataDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<boolean, AxiosError, AdminDeleteKkshowShoppingSectionDataDto>(
+    (dto: AdminDeleteKkshowShoppingSectionDataDto) =>
+      axios
+        .delete<boolean>(`/admin/kkshow-shopping/section/${dto.id}`)
+        .then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('KkshowShopping');
+        queryClient.invalidateQueries('tempKkshowShopping');
+        queryClient.invalidateQueries('AdminKkshowShoppingSections');
+      },
+    },
+  );
+};
