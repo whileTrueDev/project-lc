@@ -28,6 +28,7 @@ import { InquiryModule } from '@project-lc/nest-modules-inquiry';
 import { JwtHelperModule } from '@project-lc/nest-modules-jwt-helper';
 import {
   KkshowBcListModule,
+  KkshowEventPopupModule,
   KkshowMainModule,
   KkshowShoppingModule,
   KkshowSubNavModule,
@@ -96,6 +97,7 @@ import { AppController } from './app.controller';
     ExportModule.withControllers(),
     ProductPromotionModule.withControllers(),
     DeliveryModule.withControllers(),
+    KkshowEventPopupModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],

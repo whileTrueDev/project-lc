@@ -39,17 +39,23 @@ export function useCountdown(): UseCountdownResult {
 
   const clearTimer = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    setSeconds(0);
   }, []);
 
   useEffect(() => {
-    if (seconds < 0) clearTimer();
+    if (seconds < 0) {
+      clearTimer();
+      setSeconds(0);
+    }
   }, [clearTimer, seconds]);
 
-  const startCountdown = useCallback((startSecond: number) => {
-    setSeconds(startSecond);
-    intervalRef.current = setInterval(intervalCallbackRef.current, 1000);
-  }, []);
+  const startCountdown = useCallback(
+    (startSecond: number) => {
+      clearTimer();
+      setSeconds(startSecond);
+      intervalRef.current = setInterval(intervalCallbackRef.current, 1000);
+    },
+    [clearTimer],
+  );
 
   return {
     startCountdown,

@@ -11,9 +11,9 @@ import {
   Tabs,
   Text,
 } from '@chakra-ui/react';
-import { SignupEventPopup } from '@project-lc/components-web-kkshow/EventPopup';
 import KkshowLayout from '@project-lc/components-web-kkshow/KkshowLayout';
 import { PromotionPageGoodsList } from '@project-lc/components-web-kkshow/promotion-page/PromotionPageGoodsList';
+import { PromotionPageVideoList } from '@project-lc/components-web-kkshow/promotion-page/PromotionPageVideoList';
 import { PromotionPageProfile } from '@project-lc/components-web-kkshow/promotion-page/PromotionPageProfile';
 import { useBroadcaster, usePromotionPage } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
@@ -25,13 +25,20 @@ export function BroadcasterPromotionPage(): JSX.Element {
   const bc = useBroadcaster({ id: broadcasterId });
   const promotionPage = usePromotionPage(broadcasterId);
 
-  const tabInfo = useMemo(
+  const tabInfo: {
+    title: string;
+    isDisabled?: boolean;
+    component: JSX.Element;
+  }[] = useMemo(
     () => [
       {
         title: '상품',
         component: <PromotionPageGoodsList broadcasterId={broadcasterId} />,
       },
-      { isDisabled: true, title: '라이브방송(준비중)', component: <p>방송목록</p> },
+      {
+        title: '라이브방송 영상',
+        component: <PromotionPageVideoList broadcasterId={broadcasterId} />,
+      },
     ],
     [broadcasterId],
   );
@@ -67,9 +74,6 @@ export function BroadcasterPromotionPage(): JSX.Element {
 
   return (
     <Box>
-      {/* 신규가입 이벤트 팝업 */}
-      <SignupEventPopup />
-
       <KkshowLayout navbarFirstLink="kkmarket">
         <Box m="auto" maxW="5xl" p={2} minH="80vh" mt={[5, 10, 20]}>
           <PromotionPageProfile broadcasterId={broadcasterId} />
@@ -77,7 +81,7 @@ export function BroadcasterPromotionPage(): JSX.Element {
           <Tabs variant="line" align="center" mt={30}>
             <TabList>
               {tabInfo.map((tab) => (
-                <Tab isDisabled={tab.isDisabled} key={tab.title}>
+                <Tab isDisabled={tab?.isDisabled} key={tab.title}>
                   {tab.title}
                 </Tab>
               ))}
