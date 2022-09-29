@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import {
   KkshowBcList,
+  KkshowEventPopup,
   KkshowShoppingSectionItem,
   KkshowShoppingTabCategory,
 } from '@prisma/client';
