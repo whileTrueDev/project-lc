@@ -25,6 +25,8 @@ import ShoppingSmallSquareRowLayout from './section-layout/ShoppingSmallSquareRo
 import ShoppingCategories from './ShoppingCategories';
 
 const renderSection = (sectionItem: KkshowShoppingSectionItem): JSX.Element => {
+  if (!sectionItem) return <></>;
+
   const { layoutType } = sectionItem;
   if (layoutType === LAYOUT_CAROUSEL) {
     const data = parseJsonToGenericType<KkshowShoppingTabCarouselItem[]>(
