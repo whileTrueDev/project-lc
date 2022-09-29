@@ -3,6 +3,7 @@ import { KkshowShoppingDto, KkshowShoppingTabResData } from '@project-lc/shared-
 import { AxiosError } from 'axios';
 import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
+import { kkshowShoppingSectionsQueryKey } from '../queries/useKkshowShopping';
 
 export type useAdminKkshowShoppingMutationRes = KkshowShoppingTabResData;
 
@@ -44,7 +45,7 @@ export const useAdminUpdateKkshowShoppingSectionData = (): UseMutationResult<
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('KkshowShopping');
-        queryClient.invalidateQueries('tempKkshowShopping');
+        queryClient.invalidateQueries(kkshowShoppingSectionsQueryKey);
         queryClient.invalidateQueries('AdminKkshowShoppingSections');
       },
     },
@@ -69,7 +70,7 @@ export const useAdminDeleteKkshowShoppingSectionData = (): UseMutationResult<
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('KkshowShopping');
-        queryClient.invalidateQueries('tempKkshowShopping');
+        queryClient.invalidateQueries(kkshowShoppingSectionsQueryKey);
         queryClient.invalidateQueries('AdminKkshowShoppingSections');
       },
     },
@@ -92,7 +93,7 @@ export const useAdminUpdateKkshowShoppingSectionOrder = (): UseMutationResult<
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('KkshowShopping');
-        queryClient.invalidateQueries('tempKkshowShopping');
+        queryClient.invalidateQueries(kkshowShoppingSectionsQueryKey);
         queryClient.invalidateQueries('AdminShoppingSectionOrder');
       },
     },

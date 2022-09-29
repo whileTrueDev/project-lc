@@ -1,6 +1,6 @@
 import { Spinner } from '@chakra-ui/react';
 import { KkshowShoppingSectionItem } from '@prisma/client';
-import { useKkshowShopping, useKkshowShoppingtemp } from '@project-lc/hooks';
+import { useKkshowShoppingSections } from '@project-lc/hooks';
 import {
   KkshowShoppingTabBannerData,
   KkshowShoppingTabCarouselItem,
@@ -102,25 +102,20 @@ const renderSection = (sectionItem: KkshowShoppingSectionItem): JSX.Element => {
 };
 
 export function ShoppingSectionsContainer(): JSX.Element {
-  // const { data, isLoading } = useKkshowShopping();
-  const { data, isLoading } = useKkshowShoppingtemp();
+  const { data, isLoading } = useKkshowShoppingSections();
 
   if (isLoading) return <Spinner />;
   if (!data) return <></>;
   return (
     <>
       {/* 쇼핑탭 상단 캐러셀영역 */}
-      {/* <ShoppingCarouselLayout carouselData={data.carousel} /> */}
       {renderSection(data.carousel)}
 
+      {/* 카테고리 */}
       <ShoppingCategories />
+
+      {/* 캐러셀 제외한 다른 레이아웃 섹션을 순서대로 표시 */}
       {data.sectionItems.map((sectionItem) => renderSection(sectionItem))}
-      {/* <ShoppingAutoSlideLayout title="금주의 상품" data={data.goodsOfTheWeek} /> */}
-      {/* <ShoppingSmallSquareRowLayout title="신상라인업" data={data.newLineUp} /> */}
-      {/* <ShoppingRectGridLayout title="많이 찾은 상품" data={data.popularGoods} /> */}
-      {/* <ShoppingBigSquareRowLayout title="추천상품" data={data.recommendations} /> */}
-      {/* <ShoppingBannerLayout /> */}
-      {/* <ShoppingRatingRowLayout title="생생후기" data={data.reviews} /> */}
     </>
   );
 }

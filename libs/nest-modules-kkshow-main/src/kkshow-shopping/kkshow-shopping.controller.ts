@@ -1,10 +1,9 @@
 import { Controller, Get } from '@nestjs/common';
-import { KkshowShoppingSectionItem } from '@prisma/client';
 import { GoodsCategoryService } from '@project-lc/nest-modules-goods-category';
 import {
   GoodsCategoryWithFamily,
   KkshowShoppingTabResData,
-  KkshowShoppingTabResDataTemp,
+  KkshowShoppingSectionsResData,
 } from '@project-lc/shared-types';
 import { KkshowShoppingCategoryService } from './kkshow-shopping-category.service';
 import { KkshowShoppingService } from './kkshow-shopping.service';
@@ -28,8 +27,8 @@ export class KkshowShoppingController {
     return this.goodsCategoryService.findCategoriesByCodes(codes);
   }
 
-  @Get('temp')
-  public async getKkshowShoppingSections(): Promise<KkshowShoppingTabResDataTemp> {
+  @Get('sections')
+  public async getKkshowShoppingSections(): Promise<KkshowShoppingSectionsResData> {
     const orders = await this.kkshowShoppingService.getSectionOrder();
     const sectionItemsInOrder = await this.kkshowShoppingService.getSections(orders);
     const carouselSection = await this.kkshowShoppingService.getCarouselSection();

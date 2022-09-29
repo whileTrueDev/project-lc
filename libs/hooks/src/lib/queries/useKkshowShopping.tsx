@@ -2,7 +2,7 @@ import { KkshowShoppingSectionItem } from '@prisma/client';
 import {
   GoodsCategoryWithFamily,
   KkshowShoppingTabResData,
-  KkshowShoppingTabResDataTemp,
+  KkshowShoppingSectionsResData,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
@@ -27,32 +27,36 @@ export const useKkshowShopping = (): UseQueryResult<
   );
 };
 
-// -----temp, admin
-export const tempkkshowShoppingQueryKey = 'tempKkshowShopping';
-export const getKkshowShoppingtemp = async (): Promise<KkshowShoppingTabResDataTemp> => {
-  return axios
-    .get<KkshowShoppingTabResDataTemp>('kkshow-shopping/temp')
-    .then((res) => res.data);
-};
+// ----- 크크쇼 쇼핑탭에서 표시할 섹션데이터 조회(캐러셀 + 순서에 맞게 배열된 섹션목록)
+export const kkshowShoppingSectionsQueryKey = 'KkshowShoppingSections';
+export const getKkshowShoppingSectionsData =
+  async (): Promise<KkshowShoppingSectionsResData> => {
+    return axios
+      .get<KkshowShoppingSectionsResData>('kkshow-shopping/sections')
+      .then((res) => res.data);
+  };
 
-export const useKkshowShoppingtemp = (): UseQueryResult<
-  KkshowShoppingTabResDataTemp,
+/** 크크쇼 쇼핑탭에서 표시할 섹션데이터 조회(캐러셀 + 순서에 맞게 배열된 섹션목록) */
+export const useKkshowShoppingSections = (): UseQueryResult<
+  KkshowShoppingSectionsResData,
   AxiosError
 > => {
-  return useQuery<KkshowShoppingTabResDataTemp, AxiosError>(
-    tempkkshowShoppingQueryKey,
-    getKkshowShoppingtemp,
+  return useQuery<KkshowShoppingSectionsResData, AxiosError>(
+    kkshowShoppingSectionsQueryKey,
+    getKkshowShoppingSectionsData,
   );
 };
 
+// ------ 관리자페이지에서 전체 섹션데이터 조회
 export const getAdminKkshowShoppingSections = async (): Promise<
   KkshowShoppingSectionItem[]
 > => {
   return axios
-    .get<KkshowShoppingSectionItem[]>('/admin/kkshow-shopping/temp')
+    .get<KkshowShoppingSectionItem[]>('/admin/kkshow-shopping/sections')
     .then((res) => res.data);
 };
 
+/** 관리자페이지에서 전체 섹션데이터 조회 */
 export const useAdminKkshowShoppingSections = (): UseQueryResult<
   KkshowShoppingSectionItem[],
   AxiosError
@@ -63,6 +67,7 @@ export const useAdminKkshowShoppingSections = (): UseQueryResult<
   );
 };
 
+// 관리자페이지에서 섹션 순서 조회
 export const getAdminShoppingSectionOrder = async (): Promise<number[]> => {
   return axios.get<number[]>('/admin/kkshow-shopping/order').then((res) => res.data);
 };
@@ -72,7 +77,6 @@ export const useAdminShoppingSectionOrder = (): UseQueryResult<number[], AxiosEr
     getAdminShoppingSectionOrder,
   );
 };
-// -----temp
 
 // 크크마켓 전시 카테고리 목록 조회
 export const kkshowShoppingCategoriesKey = 'KkshowShoppingCategories';

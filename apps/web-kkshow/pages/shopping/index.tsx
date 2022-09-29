@@ -1,22 +1,12 @@
 import { Box } from '@chakra-ui/react';
 import { SignupEventPopup } from '@project-lc/components-web-kkshow/EventPopup';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
-import { ShoppingCarousel } from '@project-lc/components-web-kkshow/shopping/ShoppingCarousel';
-import { ShoppingCategories } from '@project-lc/components-web-kkshow/shopping/ShoppingCategories';
-import { ShoppingEventBanner } from '@project-lc/components-web-kkshow/shopping/ShoppingEventBanner';
-import { ShoppingGoodsOfTheWeek } from '@project-lc/components-web-kkshow/shopping/ShoppingGoodsOfTheWeek';
-import { ShoppingNewLineUp } from '@project-lc/components-web-kkshow/shopping/ShoppingNewLineUp';
-import { ShoppingPopularGoods } from '@project-lc/components-web-kkshow/shopping/ShoppingPopularGoods';
-import { ShoppingRecommendations } from '@project-lc/components-web-kkshow/shopping/ShoppingRecommendations';
-import { ShoppingReviews } from '@project-lc/components-web-kkshow/shopping/ShoppingReviews';
 import { ShoppingSectionsContainer } from '@project-lc/components-web-kkshow/shopping/ShoppingSectionsContainer';
 import {
-  getKkshowShopping,
   getKkshowShoppingCategories,
-  getKkshowShoppingtemp,
+  getKkshowShoppingSectionsData,
   kkshowShoppingCategoriesKey,
-  kkshowShoppingQueryKey,
-  tempkkshowShoppingQueryKey,
+  kkshowShoppingSectionsQueryKey,
 } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
@@ -28,13 +18,7 @@ interface KkshowShippingProps {
 export const getStaticProps: GetStaticProps<KkshowShippingProps> = async () => {
   const queryClient = createQueryClient();
   await queryClient
-    .prefetchQuery(kkshowShoppingQueryKey, getKkshowShopping)
-    .catch((err) => {
-      throw new Error(`Failed to fetch KkshowShopping data - ${err}`);
-    });
-
-  await queryClient
-    .prefetchQuery(tempkkshowShoppingQueryKey, getKkshowShoppingtemp)
+    .prefetchQuery(kkshowShoppingSectionsQueryKey, getKkshowShoppingSectionsData)
     .catch((err) => {
       throw new Error(`Failed to fetch KkshowShopping data - ${err}`);
     });
@@ -59,15 +43,6 @@ export default function Shopping(): JSX.Element {
 
       <KkshowLayout navbarFirstLink="kkmarket">
         <ShoppingSectionsContainer />
-        {/* <ShoppingCarousel />
-        <ShoppingCategories />
-        <ShoppingGoodsOfTheWeek />
-        <ShoppingNewLineUp />
-        <ShoppingPopularGoods />
-        <ShoppingEventBanner />
-        <ShoppingRecommendations />
-        <ShoppingReviews /> */}
-        {/* <ShoppingKeywords /> */}
       </KkshowLayout>
     </Box>
   );

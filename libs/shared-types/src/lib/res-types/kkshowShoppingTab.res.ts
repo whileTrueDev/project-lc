@@ -74,7 +74,7 @@ export interface KkshowShoppingTabResData {
 
 export default KkshowShoppingTabResData;
 
-export interface KkshowShoppingTabResDataTemp {
+export interface KkshowShoppingSectionsResData {
   // carousel ; 캐러셀데이터
   carousel: KkshowShoppingSectionItem;
   sectionItems: KkshowShoppingSectionItem[];

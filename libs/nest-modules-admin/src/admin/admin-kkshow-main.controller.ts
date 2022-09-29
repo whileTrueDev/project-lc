@@ -60,16 +60,14 @@ export class AdminKkshowMainController {
   /** ================================= */
   // 크크쇼 쇼핑페이지 관리
   /** ================================= */
-  @Get('kkshow-shopping')
-  async getShoppingPageData(): Promise<KkshowShoppingTabResData | null> {
-    return this.kkshowShoppingService.read();
-  }
 
-  @Get('kkshow-shopping/temp')
-  async getShoppingPageDataTemp(): Promise<KkshowShoppingSectionItem[]> {
+  /** 전체 섹션 조회 */
+  @Get('kkshow-shopping/sections')
+  async getShoppingPageSections(): Promise<KkshowShoppingSectionItem[]> {
     return this.kkshowShoppingService.getSections();
   }
 
+  /** 특정 섹션데이터 수정 */
   @Put('kkshow-shopping/section/:id')
   async updateSectionData(
     @Param('id', ParseIntPipe) id,
@@ -78,11 +76,13 @@ export class AdminKkshowMainController {
     return this.kkshowShoppingService.updateSectionData(id, dto);
   }
 
+  /** 특정 섹션데이터 삭제 */
   @Delete('kkshow-shopping/section/:id')
   async deleteSectionData(@Param('id', ParseIntPipe) id): Promise<boolean> {
     return this.kkshowShoppingService.deleteSectionData(id);
   }
 
+  /** 섹션데이터 생성 */
   @Post('kkshow-shopping/section')
   async createSectionData(
     @Body(ValidationPipe)
@@ -91,21 +91,16 @@ export class AdminKkshowMainController {
     return this.kkshowShoppingService.createSectionData(dto);
   }
 
+  /** 섹션 순서 조회 */
   @Get('kkshow-shopping/order')
   async getShoppingPageSectionOrder(): Promise<number[]> {
     return this.kkshowShoppingService.getSectionOrder();
   }
 
+  /** 섹션 순서 수정 */
   @Put('kkshow-shopping/order')
   async updateShoppingSectionOrder(@Body() dto: { order: number[] }): Promise<boolean> {
     return this.kkshowShoppingService.updateSectionOrder(dto.order);
-  }
-
-  @Put('kkshow-shopping')
-  async upsertShoppingPageData(
-    @Body() data: KkshowShoppingDto,
-  ): Promise<KkshowShoppingTabResData> {
-    return this.kkshowShoppingService.upsert(data);
   }
 
   // 쇼핑페이지 카테고리 목록 요소 추가
@@ -126,6 +121,20 @@ export class AdminKkshowMainController {
     @Param(new ValidationPipe({ transform: true })) dto: KkshowShoppingTabCategoryDto,
   ): Promise<boolean> {
     return this.kkshowShoppingCategoryService.remove(dto.categoryCode);
+  }
+
+  /** @deprecated by joni 20220929 */
+  @Get('kkshow-shopping')
+  async getShoppingPageData(): Promise<KkshowShoppingTabResData | null> {
+    return this.kkshowShoppingService.read();
+  }
+
+  /** @deprecated by joni 20220929 */
+  @Put('kkshow-shopping')
+  async upsertShoppingPageData(
+    @Body() data: KkshowShoppingDto,
+  ): Promise<KkshowShoppingTabResData> {
+    return this.kkshowShoppingService.upsert(data);
   }
 
   /** ===================== */
