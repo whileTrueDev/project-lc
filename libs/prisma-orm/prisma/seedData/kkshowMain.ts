@@ -1,3 +1,5 @@
+import { PrismaClient } from '@prisma/client';
+
 export const kkshowMainSeedData = {
   carousel: [
     {
@@ -186,4 +188,21 @@ export const kkshowMainSeedData = {
       promotionPageLinkUrl: '',
     },
   ],
+};
+
+export const createKkshowDummyEventPopup = async (
+  prisma: PrismaClient,
+): Promise<void> => {
+  await prisma.kkshowEventPopup.create({
+    data: {
+      key: 'teQUz7ldUjU_WaqsgsHd6',
+      name: '신규가입',
+      priority: 1,
+      linkUrl: 'https://www.xn--hp4b17xa.com/signup',
+      imageUrl: 'event-popup/teQUz7ldUjU_WaqsgsHd6.webp',
+      displayPath: ['/', '/bc/', '/shopping'],
+      width: 1200,
+      height: 1200,
+    },
+  });
 };

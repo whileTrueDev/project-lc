@@ -7,6 +7,7 @@ import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { GoodsCategoryModule } from '@project-lc/nest-modules-goods-category';
 import {
   KkshowBcListModule,
+  KkshowEventPopupModule,
   KkshowMainModule,
   KkshowShoppingModule,
 } from '@project-lc/nest-modules-kkshow-main';
@@ -93,6 +94,7 @@ export class AdminModule {
     ReturnModule.withoutControllers(),
     CipherModule,
     OverlayThemeModule.withoutControllers(),
+    KkshowEventPopupModule.withoutControllers(),
   ];
 
   static withoutControllers(): DynamicModule {
