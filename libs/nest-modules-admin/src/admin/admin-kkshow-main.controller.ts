@@ -83,6 +83,14 @@ export class AdminKkshowMainController {
     return this.kkshowShoppingService.deleteSectionData(id);
   }
 
+  @Post('kkshow-shopping/section')
+  async createSectionData(
+    @Body(ValidationPipe)
+    dto: Pick<KkshowShoppingSectionItem, 'layoutType' | 'data' | 'title'>,
+  ): Promise<KkshowShoppingSectionItem> {
+    return this.kkshowShoppingService.createSectionData(dto);
+  }
+
   @Get('kkshow-shopping/order')
   async getShoppingPageSectionOrder(): Promise<number[]> {
     return this.kkshowShoppingService.getSectionOrder();

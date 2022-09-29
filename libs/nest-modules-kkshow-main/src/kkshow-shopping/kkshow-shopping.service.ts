@@ -141,4 +141,13 @@ export class KkshowShoppingService {
     await this.prisma.kkshowShoppingSectionItem.delete({ where: { id } });
     return true;
   }
+
+  /** 섹션데이터 생성 */
+  public async createSectionData(
+    dto: Pick<KkshowShoppingSectionItem, 'layoutType' | 'data' | 'title'>,
+  ): Promise<KkshowShoppingSectionItem> {
+    return this.prisma.kkshowShoppingSectionItem.create({
+      data: dto,
+    });
+  }
 }

@@ -98,3 +98,31 @@ export const useAdminUpdateKkshowShoppingSectionOrder = (): UseMutationResult<
     },
   );
 };
+
+/** 새로운 섹선 아이템 생성 */
+export type AdminCreateKkshowShoppingSectionItemDto = Pick<
+  KkshowShoppingSectionItem,
+  'title' | 'layoutType' | 'data'
+>;
+export const useAdminCreateKkshowShoppingSectionItem = (): UseMutationResult<
+  KkshowShoppingSectionItem,
+  AxiosError,
+  AdminCreateKkshowShoppingSectionItemDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    KkshowShoppingSectionItem,
+    AxiosError,
+    AdminCreateKkshowShoppingSectionItemDto
+  >(
+    (dto: AdminCreateKkshowShoppingSectionItemDto) =>
+      axios
+        .post<KkshowShoppingSectionItem>(`/admin/kkshow-shopping/section`, dto)
+        .then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('AdminKkshowShoppingSections');
+      },
+    },
+  );
+};
