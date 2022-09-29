@@ -33,6 +33,7 @@ type LiveShoppingByAdminFormData = {
   externalGoods?: {
     name?: string;
     linkUrl?: string;
+    imageUrl?: string;
   };
 };
 export function AdminLiveShoppingRegist(): JSX.Element {
@@ -85,6 +86,7 @@ export function AdminLiveShoppingRegist(): JSX.Element {
       dto.externalGoods = {
         name: formData.externalGoods?.name || '',
         linkUrl: formData.externalGoods?.linkUrl || '',
+        imageUrl: formData.externalGoods?.imageUrl,
       };
     }
 
@@ -220,7 +222,7 @@ function WriteExternalGoodsSection(): JSX.Element {
   return (
     <Stack>
       <Text fontWeight="bold">3. 라이브커머스 진행할 외부 상품 정보 입력</Text>
-      <Text>상품명</Text>
+      <Text>상품명 *</Text>
       <Input
         placeholder="먹보 소고기 국밥"
         {...register('externalGoods.name', externalGoodsValueOptions)}
@@ -229,7 +231,7 @@ function WriteExternalGoodsSection(): JSX.Element {
         {errors.externalGoods?.name && errors.externalGoods.name.message}
       </ErrorText>
 
-      <Text>상품 링크(스마트스토어 등 상품 판매페이지 주소)</Text>
+      <Text>상품 링크 * (스마트스토어 등 상품 판매페이지 주소)</Text>
       <Input
         type="url"
         placeholder="https://smartstore.naver.com/mukbo_gukbap/products/6387804902"
@@ -238,6 +240,13 @@ function WriteExternalGoodsSection(): JSX.Element {
       <Text>
         {errors.externalGoods?.linkUrl && errors.externalGoods?.linkUrl.message}
       </Text>
+
+      <Text color="GrayText">상품 이미지 주소</Text>
+      <Input
+        type="url"
+        placeholder="외부상품 이미지 주소를 입력해주세요(필수 입력 아님)"
+        {...register('externalGoods.imageUrl')}
+      />
     </Stack>
   );
 }

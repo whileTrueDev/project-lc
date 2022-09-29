@@ -12,6 +12,7 @@ import {
   FcCloseUpMode,
   FcFaq,
   FcFinePrint,
+  FcIdea,
   FcInspection,
   FcLink,
   FcList,
@@ -348,6 +349,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
         name: '크크쇼 방송인목록',
         href: '/kkshow-main/kkshow-bc-list',
         icon: FcBusinessman,
+      },
+      {
+        name: '크크쇼 이벤트팝업',
+        href: '/kkshow-main/kkshow-event-popup',
+        icon: FcIdea,
       },
       {
         name: '크크쇼 라이브임베드',

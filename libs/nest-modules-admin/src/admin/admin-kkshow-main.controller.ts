@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   UseGuards,
@@ -15,17 +16,20 @@ import {
   KkshowBcList,
   KkshowShoppingTabCategory,
   LiveShoppingEmbed,
+  KkshowEventPopup,
 } from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   KkshowBcListService,
+  KkshowEventPopupService,
   KkshowLiveEmbedService,
   KkshowMainService,
   KkshowShoppingCategoryService,
   KkshowShoppingService,
 } from '@project-lc/nest-modules-kkshow-main';
 import {
+  CreateEventPopupDto,
   CreateKkshowBcListDto,
   CreateKkshowLiveEmbedDto,
   DeleteKkshowBcListDto,
@@ -34,6 +38,7 @@ import {
   KkshowShoppingDto,
   KkshowShoppingTabCategoryDto,
   KkshowShoppingTabResData,
+  UpdateEventPopupDto,
 } from '@project-lc/shared-types';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
@@ -44,6 +49,7 @@ export class AdminKkshowMainController {
     private readonly kkshowShoppingService: KkshowShoppingService,
     private readonly kkshowShoppingCategoryService: KkshowShoppingCategoryService,
     private readonly kkshowBcListService: KkshowBcListService,
+    private readonly eventPopupService: KkshowEventPopupService,
     private readonly kkshowLiveEmbedService: KkshowLiveEmbedService,
   ) {}
 
@@ -120,6 +126,35 @@ export class AdminKkshowMainController {
     @Param(new ValidationPipe({ transform: true })) dto: DeleteKkshowBcListDto,
   ): Promise<KkshowBcList> {
     return this.kkshowBcListService.delete(dto.id);
+  }
+
+  /** ===================== */
+  /** 크크쇼 이벤트팝업 관리 */
+  /** ===================== */
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('kkshow-event-popup')
+  @Post('kkshow-event-popup')
+  public async createEventPopup(
+    @Body(ValidationPipe) dto: CreateEventPopupDto,
+  ): Promise<KkshowEventPopup> {
+    return this.eventPopupService.createEventPopup(dto);
+  }
+
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('kkshow-event-popup')
+  @Delete('kkshow-event-popup/:id')
+  public async deleteEventPopup(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
+    return this.eventPopupService.deleteEventPopup(id);
+  }
+
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('kkshow-event-popup')
+  @Patch('kkshow-event-popup/:id')
+  public async updateEventPopup(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidationPipe) dto: UpdateEventPopupDto,
+  ): Promise<boolean> {
+    return this.eventPopupService.updateEventPopup({ id, dto });
   }
 
   /**

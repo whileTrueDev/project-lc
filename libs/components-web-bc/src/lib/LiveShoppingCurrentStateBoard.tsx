@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Grid,
   GridItem,
   Heading,
@@ -10,21 +11,31 @@ import {
 import { LiveShoppingPurchaseMessage } from '@prisma/client';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
-import { useLiveShoppingStateSubscription, usePurchaseMessages } from '@project-lc/hooks';
+import {
+  LIVE_SHOPPING_END_TIME_KEY,
+  useCountdown,
+  useLiveShoppingStateSubscription,
+  usePurchaseMessages,
+} from '@project-lc/hooks';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
+import dayjs from 'dayjs';
 import { AnimationDefinition } from 'framer-motion/types/render/utils/animation';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export interface LiveShoppingCurrentStateBoardProps {
   liveShoppingId: number;
+  broadcastEndDate?: Date | null;
   title: string;
 }
 
 export function LiveShoppingCurrentStateBoard({
   liveShoppingId,
   title,
+  broadcastEndDate,
 }: LiveShoppingCurrentStateBoardProps): JSX.Element {
-  const { message, alert, setAlert } = useLiveShoppingStateSubscription(liveShoppingId);
+  const { message, alert, setAlert, requestOutroPlay, endTimeFromSocketServer } =
+    useLiveShoppingStateSubscription(liveShoppingId);
+
   // * 후원메시지 데이터
   const { data, status, error } = usePurchaseMessages({
     liveShoppingId,
@@ -69,6 +80,10 @@ export function LiveShoppingCurrentStateBoard({
     },
   };
 
+  const handleLiveShoppingClose = useCallback((): void => {
+    requestOutroPlay();
+  }, [requestOutroPlay]);
+
   if (status === 'loading') return <Box>Loading...</Box>;
   if (status === 'error') {
     console.error(error);
@@ -87,6 +102,16 @@ export function LiveShoppingCurrentStateBoard({
       <Stack h="100vh" p={4}>
         {/* 라이브쇼핑명 - 제목 */}
         <Heading textAlign="center">{title}</Heading>
+
+        {/* 라이브쇼핑 종료 버튼  */}
+        <Box>
+          <LiveShoppingEndButton
+            onClick={handleLiveShoppingClose}
+            broadcastEndDate={broadcastEndDate}
+            endTimeFromSocketServer={endTimeFromSocketServer}
+            liveShoppingId={liveShoppingId}
+          />
+        </Box>
 
         {/* 관리자메시지 */}
         <SectionWithTitle variant="outlined" title="관리자 메시지">
@@ -194,5 +219,81 @@ export function StateItem({ name, value }: { name: string; value: string }): JSX
         {value}
       </Text>
     </Stack>
+  );
+}
+
+/** 컨트롤러에서 전송받아 로컬스토리지에 저장해둔 라이브쇼핑 종료시간 찾기 */
+function findSavedLiveShoppingEndTime(liveShoppingId: number): Date | undefined {
+  const endTimeLocalStorageData = window.localStorage.getItem(LIVE_SHOPPING_END_TIME_KEY);
+  const savedEndTime: Date | undefined =
+    endTimeLocalStorageData &&
+    JSON.parse(endTimeLocalStorageData)?.liveShoppingId === liveShoppingId
+      ? JSON.parse(endTimeLocalStorageData)?.endDateTime
+      : undefined;
+
+  return savedEndTime;
+}
+
+/** 라이브쇼핑 종료하기 버튼 - 종료시간을 전달받아 카운트다운 타이머를 실행하고, 남은 방송시간에 따라 버튼 disabled 여부를 결정한다 */
+function LiveShoppingEndButton({
+  onClick,
+  broadcastEndDate,
+  endTimeFromSocketServer,
+  liveShoppingId,
+}: {
+  onClick: () => void;
+  liveShoppingId: number;
+  broadcastEndDate?: Date | null;
+  endTimeFromSocketServer: string | undefined;
+}): JSX.Element {
+  const [outroButtonDisabled, setOutroButtonDisabled] = useState<boolean>(true);
+
+  const { startCountdown, clearTimer, seconds } = useCountdown();
+
+  // 방송종료시간이 변경되는 경우 남은방송시간 계산 타이머 재설정
+  useEffect(() => {
+    // 종료시간 변경될때마다 outroButtonDisabled값을 true(버튼 비활성화)로 초기화한다
+    setOutroButtonDisabled(true);
+
+    /**
+     * 방송 종료시간 가져오기
+     * 1. 컨트롤러에서 전송받은 종료시간(컨트롤러에서 전송하지 않으면 존재하지 않음)
+     * 2. 로컬스토리지에 저장된, 컨트롤러에서 전송받은 종료시간(현황판 새로고침하면 값이 사라져서 로컬스토리지에 저장해둠)
+     * 3. 컨트롤러에서 종료시간 전송받지 않은 경우 라이브쇼핑에 저장된 종료시간
+     * 4. 아무 값도 없는경우 현재를 종료시간으로 설정하여 타이머 작동 안시킴
+     */
+    const savedEndTime = findSavedLiveShoppingEndTime(liveShoppingId);
+    const now = new Date();
+    const realEndTime = dayjs(
+      endTimeFromSocketServer || savedEndTime || broadcastEndDate || now,
+    );
+
+    // 방송종료시간 - 현재시간 = 남은 방송 시간(초)로 카운트다운 타이머 실행
+    const remainingBroadcastSeconds = realEndTime.diff(now, 'second');
+    startCountdown(remainingBroadcastSeconds);
+  }, [
+    broadcastEndDate,
+    clearTimer,
+    endTimeFromSocketServer,
+    liveShoppingId,
+    startCountdown,
+  ]);
+
+  // 남은 방송시간이 10초 이하인 경우 버튼 활성화
+  useEffect(() => {
+    if (seconds <= 10) {
+      setOutroButtonDisabled(false);
+    }
+  }, [seconds, clearTimer]);
+
+  return (
+    <Button
+      onClick={onClick}
+      disabled={outroButtonDisabled}
+      colorScheme={outroButtonDisabled ? undefined : 'red'}
+    >
+      라이브 종료하기
+      {outroButtonDisabled && <Text>(라이브방송 종료시간 10초 전 활성화됩니다)</Text>}
+    </Button>
   );
 }

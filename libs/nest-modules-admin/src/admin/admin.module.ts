@@ -7,6 +7,7 @@ import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { GoodsCategoryModule } from '@project-lc/nest-modules-goods-category';
 import {
   KkshowBcListModule,
+  KkshowEventPopupModule,
   KkshowLiveEmbedModule,
   KkshowMainModule,
   KkshowShoppingModule,
@@ -94,6 +95,7 @@ export class AdminModule {
     ReturnModule.withoutControllers(),
     CipherModule,
     OverlayThemeModule.withoutControllers(),
+    KkshowEventPopupModule.withoutControllers(),
     KkshowLiveEmbedModule.withoutControllers(),
   ];
 
