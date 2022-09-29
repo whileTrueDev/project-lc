@@ -65,7 +65,11 @@ export class LiveShoppingService {
         data: {
           sellerId: dto.sellerId,
           externalGoods: {
-            create: { name: dto.externalGoods.name, linkUrl: dto.externalGoods.linkUrl },
+            create: {
+              name: dto.externalGoods.name,
+              linkUrl: dto.externalGoods.linkUrl,
+              imageUrl: dto.externalGoods.imageUrl,
+            },
           },
         },
       });
