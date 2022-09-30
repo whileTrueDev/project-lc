@@ -12,8 +12,9 @@ export function KkshowLiveChatting({
 }: KkshowLiveChattingProps): JSX.Element | null {
   const url = useMemo(() => {
     if (streamingService === 'twitch') {
+      const url = window?.location?.hostname;
       return [
-        `https://www.twitch.tv/embed/${UID}/chat?parent=localhost`,
+        `https://www.twitch.tv/embed/${UID}/chat?parent=${url}`,
         'muted=false',
       ].join('&');
     }

@@ -1,5 +1,7 @@
 /* eslint-disable react/no-array-index-key */
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import { Box, Center, Divider, Grid, GridItem, Spinner, Text } from '@chakra-ui/react';
+import MotionBox from '@project-lc/components-core/MotionBox';
 import KkshowLayout from '@project-lc/components-web-kkshow/KkshowLayout';
 import KkshowLiveChatting from '@project-lc/components-web-kkshow/main/live-embed/KkshowLiveChatting';
 import KkshowLiveEmbedDisplay from '@project-lc/components-web-kkshow/main/live-embed/KkshowLiveEmbedDisplay';
@@ -37,13 +39,17 @@ export default function LiveShoppingPage(): JSX.Element {
       </KkshowLayout>
     );
   return (
-    <KkshowLayout>
+    <>
       <Grid
-        minH="calc(100vh - 155px)"
+        minH="100vh"
         templateColumns={{ base: '1fr', md: '1fr 1fr', lg: '10fr 3fr', xl: '10fr 3fr' }}
         templateRows={{ base: '1fr', lg: '4fr 1fr' }}
       >
-        <GridItem position="relative" colSpan={{ base: 2, lg: 'auto' }}>
+        <GridItem
+          position="relative"
+          colSpan={{ base: 2, lg: 'auto' }}
+          minH={{ base: '250px', sm: '90vh', lg: 'auto' }}
+        >
           <KkshowLiveEmbedDisplay
             UID={data[0].UID}
             streamingService={data[0].streamingService}
@@ -54,7 +60,11 @@ export default function LiveShoppingPage(): JSX.Element {
           order={{ base: 2, lg: 'unset' }}
           colSpan={{ base: 2, md: 'auto' }}
           rowSpan={2}
+          pos="relative"
         >
+          {/* scoll down 유도 아이콘 */}
+          <KkshowLiveScrollDownIcon />
+
           <KkshowLiveChatting
             UID={data[0].UID}
             streamingService={data[0].streamingService}
@@ -69,6 +79,25 @@ export default function LiveShoppingPage(): JSX.Element {
           />
         </GridItem>
       </Grid>
-    </KkshowLayout>
+    </>
+  );
+}
+
+function KkshowLiveScrollDownIcon(): JSX.Element {
+  return (
+    <MotionBox
+      display={{ base: 'none', md: 'block', lg: 'none' }}
+      pos="absolute"
+      top={2}
+      left={-5}
+      initial={{ y: 0 }}
+      animate={{
+        y: [0, 3, 0],
+        transition: { repeat: Infinity, duration: 0.75 },
+      }}
+      exit={{ y: 0 }}
+    >
+      <ChevronDownIcon fontSize="xl" />
+    </MotionBox>
   );
 }

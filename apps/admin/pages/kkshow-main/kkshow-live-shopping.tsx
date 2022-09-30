@@ -75,7 +75,8 @@ export function KkshowLiveShopping(): JSX.Element {
 
         <Text color="GrayText">
           가장 최근에 등록된 (번호가 가장 높은) 라이브를 기준으로 크크쇼 라이브 페이지가
-          구성됩니다.
+          구성됩니다. (라이브 진행한 이후 가장 번호가 높은 라이브를 제외한 나머지 데이터를
+          모두 제거해주세요.)
         </Text>
 
         <KkshowLiveEmbedList />
@@ -118,10 +119,11 @@ function KkshowLiveEmbedList(): JSX.Element | null {
       {data?.map((liveEmbed, idx) => (
         <Stack direction="row" key={liveEmbed.id}>
           <Text
-            textDecoration={idx === data.length - 1 ? 'underline' : 'none'}
-            textDecorationColor={idx === data.length - 1 ? 'red' : 'none'}
+            textDecoration={idx === 0 ? 'underline' : 'none'}
+            textDecorationColor={idx === 0 ? 'red' : 'none'}
           >
-            {liveEmbed.liveShoppingId}. {liveEmbed.streamingService} {liveEmbed.UID}
+            {liveEmbed.id}. {liveEmbed.streamingService} : [{liveEmbed.UID}] : (라이브쇼핑{' '}
+            {liveEmbed.liveShoppingId})
           </Text>
           <IconButton
             aria-label="remove-live-embed-btn"
