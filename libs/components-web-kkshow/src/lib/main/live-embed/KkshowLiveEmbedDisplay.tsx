@@ -13,7 +13,7 @@ export function KkshowLiveEmbedDisplay({
     if (streamingService === 'twitch') {
       return [
         `https://player.twitch.tv?channel=${UID}`,
-        'parent=localhost',
+        `parent=${window?.location?.hostname}`,
         'muted=false',
       ].join('&');
     }
