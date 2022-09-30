@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   ParseIntPipe,
   Post,
   Query,
@@ -40,6 +41,13 @@ export class LiveShoppingController {
     private readonly liveShoppingService: LiveShoppingService,
     private readonly purchaseMessageService: PurchaseMessageService,
   ) {}
+
+  @Get(':liveShoppingId')
+  public getLiveShopping(
+    @Param('liveShoppingId', ParseIntPipe) id: number,
+  ): Promise<LiveShoppingWithGoods> {
+    return this.liveShoppingService.findLiveShopping(id);
+  }
 
   @Get()
   @UseGuards(JwtAuthGuard)

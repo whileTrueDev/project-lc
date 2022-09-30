@@ -48,7 +48,8 @@ import { dummyPayments } from './seedData/dummyPayment';
 import { createGoodsInquiry, createGoodsInquiry2 } from './seedData/goods-inquiry';
 import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
 import { createKkshowBcListDummy } from './seedData/kkshowBcList';
-import { kkshowMainSeedData } from './seedData/kkshowMain';
+import { createKkshowLiveEmbedDummy } from './seedData/kkshowLiveEmbed';
+import { kkshowMainSeedData, createKkshowDummyEventPopup } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
 import { createKkshowSubNavDummy } from './seedData/kkshowSubNav';
 import { dummyMileage, dummyMileageLog } from './seedData/mileage';
@@ -272,7 +273,7 @@ async function createDummyPastExternalGoodsLiveShopping(
       seller: { connect: { id: seller.id } },
       broadcaster: { connect: { id: broadcaster.id } },
       externalGoods: {
-        create: { name: '먹보소고기', linkUrl: 'www.google.com' },
+        create: { name: '먹보소고기', linkUrl: 'https://www.google.com' },
       },
       liveShoppingName: '먹보소고기국밥~',
       progress: 'confirmed',
@@ -538,6 +539,10 @@ async function main(): Promise<void> {
   await createDummyBroadcaster(prisma);
   // 더미 크크쇼 방송인 목록 생성
   await createKkshowBcListDummy(prisma);
+  // 더미 팝업 생성
+  await createKkshowDummyEventPopup(prisma);
+  // 더미 라이브임베드 생성
+  await createKkshowLiveEmbedDummy(prisma);
 }
 
 main()

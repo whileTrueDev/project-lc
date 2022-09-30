@@ -173,6 +173,8 @@ export class CreateLiveShoppingExternalGoodsDto {
   @IsString() name: string;
 
   @IsString() linkUrl: string;
+
+  @IsString() @IsOptional() imageUrl?: string;
 }
 
 /** 관리자로 라이브쇼핑 등록 dto

@@ -13,7 +13,12 @@ const navs = [
   { title: '기타 정보', elementId: 'goods-info' },
 ];
 
-export function GoodsViewStickyNav(): JSX.Element {
+interface GoodsViewStickyNavProps {
+  topMargin?: number;
+}
+export function GoodsViewStickyNav({
+  topMargin = KkshowSubNavbarHeight,
+}: GoodsViewStickyNavProps): JSX.Element {
   const router = useRouter();
   const goodsId = router.query.goodsId as string;
   const reviewsCount = useGoodsReviewCount(goodsId);
@@ -35,8 +40,8 @@ export function GoodsViewStickyNav(): JSX.Element {
       bgColor={bgColor}
       h={{ base: '50px', md: '60px' }}
       top={{
-        base: GoodsViewNavBarHeight,
-        md: `${KkshowSubNavbarHeight}px`,
+        base: topMargin === 0 ? 0 : GoodsViewNavBarHeight,
+        md: `${topMargin}px`,
       }}
       zIndex="sticky"
     >

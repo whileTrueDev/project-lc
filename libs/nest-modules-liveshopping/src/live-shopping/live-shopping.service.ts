@@ -65,7 +65,11 @@ export class LiveShoppingService {
         data: {
           sellerId: dto.sellerId,
           externalGoods: {
-            create: { name: dto.externalGoods.name, linkUrl: dto.externalGoods.linkUrl },
+            create: {
+              name: dto.externalGoods.name,
+              linkUrl: dto.externalGoods.linkUrl,
+              imageUrl: dto.externalGoods.imageUrl,
+            },
           },
         },
       });
@@ -115,6 +119,50 @@ export class LiveShoppingService {
     });
     if (!result) throw new InternalServerErrorException('라이브 쇼핑 삭제 실패');
     return result;
+  }
+
+  /** 라이브 쇼핑 개별 조회 */
+  async findLiveShopping(id: number): Promise<LiveShoppingWithGoods> {
+    return this.prisma.liveShopping.findUnique({
+      where: { id },
+      include: {
+        messageSetting: true,
+        goods: {
+          select: {
+            goods_name: true,
+            summary: true,
+            image: true,
+            options: true,
+            confirmation: { select: { status: true } },
+          },
+        },
+        seller: { select: { sellerShop: true } },
+        broadcaster: {
+          select: {
+            id: true,
+            userName: true,
+            userNickname: true,
+            email: true,
+            avatar: true,
+            BroadcasterPromotionPage: true,
+            channels: true,
+          },
+        },
+        liveShoppingVideo: { select: { youtubeUrl: true } },
+        images: true,
+        orderItemSupport: {
+          select: {
+            orderItem: {
+              select: {
+                options: { select: { discountPrice: true, quantity: true } },
+              },
+            },
+          },
+        },
+        liveShoppingSpecialPrices: true,
+        externalGoods: true,
+      },
+    });
   }
 
   /** 라이브 쇼핑 목록 조회 */

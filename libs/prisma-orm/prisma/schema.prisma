@@ -748,12 +748,14 @@ model LiveShopping {
   orderItemSupport            OrderItemSupport[]
   cartItemSupport             CartItemSupport[]
   liveShoppingSpecialPrices   LiveShoppingSpecialPrice[] // 라이브쇼핑에 적용되는 특가정보
+  LiveShoppingEmbed           LiveShoppingEmbed?
 }
 
 model LiveShoppingExternalGoods {
   id             Int          @id @default(autoincrement())
   name           String
   linkUrl        String       @db.Text // 외부 url 이 매우 긴 경우를 대비
+  imageUrl       String?      @db.Text
   liveShoppingId Int          @unique
   liveShopping   LiveShopping @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
 }
@@ -1226,6 +1228,22 @@ model KkshowShoppingTab {
   keywords        Json // 쇼핑탭 테마별 키워드 영역 아이템[]
 }
 
+// 크크쇼 쇼핑탭 섹션 순서 저장
+model KkshowShoppingTabSectionOrder {
+  id    Int  @id @default(autoincrement())
+  order Json // KkshowShoppingSectionItem.id[]
+}
+
+// 크크쇼 쇼핑탭에 표시될 섹션들 정보 저장
+model KkshowShoppingSectionItem {
+  id          Int     @id @default(autoincrement())
+  layoutType  String
+  title       String
+  description String?
+  data        Json // 섹션에 표시될 데이터(주로 상품정보), 레이아웃타입에 따라 다른 형태의 데이터
+  link        String? // 더보기 등 버튼이 있는 경우, 클릭가능한 배너인 경우 이동할 페이지
+}
+
 model KkshowSubNavLink {
   id    Int    @id @default(autoincrement())
   index Int
@@ -1248,6 +1266,20 @@ model KkshowBcList {
   href          String // 링크
   broadcasterId Int?         @unique // 가입한 방송인과 연결하는 경우
   broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+}
+
+// 크크쇼 이벤트 팝업
+model KkshowEventPopup {
+  id          Int      @id @default(autoincrement())
+  createDate  DateTime @default(now())
+  key         String   @unique // 식별자
+  name        String
+  priority    Int // 우선순위
+  linkUrl     String? // 클릭시 이동할 url
+  imageUrl    String // 팝업에 표시될 이미지 url
+  displayPath Json // 팝업이 표시될 크크쇼 페이지 경로
+  width       Int?
+  height      Int?
 }
 
 enum UserType {
@@ -2129,4 +2161,18 @@ model AdminLastCheckedData {
   createDate DateTime @default(now())
   updateDate DateTime @default(now()) @updatedAt
   data       Json
+}
+
+model LiveShoppingEmbed {
+  id               Int              @id @default(autoincrement())
+  streamingService StreamingService // twitch / afreeca
+  UID              String // 임베드 영상 고유 ID (트위치->트위치유저ID(ex. zilioner), 아프리카->아프리카유저Id/방송고유ID (ex. arinbbidol/242803647))
+
+  liveShoppingId Int?          @unique
+  liveShopping   LiveShopping? @relation(fields: [liveShoppingId], references: [id], onDelete: SetNull)
+}
+
+enum StreamingService {
+  twitch
+  afreeca
 }

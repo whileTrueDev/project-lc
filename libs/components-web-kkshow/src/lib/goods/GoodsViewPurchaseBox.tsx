@@ -54,6 +54,7 @@ import {
   SpecialPriceItem,
 } from '@project-lc/shared-types';
 import { useGoodsViewStore, useKkshowOrderStore } from '@project-lc/stores';
+import { getKkshowWebHost } from '@project-lc/utils';
 import { checkGoodsPurchasable, getLocaleNumber } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -151,14 +152,16 @@ export function useNowOnLiveSpecialPriceOptionList(goods: GoodsByIdRes): {
   };
 }
 
-interface GoodsViewPurchaseBoxProps {
+export interface GoodsViewPurchaseBoxProps {
   goods: GoodsByIdRes;
   isOnDrawer?: boolean;
+  pageTransferType?: 'router' | 'window_open';
 }
 /** 상품 상세 페이지 상품 옵션 및 후원 정보 입력 + 구매,장바구니 버튼 */
 export function GoodsViewPurchaseBox({
   goods,
   isOnDrawer = false,
+  pageTransferType = 'router',
 }: GoodsViewPurchaseBoxProps): JSX.Element {
   const toast = useToast({ isClosable: true });
   const handleSelectOpt = useGoodsViewStore((s) => s.handleSelectOpt);
@@ -287,7 +290,11 @@ export function GoodsViewPurchaseBox({
         bottom="0"
         zIndex={isOnDrawer ? 'sticky' : undefined}
       >
-        <GoodsViewButtonSet goods={goods} isOnDrawer={isOnDrawer} />
+        <GoodsViewButtonSet
+          goods={goods}
+          isOnDrawer={isOnDrawer}
+          pageTransferType={pageTransferType}
+        />
       </GridItem>
     </Grid>
   );
@@ -498,6 +505,7 @@ function GoodsViewSupportNotice(): JSX.Element {
 function GoodsViewButtonSet({
   goods,
   isOnDrawer = false,
+  pageTransferType = 'router',
 }: GoodsViewPurchaseBoxProps): JSX.Element {
   const toast = useToast({ isClosable: true });
   const profile = useProfile();
@@ -711,7 +719,12 @@ function GoodsViewButtonSet({
 
       // 비회원 주문 로그인화면으로 이동, 로그인 이후 페이지를 주문페이지로
       if (!profile.data?.id) {
-        router.push(`/login?from=purchase&${NEXT_PAGE_PARAM_KEY}=/payment`);
+        const url = `/login?from=purchase&${NEXT_PAGE_PARAM_KEY}=/payment`;
+        if (pageTransferType === 'window_open') {
+          window.open(`${getKkshowWebHost()}${url}`);
+        } else {
+          router.push(url);
+        }
         return;
       }
       // 로그인되어있으며, 설정된 닉네임이 없는 경우, 입력한 후원닉네임을 기본 닉네임으로 설정
@@ -725,7 +738,12 @@ function GoodsViewButtonSet({
         nicknameMutation.mutateAsync({ nickname: supportNickname });
       }
 
-      router.push('/payment');
+      const url = '/payment';
+      if (pageTransferType === 'window_open') {
+        window.open(`${getKkshowWebHost()}${url}`);
+      } else {
+        router.push(url);
+      }
     },
     [
       executePurchaseCheck,
@@ -748,6 +766,7 @@ function GoodsViewButtonSet({
       customer,
       router,
       isNowLive,
+      pageTransferType,
       nicknameMutation,
     ],
   );

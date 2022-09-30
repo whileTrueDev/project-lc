@@ -16,6 +16,9 @@ const liveShoppingStateSocket = io(
     withCredentials: true,
   },
 );
+liveShoppingStateSocket.on('playOutro', (roomName) => {
+  if (roomName) playOutro(roomName);
+});
 
 socket.on('creator list from server', (data) => {
   if (data && data.length !== 0) {
@@ -24,6 +27,11 @@ socket.on('creator list from server', (data) => {
     $('#connection-status').text('❌ 연결되지 않음');
   }
 });
+
+/** roomName(overlayUrl)로 아웃트로 송출 이벤트 발생 */
+function playOutro(roomName) {
+  socket.emit('show video from admin', { roomName, type: 'outro' });
+}
 
 $(document).ready(function ready() {
   let liveShoppingStateBoardController; // 관리자 메시지 보내기(방송인 현황판 표시) 컨트롤러, liveShoppingId 할당될때 생성
@@ -283,7 +291,7 @@ $(document).ready(function ready() {
   });
 
   $('#show-outro-video-button').click(function showOutroVideoButtonClickEvent() {
-    socket.emit('show video from admin', { roomName, type: 'outro' });
+    playOutro(roomName);
   });
 
   $('#hide-video-button').click(function HideVideoButtonClickEvent() {
@@ -367,7 +375,13 @@ $(document).ready(function ready() {
 
   $('#end-time-send-button').click(function endTimeSendButtonClickEvent() {
     const selectedTime = $('#end-time-picker').val();
+    // 오버레이로 종료시간 전송
     socket.emit('get d-day', { roomName, date: selectedTime });
+    // 현황판으로 종료시간 전송 (liveShoppingId 의 현황판에서 설정된 종료시간에 따라 라이브종료버튼 활성화함)
+    liveShoppingStateSocket.emit('setLiveShoppingEndDateTime', {
+      liveShoppingId,
+      endDateTime: selectedTime,
+    });
     const sel = `현재 전송된 종료 시간: ${selectedTime}`;
     $('#etc-control-end-time').text(sel);
   });
