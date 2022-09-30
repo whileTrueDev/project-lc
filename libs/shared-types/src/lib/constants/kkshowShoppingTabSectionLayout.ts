@@ -6,8 +6,15 @@ export const LAYOUT_RECT_GRID = 'rect--grid';
 export const LAYOUT_RATING_DETAIL = 'rating-detail--row';
 export const LAYOUT_BANNER = 'banner';
 
+type LayoutData = {
+  key: string;
+  name: string;
+  desc: string;
+  buttonLabel?: string;
+  defaultValue: any;
+};
 // 크크쇼 쇼핑탭 섹션에 적용될 레이아웃별 이름과 설명
-export const layoutDesc = {
+export const layoutDesc: Record<string, LayoutData> = {
   [LAYOUT_CAROUSEL]: {
     key: LAYOUT_CAROUSEL,
     name: '캐러셀',

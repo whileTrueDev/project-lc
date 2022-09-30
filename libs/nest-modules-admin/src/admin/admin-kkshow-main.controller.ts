@@ -18,7 +18,6 @@ import {
   KkshowShoppingSectionItem,
   KkshowShoppingTabCategory,
   LiveShoppingEmbed,
-  KkshowEventPopup,
 } from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
