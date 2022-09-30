@@ -1,3 +1,37 @@
+-- AlterTable
+ALTER TABLE `LiveShoppingExternalGoods` ADD COLUMN `imageUrl` TEXT NULL;
+
+-- CreateTable
+CREATE TABLE `LiveShoppingEmbed` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `streamingService` ENUM('twitch', 'afreeca') NOT NULL,
+    `UID` VARCHAR(191) NOT NULL,
+    `liveShoppingId` INTEGER NULL,
+
+    UNIQUE INDEX `LiveShoppingEmbed_liveShoppingId_key`(`liveShoppingId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `LiveShoppingEmbed` ADD CONSTRAINT `LiveShoppingEmbed_liveShoppingId_fkey` FOREIGN KEY (`liveShoppingId`) REFERENCES `LiveShopping`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- CreateTable
+CREATE TABLE `KkshowEventPopup` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `key` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `priority` INTEGER NOT NULL,
+    `linkUrl` VARCHAR(191) NULL,
+    `imageUrl` VARCHAR(191) NOT NULL,
+    `displayPath` JSON NOT NULL,
+    `width` INTEGER NULL,
+    `height` INTEGER NULL,
+
+    UNIQUE INDEX `KkshowEventPopup_key_key`(`key`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- CreateTable
 CREATE TABLE `KkshowShoppingTabSectionOrder` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
