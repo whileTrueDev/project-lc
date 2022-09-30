@@ -14,9 +14,10 @@ import {
 } from '@nestjs/common';
 import {
   KkshowBcList,
+  KkshowEventPopup,
+  KkshowShoppingSectionItem,
   KkshowShoppingTabCategory,
   LiveShoppingEmbed,
-  KkshowEventPopup,
 } from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
@@ -69,16 +70,47 @@ export class AdminKkshowMainController {
   /** ================================= */
   // 크크쇼 쇼핑페이지 관리
   /** ================================= */
-  @Get('kkshow-shopping')
-  async getShoppingPageData(): Promise<KkshowShoppingTabResData | null> {
-    return this.kkshowShoppingService.read();
+
+  /** 전체 섹션 조회 */
+  @Get('kkshow-shopping/sections')
+  async getShoppingPageSections(): Promise<KkshowShoppingSectionItem[]> {
+    return this.kkshowShoppingService.getSections();
   }
 
-  @Put('kkshow-shopping')
-  async upsertShoppingPageData(
-    @Body() data: KkshowShoppingDto,
-  ): Promise<KkshowShoppingTabResData> {
-    return this.kkshowShoppingService.upsert(data);
+  /** 특정 섹션데이터 수정 */
+  @Put('kkshow-shopping/section/:id')
+  async updateSectionData(
+    @Param('id', ParseIntPipe) id,
+    @Body(ValidationPipe) dto: Omit<KkshowShoppingSectionItem, 'id'>,
+  ): Promise<boolean> {
+    return this.kkshowShoppingService.updateSectionData(id, dto);
+  }
+
+  /** 특정 섹션데이터 삭제 */
+  @Delete('kkshow-shopping/section/:id')
+  async deleteSectionData(@Param('id', ParseIntPipe) id): Promise<boolean> {
+    return this.kkshowShoppingService.deleteSectionData(id);
+  }
+
+  /** 섹션데이터 생성 */
+  @Post('kkshow-shopping/section')
+  async createSectionData(
+    @Body(ValidationPipe)
+    dto: Pick<KkshowShoppingSectionItem, 'layoutType' | 'data' | 'title'>,
+  ): Promise<KkshowShoppingSectionItem> {
+    return this.kkshowShoppingService.createSectionData(dto);
+  }
+
+  /** 섹션 순서 조회 */
+  @Get('kkshow-shopping/order')
+  async getShoppingPageSectionOrder(): Promise<number[]> {
+    return this.kkshowShoppingService.getSectionOrder();
+  }
+
+  /** 섹션 순서 수정 */
+  @Put('kkshow-shopping/order')
+  async updateShoppingSectionOrder(@Body() dto: { order: number[] }): Promise<boolean> {
+    return this.kkshowShoppingService.updateSectionOrder(dto.order);
   }
 
   // 쇼핑페이지 카테고리 목록 요소 추가
@@ -99,6 +131,20 @@ export class AdminKkshowMainController {
     @Param(new ValidationPipe({ transform: true })) dto: KkshowShoppingTabCategoryDto,
   ): Promise<boolean> {
     return this.kkshowShoppingCategoryService.remove(dto.categoryCode);
+  }
+
+  /** @deprecated by joni 20220929 */
+  @Get('kkshow-shopping')
+  async getShoppingPageData(): Promise<KkshowShoppingTabResData | null> {
+    return this.kkshowShoppingService.read();
+  }
+
+  /** @deprecated by joni 20220929 */
+  @Put('kkshow-shopping')
+  async upsertShoppingPageData(
+    @Body() data: KkshowShoppingDto,
+  ): Promise<KkshowShoppingTabResData> {
+    return this.kkshowShoppingService.upsert(data);
   }
 
   /** ===================== */

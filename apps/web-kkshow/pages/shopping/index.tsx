@@ -1,18 +1,11 @@
 import { Box } from '@chakra-ui/react';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
-import { ShoppingCarousel } from '@project-lc/components-web-kkshow/shopping/ShoppingCarousel';
-import { ShoppingCategories } from '@project-lc/components-web-kkshow/shopping/ShoppingCategories';
-import { ShoppingEventBanner } from '@project-lc/components-web-kkshow/shopping/ShoppingEventBanner';
-import { ShoppingGoodsOfTheWeek } from '@project-lc/components-web-kkshow/shopping/ShoppingGoodsOfTheWeek';
-import { ShoppingNewLineUp } from '@project-lc/components-web-kkshow/shopping/ShoppingNewLineUp';
-import { ShoppingPopularGoods } from '@project-lc/components-web-kkshow/shopping/ShoppingPopularGoods';
-import { ShoppingRecommendations } from '@project-lc/components-web-kkshow/shopping/ShoppingRecommendations';
-import { ShoppingReviews } from '@project-lc/components-web-kkshow/shopping/ShoppingReviews';
+import { ShoppingSectionsContainer } from '@project-lc/components-web-kkshow/shopping/ShoppingSectionsContainer';
 import {
-  getKkshowShopping,
   getKkshowShoppingCategories,
+  getKkshowShoppingSectionsData,
   kkshowShoppingCategoriesKey,
-  kkshowShoppingQueryKey,
+  kkshowShoppingSectionsQueryKey,
 } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
@@ -24,7 +17,7 @@ interface KkshowShippingProps {
 export const getStaticProps: GetStaticProps<KkshowShippingProps> = async () => {
   const queryClient = createQueryClient();
   await queryClient
-    .prefetchQuery(kkshowShoppingQueryKey, getKkshowShopping)
+    .prefetchQuery(kkshowShoppingSectionsQueryKey, getKkshowShoppingSectionsData)
     .catch((err) => {
       throw new Error(`Failed to fetch KkshowShopping data - ${err}`);
     });
@@ -45,15 +38,7 @@ export default function Shopping(): JSX.Element {
   return (
     <Box position="relative">
       <KkshowLayout navbarFirstLink="kkmarket">
-        <ShoppingCarousel />
-        <ShoppingCategories />
-        <ShoppingGoodsOfTheWeek />
-        <ShoppingNewLineUp />
-        <ShoppingPopularGoods />
-        <ShoppingEventBanner />
-        <ShoppingRecommendations />
-        <ShoppingReviews />
-        {/* <ShoppingKeywords /> */}
+        <ShoppingSectionsContainer />
       </KkshowLayout>
     </Box>
   );

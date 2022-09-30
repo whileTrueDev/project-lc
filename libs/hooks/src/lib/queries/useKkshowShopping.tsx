@@ -1,6 +1,8 @@
+import { KkshowShoppingSectionItem } from '@prisma/client';
 import {
   GoodsCategoryWithFamily,
   KkshowShoppingTabResData,
+  KkshowShoppingSectionsResData,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
@@ -22,6 +24,57 @@ export const useKkshowShopping = (): UseQueryResult<
   return useQuery<KkshowShoppingTabResData, AxiosError>(
     kkshowShoppingQueryKey,
     getKkshowShopping,
+  );
+};
+
+// ----- 크크쇼 쇼핑탭에서 표시할 섹션데이터 조회(캐러셀 + 순서에 맞게 배열된 섹션목록)
+export const kkshowShoppingSectionsQueryKey = 'KkshowShoppingSections';
+export const getKkshowShoppingSectionsData =
+  async (): Promise<KkshowShoppingSectionsResData> => {
+    return axios
+      .get<KkshowShoppingSectionsResData>('kkshow-shopping/sections')
+      .then((res) => res.data);
+  };
+
+/** 크크쇼 쇼핑탭에서 표시할 섹션데이터 조회(캐러셀 + 순서에 맞게 배열된 섹션목록) */
+export const useKkshowShoppingSections = (): UseQueryResult<
+  KkshowShoppingSectionsResData,
+  AxiosError
+> => {
+  return useQuery<KkshowShoppingSectionsResData, AxiosError>(
+    kkshowShoppingSectionsQueryKey,
+    getKkshowShoppingSectionsData,
+  );
+};
+
+// ------ 관리자페이지에서 전체 섹션데이터 조회
+export const getAdminKkshowShoppingSections = async (): Promise<
+  KkshowShoppingSectionItem[]
+> => {
+  return axios
+    .get<KkshowShoppingSectionItem[]>('/admin/kkshow-shopping/sections')
+    .then((res) => res.data);
+};
+
+/** 관리자페이지에서 전체 섹션데이터 조회 */
+export const useAdminKkshowShoppingSections = (): UseQueryResult<
+  KkshowShoppingSectionItem[],
+  AxiosError
+> => {
+  return useQuery<KkshowShoppingSectionItem[], AxiosError>(
+    'AdminKkshowShoppingSections',
+    getAdminKkshowShoppingSections,
+  );
+};
+
+// 관리자페이지에서 섹션 순서 조회
+export const getAdminShoppingSectionOrder = async (): Promise<number[]> => {
+  return axios.get<number[]>('/admin/kkshow-shopping/order').then((res) => res.data);
+};
+export const useAdminShoppingSectionOrder = (): UseQueryResult<number[], AxiosError> => {
+  return useQuery<number[], AxiosError>(
+    'AdminShoppingSectionOrder',
+    getAdminShoppingSectionOrder,
   );
 };
 
