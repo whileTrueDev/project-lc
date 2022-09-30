@@ -26,6 +26,7 @@ import { IconType } from 'react-icons/lib';
 import {
   MdAccountCircle,
   MdLiveTv,
+  MdOutlineLiveTv,
   MdOutlineShoppingCart,
   MdPayment,
   MdShoppingBasket,
@@ -353,6 +354,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
         name: '크크쇼 이벤트팝업',
         href: '/kkshow-main/kkshow-event-popup',
         icon: FcIdea,
+      },
+      {
+        name: '크크쇼 라이브임베드',
+        href: '/kkshow-main/kkshow-live-shopping',
+        icon: MdOutlineLiveTv,
       },
     ],
   },
