@@ -33,9 +33,12 @@ import {
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import GoodsViewInformationNotice from './GoodsViewInformationNotice';
-import { GoodsViewPurchaseBox } from './GoodsViewPurchaseBox';
+import { GoodsViewPurchaseBox, GoodsViewPurchaseBoxProps } from './GoodsViewPurchaseBox';
 
-export function GoodsViewMeta(): JSX.Element | null {
+type GoodsViewMetaProps = Pick<GoodsViewPurchaseBoxProps, 'pageTransferType'>;
+export function GoodsViewMeta({
+  pageTransferType,
+}: GoodsViewMetaProps): JSX.Element | null {
   const router = useRouter();
   const goodsId = router.query.goodsId as string;
   const goods = useGoodsById(goodsId);
@@ -77,7 +80,10 @@ export function GoodsViewMeta(): JSX.Element | null {
 
           {/* 옵션 정보 및 후원 정보 */}
           <Box display={{ base: 'none', md: 'block' }}>
-            <GoodsViewPurchaseBox goods={goods.data} />
+            <GoodsViewPurchaseBox
+              goods={goods.data}
+              pageTransferType={pageTransferType}
+            />
           </Box>
 
           {/* 상품 기타 정보 info */}

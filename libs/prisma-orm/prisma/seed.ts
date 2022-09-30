@@ -48,6 +48,7 @@ import { dummyPayments } from './seedData/dummyPayment';
 import { createGoodsInquiry, createGoodsInquiry2 } from './seedData/goods-inquiry';
 import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
 import { createKkshowBcListDummy } from './seedData/kkshowBcList';
+import { createKkshowLiveEmbedDummy } from './seedData/kkshowLiveEmbed';
 import { kkshowMainSeedData, createKkshowDummyEventPopup } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
 import { createKkshowSubNavDummy } from './seedData/kkshowSubNav';
@@ -540,6 +541,8 @@ async function main(): Promise<void> {
   await createKkshowBcListDummy(prisma);
   // 더미 팝업 생성
   await createKkshowDummyEventPopup(prisma);
+  // 더미 라이브임베드 생성
+  await createKkshowLiveEmbedDummy(prisma);
 }
 
 main()
