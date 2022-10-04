@@ -255,6 +255,12 @@ function LiveShoppingEndButton({
 
   const { startCountdown, clearTimer, seconds } = useCountdown();
 
+  // 최초 마운트 시 1회만 실행 - 라이브 시간 설정되지 않는 경우 대비하여 3600 초 카운트다운 설정
+  useEffect(() => {
+    startCountdown(3600);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // 방송종료시간이 변경되는 경우 남은방송시간 계산 타이머 재설정
   useEffect(() => {
     // 종료시간 변경될때마다 outroButtonDisabled값을 true(버튼 비활성화)로 초기화한다
@@ -272,7 +278,6 @@ function LiveShoppingEndButton({
     const realEndTime = dayjs(
       endTimeFromSocketServer || savedEndTime || broadcastEndDate || now,
     );
-
     // 방송종료시간 - 현재시간 = 남은 방송 시간(초)로 카운트다운 타이머 실행
     const remainingBroadcastSeconds = realEndTime.diff(now, 'second');
     startCountdown(remainingBroadcastSeconds);
@@ -289,7 +294,11 @@ function LiveShoppingEndButton({
     if (seconds <= 10) {
       setOutroButtonDisabled(false);
     }
-  }, [seconds, clearTimer]);
+    // 10보다 많이 남았는데 버튼 disabled안되어 있다면 disabled로 설정
+    if (seconds > 10 && !outroButtonDisabled) {
+      setOutroButtonDisabled(true);
+    }
+  }, [seconds, clearTimer, outroButtonDisabled]);
 
   return (
     <Button
