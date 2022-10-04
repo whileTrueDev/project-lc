@@ -22,7 +22,10 @@ export function BroadcasterLiveShoppingList({
   const [pageSize, setPageSize] = useState<number>(5);
   const { isMobileSize } = useDisplaySize();
 
-  const { data: tableData } = useLiveShoppingList({ broadcasterId: profileData?.id });
+  const { data: tableData } = useLiveShoppingList(
+    { broadcasterId: profileData?.id },
+    { enabled: !!profileData && !!profileData.id },
+  );
 
   const {
     isOpen: detailIsOpen,

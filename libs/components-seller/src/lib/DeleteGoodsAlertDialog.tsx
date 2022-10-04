@@ -72,7 +72,7 @@ export function DeleteGoodsAlertDialog({
 
   const liveShoppings = useLiveShoppingList(
     { goodsIds: selectedGoodsIds as number[] },
-    { enabled: isOpen },
+    { enabled: isOpen && selectedGoodsIds.length > 0 },
   );
 
   // 선택된 상품목록 중, 라이브쇼핑이 존재하는 상품명
@@ -83,7 +83,10 @@ export function DeleteGoodsAlertDialog({
       if (['판매종료', '취소됨'].includes(liveShoppingProgress)) {
         return arr;
       }
-      arr.push(liveShopping.goods.goods_name);
+      arr.push(
+        liveShopping?.goods?.goods_name ||
+          `${liveShopping.liveShoppingName} 에서 판매하는 상품`,
+      );
       return arr;
     }, []);
   }, [liveShoppings.data]);
