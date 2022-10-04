@@ -12,7 +12,7 @@ export const getLiveShoppingList = async (
   dto: FindLiveShoppingDto,
 ): Promise<LiveShoppingWithGoods[]> => {
   return axios
-    .get<LiveShoppingWithGoods[]>('/live-shoppings', {
+    .get<LiveShoppingWithGoods[]>('/live-shoppings/list', {
       params: dto,
     })
     .then((res) => res.data);
