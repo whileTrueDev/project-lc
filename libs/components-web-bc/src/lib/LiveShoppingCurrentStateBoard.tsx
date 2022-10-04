@@ -84,14 +84,6 @@ export function LiveShoppingCurrentStateBoard({
     requestOutroPlay();
   }, [requestOutroPlay]);
 
-  if (status === 'loading') return <Box>Loading...</Box>;
-  if (status === 'error') {
-    console.error(error);
-    return (
-      <Box>에러가 발생했습니다. 해당 현상이 반복되는경우 고객센터로 문의해주세요.</Box>
-    );
-  }
-
   return (
     <MotionBox
       initial="default"
@@ -140,6 +132,19 @@ export function LiveShoppingCurrentStateBoard({
                 price: '주문금액',
               }}
             />
+
+            {status === 'loading' && (
+              <Box>후원메시지 및 구매 내역을 불러오고 있습니다</Box>
+            )}
+            {status === 'error' && (
+              <Box>
+                <Text>
+                  후원메시지를 조회할 수 없습니다. 해당 현상이 반복되는 경우 고객센터로
+                  문의해주세요.
+                </Text>
+                <Text>{error}</Text>
+              </Box>
+            )}
 
             {data &&
               data.map((d, index) => (
