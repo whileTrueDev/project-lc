@@ -11,7 +11,9 @@ export class KkshowLiveEmbedService {
    * 임베드 레코드 목록 조회
    */
   public async findAll(): Promise<LiveShoppingEmbed[]> {
-    return this.prisma.liveShoppingEmbed.findMany();
+    return this.prisma.liveShoppingEmbed.findMany({
+      orderBy: { id: 'desc' },
+    });
   }
 
   /**

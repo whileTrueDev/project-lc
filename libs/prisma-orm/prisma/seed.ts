@@ -273,7 +273,7 @@ async function createDummyPastExternalGoodsLiveShopping(
       seller: { connect: { id: seller.id } },
       broadcaster: { connect: { id: broadcaster.id } },
       externalGoods: {
-        create: { name: '먹보소고기', linkUrl: 'www.google.com' },
+        create: { name: '먹보소고기', linkUrl: 'https://www.google.com' },
       },
       liveShoppingName: '먹보소고기국밥~',
       progress: 'confirmed',

@@ -24,7 +24,8 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { StreamingService } from '@prisma/client';
-import { useLiveShopping } from '@project-lc/hooks';
+import { useDisplaySize, useLiveShopping } from '@project-lc/hooks';
+import { LiveShoppingWithGoods } from '@project-lc/shared-types';
 import { getKkshowWebHost } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
@@ -88,57 +89,28 @@ export function KkshowLiveLiveDisplay({
     }
   };
 
+  const { isMobileSize } = useDisplaySize();
+  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: false });
+
   if (!data) return null;
   return (
-    <Box p={4}>
-      <Flex
-        gap={2}
-        justify="space-between"
-        align="center"
-        flexDir={{ base: 'column', lg: 'row' }}
-      >
+    <Box p={2}>
+      <Flex gap={2} justify="space-between" flexDir={{ base: 'column', lg: 'row' }}>
         <Box>
           <Text fontWeight="bold" fontSize={{ base: 'xl', lg: '2xl' }}>
             {data.liveShoppingName}
           </Text>
 
-          <Grid templateColumns="1fr 3fr" gap={2} fontSize={{ base: 'sm', lg: 'md' }}>
-            <GridItem>
-              <Text>판매 상품</Text>
-            </GridItem>
-            <GridItem>
-              <Text fontSize={{ base: 'xs', lg: 'md' }}>
-                {data.goods?.goods_name || '미정'}
-              </Text>
-            </GridItem>
-
-            {data.broadcastStartDate && data.broadcastEndDate && (
-              <>
-                <GridItem>
-                  <Text>방송 시간</Text>
-                </GridItem>
-                <GridItem>
-                  <Text fontSize={{ base: 'xs', lg: 'md' }}>
-                    {formatDate(data.broadcastStartDate)} ~{' '}
-                    {formatDate(data.broadcastEndDate)}
-                  </Text>
-                </GridItem>
-              </>
-            )}
-
-            {data.sellStartDate && data.sellEndDate && (
-              <>
-                <GridItem>
-                  <Text>판매 시간</Text>
-                </GridItem>
-                <GridItem>
-                  <Text fontSize={{ base: 'xs', lg: 'md' }}>
-                    {formatDate(data.sellStartDate)} ~ {formatDate(data.sellEndDate)}
-                  </Text>
-                </GridItem>
-              </>
-            )}
-          </Grid>
+          {isMobileSize ? (
+            <>
+              <Button onClick={onToggle} size="sm" variant="link">
+                라이브쇼핑 정보 보기
+              </Button>
+              {isOpen ? <KkshowLiveInfo data={data} formatDate={formatDate} /> : null}
+            </>
+          ) : (
+            <KkshowLiveInfo data={data} formatDate={formatDate} />
+          )}
         </Box>
 
         <Flex
@@ -176,6 +148,51 @@ export function KkshowLiveLiveDisplay({
   );
 }
 export default KkshowLiveLiveDisplay;
+
+interface KkshowLiveInfoProps {
+  formatDate: (dateString: string | Date) => string;
+  data: LiveShoppingWithGoods;
+}
+function KkshowLiveInfo({ data, formatDate }: KkshowLiveInfoProps): JSX.Element {
+  return (
+    <Grid templateColumns="1fr 3fr" gap={2} fontSize={{ base: 'sm', lg: 'md' }}>
+      <GridItem>
+        <Text>판매 상품</Text>
+      </GridItem>
+      <GridItem>
+        <Text fontSize={{ base: 'xs', lg: 'md' }}>
+          {data.goods?.goods_name || '미정'}
+        </Text>
+      </GridItem>
+
+      {data.broadcastStartDate && data.broadcastEndDate && (
+        <>
+          <GridItem>
+            <Text>방송 시간</Text>
+          </GridItem>
+          <GridItem>
+            <Text fontSize={{ base: 'xs', lg: 'md' }}>
+              {formatDate(data.broadcastStartDate)} ~ {formatDate(data.broadcastEndDate)}
+            </Text>
+          </GridItem>
+        </>
+      )}
+
+      {data.sellStartDate && data.sellEndDate && (
+        <>
+          <GridItem>
+            <Text>판매 시간</Text>
+          </GridItem>
+          <GridItem>
+            <Text fontSize={{ base: 'xs', lg: 'md' }}>
+              {formatDate(data.sellStartDate)} ~ {formatDate(data.sellEndDate)}
+            </Text>
+          </GridItem>
+        </>
+      )}
+    </Grid>
+  );
+}
 
 interface KkshowPurchaseDrawerProps {
   isOpen: boolean;
