@@ -25,6 +25,7 @@ import {
   ApprovedGoodsListItem,
   FindLiveShoppingDto,
   FindNowPlayingLiveShoppingDto,
+  LiveShoppingCurrentPurchaseMessagesDto,
   LiveShoppingOutline,
   LiveShoppingRegistDTO,
   LiveShoppingWithGoods,
@@ -41,25 +42,6 @@ export class LiveShoppingController {
     private readonly liveShoppingService: LiveShoppingService,
     private readonly purchaseMessageService: PurchaseMessageService,
   ) {}
-
-  @Get(':liveShoppingId')
-  public getLiveShopping(
-    @Param('liveShoppingId', ParseIntPipe) id: number,
-  ): Promise<LiveShoppingWithGoods> {
-    return this.liveShoppingService.findLiveShopping(id);
-  }
-
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  getLiveShoppings(
-    @Query(new ValidationPipe({ transform: true })) dto?: FindLiveShoppingDto,
-  ): Promise<LiveShoppingWithGoods[]> {
-    if (!dto || !(dto.broadcasterId || dto.goodsIds || dto.id || dto.sellerId))
-      throw new BadRequestException(
-        'broadcasterId, goodsIds, id, sellerId 파라미터 중 하나를 포함해야 합니다.',
-      );
-    return this.liveShoppingService.findLiveShoppings(dto);
-  }
 
   /** 라이브쇼핑 등록 */
   @Post()
@@ -93,8 +75,10 @@ export class LiveShoppingController {
   @Get('/current-state-purchase-messages')
   @UseGuards(JwtAuthGuard)
   getLiveShoppingCurrentPurchaseMessagesAndPrice(
-    @Query('liveShoppingId', ParseIntPipe) liveShoppingId: number,
+    @Query(new ValidationPipe({ transform: true }))
+    dto: LiveShoppingCurrentPurchaseMessagesDto,
   ): Promise<LiveShoppingPurchaseMessage[]> {
+    const { liveShoppingId } = dto;
     return this.purchaseMessageService.getAllMessagesAndPrice(liveShoppingId);
   }
 
@@ -106,5 +90,25 @@ export class LiveShoppingController {
       return this.liveShoppingService.getNowPlayingLiveShopping(dto);
     }
     return [];
+  }
+
+  @Get('list')
+  @UseGuards(JwtAuthGuard)
+  getLiveShoppings(
+    @Query(new ValidationPipe({ transform: true })) dto?: FindLiveShoppingDto,
+  ): Promise<LiveShoppingWithGoods[]> {
+    if (!dto || !(dto.broadcasterId || dto.goodsIds || dto.id || dto.sellerId))
+      throw new BadRequestException(
+        'broadcasterId, goodsIds, id, sellerId 파라미터 중 하나를 포함해야 합니다.',
+      );
+    return this.liveShoppingService.findLiveShoppings(dto);
+  }
+
+  // get라우터가 여러개일 때 순서 유의한다. 위의 get 라우터에 매칭되지 않는 경우 param에 매칭되는지 확인한다
+  @Get(':liveShoppingId')
+  public getLiveShopping(
+    @Param('liveShoppingId', ParseIntPipe) id: number,
+  ): Promise<LiveShoppingWithGoods> {
+    return this.liveShoppingService.findLiveShopping(id);
   }
 }

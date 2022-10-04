@@ -8,9 +8,12 @@ export function LiveShoppingCurrentState(): JSX.Element {
   const liveShoppingId = Number(router.query.liveShoppingId);
 
   const { data: profileData } = useProfile();
-  const { data: liveShoppingList } = useLiveShoppingList({
-    broadcasterId: profileData?.id,
-  });
+  const { data: liveShoppingList } = useLiveShoppingList(
+    {
+      broadcasterId: profileData?.id,
+    },
+    { enabled: !!profileData && !!profileData?.id },
+  );
 
   const { title, broadcastEndDate } = useMemo(() => {
     if (!liveShoppingList) return { title: '' };

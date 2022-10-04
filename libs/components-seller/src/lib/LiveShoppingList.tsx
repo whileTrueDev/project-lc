@@ -62,7 +62,10 @@ export function LiveShoppingList(): JSX.Element {
   const toast = useToast();
   const { isMobileSize } = useDisplaySize();
   const { data: profile } = useProfile();
-  const { data, isLoading } = useLiveShoppingList({ sellerId: profile?.id });
+  const { data, isLoading } = useLiveShoppingList(
+    { sellerId: profile?.id },
+    { enabled: !!profile && !!profile?.id },
+  );
 
   const [pageSize, setPageSize] = useState<number>(5);
 
