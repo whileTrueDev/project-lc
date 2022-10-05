@@ -21,10 +21,23 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
    [Nest.js + Socket.io](https://docs.nestjs.com/websockets/gateways)로 구성된 WebScoket 서버입니다.
 3. [overlay-controller](./apps/overlay-controller/README.md)  
    [Nest.js + Socket.io](https://docs.nestjs.com/websockets/gateways)로 구성된 WebScoket 서버입니다.
-4. [web](./apps/web/README.md)  
+4. [web-seller](./apps/web-seller/README.md)  
    [Next.js](https://nextjs.org/)로 구성된 판매자센터 프론트엔드 서버입니다.
 5. [web-broadcaster-center](./apps/web-broadcaster-center/README.md)  
    [Next.js](https://nextjs.org/)로 구성된 방송인센터 프론트엔드 서버입니다.
+6. [web-kkshow](./apps/web-kkshow/README.md)  
+   [Next.js](https://nextjs.org/)로 구성된 크크쇼 & 크크마켓 프론트엔드 서버입니다.
+7. [admin]()  
+   [Next.js](https://nextjs.org/)로 구성된 관리자센터 프론트엔드 서버입니다.
+8. [api-realtime]()  
+   [Nest.js + Socket.io](https://docs.nestjs.com/websockets/gateways)로 구성된 WebScoket 서버입니다. 실시간 알림 소켓 연결과 라이브쇼핑 현황판 소켓 연결에 사용됩니다.
+9. [batch-inactive-handler](./apps/batch-inactive-handler/README.md)  
+   [Nest.js](https://docs.nestjs.com/)로 구성된 크크쇼 유저 휴면계정 확인 및 처리
+10.[batch-virtual-account](./apps/batch-inactive-account/README.md) 
+   [Nest.js](https://docs.nestjs.com/)로 구성된 미입금 가상계좌 주문 취소처리 standalone 배치프로그램
+11.[mailer](./apps/mailer/README.md)  
+   [Nest.js](https://docs.nestjs.com/)로 구성된
+
 
 ### Libs 목록
 
