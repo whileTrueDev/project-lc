@@ -8,7 +8,7 @@ import {
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { useCartStore, useKkshowOrderStore } from '@project-lc/stores';
 import { getCustomerWebHost } from '@project-lc/utils';
-import { setCookie } from '@project-lc/utils-frontend';
+import { pushDataLayer, setCookie } from '@project-lc/utils-frontend';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
 import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
@@ -51,6 +51,31 @@ export function OrderPaymentForm(): JSX.Element | null {
   const { data: profile } = useProfile();
   const { data: customer } = useCustomerInfo(profile?.id);
   const orderPrepareData = useKkshowOrderStore((s) => s.order);
+
+  // ga4 전자상거래 begin_checkout 이벤트 https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type=gtm#begin_checkout
+  useEffect(() => {
+    if (orderPrepareData) {
+      const { orderItems, orderPrice } = orderPrepareData;
+      const items = orderItems.flatMap((goods) => {
+        return goods.options.map((opt) => ({
+          item_id: `${goods.goodsId}`,
+          item_name: goods.goodsName,
+          price: opt.discountPrice,
+          quantity: opt.quantity,
+          item_variant: opt.value,
+        }));
+      });
+
+      pushDataLayer({
+        event: 'begin_checkout',
+        ecommerce: {
+          value: Number(orderPrice), // 쿠폰, 적립금사용 등이 적용되지 않은 주문금액
+          currency: 'KRW',
+          items,
+        },
+      });
+    }
+  }, [orderPrepareData]);
 
   const methods = useForm<CreateOrderForm>({
     mode: 'onChange',
