@@ -67,7 +67,7 @@ export function Receipt(): JSX.Element {
   useEffect(() => {
     if (orderDetailData && paymentData) {
       const transactionId = paymentData.transactionKey; // 거래의 고유식별자. 토스 트랜잭션 키 보냄.(크크쇼 주문번호 아님);
-      const orderPrice = Number(orderDetailData.orderPrice);
+      const orderPrice = Number(orderDetailData.paymentPrice); // 실제 고객이 결제한 금액 보냄 (상품가격 + 배송비)
       const totalShippingCosts = orderDetailData.shippings
         .map((s) => Number(s.shippingCost))
         .reduce((sum, sc) => sum + sc);
