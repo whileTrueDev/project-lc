@@ -50,8 +50,6 @@ export function GoodsViewMeta({
   useEffect(() => {
     if (goods.data && !dataLayerPushed.current) {
       const price = Number(goods.data.options?.[0]?.price || 0); // 할인가
-      const ogirinalPrice = goods.data.options?.[0]?.consumer_price || 0; // 정가(미할인가)
-      const discount = Number(ogirinalPrice) - price; // 할인된 금액
       const shopName = goods.data.seller.sellerShop?.shopName; // 공급회사
       const category = goods.data.categories?.[0].name || '';
       pushDataLayer({
@@ -62,7 +60,6 @@ export function GoodsViewMeta({
               item_id: goods.data.id,
               item_name: goods.data.goods_name,
               affiliation: shopName,
-              discount,
               price,
               item_category: category,
             },

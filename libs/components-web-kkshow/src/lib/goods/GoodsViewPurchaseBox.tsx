@@ -654,11 +654,8 @@ function GoodsViewButtonSet({
             items,
             currency: 'KRW',
             value: selectedOpts
-              .map((o) => ({
-                discountPrice: Number(o.price),
-                quantity: o.quantity,
-              }))
-              .reduce((total, opt) => total + opt.discountPrice * opt.quantity, 0),
+              .map((o) => Number(o.price) * o.quantity)
+              .reduce((total, cur) => total + cur, 0),
           },
         });
       })
@@ -670,10 +667,7 @@ function GoodsViewButtonSet({
       });
   }, [
     executePurchaseCheck,
-    goods.LiveShopping,
-    goods.productPromotion,
-    goods.id,
-    goods.shippingGroupId,
+    goods,
     createCartItem,
     selectedOpts,
     sellType,

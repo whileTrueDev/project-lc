@@ -43,8 +43,8 @@ export function CartActions(): JSX.Element {
         })),
       );
       const value = items
-        .map((item) => ({ price: item.price, quantity: item.quantity }))
-        .reduce((tot, cur) => tot + cur.price * cur.quantity, 0);
+        .map((item) => item.price * item.quantity)
+        .reduce((tot, cur) => tot + cur, 0);
       pushDataLayer({
         event: 'view_cart',
         ecommerce: {
