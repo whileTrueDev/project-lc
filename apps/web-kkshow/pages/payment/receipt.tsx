@@ -1,27 +1,30 @@
 import {
   Box,
-  Heading,
+  Button,
+  ButtonGroup,
+  Center,
+  Divider,
   Flex,
   Grid,
   GridItem,
-  Text,
-  Divider,
-  Button,
-  useColorModeValue,
+  Heading,
   Spinner,
-  Center,
+  Text,
+  useColorModeValue,
   useToast,
-  ButtonGroup,
 } from '@chakra-ui/react';
-import { useDisplaySize, usePaymentByOrderCode, useOrderDetail } from '@project-lc/hooks';
-import { useRouter } from 'next/router';
+import { OrderItemOption } from '@prisma/client';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { SuccessDeliveryAddress } from '@project-lc/components-web-kkshow/payment/DeliveryAddress';
 import {
-  ReceiptOrderItemInfo,
   MobileReceiptOrderItemInfo,
+  ReceiptOrderItemInfo,
 } from '@project-lc/components-web-kkshow/payment/ReceiptOrderItemInfo';
+import { useDisplaySize, useOrderDetail, usePaymentByOrderCode } from '@project-lc/hooks';
+import { pushDataLayer } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 export function Receipt(): JSX.Element {
   const router = useRouter();
@@ -60,6 +63,40 @@ export function Receipt(): JSX.Element {
 
     toast({ title: '복사되었습니다.', status: 'success' });
   };
+
+  useEffect(() => {
+    if (orderDetailData && paymentData) {
+      const transactionId = paymentData.transactionKey; // 거래의 고유식별자. 토스 트랜잭션 키 보냄.(크크쇼 주문번호 아님);
+      const orderPrice = Number(orderDetailData.orderPrice);
+      const totalShippingCosts = orderDetailData.shippings
+        .map((s) => Number(s.shippingCost))
+        .reduce((sum, sc) => sum + sc);
+      const items = orderDetailData.orderItems
+        .flatMap((oi) => {
+          const { goodsId } = oi;
+          return oi.options.map((opt) => ({ ...opt, goodsId }));
+        })
+        .map((opt: OrderItemOption & { goodsId: number }) => ({
+          item_id: opt.goodsId,
+          item_name: opt.goodsName,
+          price: Number(opt.discountPrice),
+          quantity: opt.quantity,
+          item_variant: opt.value,
+        }));
+
+      // 결제 성공 이후 receipt 페이지로 이동했을 때 purchase 이벤트 발생 & 데이터 보냄
+      pushDataLayer({
+        event: 'purchase',
+        ecommerce: {
+          transaction_id: transactionId,
+          value: orderPrice,
+          shipping: totalShippingCosts,
+          currency: 'KRW',
+          items,
+        },
+      });
+    }
+  }, [orderDetailData, paymentData]);
 
   if (orderDetailLoading) {
     return (
