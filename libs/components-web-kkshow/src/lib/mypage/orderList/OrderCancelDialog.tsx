@@ -17,6 +17,7 @@ import {
   RefundAccountDto,
 } from '@project-lc/shared-types';
 import { getOrderItemOptionSteps } from '@project-lc/utils';
+import { pushDataLayer } from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { OrderItemOptionInfo } from './OrderItemOptionInfo';
@@ -43,6 +44,9 @@ export function OrderCancelDialog({
   const targetItemOptions: (OrderCancellationItemDto & {
     discountPrice: number;
     step: OrderProcessStep;
+    goodsId: number | null;
+    goodsName: string | null;
+    value: string | null;
   })[] = useMemo(() => {
     if (!orderDetailData) return [];
     return orderDetailData.orderItems.flatMap((item) =>
@@ -54,31 +58,38 @@ export function OrderCancelDialog({
           quantity: opt.quantity,
           discountPrice: Number(opt.discountPrice), // CreateOrderCancellationDto와 무관. CreateRefundDto.refundAmount 계산용
           step: opt.step,
+          goodsId: item.goodsId,
+          goodsName: opt.goodsName,
+          value: opt.value, // 옵션명
         })),
     );
   }, [orderDetailData]);
 
-  // 환불금액 = 주문상품옵션 가격*개수 + 배송비
-  const refundAmount = useMemo(() => {
-    if (!orderDetailData) return 0;
+  const orderItemOptionsPrice = useMemo(() => {
     // 1. 취소할 상품들 옵션별 가격*개수 합
-    const orderItemOptionsPrice = targetItemOptions
+    return targetItemOptions
       .map((opt) => opt.quantity * opt.discountPrice)
       .reduce((sum, cur) => sum + cur, 0);
+  }, [targetItemOptions]);
 
+  const targetShippingCost = useMemo(() => {
+    if (!orderDetailData) return 0;
     // 주문취소상품에 적용된 배송비 정보 찾기
     const targetOptionsId = targetItemOptions.map((o) => o.orderItemOptionId);
     const targetShippingData = orderDetailData.shippings?.filter((s) =>
       s.items.some((i) => i.options.some((op) => targetOptionsId.includes(op.id))),
     );
-    // 2. 주문취소상품에 적용된 배송비 합
-    const targetShippingCost =
+    return (
       targetShippingData
         ?.map((s) => Number(s.shippingCost))
-        .reduce((sum, cur) => sum + cur, 0) || 0;
-    // Return 1 + 2
-    return orderItemOptionsPrice + targetShippingCost;
+        .reduce((sum, cur) => sum + cur, 0) || 0
+    );
   }, [orderDetailData, targetItemOptions]);
+
+  // 환불금액 = 결제금액 Order.paymentPrice (주문상품 개수*가격 + 배송비 - 마일리지 사용 등 할인)
+  const refundAmount = useMemo(() => {
+    return orderDetailData?.paymentPrice;
+  }, [orderDetailData]);
 
   // * 주문취소 요청
   const purchaseConfirmRequest = async (): Promise<void> => {
@@ -121,7 +132,10 @@ export function OrderCancelDialog({
       let refundId: number | undefined;
       // - 주문 금액 일부만 결제하는 기능은 없으므로 선택된(dto에 포함된) 주문상품옵션들은 모두 결제완료이거나 모두 입금대기 상태임
       // 선택된(dto에 포함된) 주문상품옵션들이 모두 "결제완료" 상태인 경우에만 결제취소 및 환불신청
-      if (targetItemOptions.every((opt) => opt.step === 'paymentConfirmed')) {
+      if (
+        targetItemOptions.every((opt) => opt.step === 'paymentConfirmed') &&
+        !!refundAmount
+      ) {
         const refundAccountInfo = formMethods.getValues();
         const refundDto: CreateRefundDto = {
           orderId: orderDetailData.id,
@@ -141,6 +155,25 @@ export function OrderCancelDialog({
       await orderCancelUpdateMutation.mutateAsync({
         orderCancelId: orderCancellationRes.id,
         dto: { status: 'complete', refundId },
+      });
+
+      // 주문취소 이후
+      // ga4 전자상거래 refund 이벤트 https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type=gtm#refund
+      pushDataLayer({
+        event: 'refund',
+        ecommerce: {
+          value: refundAmount, // 환불금액 = 주문상품옵션 가격*개수 + 배송비
+          shipping: targetShippingCost,
+          currency: 'KRW',
+          transaction_id: orderDetailData.payment?.paymentKey,
+          items: targetItemOptions.map((opt) => ({
+            item_id: opt.goodsId,
+            item_name: opt.goodsName,
+            item_variant: opt.value,
+            price: opt.discountPrice,
+            quantity: opt.quantity,
+          })),
+        },
       });
 
       toast({ title: '주문 취소 요청이 처리되었습니다', status: 'success' });
