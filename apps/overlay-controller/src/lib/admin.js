@@ -734,6 +734,11 @@ $(document).ready(function ready() {
   $('.sales-guide-image-control--btn--hide').click(() => {
     socket.emit('sales guide hide from admin', { roomName });
   });
+  // 판매가이드 이미지 인덱스 클릭시
+  $('.sales-guide-image--index-container > button').click((e) => {
+    const index = Number(e.currentTarget.value);
+    socket.emit('sales guide image index selected from admin', { roomName, index });
+  });
 });
 
 class LiveShoppingStateBoardController {

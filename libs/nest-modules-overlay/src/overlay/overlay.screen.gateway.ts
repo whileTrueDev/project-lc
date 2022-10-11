@@ -335,4 +335,15 @@ export class OverlayScreenGateway
   ): Promise<void> {
     this.server.to(roomName).emit('sales guide hide from server');
   }
+
+  // 판매가이드 이미지 인덱스 선택
+  @SubscribeMessage('sales guide image index selected from admin')
+  async salesGuideImageIndexSelected(
+    @MessageBody()
+    { roomName, index }: { roomName: string; index: number },
+  ): Promise<void> {
+    this.server
+      .to(roomName)
+      .emit('sales guide image index selected from server', { index });
+  }
 }
