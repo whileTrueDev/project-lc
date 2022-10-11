@@ -63,7 +63,7 @@ function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
                 </main>
               </ThemeProvider>
             </ChakraProvider>
-            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+            <ReactQueryDevtools initialIsOpen={false} />
           </Hydrate>
         </QueryClientProvider>
       </div>

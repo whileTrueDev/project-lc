@@ -29,9 +29,10 @@ import {
   getDiscountedRate,
   getLocaleNumber,
   getStandardShippingCost,
+  pushDataLayer,
 } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import GoodsViewInformationNotice from './GoodsViewInformationNotice';
 import { GoodsViewPurchaseBox, GoodsViewPurchaseBoxProps } from './GoodsViewPurchaseBox';
 
@@ -42,6 +43,35 @@ export function GoodsViewMeta({
   const router = useRouter();
   const goodsId = router.query.goodsId as string;
   const goods = useGoodsById(goodsId);
+
+  const dataLayerPushed = useRef<boolean>(false); // 이벤트가 두번 발생해서 플래그변수 저장
+  // ga4 전자상거래 view_item 이벤트 https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type=gtm#view_item
+  // TODO: 전자상거래 datalayer push 하는 함수들 모아두기..??
+  useEffect(() => {
+    if (goods.data && !dataLayerPushed.current) {
+      const price = Number(goods.data.options?.[0]?.price || 0); // 할인가
+      const shopName = goods.data.seller.sellerShop?.shopName; // 공급회사
+      const category = goods.data.categories?.[0].name || '';
+      pushDataLayer({
+        event: 'view_item',
+        ecommerce: {
+          items: [
+            {
+              item_id: goods.data.id,
+              item_name: goods.data.goods_name,
+              affiliation: shopName,
+              price,
+              item_category: category,
+            },
+          ],
+          currency: 'KRW',
+          value: goods.data.options?.[0]?.price || 0,
+        },
+      });
+      dataLayerPushed.current = true;
+    }
+  }, [goods]);
+
   if (goods.isLoading) return <GoodsViewMetaLoading />;
   if (!goods.data) return null;
   return (
