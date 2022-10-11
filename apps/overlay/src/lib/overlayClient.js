@@ -1032,15 +1032,16 @@ socket.on('play virtual video from server', () => {
 });
 
 // 판매가이드 표시 이벤트
+function getSalesGuideImageUrl({ index, ext }) {
+  const url = `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/sales-guide-images/${liveShoppingId}/sales-guide-${index}.${ext}`;
+  return url;
+}
 socket.on('sales guide display from server', function displaySalesGuide() {
   const salesGuideContainer = $('.sales-guide--container');
   const HIDE_CLASS = 'hide';
   if (salesGuideContainer.hasClass(HIDE_CLASS)) {
     // 판매 가이드 이미지를 첫번째 url로 세팅
-    const index = 1;
-    const ext = 'png';
-    const url = `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/sales-guide-images/${liveShoppingId}/sales-guide-${index}.${ext}`;
-
+    const url = getSalesGuideImageUrl({ index: 1, ext: 'png' });
     const image = new Image();
     image.src = url;
     // 이미지가 존재하면 표시
@@ -1058,7 +1059,7 @@ socket.on('sales guide display from server', function displaySalesGuide() {
 });
 
 // 판매가이드 숨기기 이벤트
-socket.on('sales guide hide from server', function hideSalesGuide() {
+function hideSalesGuide() {
   const salesGuideContainer = $('.sales-guide--container');
   const HIDE_CLASS = 'hide';
   if (!salesGuideContainer.hasClass(HIDE_CLASS)) {
@@ -1067,6 +1068,30 @@ socket.on('sales guide hide from server', function hideSalesGuide() {
       salesGuideContainer.addClass(HIDE_CLASS);
     });
   }
-});
+}
+socket.on('sales guide hide from server', hideSalesGuide);
+
+// 판매가이드 이미지 인덱스 선택 이벤트
+socket.on(
+  'sales guide image index selected from server',
+  function salesGuideImageIndexSelected({ index }) {
+    const salesImageElem = $('.sales-guide--image');
+    if (salesImageElem) {
+      let image = new Image();
+      const url = getSalesGuideImageUrl({ index, ext: 'png' });
+      image.src = url;
+      // 이미지가 존재하면 표시
+      image.onload = () => {
+        image = null;
+        salesImageElem.attr('src', url);
+      };
+      // 이미지가 존재하지 않으면 판매가이드 영역 숨김
+      image.onerror = (e) => {
+        console.error('image not exist', e);
+        hideSalesGuide();
+      };
+    }
+  },
+);
 
 export {};
