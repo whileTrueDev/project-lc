@@ -225,25 +225,6 @@ async function switchImage() {
   }, 10000);
 }
 
-// 판매가이드 이미지 켜기/끄기 토글
-function salesGuideDisplayToggle() {
-  const salesGuideContainer = $('.sales-guide--container');
-  const salesGuideImage = $('.sales-guide--image');
-  const HIDE_CLASS = 'hide';
-  if (salesGuideContainer.hasClass(HIDE_CLASS)) {
-    // 판매 가이드 이미지를 첫번째 url로 세팅
-    const index = 1;
-    const ext = 'png';
-    const url = `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/sales-guide-images/${liveShoppingId}/sales-guide-${index}.${ext}`;
-    salesGuideImage.attr('src', url);
-    // 켜기
-    salesGuideContainer.fadeIn(500).removeClass(HIDE_CLASS);
-  } else {
-    // 끄기
-    salesGuideContainer.fadeOut(500).addClass(HIDE_CLASS);
-  }
-}
-
 // 우측상단 응원문구 이벤트 및 랭킹 10초간격 setInterval
 // 메세지가 뜰 때, 랭킹도 같이 반영된다
 // 이전의 메세지가 완전히 사라진 후, 다음 메세지가 뜬다
@@ -1050,14 +1031,42 @@ socket.on('play virtual video from server', () => {
   });
 });
 
-// 판매가이드 표시, 숨기기 이벤트
-socket.on('sales guide display from server', salesGuideDisplayToggle);
-socket.on('sales guide hide from server', salesGuideDisplayToggle);
+// 판매가이드 표시 이벤트
+socket.on('sales guide display from server', function displaySalesGuide() {
+  const salesGuideContainer = $('.sales-guide--container');
+  const HIDE_CLASS = 'hide';
+  if (salesGuideContainer.hasClass(HIDE_CLASS)) {
+    // 판매 가이드 이미지를 첫번째 url로 세팅
+    const index = 1;
+    const ext = 'png';
+    const url = `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/sales-guide-images/${liveShoppingId}/sales-guide-${index}.${ext}`;
 
-// socket.on('reset theme from server', () => {
-//   $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').removeClass(
-//     currentThemeType,
-//   );
-// });
+    const image = new Image();
+    image.src = url;
+    // 이미지가 존재하면 표시
+    image.onload = () => {
+      const imageElem = $(image);
+      imageElem.addClass('sales-guide--image');
+      imageElem.appendTo(salesGuideContainer);
+      salesGuideContainer.fadeIn(500).removeClass(HIDE_CLASS);
+    };
+    // 이미지가 존재하지 않으면 표시하지 않음
+    image.onerror = () => {
+      console.error('image not exist');
+    };
+  }
+});
+
+// 판매가이드 숨기기 이벤트
+socket.on('sales guide hide from server', function hideSalesGuide() {
+  const salesGuideContainer = $('.sales-guide--container');
+  const HIDE_CLASS = 'hide';
+  if (!salesGuideContainer.hasClass(HIDE_CLASS)) {
+    salesGuideContainer.fadeOut(500, () => {
+      $('.sales-guide--image').remove();
+      salesGuideContainer.addClass(HIDE_CLASS);
+    });
+  }
+});
 
 export {};
