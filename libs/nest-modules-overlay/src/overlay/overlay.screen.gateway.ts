@@ -317,4 +317,22 @@ export class OverlayScreenGateway
   playVirtualVideo(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('play virtual video from server');
   }
+
+  // 판매가이드 영역 표시
+  @SubscribeMessage('sales guide display from admin')
+  async displaySalesGuide(
+    @MessageBody()
+    { roomName }: { roomName: string },
+  ): Promise<void> {
+    this.server.to(roomName).emit('sales guide display from server');
+  }
+
+  // 판매가이드 영역 숨기기
+  @SubscribeMessage('sales guide hide from admin')
+  async hideSalesGuide(
+    @MessageBody()
+    { roomName }: { roomName: string },
+  ): Promise<void> {
+    this.server.to(roomName).emit('sales guide hide from server');
+  }
 }
