@@ -1017,7 +1017,7 @@ span.objective-value {
 .sales-guide--container {
   position: fixed;
   width: 600px;
-  height: 500px;
+  height: 550px;
   top: 119px;
   right: 15px;
 }
@@ -1029,5 +1029,5 @@ span.objective-value {
   left: 0;
   top: 0;
   width: 600px;
-  height: 500px;
+  height: 550px;
 }

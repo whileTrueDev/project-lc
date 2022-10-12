@@ -220,7 +220,7 @@ export function AdminLiveShoppingSalesGuideImageUploadDialog({
                 <Heading size="md">판매가이드 이미지 첨부</Heading>
                 <Text>판매가이드는 {maxCount.current}장까지 등록가능합니다.</Text>
                 <Text color="tomato">
-                  판매가이드 이미지 크기는 가로 600px, 세로 500px 입니다
+                  판매가이드 이미지 크기는 가로 600px, 세로 550px 입니다
                 </Text>
                 <ImageInput
                   multiple
