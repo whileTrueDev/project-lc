@@ -1032,8 +1032,8 @@ socket.on('play virtual video from server', () => {
 });
 
 // 판매가이드 표시 이벤트
-function getSalesGuideImageUrl({ index, ext }) {
-  const url = `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/sales-guide-images/${liveShoppingId}/sales-guide-${index}.${ext}`;
+function getSalesGuideImageUrl({ index }) {
+  const url = `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/sales-guide-image/${liveShoppingId}/sales-guide-image-${index}`;
   return url;
 }
 socket.on('sales guide display from server', function displaySalesGuide() {
@@ -1041,7 +1041,7 @@ socket.on('sales guide display from server', function displaySalesGuide() {
   const HIDE_CLASS = 'hide';
   if (salesGuideContainer.hasClass(HIDE_CLASS)) {
     // 판매 가이드 이미지를 첫번째 url로 세팅
-    const url = getSalesGuideImageUrl({ index: 1, ext: 'png' });
+    const url = getSalesGuideImageUrl({ index: 1 });
     const image = new Image();
     image.src = url;
     // 이미지가 존재하면 표시

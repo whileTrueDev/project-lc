@@ -63,7 +63,7 @@ body {
 }
 
 .live-commerce {
-  /* display: none; */
+  display: none;
   left: 0px;
   bottom: 0px;
   width: 1920px;
