@@ -10,9 +10,9 @@ import {
 } from '@project-lc/hooks';
 import { CartItemRes, NEXT_PAGE_PARAM_KEY } from '@project-lc/shared-types';
 import { OrderShippingData, useCartStore, useKkshowOrderStore } from '@project-lc/stores';
-import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
+import { checkGoodsPurchasable, pushDataLayer } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 export function CartActions(): JSX.Element {
   const toast = useToast({ isClosable: true });
@@ -27,6 +27,35 @@ export function CartActions(): JSX.Element {
 
   // 각 상품의 상품홍보 정보
   const pp = useProductPromotions({ goodsIds });
+
+  const dataLayerPushed = useRef<boolean>(false);
+  // ga4 전자상거래 view_cart 이벤트(cartpage 접속시) https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type=gtm#view_cart
+  useEffect(() => {
+    if (data && !dataLayerPushed.current) {
+      const items = data.flatMap((ci) =>
+        ci.options.map((copt) => ({
+          item_id: ci.goodsId,
+          item_name: ci.goods.goods_name,
+          affiliation: ci.goods.seller.sellerShop?.shopName,
+          item_variant: copt.value,
+          price: Number(copt.discountPrice),
+          quantity: copt.quantity,
+        })),
+      );
+      const value = items
+        .map((item) => item.price * item.quantity)
+        .reduce((tot, cur) => tot + cur, 0);
+      pushDataLayer({
+        event: 'view_cart',
+        ecommerce: {
+          value,
+          currency: 'KRW',
+          items,
+        },
+      });
+      dataLayerPushed.current = true;
+    }
+  }, [data]);
 
   // 장바구니 선택된 상품 주문하기 실행 전 올바른 주문인지 체크함수
   const executePurchaseCheck = useCallback((): boolean => {

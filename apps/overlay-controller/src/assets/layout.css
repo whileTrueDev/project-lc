@@ -225,3 +225,8 @@ label {
 .objective-box {
   margin-top: 10px;
 }
+
+.sales-guide-image--index-container button {
+  width: 50px;
+  background-color: #666666;
+}

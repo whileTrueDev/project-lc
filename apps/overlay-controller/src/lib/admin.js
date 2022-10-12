@@ -724,6 +724,21 @@ $(document).ready(function ready() {
       },
     });
   });
+
+  // 판매가이드 관련 버튼 이벤트 핸들러 할당
+  // 판매가이드 표시
+  $('.sales-guide-image-control--btn--display').click(() => {
+    socket.emit('sales guide display from admin', { roomName });
+  });
+  // 판매가이드 숨기기
+  $('.sales-guide-image-control--btn--hide').click(() => {
+    socket.emit('sales guide hide from admin', { roomName });
+  });
+  // 판매가이드 이미지 인덱스 클릭시
+  $('.sales-guide-image--index-container > button').click((e) => {
+    const index = Number(e.currentTarget.value);
+    socket.emit('sales guide image index selected from admin', { roomName, index });
+  });
 });
 
 class LiveShoppingStateBoardController {
