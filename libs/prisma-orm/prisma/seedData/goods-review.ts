@@ -65,12 +65,10 @@ export const createGoodsReview = async (prisma: PrismaClient): Promise<void> => 
       images: {
         create: [
           {
-            imageUrl:
-              'https://k-kmarket.com/data/board/goods_review/761167a21b74945284840126978ac0611424122.jpg',
+            imageUrl: 'https://picsum.photos/id/102/300',
           },
           {
-            imageUrl:
-              'https://k-kmarket.com/data/board/goods_review/34a037a2d279dd8d52b0f36129b1220a1424202.jpg',
+            imageUrl: 'https://picsum.photos/id/1020/300',
           },
         ],
       },
@@ -119,12 +117,10 @@ o 이제 에어프라이어로 180도 10분!!
       images: {
         create: [
           {
-            imageUrl:
-              'https://k-kmarket.com/data/goods/1/2022/01/92_temp_16425790437819large.jpg',
+            imageUrl: 'https://picsum.photos/id/1023/300',
           },
           {
-            imageUrl:
-              'https://k-kmarket.com/data/goods/1/2022/01/92_temp_16425790495443large.jpg',
+            imageUrl: 'https://picsum.photos/id/1024/300',
           },
         ],
       },
