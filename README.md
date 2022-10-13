@@ -27,16 +27,17 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
    [Next.js](https://nextjs.org/)로 구성된 방송인센터 프론트엔드 서버입니다.
 6. [web-kkshow](./apps/web-kkshow/README.md)  
    [Next.js](https://nextjs.org/)로 구성된 크크쇼 & 크크마켓 프론트엔드 서버입니다.
-7. [admin]()  
+7. [admin](./apps/admin/README.md)  
    [Next.js](https://nextjs.org/)로 구성된 관리자센터 프론트엔드 서버입니다.
-8. [api-realtime]()  
+8. [api-realtime](./apps/api-realtime/README.md)  
    [Nest.js + Socket.io](https://docs.nestjs.com/websockets/gateways)로 구성된 WebScoket 서버입니다. 실시간 알림 소켓 연결과 라이브쇼핑 현황판 소켓 연결에 사용됩니다.
 9. [batch-inactive-handler](./apps/batch-inactive-handler/README.md)  
    [Nest.js](https://docs.nestjs.com/)로 구성된 크크쇼 유저 휴면계정 확인 및 처리
-10.[batch-virtual-account](./apps/batch-inactive-account/README.md) 
-   [Nest.js](https://docs.nestjs.com/)로 구성된 미입금 가상계좌 주문 취소처리 standalone 배치프로그램
-11.[mailer](./apps/mailer/README.md)  
-   [Nest.js](https://docs.nestjs.com/)로 구성된
+10. [batch-virtual-account](./apps/batch-inactive-account/README.md)  
+   [Nest.js](https://docs.nestjs.com/)로 구성된 미입금 가상계좌 주문 취소처리 standalone 배치프로그램 
+11. [mailer](./apps/mailer/README.md)  
+   [Nest.js](https://docs.nestjs.com/)로 구성된 마이크로서비스. 본인 인증을 위한 메일 발송 시 사용합니다
+
 
 
 ### Libs 목록
@@ -94,6 +95,31 @@ ex.
 
 - `yarn start api`
 - `yarn start web`
+
+### 상황 별 실행시켜야 하는 앱 (20221013 기준)
+1. 판매자센터 개발 시
+   - yarn start api
+   - yarn start web-seller
+   - yarn start mailer (판매자센터 회원가입 등 인증메일 발송이 필요한 경우)
+   - yarn start api-realtime(실시간 알림 관련 개발이 필요한 경우)
+2. 방송인센터 개발 시
+   - yarn start api
+   - yarn start web-broadcaster-center
+   - yarn start mailer (방송인센터 회원가입 등 인증메일 발송이 필요한 경우)
+   - yarn start api-realtime(실시간 알림, 방송인 현황판 관련 개발이 필요한 경우)
+3. 크크쇼(소비자) 개발 시
+   - yarn start api
+   - yarn start web-kkshow
+   - yarn start mailer (크크쇼 회원가입 등 인증메일 발송이 필요한 경우)
+4. 관리자센터 개발 시
+   - yarn start api
+   - yarn start admin
+   - yarn start api-realtime(실시간 알림 관련 개발이 필요한 경우)
+5. 오버레이, 오버레이 송출 컨트롤러 개발 시
+   - yarn start api
+   - yarn start api-realtime
+   - yarn start overlay
+   - yarn start overlay-controller
 
 ## 빌드
 
