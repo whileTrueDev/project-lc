@@ -1,6 +1,6 @@
 # components-web-kkshow
 
-This library was generated with [Nx](https://nx.dev).
+apps/web-kkshow (크크쇼) 에서 사용되는 컴포넌트 모음
 
 ## Running unit tests
 

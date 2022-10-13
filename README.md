@@ -158,11 +158,12 @@ App, Lib 별 더 자세한 내용은 해당 폴더의 README.md에 있습니다.
 - [apps/overlay](./apps/overlay/README.md)
 - [apps/overlay-controller](./apps/overlay-controller/README.md)
 - [apps/web](./apps/web/README.md)
-- [libs/components](./libs/components/README.md)
+- [libs/components-seller](./libs/components-seller/README.md)
 - [libs/hooks](./libs/hooks/README.md)
 - [libs/stores](./libs/stores/README.md)
 - [libs/prisma-orm](./libs/prisma-orm/README.md)
 - [libs/shared-types](./libs/shared-types/README.md)
+
 
 ## 브랜치 전략
 

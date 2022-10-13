@@ -1,6 +1,7 @@
 # components-layout
 
-This library was generated with [Nx](https://nx.dev).
+레이아웃 컴포넌트 모음
+
 
 ## Running unit tests
 

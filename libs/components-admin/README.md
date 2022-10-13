@@ -1,6 +1,6 @@
 # components-admin
 
-This library was generated with [Nx](https://nx.dev).
+apps/admin (관리자 페이지)에서 사용되는 컴포넌트 모음
 
 ## Running unit tests
 
