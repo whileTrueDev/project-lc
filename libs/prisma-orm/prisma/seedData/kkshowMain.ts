@@ -4,7 +4,7 @@ export const kkshowMainSeedData = {
   carousel: [
     {
       type: 'simpleBanner',
-      linkUrl: 'https://k-kmarket.com/goods/catalog?code=0012',
+      linkUrl: 'https://www.xn--hp4b17xa.com/goods/12',
       imageUrl:
         'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-main-carousel-images/1646985653016_배너이미지.jpeg',
       description: '크크쇼 3월 기획전',
@@ -34,10 +34,10 @@ export const kkshowMainSeedData = {
       videoUrl: 'chodan_',
       normalPrice: 39900,
       liveShoppingId: null,
-      productLinkUrl: 'https://k-kmarket.com/goods/view?no=144',
+      productLinkUrl: 'https://www.xn--hp4b17xa.com/goods/12',
       discountedPrice: 29900,
       productImageUrl:
-        'https://k-kmarket.com/data/goods/1/2022/01/_temp_16418020129358view.jpg',
+        'https://lc-project.s3.ap-northeast-2.amazonaws.com/goods/3533665%40naver.com/220708165548_%EB%8B%AD%EA%BC%AC%EC%B9%981.jpg',
       profileImageUrl:
         'https://static-cdn.jtvnw.net/jtv_user_pictures/2067380c-6c8f-4a4d-9f68-65c13572a59b-profile_image-70x70.png',
       broadcastEndDate: null,
@@ -52,10 +52,10 @@ export const kkshowMainSeedData = {
       videoUrl: 'vFv6ZUOEnAo',
       normalPrice: 20000,
       liveShoppingId: null,
-      productLinkUrl: 'https://k-kmarket.com/goods/view?no=180',
+      productLinkUrl: 'https://www.xn--hp4b17xa.com/goods/12',
       discountedPrice: 10000,
       productImageUrl:
-        'https://k-kmarket.com/data/goods/1/2021/12/_temp_16385033431082large.png',
+        'https://lc-project.s3.ap-northeast-2.amazonaws.com/goods/3533665%40naver.com/220708164922_%EC%96%91%EB%85%90+%EB%AC%B4%EB%BC%88%EB%8B%AD%EB%B0%9C2.jpg',
       profileImageUrl:
         'https://static-cdn.jtvnw.net/jtv_user_pictures/a27144c9-0c62-46e4-a7a8-9b51b394567a-profile_image-70x70.png',
       broadcastEndDate: null,
@@ -70,10 +70,10 @@ export const kkshowMainSeedData = {
       videoUrl: 'TutKdpA-JRw',
       normalPrice: 20000,
       liveShoppingId: null,
-      productLinkUrl: 'https://k-kmarket.com/goods/catalog?code=0012',
+      productLinkUrl: 'https://www.xn--hp4b17xa.com/goods/12',
       discountedPrice: 10000,
       productImageUrl:
-        'https://k-kmarket.com/data/goods/1/2022/02/_temp_16449174261446view.jpg',
+        'https://lc-project.s3.ap-northeast-2.amazonaws.com/goods/3533665%40naver.com/220708164922_%EC%96%91%EB%85%90+%EB%AC%B4%EB%BC%88%EB%8B%AD%EB%B0%9C2.jpg',
       profileImageUrl:
         'https://static-cdn.jtvnw.net/jtv_user_pictures/ec949373-7065-423c-afad-08f9504c8034-profile_image-150x150.png',
       broadcastEndDate: null,
@@ -88,7 +88,7 @@ export const kkshowMainSeedData = {
     imageUrl:
       'https://lc-project.s3.ap-northeast-2.amazonaws.com/live-shopping-images/undefined/trailer/1646985740614_민결희.jpeg',
     normalPrice: 19000,
-    productLinkUrl: 'https://k-kmarket.com/goods/view?no=181',
+    productLinkUrl: 'https://www.xn--hp4b17xa.com/goods/12',
     discountedPrice: 14900,
     liveShoppingName: '민결희 x 예스닭강정',
     broadcastStartDate: '2022-02-20T04:00:00.000Z',
@@ -150,21 +150,21 @@ export const kkshowMainSeedData = {
       broadcasterId: null,
       profileImageUrl:
         'https://static-cdn.jtvnw.net/jtv_user_pictures/2067380c-6c8f-4a4d-9f68-65c13572a59b-profile_image-150x150.png',
-      promotionPageLinkUrl: 'https://k-kmarket.com/goods/catalog?code=00160001',
+      promotionPageLinkUrl: 'https://www.xn--hp4b17xa.com/bc/1',
     },
     {
       nickname: '민결희',
       broadcasterId: null,
       profileImageUrl:
         'https://static-cdn.jtvnw.net/jtv_user_pictures/d156ff24-5b64-4ffa-83a8-1ecf0d1e71d2-profile_image-150x150.png',
-      promotionPageLinkUrl: 'https://k-kmarket.com/goods/catalog?code=00160003',
+      promotionPageLinkUrl: 'https://www.xn--hp4b17xa.com/bc/1',
     },
     {
       nickname: '나무늘봉순',
       broadcasterId: null,
       profileImageUrl:
         'https://static-cdn.jtvnw.net/jtv_user_pictures/5f179460-761b-404e-afc6-9ec9ea26df1a-profile_image-150x150.png',
-      promotionPageLinkUrl: 'https://k-kmarket.com/goods/catalog?code=00160002',
+      promotionPageLinkUrl: 'https://www.xn--hp4b17xa.com/bc/1',
     },
     {
       nickname: '신맛',

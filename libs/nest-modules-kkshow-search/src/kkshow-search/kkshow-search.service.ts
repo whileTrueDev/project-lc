@@ -156,17 +156,15 @@ export class KkshowSearchService {
   }
 
   /**
-   * 올바른 상품상세 링크 URL을 반환합니다. (Firstmall 사용하던 때의 상품 데이터의 경우 firstmall 링크를 반환)
-   * @param goods 검수 정ㅈ보가 포함된 상품 정보
+   * 올바른 상품상세 링크 URL을 반환합니다.
+   * (Firstmall 사용하던 때의 상품 데이터의 경우 firstmall 링크를 반환) => firstmall서비스 해지하여 firstmall 링크 반환 코드 삭제
+   * @param goods 검수 정보가 포함된 상품 정보
    * @returns 올바른 상품상세 링크 URL
    */
   private getGoodsLinkUrl = (goods: {
     id: number;
     confirmation?: { firstmallGoodsConnectionId?: number };
   }): string => {
-    if (goods.confirmation?.firstmallGoodsConnectionId) {
-      return `https://k-kmarket.com/goods/view?no=${goods.confirmation.firstmallGoodsConnectionId}`;
-    }
     return `${getKkshowWebHost()}/goods/${goods.id}`;
   };
 }
