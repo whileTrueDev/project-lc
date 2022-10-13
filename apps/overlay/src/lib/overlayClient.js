@@ -1031,10 +1031,67 @@ socket.on('play virtual video from server', () => {
   });
 });
 
-// socket.on('reset theme from server', () => {
-//   $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').removeClass(
-//     currentThemeType,
-//   );
-// });
+// 판매가이드 표시 이벤트
+function getSalesGuideImageUrl({ index }) {
+  const url = `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/sales-guide-image/${liveShoppingId}/sales-guide-image-${index}`;
+  return url;
+}
+socket.on('sales guide display from server', function displaySalesGuide() {
+  const salesGuideContainer = $('.sales-guide--container');
+  const HIDE_CLASS = 'hide';
+  if (salesGuideContainer.hasClass(HIDE_CLASS)) {
+    // 판매 가이드 이미지를 첫번째 url로 세팅
+    const url = getSalesGuideImageUrl({ index: 1 });
+    const image = new Image();
+    image.src = url;
+    // 이미지가 존재하면 표시
+    image.onload = () => {
+      const imageElem = $(image);
+      imageElem.addClass('sales-guide--image');
+      imageElem.appendTo(salesGuideContainer);
+      salesGuideContainer.fadeIn(500).removeClass(HIDE_CLASS);
+    };
+    // 이미지가 존재하지 않으면 표시하지 않음
+    image.onerror = () => {
+      console.error('image not exist');
+    };
+  }
+});
+
+// 판매가이드 숨기기 이벤트
+function hideSalesGuide() {
+  const salesGuideContainer = $('.sales-guide--container');
+  const HIDE_CLASS = 'hide';
+  if (!salesGuideContainer.hasClass(HIDE_CLASS)) {
+    salesGuideContainer.fadeOut(500, () => {
+      $('.sales-guide--image').remove();
+      salesGuideContainer.addClass(HIDE_CLASS);
+    });
+  }
+}
+socket.on('sales guide hide from server', hideSalesGuide);
+
+// 판매가이드 이미지 인덱스 선택 이벤트
+socket.on(
+  'sales guide image index selected from server',
+  function salesGuideImageIndexSelected({ index }) {
+    const salesImageElem = $('.sales-guide--image');
+    if (salesImageElem) {
+      let image = new Image();
+      const url = getSalesGuideImageUrl({ index, ext: 'png' });
+      image.src = url;
+      // 이미지가 존재하면 표시
+      image.onload = () => {
+        image = null;
+        salesImageElem.attr('src', url);
+      };
+      // 이미지가 존재하지 않으면 판매가이드 영역 숨김
+      image.onerror = (e) => {
+        console.error('image not exist', e);
+        hideSalesGuide();
+      };
+    }
+  },
+);
 
 export {};

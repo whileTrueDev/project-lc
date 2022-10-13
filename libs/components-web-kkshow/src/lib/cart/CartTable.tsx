@@ -1,6 +1,5 @@
 import { CheckCircleIcon, DeleteIcon } from '@chakra-ui/icons';
 import {
-  Avatar,
   Badge,
   Box,
   Button,
@@ -39,11 +38,10 @@ import {
   useIsThisGoodsNowOnLive,
   useLiveShoppingSpecialPriceListNowOnLiveByBroadcaster,
   useProductPromotions,
-  useResizedImage,
 } from '@project-lc/hooks';
 import { CartItemRes } from '@project-lc/shared-types';
 import { useCartStore } from '@project-lc/stores';
-import { getCartKey, getLocaleNumber } from '@project-lc/utils-frontend';
+import { getCartKey, getLocaleNumber, pushDataLayer } from '@project-lc/utils-frontend';
 import NextLink from 'next/link';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import shallow from 'zustand/shallow';
@@ -63,7 +61,36 @@ export function CartTable(): JSX.Element {
   // 카트 모두 비우기 핸들러
   const truncate = useCartTruncateMutation();
   const handleTruncate = async (): Promise<void> => {
-    await truncate.mutateAsync(undefined);
+    const removeFromCartPushDataLayer = (): void => {
+      const items = data?.flatMap((item) =>
+        item.options.map((opt) => ({
+          item_id: item.goods.id,
+          item_name: item.goods.goods_name,
+          affiliation: item.goods.seller.sellerShop?.shopName,
+          item_variant: opt.value,
+          price: Number(opt.discountPrice),
+          quantity: opt.quantity,
+        })),
+      );
+      const value = items
+        ?.map((item) => item.price * item.quantity)
+        .reduce((tot, cur) => tot + cur, 0);
+
+      // 해당 소비자의 모든 장바구니 상품 삭제한 이후
+      // ga4 전자상거래 remove_from_cart 이벤트 https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type=gtm#remove_from_cart
+      if (!!items && !!value) {
+        pushDataLayer({
+          event: 'remove_from_cart',
+          ecommerce: {
+            value,
+            currency: 'KRW',
+            items,
+          },
+        });
+      }
+    };
+
+    await truncate.mutateAsync(undefined).then(removeFromCartPushDataLayer);
   };
 
   // 최초 렌더링 체크
@@ -223,7 +250,30 @@ export function CartTableRow({
   // 카트 상품 삭제
   const deleteCartItem = useCartItemDeleteMutation();
   const handleCartItemDelete = (itemId: CartItemType['id']): void => {
-    deleteCartItem.mutateAsync(itemId);
+    const removeFromCartPushDataLayer = (): void => {
+      const items = cartItem.options.map((opt) => ({
+        item_id: cartItem.goods.id,
+        item_name: cartItem.goods.goods_name,
+        affiliation: cartItem.goods.seller.sellerShop?.shopName,
+        item_variant: opt.value,
+        price: Number(opt.discountPrice),
+        quantity: opt.quantity,
+      }));
+      const value = items
+        .map((item) => item.price * item.quantity)
+        .reduce((tot, cur) => tot + cur, 0);
+      // 카트테이블 특정 상품 삭제 이후
+      // ga4 전자상거래 remove_from_cart 이벤트 https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type=gtm#remove_from_cart
+      pushDataLayer({
+        event: 'remove_from_cart',
+        ecommerce: {
+          value,
+          currency: 'KRW',
+          items,
+        },
+      });
+    };
+    deleteCartItem.mutateAsync(itemId).then(removeFromCartPushDataLayer);
   };
 
   return (
@@ -275,7 +325,30 @@ export function CartItemListItem({ cartItem }: CartItemListItemProps): JSX.Eleme
   // 카트 상품 삭제
   const deleteCartItem = useCartItemDeleteMutation();
   const handleCartItemDelete = (itemId: CartItemType['id']): void => {
-    deleteCartItem.mutateAsync(itemId);
+    const removeFromCartPushDataLayer = (): void => {
+      const items = cartItem.options.map((opt) => ({
+        item_id: cartItem.goods.id,
+        item_name: cartItem.goods.goods_name,
+        affiliation: cartItem.goods.seller.sellerShop?.shopName,
+        item_variant: opt.value,
+        price: Number(opt.discountPrice),
+        quantity: opt.quantity,
+      }));
+      const value = items
+        .map((item) => item.price * item.quantity)
+        .reduce((tot, cur) => tot + cur, 0);
+      // 카트테이블 특정 상품 삭제 이후
+      // ga4 전자상거래 remove_from_cart 이벤트 https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type=gtm#remove_from_cart
+      pushDataLayer({
+        event: 'remove_from_cart',
+        ecommerce: {
+          value,
+          currency: 'KRW',
+          items,
+        },
+      });
+    };
+    deleteCartItem.mutateAsync(itemId).then(removeFromCartPushDataLayer);
   };
   return (
     <Box mt={4}>
@@ -362,7 +435,12 @@ export function CartItemDisplay({
 
           <Flex mt={2} gap={2} flexDir="column">
             {cartItem.options.map((opt, idx) => (
-              <CartTableRowOption key={opt.id} index={idx} option={opt} />
+              <CartTableRowOption
+                key={opt.id}
+                index={idx}
+                option={opt}
+                goods={cartItem.goods}
+              />
             ))}
 
             {nowAvailablePp && cartItem.support && cartItem.support.broadcaster && (
@@ -475,10 +553,12 @@ export function CartItemShopNameAndShippingCost({
 
 interface CartTableRowOptionProps {
   option: CartItemOption;
+  goods: CartItemRes[number]['goods'];
   index: number;
 }
 export function CartTableRowOption({
   option,
+  goods,
   index,
 }: CartTableRowOptionProps): JSX.Element {
   const toast = useToast();
@@ -498,13 +578,36 @@ export function CartTableRowOption({
     }
   }, [option.id, option.quantity, optionQuantity, toast]);
 
+  const items = useMemo(() => {
+    return {
+      item_id: goods.id,
+      item_name: goods.goods_name,
+      affiliation: goods.seller.sellerShop?.shopName,
+      item_variant: option.value,
+      price: Number(option.discountPrice),
+      quantity: option.quantity,
+    };
+  }, [goods, option]);
+  const value = useMemo(() => Number(option.discountPrice) * option.quantity, [option]);
   // 카트 상품 특정 옵션 삭제
   const deleteCartItemOpt = useCartItemOptDeleteMutation();
   const handleOptionDelete = useCallback(
     (optId: CartItemOptionType['id']): void => {
-      deleteCartItemOpt.mutateAsync(optId);
+      const removeFromCartDataPush = (): void => {
+        // 카트테이블 특정 옵션 삭제 이후
+        // ga4 전자상거래 remove_from_cart 이벤트 https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type=gtm#remove_from_cart
+        pushDataLayer({
+          event: 'remove_from_cart',
+          ecommerce: {
+            value,
+            currency: 'KRW',
+            items,
+          },
+        });
+      };
+      deleteCartItemOpt.mutateAsync(optId).then(removeFromCartDataPush);
     },
-    [deleteCartItemOpt],
+    [deleteCartItemOpt, items, value],
   );
 
   const optionButtons = useMemo(

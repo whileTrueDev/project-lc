@@ -317,4 +317,33 @@ export class OverlayScreenGateway
   playVirtualVideo(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('play virtual video from server');
   }
+
+  // 판매가이드 영역 표시
+  @SubscribeMessage('sales guide display from admin')
+  async displaySalesGuide(
+    @MessageBody()
+    { roomName }: { roomName: string },
+  ): Promise<void> {
+    this.server.to(roomName).emit('sales guide display from server');
+  }
+
+  // 판매가이드 영역 숨기기
+  @SubscribeMessage('sales guide hide from admin')
+  async hideSalesGuide(
+    @MessageBody()
+    { roomName }: { roomName: string },
+  ): Promise<void> {
+    this.server.to(roomName).emit('sales guide hide from server');
+  }
+
+  // 판매가이드 이미지 인덱스 선택
+  @SubscribeMessage('sales guide image index selected from admin')
+  async salesGuideImageIndexSelected(
+    @MessageBody()
+    { roomName, index }: { roomName: string; index: number },
+  ): Promise<void> {
+    this.server
+      .to(roomName)
+      .emit('sales guide image index selected from server', { index });
+  }
 }

@@ -1011,3 +1011,23 @@ span.objective-value {
     transform: translateY(-5px)
   }
 }
+
+
+/* 판매가이드 이미지 */
+.sales-guide--container {
+  position: fixed;
+  width: 600px;
+  height: 550px;
+  top: 119px;
+  right: 15px;
+}
+.sales-guide--container.hide {
+  display: none;
+}
+.sales-guide--image {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 600px;
+  height: 550px;
+}

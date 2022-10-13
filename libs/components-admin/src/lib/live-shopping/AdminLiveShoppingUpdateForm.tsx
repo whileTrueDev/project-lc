@@ -26,6 +26,7 @@ import { AdminOverlayImageUploadDialog } from '../AdminOverlayImageUploadDialog'
 import BroadcasterAutocomplete from '../BroadcasterAutocomplete';
 import LiveShoppingDatePicker from '../LiveShoppingDatePicker';
 import LiveShoppingProgressSelector from '../LiveShoppingProgressSelector';
+import AdminLiveShoppingSalesGuideImageUploadDialog from './AdminLiveShoppingSalesGuideImageUploadDialog';
 
 export type LiveShoppingFormData = Omit<LiveShoppingUpdateDTO, 'id'>;
 
@@ -59,6 +60,7 @@ export function AdminLiveShoppingUpdateForm({
     onOpen: imageDialogOnOpen,
     onClose: imageDialogOnClose,
   } = useDisclosure();
+  const salesGuideDialog = useDisclosure();
   const onClose = (): void => {
     setIsOpen(false);
   };
@@ -218,6 +220,9 @@ export function AdminLiveShoppingUpdateForm({
         >
           오버레이 이미지 등록
         </Button>
+        <Button rightIcon={<EditIcon />} onClick={salesGuideDialog.onOpen}>
+          판매가이드 이미지 등록
+        </Button>
       </Stack>
 
       <AdminLiveShoppingUpdateConfirmModal
@@ -233,6 +238,11 @@ export function AdminLiveShoppingUpdateForm({
           liveShoppingId={liveShopping.id}
         />
       )}
+      <AdminLiveShoppingSalesGuideImageUploadDialog
+        isOpen={salesGuideDialog.isOpen}
+        onClose={salesGuideDialog.onClose}
+        liveShoppingId={liveShopping.id}
+      />
     </FormProvider>
   );
 }

@@ -55,7 +55,11 @@ import {
 } from '@project-lc/shared-types';
 import { useGoodsViewStore, useKkshowOrderStore } from '@project-lc/stores';
 import { getKkshowWebHost } from '@project-lc/utils';
-import { checkGoodsPurchasable, getLocaleNumber } from '@project-lc/utils-frontend';
+import {
+  checkGoodsPurchasable,
+  getLocaleNumber,
+  pushDataLayer,
+} from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GoGift } from 'react-icons/go';
@@ -629,7 +633,31 @@ function GoodsViewButtonSet({
         ) {
           nicknameMutation.mutateAsync({ nickname: supportNickname });
         }
+        // 장바구니 담기 성공 후
+        // 장바구니로 이동 다이얼로그 열기
         cartDoneDialog.onOpen();
+
+        // add_to_cart 이벤트로 전송할 items 배열
+        const items = selectedOpts.map((opt) => ({
+          item_id: goods.id,
+          item_name: goods.goods_name,
+          affiliation: goods.seller.sellerShop?.shopName,
+          item_category: goods.categories[0].name,
+          item_variant: opt.option1,
+          price: Number(opt.price),
+          quantity: opt.quantity,
+        }));
+        // ga4 전자상거래 장바구니 데이터 담기 이벤트 add_to_cart https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type=gtm#add_to_cart
+        pushDataLayer({
+          event: 'add_to_cart',
+          ecommerce: {
+            items,
+            currency: 'KRW',
+            value: selectedOpts
+              .map((o) => Number(o.price) * o.quantity)
+              .reduce((total, cur) => total + cur, 0),
+          },
+        });
       })
       .catch(() => {
         toast({
@@ -639,10 +667,7 @@ function GoodsViewButtonSet({
       });
   }, [
     executePurchaseCheck,
-    goods.LiveShopping,
-    goods.productPromotion,
-    goods.id,
-    goods.shippingGroupId,
+    goods,
     createCartItem,
     selectedOpts,
     sellType,
