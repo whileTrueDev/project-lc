@@ -217,7 +217,9 @@ $(document).ready(function ready() {
   });
 
   $('.socket-id-button').click(function socketIdButtonClickEvent() {
-    liveShoppingId = $(this).closest('tr').children('td.liveshopping-id-cell').attr('id');
+    liveShoppingId = Number(
+      $(this).closest('tr').children('td.liveshopping-id-cell').attr('id'),
+    );
     streamerNickname = $(this).closest('tr').prop('id');
     const url = $(this).closest('tr').children('td.url-cell').attr('id');
     email = $(this).closest('tr').children('td.email-cell').attr('id');
@@ -690,6 +692,7 @@ $(document).ready(function ready() {
             nickname: customerNickname,
             message: customerMessage,
             ttsSetting,
+            liveShoppingId,
           });
         } else {
           socket.emit('get non client purchase message from admin', {

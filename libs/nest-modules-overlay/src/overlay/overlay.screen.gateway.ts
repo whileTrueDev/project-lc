@@ -55,9 +55,15 @@ export class OverlayScreenGateway
 
   // 랭킹 복구
   @SubscribeMessage('get ranking')
-  async getRanking(@MessageBody() roomName: string): Promise<void> {
+  async getRanking(
+    @MessageBody()
+    { roomName, liveShoppingId }: { roomName: string; liveShoppingId: number },
+  ): Promise<void> {
     const nicknameAndPrice = [];
-    const rankings = await this.overlayService.getRanking(roomName);
+    const rankings = await this.overlayService.getRanking({
+      overlayUrl: roomName,
+      liveShoppingId,
+    });
     rankings.forEach((eachNickname) => {
       const price = Object.values(eachNickname._sum).toString();
       const { nickname } = eachNickname;
@@ -72,10 +78,16 @@ export class OverlayScreenGateway
 
   // 전체 데이터 복구
   @SubscribeMessage('get all data')
-  async getAllPurchaseMessage(@MessageBody() roomName: string): Promise<void> {
+  async getAllPurchaseMessage(
+    @MessageBody()
+    { roomName, liveShoppingId }: { roomName: string; liveShoppingId: number },
+  ): Promise<void> {
     const nicknameAndPrice = [];
     const bottomAreaTextAndNickname: string[] = [];
-    const rankings = await this.overlayService.getRanking(roomName);
+    const rankings = await this.overlayService.getRanking({
+      overlayUrl: roomName,
+      liveShoppingId,
+    });
     // const totalSold = await this.overlayService.getTotalSoldPrice();
     const messageAndNickname = await this.overlayService.getMessageAndNickname(roomName);
 
