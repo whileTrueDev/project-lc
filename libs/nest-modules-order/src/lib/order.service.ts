@@ -349,6 +349,7 @@ export class OrderService {
       ordererEmail: orderDto.ordererEmail,
       memo: orderDto.memo,
       cashReceipts: orderDto.cashReceipts,
+      nonMemberOrderFlag,
     };
 
     // 선물하기의 경우(주문상품은 1개, 후원데이터가 존재함)
@@ -497,7 +498,7 @@ export class OrderService {
     // 구매 메시지 송출 요청
     purchaseData.forEach((data) => {
       this.logger.debug(
-        `구매 메시지 송출 이벤트 트리거 API -> Overlay - ${data.roomName} - ${data.productName} ${data.nickname}::${data.message}`,
+        `구매 메시지 송출 이벤트 트리거 API -> Overlay - ${data.roomName} (liveShoppingId: ${data.liveShoppingId}) - ${data.productName} ${data.nickname}::${data.message}`,
       );
       this.microService.emit<void, PurchaseMessage>(
         'liveshopping:overlay:purchase-msg',
