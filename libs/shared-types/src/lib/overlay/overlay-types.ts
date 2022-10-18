@@ -63,6 +63,8 @@ export interface PurchaseMessage {
   simpleMessageFlag?: boolean;
   /** 선물 구매 여부 */
   giftFlag?: boolean;
+  /** 라이브쇼핑 id */
+  liveShoppingId: number;
 }
 /** 시청자 닉네임과 닉네임별 구매금액 총액 */
 export interface NicknameAndPrice {
