@@ -396,7 +396,7 @@ $(document).ready(function ready() {
   });
 
   $('#data-send-all').click(function dataSendAllButtonClickEvent() {
-    socket.emit('get all data', roomName);
+    socket.emit('get all data', { roomName, liveShoppingId });
   });
 
   $('.message-box-lock-button').click(function messageBoxLockButtonClickEvent() {
