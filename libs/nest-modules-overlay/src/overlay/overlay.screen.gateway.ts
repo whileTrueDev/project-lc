@@ -89,7 +89,10 @@ export class OverlayScreenGateway
       liveShoppingId,
     });
     // const totalSold = await this.overlayService.getTotalSoldPrice();
-    const messageAndNickname = await this.overlayService.getMessageAndNickname(roomName);
+    const messageAndNickname = await this.overlayService.getMessageAndNickname({
+      overlayUrl: roomName,
+      liveShoppingId: Number(liveShoppingId),
+    });
 
     rankings.forEach((eachNickname) => {
       const price = Object.values(eachNickname._sum).toString();

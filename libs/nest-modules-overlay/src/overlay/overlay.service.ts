@@ -303,7 +303,13 @@ export class OverlayService {
   }
 
   // 닉네임과 메세지 (하단띠배너에 사용)
-  async getMessageAndNickname(overlayUrl: string): Promise<NicknameAndText[]> {
+  async getMessageAndNickname({
+    liveShoppingId,
+    overlayUrl,
+  }: {
+    liveShoppingId: number;
+    overlayUrl: string;
+  }): Promise<NicknameAndText[]> {
     const messageAndNickname = await this.prisma.liveShoppingPurchaseMessage.findMany({
       select: {
         nickname: true,
@@ -313,6 +319,7 @@ export class OverlayService {
         broadcaster: {
           overlayUrl: { contains: overlayUrl },
         },
+        liveShoppingId,
         loginFlag: true,
       },
     });
