@@ -930,7 +930,7 @@ socket.on('change theme from server', ({ themeType, themeData }) => {
   logo.show();
   liveCommerceFrame.css('background', '');
   areas.css('background-color', 'rgba(0, 0, 0, 0.5)').css('color', '#ffffff');
-  rankingTitleText.css('color', '#ffd200').css('text-shadow', '5px 5px 10px #000');
+  rankingTitleText.css('color', '#ffd200').css('text-shadow', '5px 5px 10px #000000');
   podiumIcon.attr('src', '/images/podium.png');
   timerIcon.attr('src', '/images/clock.png');
 
