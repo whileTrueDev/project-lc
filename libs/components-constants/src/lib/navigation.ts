@@ -1,3 +1,4 @@
+import { getKkshowWebHost } from '@project-lc/utils';
 import {
   AiOutlineContainer,
   AiOutlineHome,
@@ -51,7 +52,7 @@ export const mainNavItems: Array<NavItem> = [
   },
   {
     label: '크크마켓',
-    href: 'https://k-kmarket.com/',
+    href: `${getKkshowWebHost()}/shopping`,
     isExternal: true,
   },
 ];

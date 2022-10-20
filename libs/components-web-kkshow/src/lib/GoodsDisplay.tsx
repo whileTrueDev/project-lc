@@ -164,7 +164,7 @@ export function GoodsDisplay({
 
   return (
     <NextLink href={goods.linkUrl}>
-      <Box cursor="pointer" onMouseEnter={on} onMouseLeave={off}>
+      <Box cursor="pointer" onMouseEnter={on} onMouseLeave={off} width="100%">
         <GoodsDisplayImage
           alt={goods.name}
           src={goods.imageUrl}

@@ -1,6 +1,7 @@
 # components-shared
 
-This library was generated with [Nx](https://nx.dev).
+apps/admin, apps/web-kkshow, apps/web-broadcaster-center, apps/web-seller 등 여러 app에 걸쳐 공통으로 사용되는 컴포넌트 모음
+
 
 ## Running unit tests
 

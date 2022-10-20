@@ -127,13 +127,15 @@ export class OverlayService {
       productName,
       message,
       nickname: _nickname,
+      liveShoppingId,
     } = purchase;
     this.logger.debug(
-      `Purchase Message - ${overlayUrl} - ${productName} ${_nickname}::${message}`,
+      `Purchase Message - ${overlayUrl} (liveShoppingId : ${liveShoppingId}) - ${productName} ${_nickname}::${message}`,
     );
     // 하단 띠배너 응원메세지 띄울 때 사용
     // const bottomAreaTextAndNickname: string[] = [];
-    const rankings = await this.getRanking(overlayUrl);
+    const rankings = await this.getRanking({ overlayUrl, liveShoppingId });
+
     const nicknameAndPrice = rankings
       .map(({ nickname, _sum: { price } }) => ({ nickname, price }))
       .sort((a, b) => b.price - a.price);
@@ -265,13 +267,20 @@ export class OverlayService {
   }
 
   // 랭킹 받아오기
-  async getRanking(overlayUrl: string): Promise<NicknameAndPrice[]> {
+  async getRanking({
+    overlayUrl,
+    liveShoppingId,
+  }: {
+    overlayUrl: string;
+    liveShoppingId: number;
+  }): Promise<NicknameAndPrice[]> {
     const topRanks = await this.prisma.liveShoppingPurchaseMessage.groupBy({
       by: ['nickname'],
       where: {
         broadcaster: {
           overlayUrl: { contains: overlayUrl },
         },
+        liveShoppingId: Number(liveShoppingId),
         loginFlag: true,
       },
       _sum: {
@@ -294,7 +303,13 @@ export class OverlayService {
   }
 
   // 닉네임과 메세지 (하단띠배너에 사용)
-  async getMessageAndNickname(overlayUrl: string): Promise<NicknameAndText[]> {
+  async getMessageAndNickname({
+    liveShoppingId,
+    overlayUrl,
+  }: {
+    liveShoppingId: number;
+    overlayUrl: string;
+  }): Promise<NicknameAndText[]> {
     const messageAndNickname = await this.prisma.liveShoppingPurchaseMessage.findMany({
       select: {
         nickname: true,
@@ -304,6 +319,7 @@ export class OverlayService {
         broadcaster: {
           overlayUrl: { contains: overlayUrl },
         },
+        liveShoppingId,
         loginFlag: true,
       },
     });
