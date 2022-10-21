@@ -50,11 +50,13 @@ export function Index(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const broadcasterContacts = useBroadcasterContacts(broadcasterProfileData?.id);
 
-  const 기본연락처존재여부 = useMemo<boolean>(() => {
+  // 기본연락처존재여부
+  const isDefaultContactExist = useMemo<boolean>(() => {
     return broadcasterContacts.data?.length !== 0;
   }, [broadcasterContacts]);
 
-  const 기본연락처 = useMemo<{
+  // 표시할 연락처 - 기본연락처 데이터가 없으면 미등록 리턴
+  const displayContactData = useMemo<{
     phoneNumber: string;
     email: string;
   }>(() => {
@@ -71,21 +73,20 @@ export function Index(): JSX.Element {
       email: '미등록',
     };
   }, [broadcasterContacts]);
+
   // 기본 연락처 부재시에 시작가이드 실행영역
   useEffect(() => {
-    if (!기본연락처존재여부) {
-      onOpen();
-    }
-  }, [onOpen, 기본연락처존재여부]);
+    if (!isDefaultContactExist) onOpen();
+  }, [onOpen, isDefaultContactExist]);
 
   return (
     <MypageLayout appType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
       <Container maxW="7xl" p={[1, 6, 6, 6]}>
         {/* 방송인 기본 정보 영역 */}
-        {기본연락처존재여부 ? (
+        {isDefaultContactExist ? (
           <Grid m={2} templateColumns="1fr">
             <GridItem colSpan={{ base: 2, xl: 1 }}>
-              <BroadcasterStatusSection status={기본연락처} />
+              <BroadcasterStatusSection status={displayContactData} />
             </GridItem>
           </Grid>
         ) : (
