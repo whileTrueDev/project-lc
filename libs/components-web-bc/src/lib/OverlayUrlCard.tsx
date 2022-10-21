@@ -72,7 +72,7 @@ export function OverlayUrlCard(): JSX.Element {
 
   return (
     <UrlCard
-      label="라이브 쇼핑 화면 URL"
+      label="라이브 쇼핑 오버레이 화면 URL"
       inputValue={
         profileData?.agreementFlag ? overlayUrlValue : '이용 동의가 필요합니다.'
       }

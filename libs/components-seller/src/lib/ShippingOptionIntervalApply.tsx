@@ -192,7 +192,7 @@ export function ShippingOptionIntervalApply({
                     },
                   })}
                 />
-                <Text>{suffix}</Text>
+                <Text>원</Text>
               </Stack>
             </FormControl>
           </Stack>
