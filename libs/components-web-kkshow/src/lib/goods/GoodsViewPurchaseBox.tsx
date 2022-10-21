@@ -360,6 +360,10 @@ function GoodsViewBroadcasterSupportBox({
   const router = useRouter();
   const bcFromPromotionPage = router.query.bc as string;
   useEffect(() => {
+    // 방송인페이지로부터 접속된 것이 아니면 기본적으로 후원방송인은 선택하지 않는다
+    if (!bcFromPromotionPage) {
+      handleSelectBc(null);
+    }
     if (relatedBroadcasters && bcFromPromotionPage) {
       const broadcaster = relatedBroadcasters.find(
         (b) => b.id === Number(bcFromPromotionPage),
