@@ -742,10 +742,10 @@
     "@aws-sdk/types" "3.55.0"
     tslib "^2.3.1"
 
-"@aws-sdk/types@3.190.0":
-  version "3.190.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/types/-/types-3.190.0.tgz#ef22549c81ea6a7dd2c57e5869e787fea40c4434"
-  integrity sha512-mkeZ+vJZzElP6OdRXvuLKWHSlDQxZP9u8BjQB9N0Rw0pCXTzYS0vzIhN1pL0uddWp5fMrIE68snto9xNR6BQuA==
+"@aws-sdk/types@3.193.0":
+  version "3.193.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/types/-/types-3.193.0.tgz#a2079ccda7312c7ba535b4379c97980141948fd9"
+  integrity sha512-LV/wcPolRZKORrcHwkH59QMCkiDR5sM+9ZtuTxvyUGG2QFW/kjoxs08fUF10OWNJMrotBI+czDc5QJRgN8BlAw==
 
 "@aws-sdk/types@3.55.0", "@aws-sdk/types@^3.1.0":
   version "3.55.0"
@@ -844,12 +844,12 @@
     "@aws-sdk/types" "3.55.0"
     tslib "^2.3.1"
 
-"@aws-sdk/util-endpoints@^3.192.0":
-  version "3.192.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/util-endpoints/-/util-endpoints-3.192.0.tgz#64474f877ba2dc54d0efbe2a862975ae790f4319"
-  integrity sha512-HaHCt3gpY9yjCqts06Hwy857U9Z01OW3Wv1JDYK5tp6BxeTcqvNW0rVqKr3zr1yE4B8s+6nNIlxr3VZ5cZXyEg==
+"@aws-sdk/util-endpoints@^3.193.0":
+  version "3.193.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/util-endpoints/-/util-endpoints-3.193.0.tgz#2783430fe22a534f668ad1e60108b5d0747e55a6"
+  integrity sha512-DiYqsNM7CpZPsMlQgoulbZ21IgvLvUaVnybyZDKEctWrtHJyIajK4a0eDOAmNCQ/urzIGQNvXl7I0kKx2DYMWg==
   dependencies:
-    "@aws-sdk/types" "3.190.0"
+    "@aws-sdk/types" "3.193.0"
     tslib "^2.3.1"
 
 "@aws-sdk/util-format-url@3.58.0":
