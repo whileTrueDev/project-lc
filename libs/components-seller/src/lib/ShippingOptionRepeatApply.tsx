@@ -225,7 +225,7 @@ export function ShippingOptionRepeatApply({
             </FormControlInputWrapper>
           </Stack>
           <ResponsiveDivider />
-          <CostInputWrapper id="firstCost" suffix={suffix}>
+          <CostInputWrapper id="firstCost" suffix="원">
             <Input
               type="number"
               max={MAX_COST}
@@ -267,7 +267,7 @@ export function ShippingOptionRepeatApply({
             </FormControlInputWrapper>
           </Stack>
           <ResponsiveDivider />
-          <CostInputWrapper id="secondCost" suffix={suffix}>
+          <CostInputWrapper id="secondCost" suffix="원">
             <Input
               type="number"
               max={MAX_COST}
