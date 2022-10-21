@@ -184,12 +184,22 @@ export function GoodsViewPurchaseBox({
       goods.options.length === 1 && goods.options.every((x) => x.default_option === 'y'),
     [goods.options],
   );
-  // 기본 옵션 1개만 존재하는 경우 기본 선택되도록
+
   useEffect(() => {
+    // 이전에 선택된 옵션이 존재하는 경우(다른 상품 페이지에서 옵션을 선택했던 경우), 현재 보고있는 상품의 옵션이 아니면 삭제
+    if (selectedOpts.length !== 0) {
+      const otherGoodsSelectedOpts = selectedOpts.filter(
+        (opt) => opt.goodsId !== goods.id,
+      );
+      otherGoodsSelectedOpts.forEach((otherGoodsOpt) =>
+        handleRemoveOpt(otherGoodsOpt.id),
+      );
+    }
+    // 기본 옵션 1개만 존재하는 경우 기본 선택되도록
     if (isOnlyDefaultOption && selectedOpts.length === 0) {
       handleSelectOpt({ ...goods.options[0], quantity: 1 });
     }
-  }, [goods.options, handleSelectOpt, isOnlyDefaultOption, selectedOpts.length]);
+  }, [goods, handleSelectOpt, isOnlyDefaultOption, handleRemoveOpt, selectedOpts]);
 
   return (
     <Grid templateColumns="1fr 2fr" mt={{ base: 2, md: 6 }} gridRowGap={2} maxH="75vh">
