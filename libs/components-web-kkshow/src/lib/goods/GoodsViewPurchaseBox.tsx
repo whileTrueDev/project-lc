@@ -834,15 +834,16 @@ function GoodsViewButtonSet({
         {/* 방송인에게 선물 버튼 */}
         {selectedBc && (
           <Tooltip label="방송인에게 선물하기">
-            <IconButton
-              aria-label="방송인에게 선물하기 버튼"
+            <Button
+              isFullWidth
+              leftIcon={<GoGift />}
               size={buttonSize}
-              icon={<GoGift />}
-              colorScheme="facebook"
+              colorScheme="pink"
               isDisabled={goods.goods_status !== 'normal'}
-              variant="outline"
               onClick={() => handleOrderClick('gift')}
-            />
+            >
+              선물하기
+            </Button>
           </Tooltip>
         )}
         <Button
