@@ -113,7 +113,13 @@ export function ExportManyDialog({
     const dto: CreateKkshowExportDto[] = [];
     selectedKeys.forEach((k) => {
       const data = formData[Number(k)];
-      const realData = { ...data, items: data.items.filter((x) => !!x.quantity) };
+      const sellerId = orders.find((o) => o.id === data.orderId)?.orderItems[0]?.goods
+        ?.sellerId;
+      const realData = {
+        ...data,
+        items: data.items.filter((x) => !!x.quantity),
+        sellerId,
+      };
       dto.push(realData);
     });
     const realDto = dto.filter((d) =>
