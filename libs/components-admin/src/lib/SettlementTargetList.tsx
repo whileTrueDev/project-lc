@@ -67,7 +67,7 @@ export function SettlementTargetList(): JSX.Element | null {
       {
         header: '판매자명',
         render: (target: SellerSettlementTarget) => (
-          <Td w="100px">{target.seller.sellerShop.shopName}</Td>
+          <Td w="100px">{target?.seller?.sellerShop?.shopName}</Td>
         ),
       },
       {
@@ -117,8 +117,8 @@ export function SettlementTargetList(): JSX.Element | null {
       {
         header: '정산계좌',
         render: (target: SellerSettlementTarget) => {
-          if (!target.seller.sellerSettlementAccount) return <Td>등록안함</Td>;
-          return <Td>{target.seller.sellerSettlementAccount?.[0].bank}</Td>;
+          if (!target?.seller?.sellerSettlementAccount) return <Td>등록안함</Td>;
+          return <Td>{target?.seller?.sellerSettlementAccount?.[0].bank}</Td>;
         },
       },
       {
@@ -215,8 +215,8 @@ function SettlementItemInfoDialog({
   const executeDialog = useDisclosure();
 
   const isAbleToSettle =
-    (selectedSettleItem.seller.sellerSettlementAccount || []).length > 0
-      ? !!selectedSettleItem.seller.sellerSettlementAccount?.[0]
+    (selectedSettleItem?.seller?.sellerSettlementAccount || []).length > 0
+      ? !!selectedSettleItem?.seller?.sellerSettlementAccount?.[0]
       : false;
 
   const [round, setRound] = useState<'1' | '2'>('1');
@@ -226,11 +226,11 @@ function SettlementItemInfoDialog({
 
   const executeSettlement = useCreateSettlementMutation();
   const onConfirm = async (): Promise<void> => {
-    if (!selectedSettleItem.sellerId) return undefined;
+    if (!selectedSettleItem?.sellerId) return undefined;
     if (!selectedSettleItem.exportCode) return undefined;
     return executeSettlement
       .mutateAsync({
-        sellerId: selectedSettleItem.sellerId,
+        sellerId: selectedSettleItem?.sellerId,
         round,
         buyer: selectedSettleItem.order.ordererName,
         recipient: selectedSettleItem.order.recipientName,
@@ -375,8 +375,8 @@ function SettlementItemOptionDetail({
 
   // 정산 정보를 등록했는 지 여부
   const isAbleToSettle =
-    (settlementTarget.seller.sellerSettlementAccount || []).length > 0
-      ? !!settlementTarget.seller.sellerSettlementAccount?.[0]
+    (settlementTarget?.seller?.sellerSettlementAccount || []).length > 0
+      ? !!settlementTarget?.seller?.sellerSettlementAccount?.[0]
       : false;
 
   // 판매 유형
@@ -505,10 +505,11 @@ function SettlementItemOptionDetail({
       <GridItem>판매자</GridItem>
       <GridItem>
         <Box>
-          <Text>{settlementTarget.seller?.email}</Text>
-          <Text>{settlementTarget.seller?.name}</Text>
-          <Text>{settlementTarget.seller?.sellerShop?.shopName}</Text>
+          <Text>{settlementTarget?.seller?.email}</Text>
+          <Text>{settlementTarget?.seller?.name}</Text>
+          <Text>{settlementTarget?.seller?.sellerShop?.shopName}</Text>
         </Box>
+        ?
       </GridItem>
 
       <GridItem>판매자 정산정보</GridItem>
