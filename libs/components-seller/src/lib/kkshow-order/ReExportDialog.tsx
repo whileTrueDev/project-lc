@@ -94,8 +94,14 @@ export function ReExportDialog({
   const exportOrder = useExportOrderMutation();
 
   const processReExport = (data: ReExportData): void => {
+    // 출고처리할 상품의 판매자id 조회 => export.sellerId로 저장
+    const itemIds = data.items.map((i) => i.orderItemId);
+    const sellerId = order.orderItems.find((oi) => itemIds.includes(oi.id))?.goods
+      ?.sellerId;
+
     const dto = {
       ...data,
+      sellerId,
       exchangeExportedFlag: true, // 재출고 처리
       exchangeId: exchangeData.id, // 재출고와 연결할 교환요청 고유번호
     };
