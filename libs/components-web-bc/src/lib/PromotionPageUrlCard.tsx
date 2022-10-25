@@ -119,15 +119,21 @@ export function PromotionPageUrlInformationModal({
       <Modal isOpen={isOpen} onClose={onClose} size="3xl" blockScrollOnMount>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>상품 홍보 페이지란?</ModalHeader>
+          <ModalHeader textAlign="center">상품 홍보 페이지란?</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={10}>
-              <Text>
-                해당 페이지에서 판매가 발생하면 일정 수수료가 지급됩니다. <br />팬
-                여러분들이 볼 수 있는 공간 (방송국 정보란, 개인 SNS 등)에 해당 URL을
-                게시하고 상품을 홍보해보세요!
-              </Text>
+              <Box textAlign="center">
+                <Text>
+                  해당 페이지에서 홍보중인 상품으로 접속하여 판매가 발생하면 <br />
+                  방송인 분들께 일정 수수료가 지급됩니다.
+                </Text>
+                <Text>
+                  팬 여러분들이 볼 수 있는 공간 (방송국 정보란, 개인 SNS 등)에 <br /> 상품
+                  홍보 페이지URL을 게시하고 상품을 홍보해보세요!
+                </Text>
+              </Box>
+
               <Box pos="relative" w="100%" h="600px">
                 <ChakraNextImage
                   layout="fill"
@@ -135,7 +141,6 @@ export function PromotionPageUrlInformationModal({
                   src={`${BASE_BANNER_IMAGE_S3_PATH}promotion-page-example.png`}
                 />
               </Box>
-
               <Box>
                 <Text fontWeight="bold" mb={4}>
                   기본 이미지(사용할 이미지가 없으시면 사용해주세요)
