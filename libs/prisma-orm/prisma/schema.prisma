@@ -418,7 +418,7 @@ enum SellType {
 }
 
 // ****************************
-// 배송비 정책 테이블 - fm_shipping_grouping 참고
+// 배송비 정책 테이블 
 model ShippingGroup {
   id                      Int                @id @default(autoincrement())
   seller                  Seller             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
@@ -447,7 +447,7 @@ enum ShippingCalculType {
 }
 
 // ****************************
-// 배송 설정 테이블 - fm_shipping_set 참고
+// 배송 설정 테이블
 model ShippingSet {
   id                  Int                @id @default(autoincrement())
   shippingOptions     ShippingOption[] // 배송설정에 포함된 배송옵션들
@@ -489,7 +489,13 @@ enum DeliveryNation {
   global // 해외
 }
 
-// 배송 옵션 테이블 fm_shipping_option 참고
+// 배송 옵션 테이블
+// section_st, section_ed 값은 shipping_opt_type에 따라 다른 의미를 가진다
+// * shipping_opt_type값이 xxx_rep(구간반복)인 경우
+//     - 반드시 쌍을 이루는(=shipping_opt_type이 xxx_rep인) ShippingOption데이터가 존재한다
+//     - 쌍을 이루는 데이터 중 section_st값이 작은쪽이 첫번째 옵션이다
+//     - 첫번째 옵션의 section_st는 ~원(개)이상, section_ed는 ~원(개)"미만" 의미
+//     - 두번째 옵션의 section_st는 ~원(개)이상, section_ed는 ~원(개)"마다" 의미
 model ShippingOption {
   id                Int                @id @default(autoincrement())
   shippingCost      ShippingCost[] // 배송옵션에 해당하는 배송금액
@@ -499,7 +505,7 @@ model ShippingOption {
   shipping_set_type ShippingSetType    @default(std) // 배송옵션 타입 std - 기본 / add - 추가
   shipping_opt_type ShippingOptType    @default(free) //'배송옵션 타입 free - 무료 / fixed - 고정 / amount - 금액 / cnt - 수량 / weight - 무게',
   default_yn        YesOrNo_UPPERCASE? @default(N) // 기본 옵션인지 여부
-  section_st        Float? // 시작구간(무게, 금액, 수량)
+  section_st        Float? // 시작구간(무게, 금액, 수량) shipping_opt_type에 따라 다른 의미를 가진다
   section_ed        Float? // 끝구간(무게, 금액, 수량)
 }
 
@@ -521,14 +527,14 @@ enum ShippingOptType {
   weight_rep // 무게(구간반복)
 }
 
-// 배송비 금액 테이블 fm_shipping_cost 참고,
+// 배송비 금액 테이블 
 // 배송지역 상세 부분 구현하지 못하여 배송비 금액테이블 부분에 배송지역 추가함
 model ShippingCost {
   id                 Int            @id @default(autoincrement())
   shippingOption     ShippingOption @relation(fields: [shipping_opt_seq], references: [id], onDelete: Cascade)
   shipping_opt_seq   Int
   shipping_cost      Decimal?       @db.Decimal(11, 2) // 해당 지역에 부과되는 배송비 금액
-  shipping_area_name String         @db.VarChar(255) // '지역명',
+  shipping_area_name String         @db.VarChar(255) // '지역명' - 대한민국, 혹은 시도단위
 }
 
 // -------------------------------------------------
@@ -733,7 +739,7 @@ model LiveShopping {
   requests                    String?                       @db.LongText // 요청사항
   progress                    LiveShopppingProgressType     @default(registered) // 진행상태
   messageSetting              LiveShoppingMessageSetting?
-  externalGoods               LiveShoppingExternalGoods? // 판매자가 크크쇼 외부에서 판매하는 상품(판매자의 네이버스마트스토어 상품)으로 라이브커머스 진행하는 경우 존재함(이 경우 연결된 크크쇼 상품은 없음)
+  externalGoods               LiveShoppingExternalGoods? // 판매자가 크크쇼 외부에서 판매하는 상품(판매자의 네이버스마트스토어 상품)으로 라이브커머스 진행하는 경우에만 존재함(이때 연결된 크크쇼 상품goods은 null)
   broadcastStartDate          DateTime? // 라이브 방송 시작 시간
   broadcastEndDate            DateTime? // 라이브 방송 종료 시간
   sellStartDate               DateTime? // 라이브커머스 상품판매 시작 시간
@@ -746,11 +752,11 @@ model LiveShopping {
   desiredPeriod               String?                       @default("무관") // 희망 진행 기간
   sellerContacts              SellerContacts?               @relation(fields: [contactId], references: [id])
   seller                      Seller                        @relation(fields: [sellerId], references: [id])
-  goods                       Goods?                        @relation(fields: [goodsId], references: [id]) // 연결된 크크쇼 상품(다른 판매자의 네이버스마트스토어 등을 통해 라이브커머스를 진행하는 경우 연결된 크크쇼 상품은 존재하지 않는다. 대신 externalGoods가 존재함)
+  goods                       Goods?                        @relation(fields: [goodsId], references: [id]) // 연결된 크크쇼 상품(다른 판매자의 네이버스마트스토어 등을 통해 라이브커머스를 진행하는 경우 null임. 대신 externalGoods가 존재함)
   broadcaster                 Broadcaster?                  @relation(fields: [broadcasterId], references: [id])
-  liveShoppingVideo           LiveShoppingVideo?            @relation(fields: [videoId], references: [id])
+  liveShoppingVideo           LiveShoppingVideo?            @relation(fields: [videoId], references: [id]) // 라이브쇼핑 편집본 유튜브영상 정보
   SellerSettlementItems       SellerSettlementItems[]
-  liveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
+  liveShoppingPurchaseMessage LiveShoppingPurchaseMessage[] // 해당 라이브쇼핑에 대한 후원메시지
   BroadcasterSettlementItems  BroadcasterSettlementItems[]
   images                      LiveShoppingImage[] // 라이브쇼핑 홍보물 이미지(크크쇼 메인 캐러셀이나 라이브 예고에 표시되는 이미지)
   followers                   Customer[] // 20221020 기준 라이브커머스 팔로우 기능 없음
@@ -783,7 +789,7 @@ enum TtsSetting {
 // 라이브쇼핑 구매 메시지 세팅
 model LiveShoppingMessageSetting {
   id               Int        @id @default(autoincrement())
-  levelCutOffPoint Int        @default(30000) // 1단계, 2단계 도네 구분하는 기준금액(기본값 30,000원 이상인 경우 2단계 도네 표시)
+  levelCutOffPoint Int        @default(30000) // 1단계, 2단계 도네 구분하는 기준금액(기본값은 30,000원 이상인 경우 2단계 도네 표시)
   ttsSetting       TtsSetting @default(full)
   fanNick          String     @default("") // 비회원 구매시 표시될 기본 닉네임
 
@@ -826,6 +832,7 @@ model LiveShoppingVideo {
   LiveShopping LiveShopping[]
 }
 
+// 라이브쇼핑 관련 이미지 타입
 enum LiveShoppingImageType {
   carousel //크크쇼 메인 캐러셀 이미지
   trailer //라이브예고용 이미지(인스타게시물), 크크쇼 메인 라이브예고 부분에 표시됨
@@ -842,7 +849,7 @@ model LiveShoppingImage {
 }
 
 // 라이브쇼핑 특가
-// 특정 라이브쇼핑시에만 상품에 적용될 가격(라이브특가가 없는 경우 상품 가격 그대로 라이브커머스 진행함)
+// 특정 라이브쇼핑시에만 상품옵션에 적용될 가격(라이브특가가 없는 경우 상품 가격 그대로 라이브커머스 진행함)
 model LiveShoppingSpecialPrice {
   id               Int               @id @default(autoincrement())
   specialPrice     Decimal           @db.Decimal(10, 2) // 라이브쇼핑 특가
@@ -865,18 +872,20 @@ model SellCommission {
 
 // -------------------------------------------------
 // 공지사항
+// 공지사항 글 내용은 노션 공공페이지로 작성하고, 작성된 공지사항 노션 url을 Notice 테이블에 저장함
 // -------------------------------------------------
 model Notice {
   id          Int          @id @default(autoincrement())
   title       String // 공지사항 글의 제목
   url         String // 공지사항 글의 notion URL
-  postingFlag Boolean      @default(false) // 공지사항 글 게시여부
+  postingFlag Boolean      @default(false) // 공지사항 글 게시여부 => 게시여부 true여야 대상에게 표시됨
   postingDate DateTime     @default(now()) // 공지사항 글 게시시간
   target      NoticeTarget @default(all) // 공지사항 대상(전체, 판매자, 방송인, 구매자)
 }
 
+// 공지사항 대상
 enum NoticeTarget {
-  all // 전체
+  all // 전체 => 크크쇼, 판매자, 방송인 모두에게 표시됨
   seller // 판매자
   broadcaster // 방송인
   customer // 구매자
@@ -931,7 +940,8 @@ model SellerOrderCancelRequestItem {
   orderSeq                 Int
 }
 
-// 유저 알림메시지
+// 유저 알림메시지 
+// 관리자가 특정 판매자, 특정 방송인에게 보내는 알림메시지
 model UserNotification {
   id         Int      @id @default(autoincrement())
   userEmail  String // 타겟 유저 이메일
@@ -982,6 +992,7 @@ model Inquiry {
 }
 
 // 휴면 계정 테이블
+// 이하 Inactive 붙은 테이블은 모두 휴면 계정의 정보 저장한 테이블임
 model InactiveBroadcaster {
   id                                Int                                 @id @default(autoincrement())
   email                             String?                             @unique // 방송인 이메일(가입시 사용)
@@ -1175,7 +1186,7 @@ enum PolicyTarget {
   all // 전체
 }
 
-// 정책(개인정보처리방침, 이용약관) 테이블
+// 개인정보처리방침, 이용약관 테이블
 model Policy {
   id              Int            @id @default(autoincrement())
   category        PolicyCategory // 정책 분야 : 이용약관 | 개인정보처리방침
@@ -1188,7 +1199,7 @@ model Policy {
   content         String         @db.LongText // 내용
 }
 
-// 개인정보접근기록
+// 개인정보접근기록 - 관리자센터에서 특정 페이지(개인정보 등이 표시되는) 접근하거나 다운로드를 할 경우 데이터 저장
 model PrivacyApproachHistory {
   id         Int                              @id @default(autoincrement())
   adminEmail String // 접근한 관리자 이메일
@@ -1216,6 +1227,7 @@ enum PrivacyApproachHistoryActionType {
   view // 조회
 }
 
+// 관리자계정 권한 변경 내역
 model AdminClassChangeHistory {
   id                 Int       @id @default(autoincrement())
   adminEmail         String // 접근한 관리자 이메일
@@ -1226,6 +1238,7 @@ model AdminClassChangeHistory {
 }
 
 // 크크쇼 메인페이지 데이터
+// 크크쇼 메인페이지(크크쇼.com)에 표시될 데이터를 JSON형태로 저장
 model KkshowMain {
   id              Int  @id @default(autoincrement())
   carousel        Json // 메인캐러셀 영역 아이템[]
@@ -1234,7 +1247,9 @@ model KkshowMain {
   bestBroadcaster Json // 베스트방송인 영역 아이템[]
 }
 
-// 크크쇼 쇼핑탭 데이터
+// @deprecated 크크쇼 쇼핑탭 데이터
+// 더 이상 사용하지 않음
+// KkshowShoppingTabSectionOrder, KkshowShoppingSectionItem 대신 사용
 model KkshowShoppingTab {
   id              Int  @id @default(autoincrement())
   carousel        Json // 쇼핑탭 캐러셀 영역 아이템[]
@@ -1247,13 +1262,13 @@ model KkshowShoppingTab {
   keywords        Json // 쇼핑탭 테마별 키워드 영역 아이템[]
 }
 
-// 크크쇼 쇼핑탭 섹션 순서 저장
+// 크크쇼 쇼핑탭(크크쇼.com/shopping) 섹션 표시될 순서 저장
 model KkshowShoppingTabSectionOrder {
   id    Int  @id @default(autoincrement())
   order Json // KkshowShoppingSectionItem.id[]
 }
 
-// 크크쇼 쇼핑탭에 표시될 섹션들 정보 저장
+// 크크쇼 쇼핑탭(크크쇼.com/shopping)에 표시될 섹션들 정보를 JSON형태로 저장
 model KkshowShoppingSectionItem {
   id          Int     @id @default(autoincrement())
   layoutType  String
@@ -1277,7 +1292,7 @@ model KkshowShoppingTabCategory {
   goodsCategoryCode String        @unique
 }
 
-// 크크쇼 방송인 목록
+// 크크쇼 방송인 목록 (크크쇼.com/bc)에 표시
 model KkshowBcList {
   id            Int          @id @default(autoincrement())
   nickname      String       @unique // 닉네임
@@ -1307,6 +1322,7 @@ enum UserType {
 }
 
 // 이용안내
+// 판매자, 방송인센터에서 사용됨
 model Manual {
   id                 Int      @id @default(autoincrement())
   target             UserType // seller | broadcaster
@@ -1326,6 +1342,7 @@ enum PaperType {
   mailOrder // 통신판매업증
 }
 
+// 정산계좌, 정산정보 검수내역
 model ConfirmHistory {
   id                           Int                         @id @default(autoincrement())
   sellerBusinessRegistrationId Int?
@@ -1404,7 +1421,7 @@ model CustomerSocialAccount {
   @@index([customerId], name: "customerId")
 }
 
-// 소비자 주소록
+// 소비자 주소록(소비자 당 최대 3개까지 등록가능)
 model CustomerAddress {
   id            Int      @id @default(autoincrement()) // 주소록고유번호
   title         String // 주소록 별칭
@@ -1420,7 +1437,7 @@ model CustomerAddress {
   customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
 
-// 소비자 알림설정
+// 소비자 알림설정 (20221024 기준 알림기능 없음)
 model CustomerNotificationSetting {
   id            Int     @id @default(autoincrement()) // 소비자 알림설정 고유번호
   orderDelivery Boolean @default(true) // 주문,배송 알림여부
@@ -1475,6 +1492,7 @@ enum DiscountApplyType {
 
 // ****************
 // 쿠폰
+// 쿠폰은 관리자가 생성하고, 특정 소비자별로 발급할 수 있다
 // ****************
 model Coupon {
   id                   Int                @id @default(autoincrement()) // 쿠폰 고유번호
@@ -1531,12 +1549,16 @@ enum CouponLogType {
 
 // *****************
 // 장바구니
+// 장바구니에 들어있는 상품이 주문될 상품이므로 
+// CartItem - CartItemOption - CartItemSupport 
+// 주문상품 관련 테이블과 동일한 구조를 가지고 있다
+// OrderItem - OrderItemOption - OrderItemSupport
 // *****************
 // 장바구니 상품
 model CartItem {
   id              Int              @id @default(autoincrement()) // 장바구니 상품 고유번호
   createDate      DateTime         @default(now())
-  customerId      Int? // 비로그인 상태로 장바구니에 담은것도 디비에 저장해야 하나? 쿠키에만 저장하면 되나??
+  customerId      Int?
   customer        Customer?        @relation(fields: [customerId], references: [id], onDelete: Cascade)
   tempUserId      String? // 비로그인한 유저 식별값(세션id?)
   goodsId         Int?
@@ -1567,6 +1589,7 @@ model CartItemOption {
 }
 
 // 장바구니 상품 후원
+// 후원정보는 옵션이 아니라 상품에 연결된다
 model CartItemSupport {
   id            Int          @id @default(autoincrement()) // 장바구니 상품 후원 고유번호
   message       String? // 후원메시지
@@ -1672,6 +1695,7 @@ model GoodsInquiryComment {
 
 // **************************************************************************
 // 주문
+// 주문에는 여러 상품이 포함될 수 있다 => 여러 상품들 = orderItems
 // **************************************************************************
 model Order {
   id                         Int                          @id @default(autoincrement()) // 주문 고유번호
@@ -1768,7 +1792,7 @@ enum PaymentMethod {
 }
 
 // 주문에 부과된 배송비정보 저장하는 테이블
-// 하나의 주문에 여러 배송비가 부과될 수 있다
+// 하나의 주문에 여러 배송비가 부과될 수 있다 (서로 다른 판매자의 상품을 한꺼번에 주문하는 경우, 상품별로 배송비가 부과된다)
 model OrderShipping {
   id                  Int                 @id @default(autoincrement()) // 고유 식별 번호
   shippingCostPayType ShippingCostPayType @default(prepay) // shipping_type 배송비 결제방식
@@ -1858,6 +1882,7 @@ model OrderItemOption {
 }
 
 // 주문상품후원
+// 주문상품에 연결된 후원메시지
 model OrderItemSupport {
   id                 Int               @id @default(autoincrement()) // 주문 상품 후원 고유번호
   message            String? // 후원메시지
@@ -1877,7 +1902,7 @@ model OrderItemSupport {
 // ****************
 // 환불
 // ****************
-// 환불 : 판매자 혹은 관리자가 환불한 결과 내역을 남기기 위한 테이블. 소비자의 환불요청은 반품Return테이블에 저장됨.
+// 환불 : 판매자 혹은 관리자가 "환불한 결과 내역"을 남기기 위한 테이블. 소비자의 환불요청은 반품Return(=상품 수거과정 없는 반품) 테이블에 저장됨.
 // 환불기록생성하는 시점에 이미 실제 환불처리는 완료(소비자 계좌로 돈을 반환하든, 토스페이먼츠 결제취소 api를 사용하든)되었을거라 생각하여
 // 환불처리상태, 생성일자 컬럼 삭제
 model Refund {
@@ -1927,7 +1952,8 @@ model RefundItem {
 
 // 220503 수정 @joni 판매상품 대부분이 회수하기 어려운 형태의 식품임.
 // 반품 기록은 남겨두도록 하나, 상품회수 과정을 제외하고 환불만 처리하도록 함(메모에 "상품수거없음" 기록)
-// 재배송/환불에서 소비자가 해결방법'환불'요청한 내역 저장(=상품 수거과정 없는 반품)
+// 재배송/환불에서 소비자가 해결방법 중 "환불"요청한 내역 저장(=상품 수거과정 없는 반품)
+// 하나의 반품요청에는 여러상품옵션(동일한 판매자의 상품임)이 포함될 수 있다
 model Return {
   id                  Int           @id @default(autoincrement()) // 반품고유번호
   returnCode          String?       @unique //반품코드
@@ -1961,6 +1987,7 @@ model ReturnImage {
 }
 
 // 반품 상품
+// 반품요청(=수거없는 환불)에 포함된 상품옵션
 model ReturnItem {
   id                Int             @id @default(autoincrement()) // 반품상품 고유번호
   returnId          Int // 반품고유번호
@@ -1992,6 +2019,7 @@ enum ExchangeProcessStatus {
 // 220503 수정 @joni 판매상품 대부분이 회수하기 어려운 형태의 식품임.
 // 교환 기록은 남겨두도록 하나, 교환에서 상품회수 과정을 제외하고 재배송만 처리하도록 함(메모에 "상품수거없음" 기록)
 // 재배송/환불에서 소비자가 해결방법'재배송'요청한 내역 저장(=상품 수거과정 없는 교환)
+// 하나의 교환요청에는 여러상품옵션(동일한 판매자의 상품임)이 포함될 수 있다
 model Exchange {
   id                     Int                   @id @default(autoincrement()) // 교환고유번호
   exchangeCode           String?               @unique //교환코드
@@ -2079,7 +2107,7 @@ model OrderCancellationItem {
 // 출고
 model Export {
   id                   Int                @id @default(autoincrement()) // 출고고유번호
-  exportCode           String?            @unique // 출고코드
+  exportCode           String?            @unique // 출고코드 D로 시작함
   orderId              Int // 주문 고유번호
   order                Order              @relation(fields: [orderId], references: [id]) // 연결된 주문
   status               OrderProcessStep   @default(exportDone) // 출고상태 : 출고준비 | 출고완료(기본값) | 배송중 | 배송완료 -> 모두 OrderProcessStep 에 있어서 그대로 사용함
@@ -2171,10 +2199,10 @@ model OverlayTheme {
   name       String // 테마 이름
   key        String   @unique // 테마 식별 키
   category   String? // 테마 분류(게임, 계절..)
-  data       Json // OverlayThemeType 형태의 객체 string
+  data       Json // OverlayThemeType 형태의 JSON
 }
 
-// 테이블 별로 관리자가 확인한 마지막 데이터의 id값(number) 저장
+// 테이블 별로 관리자가 확인한 마지막 데이터의 id값(number) 저장 => 관리자페이지 알림초기화 기능 위한 테이블
 model AdminLastCheckedData {
   id         Int      @id @default(autoincrement())
   createDate DateTime @default(now())
@@ -2182,6 +2210,7 @@ model AdminLastCheckedData {
   data       Json
 }
 
+// 크크쇼 라이브쇼핑 (크크쇼.com/live-shopping) 페이지에 방송화면 표시하기 위한 데이터
 model LiveShoppingEmbed {
   id               Int              @id @default(autoincrement())
   streamingService StreamingService // twitch / afreeca
