@@ -85,9 +85,17 @@ export function ExportManyDialog({
       if (isValid) {
         formMethods.setValue(`${orderIdx}.orderId`, orderId);
         const dto = formMethods.getValues(fieldID);
+
+        // 출고처리할 상품의 판매자id 조회 => export.sellerId로 저장
+        const itemIds = dto.items.map((i) => i.orderItemId);
+        const sellerId = orders
+          .find((o) => o.id === orderId)
+          ?.orderItems.find((oi) => itemIds.includes(oi.id))?.goods?.sellerId;
+
         // options배열, items의 빈 값 정리
         const realDto = {
           ...dto,
+          sellerId,
           items: dto.items.filter((v) => !!v),
           exportOptions: dto.items.filter((x) => !!x.quantity),
         };
@@ -104,7 +112,7 @@ export function ExportManyDialog({
         }
       }
     },
-    [exportOrder, formMethods, onExportFail, onExportSuccess, toast],
+    [exportOrder, formMethods, onExportFail, onExportSuccess, orders, toast],
   );
 
   /** 폼제출 핸들러 -> 일괄 출고 처리 API 요청 */
