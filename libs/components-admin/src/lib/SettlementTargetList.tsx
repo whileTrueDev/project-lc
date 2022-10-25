@@ -243,19 +243,19 @@ function SettlementItemInfoDialog({
         items: selectedSettleItem.items.map((item) => {
           let whiletrueCommissionRate: string | null;
           let broadcasterCommissionRate: string | null;
-          if (item.orderItem.support.liveShopping) {
+          if (item.orderItem.support?.liveShopping) {
             whiletrueCommissionRate =
-              item.orderItem.support.liveShopping?.whiletrueCommissionRate.toString() ||
+              item.orderItem.support?.liveShopping?.whiletrueCommissionRate.toString() ||
               null;
             broadcasterCommissionRate =
-              item.orderItem.support.liveShopping?.broadcasterCommissionRate.toString() ||
+              item.orderItem.support?.liveShopping?.broadcasterCommissionRate.toString() ||
               null;
-          } else if (item.orderItem.support.productPromotion) {
+          } else if (item.orderItem.support?.productPromotion) {
             whiletrueCommissionRate =
-              item.orderItem.support.productPromotion?.whiletrueCommissionRate.toString() ||
+              item.orderItem.support?.productPromotion?.whiletrueCommissionRate.toString() ||
               null;
             broadcasterCommissionRate =
-              item.orderItem.support.productPromotion?.broadcasterCommissionRate.toString() ||
+              item.orderItem.support?.productPromotion?.broadcasterCommissionRate.toString() ||
               null;
           } else {
             whiletrueCommissionRate =
@@ -282,13 +282,13 @@ function SettlementItemInfoDialog({
             price:
               Number(item.orderItemOption.discountPrice) * item.orderItemOption.quantity,
             pricePerPiece: Number(item.orderItemOption.discountPrice),
-            sellType: item.orderItem.support.liveShopping
-              ? SellType.liveShopping
-              : item.orderItem.support.productPromotion
-              ? SellType.productPromotion
+            sellType: item.orderItem.support?.liveShopping
+              ? SellType?.liveShopping
+              : item.orderItem.support?.productPromotion
+              ? SellType?.productPromotion
               : SellType.normal,
-            liveShoppingId: item.orderItem.support.liveShopping?.id,
-            productPromotionId: item.orderItem.support.productPromotion?.id,
+            liveShoppingId: item.orderItem.support?.liveShopping?.id,
+            productPromotionId: item.orderItem.support?.productPromotion?.id,
             broadcasterCommissionRate,
             broadcasterCommission,
             whiletrueCommissionRate,
@@ -381,10 +381,10 @@ function SettlementItemOptionDetail({
 
   // 판매 유형
   const sellType = useMemo<'라이브쇼핑' | '상품홍보' | '기본판매'>(() => {
-    if (item.orderItem.support.liveShopping) return '라이브쇼핑';
-    if (item.orderItem.support.productPromotion) return '상품홍보';
+    if (item.orderItem.support?.liveShopping) return '라이브쇼핑';
+    if (item.orderItem.support?.productPromotion) return '상품홍보';
     return '기본판매';
-  }, [item.orderItem.support.liveShopping, item.orderItem.support.productPromotion]);
+  }, [item.orderItem.support?.liveShopping, item.orderItem.support?.productPromotion]);
 
   return (
     <Grid
@@ -461,31 +461,32 @@ function SettlementItemOptionDetail({
 
       <GridItem>판매 수수료</GridItem>
       <GridItem color="green.500">
-        {item.orderItem.support.liveShopping && (
+        {item.orderItem.support?.liveShopping && (
           <CommissionInfo
             totalPrice={totalPrice}
             broadcasterCommissionRate={
-              item.orderItem.support.liveShopping?.broadcasterCommissionRate
+              item.orderItem.support?.liveShopping?.broadcasterCommissionRate
             }
             whiletrueCommissionRate={
-              item.orderItem.support.liveShopping?.whiletrueCommissionRate
+              item.orderItem.support?.liveShopping?.whiletrueCommissionRate
             }
           />
         )}
-        {item.orderItem.support.productPromotion && (
+        {item.orderItem.support?.productPromotion && (
           <CommissionInfo
             totalPrice={totalPrice}
             broadcasterCommissionRate={
-              item.orderItem.support.productPromotion?.broadcasterCommissionRate
+              item.orderItem.support?.productPromotion?.broadcasterCommissionRate
             }
             whiletrueCommissionRate={
-              item.orderItem.support.productPromotion?.whiletrueCommissionRate
+              item.orderItem.support?.productPromotion?.whiletrueCommissionRate
             }
           />
         )}
         {item.orderItem.channel === SellType.normal &&
           !(
-            item.orderItem.support.liveShopping || item.orderItem.support.productPromotion
+            item.orderItem.support?.liveShopping ||
+            item.orderItem.support?.productPromotion
           ) && (
             <Box>
               <Text>
@@ -509,7 +510,6 @@ function SettlementItemOptionDetail({
           <Text>{settlementTarget?.seller?.name}</Text>
           <Text>{settlementTarget?.seller?.sellerShop?.shopName}</Text>
         </Box>
-        ?
       </GridItem>
 
       <GridItem>판매자 정산정보</GridItem>
