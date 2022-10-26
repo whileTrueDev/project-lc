@@ -182,7 +182,7 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailR
   protected getSheetRef(orders: OrderDetailRes[]): string {
     const lengthOfRows = orders.reduce((prev, curr) => {
       let num = 0;
-      curr.shippings.forEach((ship: any) => {
+      curr.shippings?.forEach((ship: any) => {
         ship.items.forEach((item: any) => {
           item.options.forEach(() => {
             num += 1;
@@ -215,8 +215,11 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailR
       // 셀병합위해 사용할 주문상품옵션 순회 인덱스(해당 주문에 포함된 주문상품옵션 중 마지막 값인지 확인하기 위한 용도)
       let orderItemOptionIndex = 0;
 
-      order.shippings.forEach((ship) => {
+      // 주문에 포함된 배송비별로 주문상품표시
+      order.shippings?.forEach((ship) => {
+        // 현재 배송비에 포함된 상품id 목록
         const shipItemIdList = ship.items.map((item) => item.id);
+        // 주문상품 중 현재 배송비와 연결된 상품들
         const shippingOrderItems = order.orderItems.filter((oi) =>
           shipItemIdList.includes(oi.id),
         );
