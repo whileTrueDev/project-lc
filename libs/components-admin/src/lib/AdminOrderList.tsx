@@ -1,5 +1,13 @@
 import { Box, Icon, Link, Text, useDisclosure } from '@chakra-ui/react';
-import { GridColumns, GridRowData, GridRowId, GridToolbar } from '@material-ui/data-grid';
+import {
+  GridColumns,
+  GridRowData,
+  GridRowId,
+  GridToolbarColumnsButton,
+  GridToolbarContainer,
+  GridToolbarDensitySelector,
+  GridToolbarFilterButton,
+} from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { OrderToolbar } from '@project-lc/components-seller/kkshow-order/OrderList';
@@ -105,7 +113,6 @@ const columns: GridColumns = [
 ];
 
 export function AdminOrderList(): JSX.Element {
-  const exportManyDialog = useDisclosure();
   // 페이지당 행 select
   const rowsPerPageOptions = useRef<number[]>([10, 20, 50, 100]);
   const mapPageToNextCursor = useRef<{ [page: number]: GridRowId }>({});
@@ -114,6 +121,7 @@ export function AdminOrderList(): JSX.Element {
   // 페이지
   const [page, setPage] = useState(0);
 
+  const exportManyDialog = useDisclosure();
   const sellerOrderStates = useSellerOrderStore();
 
   const handlePageChange = (newPage: number): void => {
@@ -175,10 +183,17 @@ export function AdminOrderList(): JSX.Element {
         checkboxSelection
         selectionModel={sellerOrderStates.selectedOrders}
         onSelectionModelChange={sellerOrderStates.handleOrderSelected}
+        componentsProps={{
+          toolbar: { exportOptions: { disabledToolbarButton: true } },
+        }}
         components={{
           Toolbar: () => (
             <>
-              <GridToolbar />
+              <GridToolbarContainer>
+                <GridToolbarColumnsButton />
+                <GridToolbarFilterButton />
+                <GridToolbarDensitySelector />
+              </GridToolbarContainer>
               <OrderToolbar
                 options={[
                   {
