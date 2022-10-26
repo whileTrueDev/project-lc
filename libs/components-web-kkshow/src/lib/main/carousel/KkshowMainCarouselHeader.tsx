@@ -20,7 +20,7 @@ export function KkshowMainCarouselHeader({
   if (type === 'upcoming')
     return (
       <KkshowMainCarouselHeaderContainer>
-        <Heading fontSize={{ base: 'lg', md: '3xl' }}>UPCOMMING</Heading>
+        <Heading fontSize={{ base: 'lg', md: '3xl' }}>COMMING SOON</Heading>
       </KkshowMainCarouselHeaderContainer>
     );
 
