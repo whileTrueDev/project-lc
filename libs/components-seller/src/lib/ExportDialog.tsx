@@ -78,7 +78,17 @@ export function ExportDialog({
       if (isValid) {
         formMethods.setValue(`${orderShippingIdx}.orderId`, orderId);
         const dto = formMethods.getValues(fieldID);
-        const realDto = { ...dto, items: dto.items.filter((x) => !!x.quantity) };
+
+        // 출고처리할 상품의 판매자id 조회 => export.sellerId로 저장
+        const itemIds = dto.items.map((i) => i.orderItemId);
+        const sellerId = order.orderItems.find((oi) => itemIds.includes(oi.id))?.goods
+          ?.sellerId;
+
+        const realDto = {
+          ...dto,
+          sellerId,
+          items: dto.items.filter((x) => !!x.quantity),
+        };
         // 보낼 수량이 0개 인지 체크
         if (realDto.items.every((o) => Number(o.quantity) === 0)) {
           toast({
@@ -92,7 +102,7 @@ export function ExportDialog({
         }
       }
     },
-    [exportOrder, formMethods, onExportFail, onExportSuccess, toast],
+    [exportOrder, formMethods, onExportFail, onExportSuccess, order, toast],
   );
 
   /** 합포장 출고처리가 가능한지 여부 */

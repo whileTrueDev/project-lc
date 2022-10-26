@@ -3,7 +3,6 @@ import { useKkshowSearchStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { useCallback, useRef } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { useQueryClient } from 'react-query';
 import shallow from 'zustand/shallow';
 import { FullPageSearchDrawer } from './FullPageSearchBox';
 import { DesktopSearchInputBox } from './DesktopSearchInputBox';
@@ -14,7 +13,7 @@ interface SearchForm {
 export function Searcher(): JSX.Element {
   const toast = useToast();
   const router = useRouter();
-  const queryClient = useQueryClient();
+
   const searchStore = useKkshowSearchStore(
     (s) => ({
       appendKeyword: s.appendKeyword,
@@ -35,8 +34,8 @@ export function Searcher(): JSX.Element {
   const onSubmit: SubmitHandler<SearchForm> = (formData): void => {
     if (formData.keyword) {
       searchStore.appendKeyword(formData.keyword);
+
       router.push({ pathname: '/search', query: { keyword: formData.keyword } });
-      queryClient.invalidateQueries('getSearchResults');
       searchStore.closeSearchDrawer();
     } else {
       focusOnInput();

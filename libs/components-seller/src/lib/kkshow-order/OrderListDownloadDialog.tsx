@@ -50,9 +50,12 @@ export function OrderListDownloadDialog({
   // 선택된 주문
   const selectedOrders = useSellerOrderStore((state) => state.selectedOrders);
   // 선택된 주문 상세 정보 조회
+  // 해당 기능은 판매자와 관리자센터 양쪽에서 사용함
+  // 로그인한 사용자가 판매자인 경우에만 해당 판매자의id를 보내서, 주문에 포함된 해당 판매자의 상품만 조회하도록 함
+  // 로그인한 사용자가 관리자인 경우에는 sellerId를 보내지 않음 -> 주문에 포함된 모든 상품 조회
   const orderDetails = useOrderDetailsForSpreadsheet({
     orderIds: selectedOrders.map((orderId) => Number(orderId)),
-    sellerId: profileData?.id,
+    sellerId: profileData && profileData.type === 'seller' ? profileData.id : undefined,
   });
 
   const disableHeaders = useOrderListDownloadStore((st) => st.disableHeaders);

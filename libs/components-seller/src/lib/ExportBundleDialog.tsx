@@ -41,6 +41,7 @@ export interface ExportBundleDialogProps {
     | 'recipientDetailAddress'
     | 'recipientName'
     | 'recipientPhone'
+    | 'orderItems'
   >[];
 }
 export function ExportBundleDialog({
@@ -60,17 +61,19 @@ export function ExportBundleDialog({
 
   const exportBundledOrders = useExportBundledOrdersMutation();
 
-  /** 합포장 출고처리 가능한 지 체크 */
-  const isAbleToBundle = useMemo(() => {
-    const targetOrders = orders.filter((order) => {
+  const _targetOrders = useMemo(() => {
+    return orders.filter((order) => {
       return order.shippings?.some((shipp) => {
         return !!selectedOrderShippings.find((x) => x.shippingId === shipp.id);
       });
     });
+  }, [orders, selectedOrderShippings]);
 
-    return targetOrders.reduce((isOk, order, crrIndex) => {
+  /** 합포장 출고처리 가능한 지 체크 */
+  const isAbleToBundle = useMemo(() => {
+    return _targetOrders.reduce((isOk, order, crrIndex) => {
       if (!isOk) return false;
-      const prev = targetOrders[crrIndex - 1];
+      const prev = _targetOrders[crrIndex - 1];
       if (!prev) return true;
       // * 선택한 주문의 주문자, 받는곳, 받는분, 받는분 연락처(휴대폰)의 정보가 동일해야 합니다.
       // 주문자
@@ -85,7 +88,7 @@ export function ExportBundleDialog({
       // * 선택한 주문의 동일 판매자의 실물 배송상품을 합포장 할 수 있습니다.
       return true;
     }, true);
-  }, [orders, selectedOrderShippings]);
+  }, [_targetOrders]);
 
   /** 합포장 출고 처리 요청 */
   const exportBundle = useCallback(
@@ -135,6 +138,9 @@ export function ExportBundleDialog({
     const formData = getValues();
     const selectedKeys = Object.keys(formData);
     const _orders: CreateKkshowExportDto[] = [];
+
+    // 상품 판매자 id
+    const sellerId = _targetOrders[0]?.orderItems[0]?.goods?.sellerId;
     selectedKeys.forEach((k) => {
       const data = formData[Number(k)];
       const realData = {
@@ -142,6 +148,7 @@ export function ExportBundleDialog({
         items: data.items.filter((x) => !!x.quantity),
         deliveryCompany,
         deliveryNumber,
+        sellerId,
       };
       _orders.push(realData);
     });

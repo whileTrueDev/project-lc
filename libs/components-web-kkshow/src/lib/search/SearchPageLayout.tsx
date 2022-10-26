@@ -6,6 +6,7 @@ import { useKkshowSearchResults } from '@project-lc/hooks';
 import { SearchResult } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { useQueryClient } from 'react-query';
 import KkshowNavbar from '../KkshowNavbar';
 import KKshowMainExternLinks from '../main/KKshowMainExternLinks';
 
@@ -38,6 +39,7 @@ export function useSearchPageState(): {
   searchKeyword?: string;
 } {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { keyword } = router.query;
 
   const searchKeyword = keyword ? (keyword as string) : undefined;
@@ -48,7 +50,10 @@ export function useSearchPageState(): {
 
   useEffect(() => {
     setQuery(keyword ? (keyword as string) : undefined);
-  }, [keyword]);
+    if (keyword) {
+      queryClient.invalidateQueries('getSearchResults');
+    }
+  }, [keyword, queryClient]);
 
   return {
     data,
