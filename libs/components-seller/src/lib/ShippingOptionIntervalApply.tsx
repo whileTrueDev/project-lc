@@ -39,7 +39,7 @@ export function ShippingOptionIntervalApply({
     },
   });
 
-  const [sectionStart, setSectionStart] = useState<number>(0);
+  const [sectionStart, setSectionStart] = useState<number>(1);
 
   const { addShippingOption, shippingOptions, setShippingOptions } =
     useShippingSetItemStore();
@@ -81,12 +81,12 @@ export function ShippingOptionIntervalApply({
       },
     };
 
-    // 입력하는 구간시작값이 0 이고, 마지막 입력된 옵션의 구간시작값이 0인 경우 마지막 옵션을 덮어씀
+    // 입력하는 구간시작값이 1 이고, 마지막 입력된 옵션의 구간시작값이 1인 경우 마지막 옵션을 덮어씀
     // 아닌경우 옵션 추가함
     if (
-      sectionStart === 0 &&
+      sectionStart === 1 &&
       shippingOptions.length !== 0 &&
-      shippingOptions[shippingOptions.length - 1].section_st === 0
+      shippingOptions[shippingOptions.length - 1].section_st === 1
     ) {
       setShippingOptions([...shippingOptions.slice(0, -1), option]);
     } else {
@@ -99,9 +99,9 @@ export function ShippingOptionIntervalApply({
     if (shippingOptions.length > 0) {
       setSectionStart(shippingOptions[shippingOptions.length - 1].section_ed || 0);
     }
-    // 추가된 옵션이 없다면 구간시작값 0으로 설정
+    // 추가된 옵션이 없다면 구간시작값 1으로 설정
     if (shippingOptions.length === 0) {
-      setSectionStart(0);
+      setSectionStart(1);
     }
 
     setValue('section_ed', null);
