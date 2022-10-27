@@ -11,7 +11,13 @@ import {
 import { getLocaleNumber, getShippingOptionLabel } from '@project-lc/utils-frontend';
 import { FaTruck } from 'react-icons/fa';
 
-export function OptionItemDisplay({ item }: { item: ShippingOptionDto }): JSX.Element {
+export function OptionItemDisplay({
+  item,
+  isLastOption,
+}: {
+  item: ShippingOptionDto;
+  isLastOption?: boolean;
+}): JSX.Element {
   const { shippingCost: costItem, shipping_opt_type: shippingOptType } = item;
   const selectOption = shippingSelectOptions.find(
     (select) => select.key === shippingOptType,
@@ -24,7 +30,7 @@ export function OptionItemDisplay({ item }: { item: ShippingOptionDto }): JSX.El
     <Stack direction={{ base: 'column', sm: 'row' }}>
       {/* 무료, 고정 인 경우 범위 표시 안함 */}
       {!['free', 'fixed'].includes(shippingOptType) && (
-        <Text>{`${getShippingOptionLabel(item, suffix)} · `}</Text>
+        <Text>{`${getShippingOptionLabel(item, suffix, isLastOption)} · `}</Text>
       )}
       <Text>{`${areaName} · ${costText}`}</Text>
     </Stack>
@@ -48,8 +54,12 @@ export function ShippingPolicySetListItem({
     tempId,
   } = set;
 
-  const stdOptions = shippingOptions.filter((opt) => opt.shipping_set_type === 'std');
-  const addOptions = shippingOptions.filter((opt) => opt.shipping_set_type === 'add');
+  const stdOptions = shippingOptions
+    .filter((opt) => opt.shipping_set_type === 'std')
+    .sort((a, b) => (a.section_st || 0) - (b.section_st || 0)); // 옵션범위 시작값 오름차순으로 정렬
+  const addOptions = shippingOptions
+    .filter((opt) => opt.shipping_set_type === 'add')
+    .sort((a, b) => (a.section_st || 0) - (b.section_st || 0)); // 옵션범위 시작값 오름차순으로 정렬
   return (
     <Stack direction="row" key={set.tempId} {...boxStyle}>
       {onDelete ? (
@@ -97,8 +107,12 @@ export function ShippingPolicySetListItem({
         <Stack direction={{ base: 'column', sm: 'row' }}>
           <BoldText>기본 배송비</BoldText>
           <Stack>
-            {stdOptions.map((opt) => (
-              <OptionItemDisplay key={opt.tempId} item={opt} />
+            {stdOptions.map((opt, index) => (
+              <OptionItemDisplay
+                key={opt.tempId}
+                item={opt}
+                isLastOption={index === stdOptions.length - 1} // 구간반복 옵션(xx_rep)의 경우 마지막 옵션은 '~당'을 의미함. 이를 변경하기 위해 전달
+              />
             ))}
           </Stack>
         </Stack>
@@ -109,7 +123,13 @@ export function ShippingPolicySetListItem({
           <BoldText>추가 배송비</BoldText>
           <Stack>
             {addOptions.length > 0 ? (
-              addOptions.map((opt) => <OptionItemDisplay key={opt.tempId} item={opt} />)
+              addOptions.map((opt, index) => (
+                <OptionItemDisplay
+                  key={opt.tempId}
+                  item={opt}
+                  isLastOption={index === addOptions.length - 1} // 구간반복 옵션(xx_rep)의 경우 마지막 옵션은 '~당'을 의미함. 이를 변경하기 위해 전달
+                />
+              ))
             ) : (
               <Text>X</Text>
             )}
