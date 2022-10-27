@@ -93,7 +93,7 @@ export class ExchangeService {
         images: true,
       },
     });
-    // 조회한 데이터를 필요한 형태로 처리
+    // 조회한 데이터를 필요한 형태(응답타입에 맞는 형태)로 처리
     const list = data.map((d) => {
       const { exchangeItems, ...rest } = d;
 

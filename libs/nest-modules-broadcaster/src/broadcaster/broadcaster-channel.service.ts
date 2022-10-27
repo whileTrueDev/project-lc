@@ -55,6 +55,7 @@ export class BroadcasterChannelService {
     }
   }
 
+  /** 휴면 방송인 채널 복구 */
   async restoreBroadcasterChannel(broadcasterId: Broadcaster['id']): Promise<void> {
     const restoreDatas = await this.prisma.inactiveBroadcasterChannel.findMany({
       where: {

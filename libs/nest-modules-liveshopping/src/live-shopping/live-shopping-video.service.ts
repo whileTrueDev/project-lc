@@ -9,6 +9,7 @@ import {
 export class LiveShoppingVideoService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** 전체 라이브쇼핑 비디오 조회 */
   public async findAll(
     dto: DefaultPaginationDto,
   ): Promise<PaginatedLiveShoppingVideoRes> {

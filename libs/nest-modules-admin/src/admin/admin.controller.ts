@@ -266,6 +266,7 @@ export class AdminController {
     return this.adminService.setGoodsRejection(dto);
   }
 
+  /** 관리자로 라이브쇼핑 생성 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('/live-shopping')
   async createLiveShoppingByAdmin(
@@ -274,6 +275,7 @@ export class AdminController {
     return this.liveShoppingService.createLiveShoppingByAdmin(dto);
   }
 
+  /** 관리자 라이브쇼핑 조회 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/live-shoppings')
   async getLiveShoppings(
@@ -282,6 +284,7 @@ export class AdminController {
     return this.liveShoppingService.findLiveShoppings(dto);
   }
 
+  /** 라이브 특가 정보 수정 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch('/live-shopping/special-price/:specialPriceId')
   async updateLiveShoppingSpecialPriceData(
@@ -294,6 +297,7 @@ export class AdminController {
     });
   }
 
+  /** 라이브 쇼핑 정보 수정 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   @UseInterceptors(HttpCacheInterceptor)
@@ -321,6 +325,7 @@ export class AdminController {
     return this.adminService.getLiveShoppingGiftOrders(liveShoppingId);
   }
 
+  /** 방송인 목록 조회 (라이브쇼핑 진행할) */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/live-shopping/broadcasters')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
@@ -328,6 +333,7 @@ export class AdminController {
     return this.broadcasterService.getAllBroadcasterIdAndNickname();
   }
 
+  /** 라이브쇼핑 이미지(캐러셀 이미지 혹은 라이브쇼핑 예고이미지임. 오버레이 이미지 아님!) 저장 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('/live-shopping/images')
   upsertLiveShoppingImage(@Body() dto: LiveShoppingImageDto): Promise<boolean> {
@@ -413,12 +419,9 @@ export class AdminController {
     return this.sellerService.getSellerList();
   }
 
-  /** ================================= */
-  // 상품홍보 ProductPromotion
-  /** ================================= */
-
   /** 전체 상품목록 조회
-   * - 상품홍보에 연결하기 위한 상품(project-lc goods) 전체목록. 검수완료 & 정상판매중 일 것
+   * - 상품홍보에 연결하기 위한 상품(project-lc goods) 전체목록 조회
+   * 검수완료 & 정상판매중 일 것
    * goodsConfirmation.status === confirmed && goods.status === normal
    * goodsId, goodsName, sellerId, sellerEmail
    * */
@@ -428,12 +431,15 @@ export class AdminController {
     return this.projectLcGoodsService.findAllConfirmedLcGoodsList();
   }
 
+  /** 전체 상품목록 조회(카테고리 포함) -
+   * 관리자에서 쿠폰에 연결하기 위한 상품(project-lc goods) 전체목록 조회 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('confirmed-goods-list-category')
   async findAllConfirmedLcGoodsListWithCategory(): Promise<AdminAllLcGoodsList> {
     return this.projectLcGoodsService.findAllConfirmedLcGoodsListWithCategory();
   }
 
+  /** 개인정보 관련 데이터 접근 내역 저장 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('privacy-approach-history')
   async createPrivacyApproachHistory(
@@ -443,6 +449,7 @@ export class AdminController {
     return this.adminPrivacyApproachSevice.createPrivacyApproachHistory(req, dto);
   }
 
+  /** 관리자 권한 변경 내역 저장 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('class-change-history')
   async createClassChangeHistory(
@@ -451,18 +458,21 @@ export class AdminController {
     return this.adminService.createAdminClassChangeHistory(dto);
   }
 
+  /** 관리자 계정 조회 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/admin-managers')
   async getAdminUserList(): Promise<AdminClassDto[]> {
     return this.adminService.getAdminUserList();
   }
 
+  /** 관리자계정 권한 수정 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch('/admin-class')
   async updateAdminClass(@Body() dto: AdminClassDto): Promise<Administrator> {
     return this.adminService.updateAdminClass(dto);
   }
 
+  /** 관리자 계정 삭제 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete('/user/:userId')
   async deleteAdminUser(@Param('userId') userId: number): Promise<boolean> {

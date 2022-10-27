@@ -7,6 +7,7 @@ import { LiveShoppingVideoService } from './live-shopping-video.service';
 export class LiveShoppingVideoController {
   constructor(private readonly liveShoppingVideoService: LiveShoppingVideoService) {}
 
+  /** 크크쇼.com/live-shopping 페이지에서 표시할 지난 라이브영상 목록 조회 */
   @Get()
   public async findAll(
     @Query(new ValidationPipe({ transform: true })) dto: DefaultPaginationDto,

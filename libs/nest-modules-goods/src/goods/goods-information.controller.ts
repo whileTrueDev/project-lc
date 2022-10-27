@@ -20,7 +20,7 @@ import { GoodsInformationService } from './goods-information.service';
 export class GoodsInformationController {
   constructor(private readonly goodsInformationService: GoodsInformationService) {}
 
-  /** 상품제공고시 수정 */
+  /** 상품에 연결된 상품제공고시 내용 수정 */
   @Put()
   updateGoodsInformationNotice(
     @Param('goodsId', ParseIntPipe) goodsId: Goods['id'],

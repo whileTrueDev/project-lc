@@ -35,6 +35,7 @@ export class CouponController {
     private readonly couponLogService: CouponLogService,
   ) {}
 
+  /** 특정 소비자에게 발급된 쿠폰 목록을 조회합니다 */
   @Get()
   getCustomerCoupons(@CustomerInfo() { id }: UserPayload): Promise<CustomerCouponRes[]> {
     return this.customerCouponService.findCustomerCoupons({
@@ -43,6 +44,7 @@ export class CouponController {
     });
   }
 
+  /** 특정 소비자에 대한 쿠폰발급, 사용내역을 조회합니다  */
   @Get('history')
   async getCouponLogs(
     @CustomerInfo() { id }: UserPayload,
@@ -50,6 +52,7 @@ export class CouponController {
     return this.couponLogService.findCouponLogs(id);
   }
 
+  /** 소비자에게 발급된 특정 쿠폰 정보를 조회합니다 */
   @Get(':customerCouponId')
   getCustomerCouponByCouponId(
     @Param('customerCouponId', ParseIntPipe) customerCouponId: number,
@@ -57,6 +60,7 @@ export class CouponController {
     return this.customerCouponService.findCustomerCoupon(customerCouponId);
   }
 
+  /** 소비자에게 발급된 특정 쿠폰의 상태(사용여부)를 변경합니다 */
   @Patch('/:customerCouponId')
   updateCustomerCouponStatus(
     @Param('customerCouponId', ParseIntPipe) customerCouponId: number,

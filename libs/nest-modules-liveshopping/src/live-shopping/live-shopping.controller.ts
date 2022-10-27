@@ -53,6 +53,7 @@ export class LiveShoppingController {
     return this.liveShoppingService.createLiveShopping(seller.id, dto);
   }
 
+  /** 라이브쇼핑 삭제 */
   @Delete()
   @UseGuards(JwtAuthGuard)
   deleteLiveShopping(
@@ -61,6 +62,7 @@ export class LiveShoppingController {
     return this.liveShoppingService.deleteLiveShopping(liveShoppingId);
   }
 
+  /** 라이브쇼핑 진행 가능한 상품 목록 조회 */
   @Get('/confirmed-goods')
   @UseGuards(JwtAuthGuard)
   async getApprovedGoodsList(
@@ -82,6 +84,7 @@ export class LiveShoppingController {
     return this.purchaseMessageService.getAllMessagesAndPrice(liveShoppingId);
   }
 
+  /** 현재 판매중, 방송중인 라이브쇼핑 목록 조회 */
   @Get('now-on-live')
   async getNowPlayingLiveShopping(
     @Query(new ValidationPipe({ transform: true })) dto: FindNowPlayingLiveShoppingDto,
@@ -92,6 +95,9 @@ export class LiveShoppingController {
     return [];
   }
 
+  /**
+   * dto 값에 따라 where 적용하여 라이브쇼핑 목록 조회
+   */
   @Get('list')
   @UseGuards(JwtAuthGuard)
   getLiveShoppings(
@@ -105,6 +111,7 @@ export class LiveShoppingController {
   }
 
   // get라우터가 여러개일 때 순서 유의한다. 위의 get 라우터에 매칭되지 않는 경우 param에 매칭되는지 확인한다
+  /** 특정 라이브쇼핑 정보 조회 */
   @Get(':liveShoppingId')
   public getLiveShopping(
     @Param('liveShoppingId', ParseIntPipe) id: number,
