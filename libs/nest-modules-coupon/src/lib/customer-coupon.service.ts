@@ -64,7 +64,9 @@ export class CustomerCouponService {
   async createCustomerWelcomeCoupon(customerId: number): Promise<CustomerCoupon | null> {
     const welcomeCoupon = await this.prismaService.coupon.findFirst({
       where: { name: '회원가입 3,000원 할인 쿠폰' },
+      orderBy: { createDate: 'desc' }, // 동일한 이름의 쿠폰이 있으면 가장 최근에 만든 쿠폰이 발급되도록
     });
+
     if (!welcomeCoupon) return null;
     return this.createCustomerCoupon({
       couponId: welcomeCoupon.id,

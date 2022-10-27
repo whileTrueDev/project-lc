@@ -47,7 +47,7 @@ export function findApplicableOptionSection(
     const { section_st, section_ed } = optionSorted[i];
     if (
       (section_st <= value && section_ed > value) ||
-      (section_st <= value && section_ed === 0)
+      (section_st <= value && !section_ed) // section_ed가 0 이거나 Null인 경우
     ) {
       foundApplicableOption = optionSorted[i];
       break;
@@ -96,9 +96,9 @@ export function addRepeatShippingOptionCost({
   if (itemOption[key] <= fixedApplyLimit) {
     return baseCost + fixedCost;
   }
-
   const rest = itemOption[key] - fixedApplyLimit; // 고정비용 적용하고 남은 값
   const totalRepeatCost = Math.ceil(rest / repeatCriteria) * repeatCost; // 남은 값은 repeatCriteria 당 repeatCost 적용
+
   return baseCost + fixedCost + totalRepeatCost;
 }
 
@@ -449,6 +449,7 @@ export const calculateShippingCostInCartTable = ({
       });
     }
   }
+
   return shippingCost;
 };
 
