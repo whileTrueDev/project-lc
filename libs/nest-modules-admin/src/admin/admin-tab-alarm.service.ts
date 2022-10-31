@@ -142,6 +142,7 @@ export class AdminTabAlarmSevice {
     };
   }
 
+  /** 관리자가 마지막으로 확인한 데이터 고유번호 저장 */
   async updateLastCheckedData(dto: Record<string, number>): Promise<boolean> {
     await this.prisma.adminLastCheckedData.update({
       where: { id: 1 },
@@ -150,6 +151,7 @@ export class AdminTabAlarmSevice {
     return true;
   }
 
+  /** 관리자가 마지막으로 확인한 데이터 고유번호 조회 */
   async getLastCheckedData(): Promise<LastCheckedDataRes> {
     const data = await this.prisma.adminLastCheckedData.findFirst();
     if (!data) return {};

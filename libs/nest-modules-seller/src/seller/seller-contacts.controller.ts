@@ -27,12 +27,14 @@ import { SellerContactsService } from './seller-contacts.service';
 export class SellerContactsController {
   constructor(private readonly sellerContactsService: SellerContactsService) {}
 
+  /** 판매자의 기본연락처 조회 */
   @UseGuards(JwtAuthGuard)
   @Get()
   public findDefaultContacts(@Query('email') email: string): Promise<SellerContactsDTO> {
     return this.sellerContactsService.findDefaultContacts(email);
   }
 
+  /** 판매자 연락처 등록 */
   @UseGuards(JwtAuthGuard)
   @Post()
   public createContacts(

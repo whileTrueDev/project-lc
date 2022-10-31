@@ -24,6 +24,7 @@ export class BroadcasterPromotionPageContoller {
     private readonly broadcasterPromotionPageService: BroadcasterPromotionPageService,
   ) {}
 
+  /** 방송인 홍보페이지 조회 */
   @Get()
   findPromotionPage(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: Broadcaster['id'],
@@ -31,6 +32,7 @@ export class BroadcasterPromotionPageContoller {
     return this.broadcasterPromotionPageService.findByBroadcasterId(broadcasterId);
   }
 
+  /** 방송인 홍보페이지에 등록된 상품 목록 조회 */
   @Get('goods')
   findPromotionPageGoods(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: Broadcaster['id'],
@@ -39,6 +41,7 @@ export class BroadcasterPromotionPageContoller {
     return this.broadcasterPromotionPageService.findPromotionGoods(broadcasterId, dto);
   }
 
+  /** 방송인 홍보페이지에 표시할 랭킹 정보 조회 */
   @Get('ranking')
   async findRanking(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: Broadcaster['id'],

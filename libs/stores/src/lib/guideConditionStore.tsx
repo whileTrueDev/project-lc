@@ -6,6 +6,7 @@ export interface GuideConditionStore {
   completeStep(): void;
 }
 
+/** 시작가이드 단계별 상태 관리 */
 export const guideConditionStore = create<GuideConditionStore>((set) => ({
   condition: false,
   setCondition: (value: boolean) => {

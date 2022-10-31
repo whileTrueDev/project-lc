@@ -38,7 +38,7 @@ export class ExchangeController {
     return this.exchangeService.createExchange(dto);
   }
 
-  /** 특정 반품요청 상세 조회 */
+  /** 특정 교환요청 상세 조회 */
   @Get(':exchangeCode')
   getExchangeDetail(
     @Param('exchangeCode') exchangeCode: string,

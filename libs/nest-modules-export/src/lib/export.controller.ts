@@ -59,7 +59,9 @@ export class ExportController {
     return this.exportService.getExportDetail(exportCode);
   }
 
-  /** 출고목록조회 - 판매자, 관리자 용 */
+  /** 출고목록조회 - 판매자, 관리자 용
+   * dto.sellerId 값이 있으면, 해당 판매자의 상품이 포함된 출고정보만 조회합니다
+   */
   @Get()
   public getExportList(
     @Query(new ValidationPipe({ transform: true })) dto: FindExportListDto,

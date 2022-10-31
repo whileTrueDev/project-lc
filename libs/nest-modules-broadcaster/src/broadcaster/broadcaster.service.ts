@@ -29,6 +29,7 @@ export class BroadcasterService {
     private readonly imageResizer: ImageResizer,
   ) {}
 
+  /** overlayUrl로 특정 방송인 이메일 조회 */
   async getBroadcasterEmail(overlayUrl: string): Promise<BroadcasterWithoutUserNickName> {
     const dto = await this.prisma.broadcaster.findUnique({
       select: { id: true, email: true },
@@ -37,6 +38,7 @@ export class BroadcasterService {
     return dto;
   }
 
+  /** 전체 방송인 id, 닉네임, 이메일, 홍보페이지, 프로필이미지 url 조회 */
   async getAllBroadcasterIdAndNickname(): Promise<BroadcasterDTO[]> {
     return this.prisma.broadcaster.findMany({
       where: {
@@ -52,9 +54,8 @@ export class BroadcasterService {
     });
   }
 
-  // 로그인 로직에 필요한 함수
   /**
-   * 로그인
+   * 방송인 이메일 로그인 처리
    */
   async login(
     email: string,
@@ -186,7 +187,7 @@ export class BroadcasterService {
     return null;
   }
 
-  /** 모든 방송인 정보 조회 */
+  /** 전체 방송인 정보 조회 */
   public async getBroadcasters(): Promise<Broadcaster[]> {
     const include = {
       broadcasterAddress: true,
@@ -359,6 +360,7 @@ export class BroadcasterService {
     });
   }
 
+  /** 휴면 방송인 소셜로그인 계정 복구 */
   private async restoreInactiveSocialBroadcaster(
     restoreSocialData: BroadcasterSocialAccount,
   ): Promise<BroadcasterSocialAccount> {

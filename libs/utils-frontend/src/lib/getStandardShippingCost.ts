@@ -1,6 +1,7 @@
 import { Decimal } from '@prisma/client/runtime';
 import { GoodsByIdRes } from '@project-lc/shared-types';
 
+/** 기본 배송비 조회 */
 export const getStandardShippingCost = (
   shippingGroup?: GoodsByIdRes['ShippingGroup'],
 ): Decimal => {

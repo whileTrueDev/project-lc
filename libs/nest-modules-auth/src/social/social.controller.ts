@@ -37,7 +37,7 @@ export class SocialController {
     private readonly socialService: SocialService,
   ) {}
 
-  /** email 로 가입된 셀러에 연동된 소셜계정목록 반환 */
+  /** email 로 가입된 사용자에 연동된 소셜계정목록 반환 */
   @UseGuards(JwtAuthGuard)
   @Get('/accounts')
   async getSocialAccounts(
@@ -59,6 +59,7 @@ export class SocialController {
     return this.handleSocialCallback({ req, res, loginMethod: '소셜/구글' });
   }
 
+  /** 구글 계정 연동 해제 */
   @Delete('/google/unlink/:serviceId')
   async googleUnlink(
     @Param('serviceId') serviceId: string,
@@ -80,6 +81,7 @@ export class SocialController {
     return this.handleSocialCallback({ req, res, loginMethod: '소셜/네이버' });
   }
 
+  /** 네이버 계정 연동 해제 */
   @Delete('/naver/unlink/:serviceId')
   async naverUnlink(
     @Param('serviceId') serviceId: string,
@@ -101,6 +103,7 @@ export class SocialController {
     return this.handleSocialCallback({ req, res, loginMethod: '소셜/카카오' });
   }
 
+  /** 카카오 계정 연동 해제 */
   @Delete('/kakao/unlink/:serviceId')
   async kakaoUnlink(
     @Param('serviceId') serviceId: string,
@@ -117,8 +120,11 @@ export class SocialController {
     loginMethod: LoginMethods;
   }): Promise<void> {
     const { req, res, loginMethod } = opts;
+
+    // 소셜로그인 시 SocialLoginUserTypeMiddleware를 통해 쿠키에 추가된 userType 확인
     const userType: UserType = getUserTypeFromRequest(req);
     if (!userType) throw new BadRequestException('userType cookie must be defined');
+
     const userPayload = this.socialService.login(userType, req, res);
     const { nextpage } = req.cookies;
     const hostUrl = this.getFrontUrl(userType);
@@ -130,13 +136,14 @@ export class SocialController {
     // 로그인 기록 생성
     this.loginHistoryService.createLoginStamp(req, loginMethod);
 
+    // 로그인 이후 userType쿠키 삭제
     res.clearCookie(USER_TYPE_KEY);
     res.clearCookie(NEXT_PAGE_PARAM_KEY);
     if (userType === 'customer') return res.redirect(hostUrl + (nextpage || ''));
     return res.redirect(`${hostUrl}/mypage`);
   }
 
-  /** 소셜로그인 userType에 따른 마이페이지 주소 리턴 */
+  /** 소셜로그인 userType에 따른 마이페이지 주소(로그인 이후 이동할 페이지) 리턴 */
   private getFrontUrl(userType: UserType): string {
     let hostUrl: string;
     if (userType === 'broadcaster') {

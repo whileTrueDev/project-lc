@@ -17,6 +17,8 @@ export interface SellerOrderStoreState extends GetOrderListDto {
   selectedOrders: GridRowId[];
   handleOrderSelected: (s: GridSelectionModel) => void;
 }
+
+/** 판매자 주문 필터 상태 관리 */
 export const useSellerOrderStore = create<SellerOrderStoreState>((set, get) => ({
   search: '',
   searchDateType: '주문일',

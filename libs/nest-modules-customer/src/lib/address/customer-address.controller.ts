@@ -40,6 +40,7 @@ export class CustomerAddressController {
     return this.customerAddressService.findMany(customerId);
   }
 
+  /** 특정 소비자의 기본 주소 조회 */
   @Get('/default')
   findDefaultAddress(
     @Param('customerId', ParseIntPipe) customerId: CustomerAddress['id'],

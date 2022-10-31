@@ -18,6 +18,8 @@ export interface ShippingGroupItemStoreState extends ShippingGroupDto {
   removeShippingSet: (id: number) => void;
   reset: () => void;
 }
+
+/** 배송비정책(ShippingGroup) 생성하기 위한 데이터 관리 */
 export const useShippingGroupItemStore = create<ShippingGroupItemStoreState>(
   (set, get) => ({
     shipping_group_name: '',

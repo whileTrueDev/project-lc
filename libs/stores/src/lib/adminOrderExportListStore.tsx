@@ -10,6 +10,7 @@ export interface AdminOrderExportListStore {
   resetSelectedExports: () => void;
 }
 
+/** 관리자 주문 내보내기 기능을 위한 상태 관리 */
 export const useAdminOrderExportListStore = create<AdminOrderExportListStore>((set) => ({
   selectedItems: [],
   onSelectedItemsChange: (newV) => {

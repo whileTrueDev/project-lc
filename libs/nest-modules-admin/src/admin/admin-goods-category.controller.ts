@@ -31,11 +31,13 @@ import {
 export class AdminGoodsCategoryController {
   constructor(private readonly categoryService: GoodsCategoryService) {}
 
+  /** 전체 상품 카테고리 조회 */
   @Get()
   async getCategories(): Promise<AdminGoodsCategoryRes> {
     return this.categoryService.getCategories();
   }
 
+  /** 상품 카테고리 생성 */
   @Post()
   async createCategory(
     @Body(ValidationPipe) dto: CreateGoodsCategoryDto,
@@ -43,6 +45,7 @@ export class AdminGoodsCategoryController {
     return this.categoryService.createCategory(dto);
   }
 
+  /** 특정 상품 카테고리 정보 수정 */
   @Patch(':id')
   async updateCategory(
     @Param('id', ParseIntPipe) id: number,
@@ -51,6 +54,7 @@ export class AdminGoodsCategoryController {
     return this.categoryService.updateCategory(id, dto);
   }
 
+  /** 특정 상품 카테고리 삭제 */
   @Delete(':id')
   async deletePolicy(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
     return this.categoryService.deleteCategory(id);

@@ -18,6 +18,7 @@ export interface SearchDrawerStore {
 
 export const KEYWORD_KEY = 'recentSearchKeyword';
 
+/** 크크쇼 검색 상태 관리 */
 export const useKkshowSearchStore = create<KkshowSearchStore>((set) => ({
   // 검색어
   keywords: [],

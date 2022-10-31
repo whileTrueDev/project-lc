@@ -116,7 +116,7 @@ export class AdminService {
     return confirmedSellers;
   }
 
-  // 관리자 페이지 상품검수 데이터, 상품검수가 완료되지 않은 상태일 경우,
+  // 관리자 페이지 상품검수를 위한 상품목록 데이터 조회
   public async getGoodsInfo({ sort, direction }): Promise<AdminGoodsListRes> {
     const items = await this.prisma.goods.findMany({
       orderBy: [{ [sort]: direction }],
@@ -189,6 +189,7 @@ export class AdminService {
     return goodsConfirmation;
   }
 
+  /** 상품 검수 상태를 '반려'로 변경 */
   public async setGoodsRejection(dto: GoodsRejectionDto): Promise<GoodsConfirmation> {
     const goodsConfirmation = await this.prisma.goodsConfirmation.update({
       where: { goodsId: dto.goodsId },
@@ -205,6 +206,7 @@ export class AdminService {
     return goodsConfirmation;
   }
 
+  /** 라이브쇼핑 정보 수정 */
   public async updateLiveShoppings(
     dto: LiveShoppingUpdateDTO,
     videoId?: number | null,
@@ -293,6 +295,7 @@ export class AdminService {
     return true;
   }
 
+  /** 라이브쇼핑 이미지(캐러셀, 방송예고 이미지) 저장 */
   async upsertLiveShoppingImage({
     liveShoppingId,
     imageType,
@@ -326,6 +329,7 @@ export class AdminService {
     return true;
   }
 
+  /** 라이브쇼핑에 유튜브 영상 주소 등록 */
   public async registVideoUrl(url: string): Promise<number> {
     const videoUrl = await this.prisma.liveShoppingVideo.create({
       data: { youtubeUrl: url || undefined },
@@ -334,6 +338,7 @@ export class AdminService {
     return videoUrl.id;
   }
 
+  /** 라이브쇼핑에서 유튜브 영상 주소 삭제 */
   public async deleteVideoUrl(liveShoppingId: number): Promise<boolean> {
     const videoUrl = await this.prisma.liveShopping.update({
       where: { id: Number(liveShoppingId) },
@@ -393,6 +398,7 @@ export class AdminService {
     return false;
   }
 
+  /** 관리자 계정 모두 조회 */
   public async getAdminUserList(): Promise<AdminClassDto[]> {
     return this.prisma.administrator.findMany({
       select: {
@@ -403,6 +409,7 @@ export class AdminService {
     });
   }
 
+  /** 관리자 계정 권한 수정 */
   public async updateAdminClass(dto: AdminClassDto): Promise<Administrator> {
     return this.prisma.administrator.update({
       where: {
@@ -414,6 +421,7 @@ export class AdminService {
     });
   }
 
+  /** 특정 관리자 계정 삭제 */
   public async deleteAdminUser(id: number): Promise<boolean> {
     const doDelete = await this.prisma.administrator.delete({
       where: {
@@ -424,6 +432,7 @@ export class AdminService {
     return false;
   }
 
+  /** 관리자 계정 권한 수정내역 생성 */
   public async createAdminClassChangeHistory(dto): Promise<AdminClassChangeHistory> {
     return this.prisma.adminClassChangeHistory.create({
       data: {

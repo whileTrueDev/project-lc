@@ -1,5 +1,10 @@
 # nest-modules-order-cancel
 
+@deprecated
+퍼스트몰과 연동하여 서비스하던 때 필요했던 기능으로
+더 이상 사용하지 않는 기능입니다
+
+
 ** order 모듈의 order-cancellation 과 이름이 유사하여 헷갈릴 수 있음 **
 
 판매자의 사정으로 구매자에게 주문취소를 요청해야 하는 경우 

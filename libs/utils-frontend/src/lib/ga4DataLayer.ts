@@ -4,10 +4,10 @@ declare global {
   }
 }
 
-// TODO : 이벤트 별 타입 설정하기 혹은 타입 모듈 있는지 확인하기
 // https://developers.google.com/analytics/devguides/collection/ga4/reference/events#view_item
 // 이벤트별로 필수, 옵션 파라미터 값이 다 다르다
 // 타입정의 되어 있는 게 있을거같다 react-gtm-module ?
+/** 구글애널리틱스4 데이터레이어에 이벤트 데이터 저장 */
 export const pushDataLayer = ({
   event,
   ...rest

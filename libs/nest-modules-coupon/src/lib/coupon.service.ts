@@ -11,7 +11,7 @@ export class CouponService {
     private readonly goodsService: GoodsService,
   ) {}
 
-  /** 쿠폰 상세조회 */
+  /** 특정 쿠폰 상세조회 */
   public async findCoupon(couponId: number): Promise<Coupon> {
     return this.prismaService.coupon.findFirst({
       where: {
@@ -33,7 +33,7 @@ export class CouponService {
     });
   }
 
-  /** 쿠폰 목록 조회 */
+  /** 쿠폰 전체 목록 조회 */
   public async findCoupons(): Promise<Coupon[]> {
     return this.prismaService.coupon.findMany({
       include: {

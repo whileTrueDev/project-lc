@@ -10,7 +10,7 @@ import {
 export class SellerContactsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** 판매자의 기본 연락처 */
+  /** 판매자의 기본 연락처 조회 */
   async findDefaultContacts(email: string): Promise<SellerContactsDTO> {
     const userId = await this.prisma.seller.findFirst({
       where: { email },
@@ -42,7 +42,7 @@ export class SellerContactsService {
     return { contactId: contact.id };
   }
 
-  /** 판매자 연락처 등록 */
+  /** 휴면 판매자 연락처 복구 */
   public async restoreSellerContacts(sellerId): Promise<void> {
     const restoreDatas = await this.prisma.inactiveSellerContacts.findMany({
       where: { sellerId },

@@ -24,18 +24,19 @@ import { CreateOverlayThemeDto } from '@project-lc/shared-types';
 export class AdminOverlayThemeController {
   constructor(private readonly themeService: OverlayThemeService) {}
 
-  /** 목록 조회 */
+  /** 오버레이 테마 목록 조회 */
   @Get('list')
   async getPolicyList(): Promise<OverlayTheme[]> {
     return this.themeService.getList();
   }
 
-  /** 개별조회 */
+  /** 오버레이 테마 개별조회 */
   @Get()
   async getPolicy(@Query('id', ParseIntPipe) id: number): Promise<OverlayTheme> {
     return this.themeService.getTheme(id);
   }
 
+  /** 오버레이 테마 생성 */
   @Post()
   async createPolicy(
     @Body(ValidationPipe) dto: CreateOverlayThemeDto,
@@ -43,6 +44,7 @@ export class AdminOverlayThemeController {
     return this.themeService.createTheme(dto);
   }
 
+  /** 특정 오버레이 테마 삭제 */
   @Delete(':id')
   async deletePolicy(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
     return this.themeService.deleteTheme(id);

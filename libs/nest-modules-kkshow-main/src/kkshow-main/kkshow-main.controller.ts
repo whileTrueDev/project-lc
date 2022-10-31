@@ -6,6 +6,7 @@ import { KkshowMainService } from './kkshow-main.service';
 export class KkshowMainController {
   constructor(private readonly kkshowMainService: KkshowMainService) {}
 
+  /** 크크쇼 메인에 표시될 데이터 조회 */
   @Get()
   getKkshowMainData(): Promise<KkshowMainResData | null> {
     return this.kkshowMainService.read();

@@ -9,13 +9,23 @@ import { PolicyService } from './policy.service';
 export class PolicyController {
   constructor(private readonly policyService: PolicyService) {}
 
-  // * 목록조회
+  /**
+   * 이용약관/개인정보처리방침 목록조회
+   * @param dto.targetUser 방송인, 판매자, 소비자 구분
+   * @param dto.category 이용약관,개인정보처리방침 구분
+   * @returns 실제내용(content)는 제외한 이용약관/개인정보처리방침 목록
+   */
   @Get('list')
   async getPolicyList(@Query() dto: GetPolicyDto): Promise<Omit<Policy, 'content'>[]> {
     return this.policyService.getPolicyListByCategoryAndTarget(dto, { isAdmin: false });
   }
 
-  // * 최신 데이터 1개 조회
+  /**
+   * 이용약관/개인정보처리방침 최신 데이터 조회
+   * @param dto.targetUser 방송인, 판매자, 소비자 구분
+   * @param dto.category 이용약관,개인정보처리방침 구분
+   * @returns 최신 버전의 이용약관/개인정보처리방침
+   */
   @Get()
   async getPolicy(
     @Query(new ValidationPipe({ transform: true })) dto: GetPolicyDto,

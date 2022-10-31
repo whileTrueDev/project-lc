@@ -66,14 +66,14 @@ export class SellerController {
     private readonly prismaService: PrismaService,
   ) {}
 
-  // * 판매자 정보 조회
+  /** 판매자 정보 조회 */
   @Get()
   @UseInterceptors(HttpCacheInterceptor)
   public findOne(@Query(ValidationPipe) dto: FindSellerDto): Promise<FindSellerRes> {
     return this.sellerService.findOne({ email: dto.email });
   }
 
-  // * 판매자 회원가입
+  /** 판매자 회원가입 */
   @Post()
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('seller')
@@ -92,7 +92,7 @@ export class SellerController {
     return seller;
   }
 
-  // * 이메일 주소 중복 체크
+  /** 판매자 이메일 주소 중복 체크 */
   @Get('email-check')
   public async emailDupCheck(
     @Query(ValidationPipe) dto: EmailDupCheckDto,
@@ -100,7 +100,7 @@ export class SellerController {
     return this.sellerService.isEmailDupCheckOk(dto.email);
   }
 
-  // 판매자 계정 삭제
+  /** 판매자 계정 삭제 */
   @UseGuards(JwtAuthGuard)
   @Delete()
   @UseInterceptors(HttpCacheInterceptor)
@@ -115,7 +115,7 @@ export class SellerController {
     return this.sellerService.deleteOne(email);
   }
 
-  // 로그인 한 사람이 본인인증을 위해 비밀번호 확인
+  /** 판매자 비밀번호 확인 (로그인 이후, 정보수정 등 진행할 때 비밀번호 재확인용) */
   @UseGuards(JwtAuthGuard)
   @Post('validate-password')
   public async validatePassword(
@@ -124,7 +124,7 @@ export class SellerController {
     return this.sellerService.checkPassword(dto.email, dto.password);
   }
 
-  // 비밀번호 변경
+  /** 판매자 비밀번호 변경  */
   @Patch('password')
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('seller')
@@ -134,7 +134,7 @@ export class SellerController {
     return this.sellerService.changePassword(dto.email, dto.password);
   }
 
-  // 본인의 정산정보 및 정산 검수 정보 조회
+  /** 로그인 한 판매자 본인의 정산정보 및 정산 검수 정보 조회 */
   @UseGuards(JwtAuthGuard)
   @Get('settlement')
   @UseInterceptors(HttpCacheInterceptor)
@@ -144,7 +144,7 @@ export class SellerController {
     return this.sellerSettlementInfoService.selectSellerSettlementInfo(sellerInfo);
   }
 
-  // 본인의 사업자 등록정보 등록
+  /** 로그인 한 판매자 본인의 사업자 등록정보 등록 */
   @UseGuards(JwtAuthGuard)
   @Post('business-registration')
   @UseInterceptors(HttpCacheInterceptor)
@@ -172,7 +172,7 @@ export class SellerController {
     return result;
   }
 
-  // 본인의 계좌정보 등록
+  /** 로그인 한 판매자 본인의 계좌정보 등록 */
   @UseGuards(JwtAuthGuard)
   @Post('settlement-account')
   @UseInterceptors(HttpCacheInterceptor)
@@ -184,7 +184,7 @@ export class SellerController {
     return this.sellerSettlementInfoService.insertSettlementAccount(dto, sellerInfo);
   }
 
-  // 본인의 정산정보 및 정산 검수 히스토리 조회
+  /** 로그인 한 판매자 본인의 정산정보 및 정산 검수 히스토리 조회 */
   @UseGuards(JwtAuthGuard)
   @Get('settlement/confirmation-history')
   @UseInterceptors(HttpCacheInterceptor)
@@ -194,6 +194,7 @@ export class SellerController {
     return this.sellerSettlementInfoService.getSettlementConfirmHistory(sellerInfo);
   }
 
+  /** 판매자 정산정보/계좌정보 검수 내역 생성 */
   @UseGuards(JwtAuthGuard)
   @Post('settlement/confirmation-history')
   public async InsertSettlementHistory(
@@ -202,6 +203,7 @@ export class SellerController {
     return this.sellerSettlementInfoService.createSettlementConfirmHistory(dto);
   }
 
+  /** 로그인 한 판매자 본인의 상점정보 변경 */
   @UseGuards(JwtAuthGuard)
   @Patch('shop-info')
   @UseInterceptors(HttpCacheInterceptor)
@@ -228,7 +230,7 @@ export class SellerController {
     return this.sellerSettlementService.findSellCommission();
   }
 
-  /** 셀러 아바타 이미지 s3업로드 후 url 저장 */
+  /** 판매자 아바타 이미지 s3업로드 후 url 저장 */
   @Post('/avatar')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
@@ -241,7 +243,7 @@ export class SellerController {
     return this.sellerService.addSellerAvatar(seller.sub, file);
   }
 
-  /** 셀러 아바타 이미지 null로 저장 */
+  /** 판매자 아바타 이미지 null로 저장 */
   @Delete('/avatar')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(HttpCacheInterceptor)
@@ -250,6 +252,7 @@ export class SellerController {
     return this.sellerService.removeSellerAvatar(seller.sub);
   }
 
+  /** 판매자 이용정보 동의여부 변경 */
   @Patch('agreement')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(HttpCacheInterceptor)
@@ -260,6 +263,7 @@ export class SellerController {
     return this.sellerService.updateAgreementFlag(dto);
   }
 
+  /** 판매자 휴면계정 복구 */
   @Patch('restore')
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('seller/settlement')

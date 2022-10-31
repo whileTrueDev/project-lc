@@ -17,6 +17,10 @@ import { OrderItemOptionService } from './orderitemoption.service';
 @Controller('order-item-option')
 export class OrderItemOptionController {
   constructor(private readonly service: OrderItemOptionService) {}
+
+  /** 주문상품옵션의 상태를 변경
+   * 주문에는 여러 상품이 포함되어 있고, 상품마다 상태가 다를 수 있다
+   */
   @Patch(':id')
   public async update(
     @Param('id', ParseIntPipe) id: number,

@@ -85,6 +85,7 @@ export class BroadcasterController {
     return broadcaster;
   }
 
+  /** 휴면 방송인 계정 복구 */
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('channel-list', 'broadcaster/contacts', 'broadcaster/settlement-info')
   @Patch('restore')

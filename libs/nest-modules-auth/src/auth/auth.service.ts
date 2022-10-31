@@ -60,7 +60,7 @@ export class AuthService {
   }
 
   /**
-   * seller의 존재 여부를 확인한다. (local.strategy.ts 파일에서 사용)
+   * 사용자 존재여부 확인하여 로그인처리 (local.strategy.ts 파일에서 사용)
    * @param email 입력한 이메일 문자열
    * @param pwdInput 입력한 패스워드 문자열
    * @returns {SellerPayload} User 인터페이스 객체
@@ -129,6 +129,7 @@ export class AuthService {
     };
   }
 
+  /** 로그인한 유저의 정보를 조회하여 UserProfileRes 형태로 리턴합니다 */
   async getProfile(userPayload: UserPayload, appType: UserType): Promise<UserProfileRes> {
     const { sub, type } = userPayload;
     let user: Seller | Broadcaster | Customer | Administrator;
