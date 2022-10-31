@@ -35,7 +35,7 @@ export class MileageController {
     return this.mileageService.findMileage(id);
   }
 
-  /** 특정 소비자의 마일리지 정보 수정 */
+  /** 특정 소비자의 마일리지 정보 수정(마일리지 사용 처리) */
   @Patch()
   upsertOneMileage(
     @CustomerInfo() { id }: UserPayload,

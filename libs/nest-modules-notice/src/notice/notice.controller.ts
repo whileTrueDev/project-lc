@@ -25,12 +25,14 @@ import { NoticeService } from './notice.service';
 export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 
+  /** target 에 맞는 공지사항 조회(postingFlag: true인 데이터만 조회함) */
   @Get()
   @CacheTTL(60 * 60 * 60) // 1시간
   getNotice(@Query('target') target: NoticeTarget): Promise<Notice[]> {
     return this.noticeService.getNotices(target);
   }
 
+  /** 관리자페이지에서 전체 공지사항 조회(관리자용) */
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Get('/admin')
@@ -38,6 +40,7 @@ export class NoticeController {
     return this.noticeService.getAdminNotices();
   }
 
+  /** 공지사항 생성(관리자용) */
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Post()
@@ -45,6 +48,7 @@ export class NoticeController {
     return this.noticeService.postNotice(dto);
   }
 
+  /** 공지사항 정보 수정(관리자용) */
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Patch()
@@ -52,6 +56,7 @@ export class NoticeController {
     return this.noticeService.patchNotice(dto);
   }
 
+  /** 공지사항 삭제(관리자용) */
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Delete(':id')

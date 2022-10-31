@@ -8,6 +8,7 @@ export interface LiveShoppingRegistForm {
   handleSetDefault(value: boolean): void;
 }
 
+/** 라이브쇼핑 등록 위한 정보(선택된 상품) 관리 */
 export const liveShoppingRegist = create<LiveShoppingRegistForm>((set) => ({
   selectedGoods: null,
   setDefault: true,

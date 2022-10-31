@@ -8,6 +8,8 @@ export interface ICartStore {
   handleSelectAll: (allData: CartItemRes) => void;
   handleUnselectAll: () => void;
 }
+
+/** 크크쇼 장바구니 상태 관리 */
 export const useCartStore = create<ICartStore>((set) => ({
   selectedItems: [],
   handleToggle: (s: CartItemRes[number]) => {

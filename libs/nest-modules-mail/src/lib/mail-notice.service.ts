@@ -11,6 +11,7 @@ export class MailNoticeService {
   private readonly logger = new Logger(MailNoticeService.name);
   constructor(private readonly mailerService: MailerService) {}
 
+  /** 휴면계정 전환 예정 이메일 발송 */
   public async sendPreInactivateMail(users: TargetUser[]): Promise<boolean> {
     try {
       this.logger.debug(`START: sendPreInactivateMail - ${users.join(',')}`);
@@ -32,6 +33,7 @@ export class MailNoticeService {
     }
   }
 
+  /** 휴면 계정 전환 안내 메일 발송 */
   public async sendInactivateMail(users: TargetUser[]): Promise<boolean> {
     try {
       this.logger.debug(`START: sendInactivateMail - ${users.join(',')}`);

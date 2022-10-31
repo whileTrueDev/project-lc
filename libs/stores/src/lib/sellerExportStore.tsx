@@ -10,6 +10,7 @@ export interface SellerExportStore {
   resetSelectedOrderShippings: () => void;
 }
 
+/** 출고 위한 배송비정보 상태 관리 */
 export const sellerExportStore = create<SellerExportStore>((set, get) => ({
   selectedOrderShippings: [],
   handleOrderShippingSelect: ({ shippingId, orderId }, forceConcat) => {

@@ -75,7 +75,8 @@ export class OrderService {
     @Inject(MICROSERVICE_OVERLAY_TOKEN) private readonly microService: ClientProxy,
   ) {}
 
-  /** 선물주문생성시 처리 - 방송인 정보(받는사람 주소, 연락처) 리턴, giftFlag: true 설정 */
+  /** 선물주문생성시 주문정보 처리하는 함수
+   * - 방송인 정보(받는사람 주소, 연락처) 리턴, giftFlag: true 설정 */
   private async handleGiftOrder(
     dto: CreateOrderDto,
   ): Promise<Partial<Prisma.OrderCreateInput>> {
@@ -127,7 +128,7 @@ export class OrderService {
     );
   }
 
-  /** 주문에서 주문자 정보 빈 문자열로 바꿔서 리턴 */
+  /** 주문에서 받는사람 정보 빈 문자열로 바꿔서 리턴(선물하기로 주문 생성시 받는사람 정보가 방송인의 정보로 저장되므로 방송인의 정보가 노출되지 않도록 삭제함) */
   private removeRecipientInfo<T extends Order>(order: T): T {
     return {
       ...order,
@@ -142,6 +143,7 @@ export class OrderService {
 
   /** 주문 상세조회(OrderDetailRes) 데이터에서
    * 출고정보 중 택배사(deliveryCompany), 운송장번호(deliveryNumber) 삭제
+   * => 선물하기 주문의 경우 출고정보에 방송인의 정보가 포함되어 있어 해당 정보가 노출되지 않도록 삭제처리함
    *
    * 주문 목록 조회는 출고데이터를 포함하지 않으므로 주문상세조회 응답값에만 해당 함수 적용함
    * */
@@ -166,7 +168,9 @@ export class OrderService {
     };
   }
 
-  /** 주문에 포함된 배송비정보 생성 */
+  /** 주문에 포함된 배송비정보 생성
+   * 주문에는 여러 상품이 포함될 수 있고, 상품마다 다른 배송비정책을 적용한다
+   */
   async createOrderShippingData(
     orderId: number,
     shippingData: CreateOrderShippingData[],

@@ -78,7 +78,6 @@ export class SellerSettlementInfoService {
    * 휴면 사업자 등록증 confirmation 상태 복구
    * @param sellerId
    */
-
   public async restoreInactiveBusinessRegistrationConfirmation(
     sellerId: Seller['id'],
   ): Promise<BusinessRegistrationConfirmation | null> {
@@ -118,7 +117,6 @@ export class SellerSettlementInfoService {
    * 휴면 사업자 등록증 confirmation 삭제
    * @param sellerId
    */
-
   public async deleteInactiveBusinessRegistrationConfirmation(
     registrationId: number,
   ): Promise<InactiveBusinessRegistrationConfirmation> {
@@ -269,6 +267,7 @@ export class SellerSettlementInfoService {
     return { ...settlementInfo, sellerSettlementAccount: decryptedSettlementAccount };
   }
 
+  /** 판매자 정산정보 / 사업자등록증 / 계좌정보 검수내역 생성 */
   public createSettlementConfirmHistory(dto: ConfirmHistoryDto): Promise<ConfirmHistory> {
     const { type } = dto;
     const { sellerSettlementAccountId } = dto;
@@ -309,6 +308,7 @@ export class SellerSettlementInfoService {
     });
   }
 
+  /** 판매자 정산정보 / 사업자등록증 / 계좌정보 검수내역 조회 */
   public getSettlementConfirmHistory(user: UserPayload): Promise<ConfirmHistory[]> {
     const { type } = user;
     const { id } = user;

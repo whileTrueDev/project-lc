@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 export class NoticeService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // target에 해당하는 공지사항 조회
   public async getNotices(target?: NoticeTarget): Promise<Notice[]> {
     const notice = await this.prisma.notice.findMany({
       where: { postingFlag: true, target: target ? { in: ['all', target] } : undefined },

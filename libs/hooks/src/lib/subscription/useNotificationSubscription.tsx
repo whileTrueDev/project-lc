@@ -9,6 +9,9 @@ import { useQueryClient } from 'react-query';
 import { io, Socket } from 'socket.io-client';
 import axiosInstance from '../../axios';
 
+/**
+ * 알림메시지 소켓 연결 & 이벤트핸들러 등록
+ */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useNotificationSubscription = (
   onCreated?: (newNoti: CreateNotificationDto) => void,

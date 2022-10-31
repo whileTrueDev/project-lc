@@ -25,6 +25,8 @@ interface GoodsViewStore {
   supportNickname: string;
   onSuNickChange: (msg: string) => void;
 }
+
+/** 상품 상세조회 페이지 상태(선택된 상품 옵션, 선택된 후원방송인 정보) 관리 */
 export const useGoodsViewStore = create<GoodsViewStore>((set, get) => ({
   selectedNavIdx: 0,
   handleSelectNav: (num: number) => {

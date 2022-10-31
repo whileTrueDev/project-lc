@@ -19,7 +19,7 @@ export class SellerService {
   ) {}
 
   /**
-   * 회원 가입
+   * 판매자 회원 가입
    */
   async signUp(signUpInput: Prisma.SellerCreateInput): Promise<Seller> {
     const hashedPw = await this.userPwManager.hashPassword(signUpInput.password);
@@ -41,7 +41,7 @@ export class SellerService {
   }
 
   /**
-   * 로그인
+   * 판매자 로그인
    */
   async login(email: string, pwdInput: string): Promise<Seller | InactiveSeller | null> {
     const user = await this.findOne({ email });
@@ -71,7 +71,7 @@ export class SellerService {
   }
 
   /**
-   * 유저 정보 조회
+   * 판매자 정보 조회
    */
   async findOne(findInput: Prisma.SellerWhereUniqueInput): Promise<FindSellerRes> {
     const seller = await this.prisma.seller.findUnique({
@@ -104,7 +104,7 @@ export class SellerService {
   }
 
   /**
-   * 휴면 유저 정보 조회
+   * 휴면 판매자 정보 조회
    */
   async findInactiveOne(
     findInput: Prisma.SellerWhereUniqueInput,
@@ -129,7 +129,7 @@ export class SellerService {
   }
 
   /**
-   * 이메일 주소가 중복되는 지 체크합니다.
+   * 판매자 이메일 주소가 중복되는 지 체크합니다.
    * @param email 중복체크할 이메일 주소
    * @returns {boolean} 중복되지않아 괜찮은 경우 true, 중복된 경우 false
    */
@@ -142,7 +142,7 @@ export class SellerService {
   }
 
   /**
-   * 해당 이메일로 가입된 계정이 삭제될 수 있는지 확인함
+   * 해당 이메일로 가입된 판매자 계정이 삭제될 수 있는지 확인함
    * @throws {Error}
    */
   private async checkCanBeDeletedSeller(email: string): Promise<boolean> {
@@ -171,7 +171,7 @@ export class SellerService {
   }
 
   /**
-   * seller 삭제
+   * 판매자 삭제
    */
   async deleteOne(email: string): Promise<boolean> {
     await this.checkCanBeDeletedSeller(email);
@@ -205,7 +205,7 @@ export class SellerService {
     return seller;
   }
 
-  /** 셀러 아바타 이미지 url 저장 */
+  /** 판매자 아바타 이미지 url 저장 */
   public async addSellerAvatar(
     email: Seller['email'],
     file: Express.Multer.File,
@@ -223,7 +223,7 @@ export class SellerService {
     return true;
   }
 
-  /** 셀러 아바타 이미지 url null 로 초기화 */
+  /** 판매자 아바타 이미지 url null 로 초기화 */
   public async removeSellerAvatar(email: Seller['email']): Promise<boolean> {
     await this.prisma.seller.update({
       where: { email },
@@ -253,6 +253,7 @@ export class SellerService {
     });
   }
 
+  /** 판매자 이용동의 여부 변경 */
   public async updateAgreementFlag(dto: SellerContractionAgreementDto): Promise<Seller> {
     const seller = await this.prisma.seller.update({
       where: { id: dto.id },
@@ -263,7 +264,7 @@ export class SellerService {
     return seller;
   }
 
-  /** 휴면 계정 데이터 복구 */
+  /** 판매자 휴면 계정 데이터 복구 */
   public async restoreInactiveSeller(email: Seller['email']): Promise<Seller> {
     const restoreData = await this.prisma.inactiveSeller.findFirst({
       where: { email },
@@ -291,6 +292,7 @@ export class SellerService {
     });
   }
 
+  /** 휴면 판매자의 소셜로그인 계정 복구 */
   private async restoreInactiveSocialSeller(
     restoreSocialData: SellerSocialAccount,
   ): Promise<SellerSocialAccount> {

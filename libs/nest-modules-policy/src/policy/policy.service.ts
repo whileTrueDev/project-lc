@@ -16,11 +16,15 @@ type PolicyFindOption = {
 export class PolicyService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** 기존 약관/방침 개수 세기 */
   private async countPolicy(where: Prisma.PolicyWhereInput): Promise<number> {
     const policyCount = await this.prisma.policy.count({ where });
     return policyCount;
   }
 
+  /** 다음 버전의 약관/방침 명칭 생성
+   * `{대상}_{이용약관/개인정보처리방침}_{버전}차` 형태
+   */
   private async createNextVersionName({
     category,
     targetUser,
@@ -32,7 +36,7 @@ export class PolicyService {
     return `${targetUserName}_${categoryName}_${count + 1}차`;
   }
 
-  // 생성
+  /** 이용약관/개인정보처리방침 생성  */
   public async createPolicy(dto: CreatePolicyDto): Promise<Policy> {
     const { category, targetUser, version } = dto;
     const nextVersion =
@@ -46,6 +50,7 @@ export class PolicyService {
     return data;
   }
 
+  /** 고유번호로 이용약관/개인정보처리방침 조회 */
   private async findPolicyById(id: number): Promise<Policy> {
     const policy = await this.prisma.policy.findUnique({ where: { id } });
     if (!policy) {
@@ -70,7 +75,7 @@ export class PolicyService {
     }
   }
 
-  /** 수정 */
+  /** 이용약관/개인정보처리방침 수정 */
   public async updatePolicy(policyId: number, dto: UpdatePolicyDto): Promise<Policy> {
     const policy = await this.findPolicyById(policyId);
 
@@ -86,7 +91,7 @@ export class PolicyService {
     return data;
   }
 
-  /** 삭제 */
+  /** 이용약관/개인정보처리방침 삭제 */
   public async deletePolicy(policyId: number): Promise<boolean> {
     const policy = await this.findPolicyById(policyId);
 

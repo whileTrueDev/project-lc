@@ -20,6 +20,7 @@ export interface GoodsRegistStore {
   setSelectedCategories: (categories: GoodsCategory[]) => void;
 }
 
+/** 상품 생성을 위한 정보(상품정보제공고시, 카테고리) 관리 */
 export const goodsRegistStore = create<GoodsRegistStore>((set, get) => ({
   informationNotice: {},
   initializeNotice: (noticeObj: Record<string, string>) => {

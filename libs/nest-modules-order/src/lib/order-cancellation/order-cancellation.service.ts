@@ -28,11 +28,9 @@ export class OrderCancellationService {
     private readonly orderService: OrderService,
   ) {}
 
-  /* 주문취소 생성(소비자가 주문취소 요청 생성) 혹은 완료되지 않은 요청 반환 
-  
-  * 해당 주문에 대해 완료되지 않은 주문취소요청이 있으면 새로 생성하지 않고 완료되지 않은 주문취소요청을 반환 
+  /** 주문취소 생성(소비자가 주문취소 요청 생성) 
+   * 혹은 완료되지 않은 요청 반환 (해당 주문에 대해 완료되지 않은 주문취소요청이 있으면 새로 생성하지 않고 완료되지 않은 주문취소요청을 반환 )
     => 220712 기준, 전체 주문상품옵션 취소만 가능하기 때문에 완료되지 않은 주문취소 요청이 있으면 반환하도록 만들어둠 
-    TODO :주문상품옵션 중 일부만 주문취소할 수 있도록 기능이 변경된다면(하나의 주문에 대해 여러 주문취소요청이 발생할 수 있으므로) 해당 함수명 및 로직 수정 필요
   */
   async findOrCreateOrderCancellation(
     dto: CreateOrderCancellationDto,

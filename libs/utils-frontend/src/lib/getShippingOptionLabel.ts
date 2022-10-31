@@ -1,5 +1,6 @@
 import { ShippingOptionDto } from '@project-lc/shared-types';
 
+/** 배송비 옵션 문구 출력 */
 export function getShippingOptionLabel(
   item: ShippingOptionDto,
   suffix: string,

@@ -13,6 +13,8 @@ export const getOrderDownloadFileName = (): string => {
   const ORDER_DOWNLOAD_DEFAULT_FILENAME = `크크쇼주문목록_${now}`;
   return ORDER_DOWNLOAD_DEFAULT_FILENAME;
 };
+
+/** 주문목록 다운로드 상태 관리 */
 export const useOrderListDownloadStore = create<OrderListDownloadStoreStates>(
   (set, get) => ({
     fileName: getOrderDownloadFileName(),
