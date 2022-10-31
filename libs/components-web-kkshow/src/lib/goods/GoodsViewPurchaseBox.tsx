@@ -436,8 +436,10 @@ function GoodsViewBroadcasterSupportBox({
                     icon={<CloseIcon />}
                   />
                 </Flex>
-                <CustomAvatar src={selectedBc.avatar || ''} />
-                <Text>{selectedBc.userNickname}</Text>
+                <Flex justify="center">
+                  <CustomAvatar src={selectedBc.avatar || ''} />
+                </Flex>
+                <Text align="center">{selectedBc.userNickname}</Text>
                 {ls.data?.some((l) => l.broadcasterId === selectedBc.id) && (
                   <Badge colorScheme="red" variant="solid">
                     현재 LIVE 판매중
