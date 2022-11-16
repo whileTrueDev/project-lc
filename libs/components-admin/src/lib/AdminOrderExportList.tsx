@@ -109,7 +109,7 @@ export function AdminOrderExportList(): JSX.Element {
 
   const { data, isLoading } = useExports({
     withSellerInfo: true,
-    skip: page,
+    skip: pageSize * page,
     take: pageSize,
   });
   useEffect(() => {
