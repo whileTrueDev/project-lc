@@ -7,7 +7,7 @@ import { CustomerCouponLogRes } from '@project-lc/shared-types';
 export class CouponLogService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  /** 모든 쿠폰 사용 내역 조회 */
+  /** (관리자 모듈에서 사용)모든 쿠폰 사용 내역 조회 */
   adminFindCouponLogs(): Promise<CustomerCouponLog[]> {
     return this.prismaService.customerCouponLog.findMany({
       include: {

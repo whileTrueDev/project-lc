@@ -5,6 +5,7 @@ export interface MypageDesktopSidebarStore {
   onToggle: () => void;
 }
 
+/** 마이페이지 사이드바 열림상태 관리 */
 export const mypageDesktopSidebarStore = create<MypageDesktopSidebarStore>(
   (set, get) => ({
     isOpen: true,

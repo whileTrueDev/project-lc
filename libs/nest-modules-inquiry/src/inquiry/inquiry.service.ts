@@ -7,6 +7,7 @@ import { InquiryDtoWithoutReadFlag } from '@project-lc/shared-types';
 export class InquiryService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** 일반문의 생성 */
   async registInquiry(dto: InquiryDtoWithoutReadFlag): Promise<boolean> {
     await this.prisma.inquiry.create({
       data: {
@@ -23,12 +24,14 @@ export class InquiryService {
     return true;
   }
 
+  /** 일반문의 전체 조회 */
   async getInquries(): Promise<Inquiry[]> {
     return this.prisma.inquiry.findMany({
       orderBy: [{ readFlag: 'asc' }, { createDate: 'desc' }],
     });
   }
 
+  /** 일반문의 읽음여부 = 읽음 으로 변경 */
   async updateReadFlag(id: { inquiryId: number }): Promise<boolean> {
     await this.prisma.inquiry.update({
       where: { id: id.inquiryId },

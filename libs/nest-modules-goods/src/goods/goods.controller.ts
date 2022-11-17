@@ -71,7 +71,7 @@ export class GoodsController {
     });
   }
 
-  /** 상품 이미지 생성 */
+  /** 상품 이미지 생성 - s3에 저장된 이미지 url을 저장함 */
   @Post('/image')
   @UseGuards(JwtAuthGuard)
   registGoodsImages(@Body(ValidationPipe) dto: GoodsImageDto[]): Promise<GoodsImages[]> {
@@ -92,7 +92,7 @@ export class GoodsController {
     return this.goodsService.updateGoodsImages(dto);
   }
 
-  /** 상품 목록 조회 - 본인 판매상품만 확인가능 */
+  /** 상품 목록 조회 - 본인 판매상품만 확인가능(@SellerInfo 데코레이터 사용으로 판매자로 로그인했을때만 사용가능) */
   @Get('/list')
   @UseGuards(JwtAuthGuard)
   getGoodsList(
@@ -156,12 +156,13 @@ export class GoodsController {
     return this.goodsService.registGoods(seller.id, dto);
   }
 
+  /** 검수 승인된 모든 상품의 고유번호 조회(상품 노출여부 상관없음) */
   @Get('all-ids')
   getAllGoodsIds(): Promise<AllGoodsIdsRes> {
     return this.goodsService.findAllGoodsIds();
   }
 
-  /** 카테고리코드 기준 상품 간략 정보 목록 조회 */
+  /** 카테고리코드 기준으로 상품 간략 정보 목록 조회 */
   @Get('by-category/:categoryCode')
   getGoodsByCategory(
     @Param('categoryCode') categoryCode: string,

@@ -80,6 +80,7 @@ export class CustomerController {
     return newCustomer;
   }
 
+  /** 소비자 비밀번호 맞는지 확인 */
   @UseGuards(JwtAuthGuard)
   @Post('validate-password')
   public async validatePassword(
@@ -137,6 +138,7 @@ export class CustomerController {
     return this.customerService.removeCustomerAvatar(customer.sub);
   }
 
+  /** 소비자 계정 삭제 */
   @UseInterceptors(HttpCacheInterceptor)
   @Delete(':customerId')
   @UseGuards(JwtAuthGuard)

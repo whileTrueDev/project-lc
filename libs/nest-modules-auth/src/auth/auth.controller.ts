@@ -34,7 +34,10 @@ export class AuthController {
     private readonly mailVerificationService: MailVerificationService,
   ) {}
 
-  // 최초 로그인을 담당할 Router 구현하기
+  /**
+   * 이메일 & 비밀번호 입력으로 로그인
+   * 해당 라우터 실행 전 LocalAuthGuard가 실행됩니다(./strategies/local.strategy.ts)
+   */
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
@@ -59,6 +62,7 @@ export class AuthController {
     return res.status(200).send({ ...loginToken, id: user.id, userType: user.type });
   }
 
+  /** 로그아웃 */
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@Res() res): void {
@@ -66,6 +70,7 @@ export class AuthController {
     res.sendStatus(200);
   }
 
+  /** 로그인한 유저 정보 조회 */
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
@@ -76,7 +81,7 @@ export class AuthController {
     return this.authService.getProfile(req.user, appType);
   }
 
-  // * 인증코드 메일 전송
+  /** 메일로 인증코드 발송 */
   @Post('mail-verification')
   async sendMailVerification(
     @Body(ValidationPipe) dto: SendMailVerificationDto,
@@ -87,7 +92,7 @@ export class AuthController {
     return this.mailVerificationService.sendVerificationMail(dto.email);
   }
 
-  // * 인증코드가 맞는지 확인
+  /** 인증코드가 유효한지 확인 */
   @HttpCode(200)
   @Post('code-verification')
   async verifyCode(

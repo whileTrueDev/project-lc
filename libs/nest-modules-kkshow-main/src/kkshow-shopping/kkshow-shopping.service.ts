@@ -17,10 +17,12 @@ import { parseJsonToGenericType } from '@project-lc/utils';
 export class KkshowShoppingService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** @deprecated */
   private async findFirst(): Promise<KkshowShoppingTab> {
     return this.prisma.kkshowShoppingTab.findFirst();
   }
 
+  /** @deprecated */
   private jsonToResType(data: KkshowShoppingTab): KkshowShoppingTabResData {
     return {
       carousel: parseJsonToGenericType<KkshowShoppingTabResData['carousel']>(
@@ -46,12 +48,14 @@ export class KkshowShoppingService {
     };
   }
 
+  /** @deprecated */
   public async read(): Promise<KkshowShoppingTabResData> {
     const data = await this.findFirst();
     if (data) return this.jsonToResType(data);
     return null;
   }
 
+  /** @deprecated */
   /** 크크쇼메인데이터 생성(데이터가 없는 경우) 혹은 수정(데이터가 존재하는 경우) */
   async upsert(data: KkshowShoppingDto): Promise<KkshowShoppingTabResData> {
     const existData = await this.findFirst();

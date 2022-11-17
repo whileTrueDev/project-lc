@@ -18,6 +18,7 @@ import { FindCustomerDto } from '@project-lc/shared-types';
 export class AdminCustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
+  /** 전체 소비자 조회(관리자용) */
   @Get()
   findAll(
     @Query(new ValidationPipe({ transform: true }))

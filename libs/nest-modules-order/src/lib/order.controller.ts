@@ -41,7 +41,7 @@ import { OrderService } from './order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  /** 구매확정 */
+  /** 구매확정하기 */
   @UseGuards(JwtAuthGuard)
   @Post('purchase-confirm')
   purchaseConfirm(
@@ -50,7 +50,7 @@ export class OrderController {
     return this.orderService.purchaseConfirm(dto);
   }
 
-  /** 주문생성 - 가드 적용하지 않아야 함 */
+  /** 주문생성 - 비회원도 주문이 가능하도록 가드 @UseGuards(JwtAuthGuard) 적용하지 않아야 함 */
   @Post()
   async createOrder(
     @Body('order', new ValidationPipe({ transform: true })) order: CreateOrderDto,
@@ -126,7 +126,7 @@ export class OrderController {
   }
 
   /*
-   * 관리자/판매자 사용
+   * 관리자/판매자 사용 - 주문정보 수정
    */
   @UseGuards(JwtAuthGuard)
   @Patch(':orderId')
@@ -156,8 +156,9 @@ export class OrderController {
     return this.orderService.findAllByBroadcaster(broadcasterId, dto);
   }
 
-  /** 주문생성 전 배송비 조회
-    => 배송비 조회 위한 {주문상품id, 옵션id, 개수}[] 정보를 쿼리스트링으로 받고있다 주문내역이 길면 문제가 생길 우려가 있다..
+  /** 주문을 생성하기 전 주문에 적용될 배송비 조회
+    => 배송비 조회 위한 {주문상품id, 옵션id, 개수}[] 정보를 쿼리스트링으로 받고있다 
+    주문내역이 길면 문제가 생길 우려가 있다
    */
   @Get('/shipping/check')
   checkOrderShippingCost(

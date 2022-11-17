@@ -1,6 +1,7 @@
 import { KkshowShoppingDto, KkshowShoppingTabResData } from '@project-lc/shared-types';
 
-/** 크크쇼메인데이터(js 객체형태)를 KkshowMain dto 형태로 변환 */
+/** @deprecated 쇼핑탭 섹션 사용하면서 더 이상 사용하지 않는 함수임
+ * 크크쇼메인데이터(js 객체형태)를 KkshowMain dto 형태로 변환 */
 export const kkshowShoppingToDto = (
   data: KkshowShoppingTabResData,
 ): KkshowShoppingDto => {

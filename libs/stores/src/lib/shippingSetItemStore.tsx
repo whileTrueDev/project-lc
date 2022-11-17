@@ -31,6 +31,7 @@ export interface ShippingSetItemStoreState extends ShippingSetDto {
   reset: () => void;
 }
 
+/** 배송설정(ShippingSet) 생성하기 위한 데이터 관리 */
 export const useShippingSetItemStore = create<ShippingSetItemStoreState>((set, get) => ({
   shipping_set_code: 'delivery',
   shipping_set_name: '택배',

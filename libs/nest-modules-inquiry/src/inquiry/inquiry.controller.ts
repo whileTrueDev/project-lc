@@ -20,6 +20,7 @@ import { InquiryService } from './inquiry.service';
 export class InquiryController {
   constructor(private readonly inquiryService: InquiryService) {}
 
+  /** 일반문의 전체 조회(관리자가 사용) */
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Get()
@@ -27,11 +28,13 @@ export class InquiryController {
     return this.inquiryService.getInquries();
   }
 
+  /** 일반문의 생성 */
   @Post()
   registInquiry(@Body(ValidationPipe) dto: InquiryDto): Promise<boolean> {
     return this.inquiryService.registInquiry(dto);
   }
 
+  /** 일반문의 읽음여부 수정(관리자가 사용) */
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Patch()

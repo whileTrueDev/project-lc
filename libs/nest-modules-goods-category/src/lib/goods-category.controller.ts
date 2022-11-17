@@ -55,6 +55,7 @@ export class GoodsCategoryController {
     return this.goodsCategoryService.disconnectCategoryOnGoods(dto);
   }
 
+  /** 특정 카테고리 정보 조회(상위, 하위카테고리 정보 포함) */
   @Get(':categoryCode')
   public async getOneCategory(
     @Param('categoryCode') categoryCode: string,

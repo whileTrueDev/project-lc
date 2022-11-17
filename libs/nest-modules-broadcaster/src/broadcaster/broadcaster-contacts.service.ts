@@ -98,6 +98,7 @@ export class BroadcasterContactsService {
     return !!result;
   }
 
+  /** 휴면 방송인 연락처 복구 */
   public async restoreBroadcasterContacts(
     broadcasterId: Broadcaster['id'],
   ): Promise<void> {

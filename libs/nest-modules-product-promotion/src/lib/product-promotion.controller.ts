@@ -7,6 +7,7 @@ import { ProductPromotionService } from './product-promotion.service';
 export class ProductPromotionController {
   constructor(private readonly productPromotionService: ProductPromotionService) {}
 
+  /** goodsId 목록에 연결된 상품홍보 데이터 모두 조회 */
   @Get()
   findAll(
     @Query(new ValidationPipe({ transform: true })) dto: FindProductPromotionsDto,

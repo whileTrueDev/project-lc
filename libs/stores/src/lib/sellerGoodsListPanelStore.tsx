@@ -18,6 +18,7 @@ export interface SellerGoodsListPanelStoreState {
   handleSortChange(event: React.ChangeEvent<HTMLSelectElement>): void;
 }
 
+/** 상품목록 조회 상태 관리 */
 export const useSellerGoodsListPanelStore = create<SellerGoodsListPanelStoreState>(
   (set, get) => ({
     page: 0,

@@ -6,6 +6,7 @@ export interface LiveShoppingStateBoardWindowStore {
   closeWindow: () => void;
 }
 
+/** 방송인센터 현황판 윈도우 객체 상태 관리 */
 export const liveShoppingStateBoardWindowStore =
   create<LiveShoppingStateBoardWindowStore>((set, get) => ({
     _window: null,

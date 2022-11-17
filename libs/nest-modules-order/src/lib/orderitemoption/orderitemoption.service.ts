@@ -7,6 +7,7 @@ import { UpdateOrderItemOptionDto } from '@project-lc/shared-types';
 export class OrderItemOptionService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** 주문옵션상품의 상태를 변경 */
   public async update(
     id: OrderItemOption['id'],
     dto: UpdateOrderItemOptionDto,

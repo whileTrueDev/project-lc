@@ -57,11 +57,13 @@ export class AdminKkshowMainController {
   /** ================================= */
   // 크크쇼메인페이지 관리
   /** ================================= */
+  /** 크크쇼 메인페이지에 표시될 데이터 조회 */
   @Get('kkshow-main')
   async getMainPageData(): Promise<KkshowMainResData | null> {
     return this.kkshowMainService.read();
   }
 
+  /** 크크쇼 메인페이지에 표시될 데이터 생성 혹은 수정 */
   @Post('kkshow-main')
   async upsertMainPageData(@Body() data: KkshowMainDto): Promise<KkshowMainResData> {
     return this.kkshowMainService.upsert(data);
@@ -69,9 +71,9 @@ export class AdminKkshowMainController {
 
   /** ================================= */
   // 크크쇼 쇼핑페이지 관리
+  // 크크쇼 쇼핑페이지는 여러개의 섹션데이터로 구성된다
   /** ================================= */
-
-  /** 전체 섹션 조회 */
+  /** 크크쇼 쇼핑페이지에 표시될 전체 섹션 조회 */
   @Get('kkshow-shopping/sections')
   async getShoppingPageSections(): Promise<KkshowShoppingSectionItem[]> {
     return this.kkshowShoppingService.getSections();
@@ -150,12 +152,14 @@ export class AdminKkshowMainController {
   /** ===================== */
   /** 크크쇼 방송인 목록 관리 */
   /** ===================== */
+  /** 크크쇼.com/bc 페이지에 표시될 방송인 목록 데이터 조회 */
   @UseInterceptors(HttpCacheInterceptor)
   @Get('kkshow-bc-list')
   public async getKkshowBcList(): Promise<KkshowBcList[]> {
     return this.kkshowBcListService.findAll();
   }
 
+  /** 크크쇼.com/bc 페이지에 표시될 방송인 데이터 생성 */
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('kkshow-bc-list')
   @Post('kkshow-bc-list')
@@ -165,6 +169,7 @@ export class AdminKkshowMainController {
     return this.kkshowBcListService.create(dto);
   }
 
+  /** 크크쇼.com/bc 페이지에 표시되는 특정 방송인 데이터 삭제 */
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('kkshow-bc-list')
   @Delete('kkshow-bc-list/:id')
@@ -177,6 +182,7 @@ export class AdminKkshowMainController {
   /** ===================== */
   /** 크크쇼 이벤트팝업 관리 */
   /** ===================== */
+  /** 이벤트 팝업 생성 */
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('kkshow-event-popup')
   @Post('kkshow-event-popup')
@@ -186,6 +192,7 @@ export class AdminKkshowMainController {
     return this.eventPopupService.createEventPopup(dto);
   }
 
+  /** 이벤트 팝업 삭제 */
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('kkshow-event-popup')
   @Delete('kkshow-event-popup/:id')
@@ -205,6 +212,7 @@ export class AdminKkshowMainController {
 
   /**
    * 라이브 임베드 레코드 생성
+   * 크크쇼.com/live-shopping 페이지에 표시(가장 나중에 생성된 정보가 표시됨)될 임베드 방송 정보 생성
    */
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('kkshow-live-embed')

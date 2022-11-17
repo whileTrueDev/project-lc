@@ -7,9 +7,10 @@ import { KkshowEventPopupService } from './kkshow-event-popup.service';
 export class KkshowEventPopupController {
   constructor(private readonly eventPopupService: KkshowEventPopupService) {}
 
+  /** 크크쇼 이벤트 팝업 목록 조회 */
   @UseInterceptors(HttpCacheInterceptor)
   @Get()
-  public getKkshowBcList(): Promise<KkshowEventPopup[]> {
+  public getKkshowEventPopupList(): Promise<KkshowEventPopup[]> {
     return this.eventPopupService.getEventPopupList();
   }
 }

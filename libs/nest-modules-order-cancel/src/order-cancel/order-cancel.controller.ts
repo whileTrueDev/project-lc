@@ -22,6 +22,7 @@ import {
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { OrderCancelService } from './order-cancel.service';
 
+/** @deprecated 더 이상 사용하지 않는 기능입니다 ./readme.md를 참고해주세요 */
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
 @CacheClearKeys('order-cancel')

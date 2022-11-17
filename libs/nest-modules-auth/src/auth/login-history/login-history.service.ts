@@ -11,6 +11,7 @@ export type LoginMethods = '이메일' | '소셜/카카오' | '소셜/네이버'
 export class LoginHistoryService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** 로그인 내역 저장 */
   public async createLoginStamp(
     req: Request,
     loginMethod: LoginMethods,
