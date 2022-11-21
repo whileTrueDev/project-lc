@@ -119,6 +119,10 @@ export function OrderDetail(): JSX.Element {
               <Text>{data.ordererName}</Text>
             </Flex>
             <Flex justifyContent="space-between">
+              <Text>회원여부</Text>
+              <Text>{data.customerId ? '회원' : '비회원'}</Text>
+            </Flex>
+            <Flex justifyContent="space-between">
               <Text>주문자 연락처</Text>
               <Text>{data.ordererPhone}</Text>
             </Flex>
@@ -214,6 +218,12 @@ export function OrderDetail(): JSX.Element {
                         <Avatar size="xs" src={item.support.broadcaster.avatar} />
                         <Text fontSize="sm">
                           방송인: {item.support.broadcaster.userNickname}
+                        </Text>
+                        <Text fontSize="sm">
+                          후원닉네임 :{' '}
+                          {item.support.nickname
+                            ? item.support.nickname
+                            : '정보가 없습니다'}
                         </Text>
                         <Text fontSize="sm">메시지: {item.support.message}</Text>
                       </GridItem>
