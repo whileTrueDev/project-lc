@@ -119,6 +119,10 @@ export function OrderDetail(): JSX.Element {
               <Text>{data.ordererName}</Text>
             </Flex>
             <Flex justifyContent="space-between">
+              <Text>회원여부</Text>
+              <Text>{data.customerId ? '회원' : '비회원'}</Text>
+            </Flex>
+            <Flex justifyContent="space-between">
               <Text>주문자 연락처</Text>
               <Text>{data.ordererPhone}</Text>
             </Flex>
