@@ -215,6 +215,12 @@ export function OrderDetail(): JSX.Element {
                         <Text fontSize="sm">
                           방송인: {item.support.broadcaster.userNickname}
                         </Text>
+                        <Text fontSize="sm">
+                          후원닉네임 :{' '}
+                          {item.support.nickname
+                            ? item.support.nickname
+                            : '정보가 없습니다'}
+                        </Text>
                         <Text fontSize="sm">메시지: {item.support.message}</Text>
                       </GridItem>
                     </>
