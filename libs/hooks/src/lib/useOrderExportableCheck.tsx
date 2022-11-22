@@ -34,13 +34,6 @@ export const useOrderExportableCheck = (order?: OrderDetailRes): OrderExportable
     });
   }, [order?.orderItems]);
 
-  console.log('====isDone====');
-  console.log(isDone);
-  console.log('====isExportable====');
-  console.log(isExportable);
-  console.log('====order====');
-  console.log(order);
-
   if (!order) return { isDone: false, isExportable: false };
   return { isDone, isExportable };
 };
