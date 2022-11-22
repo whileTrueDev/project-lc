@@ -62,8 +62,22 @@ export function ExportOrderOptionList({
   // 주문 출고가능한 지 체크
   const { isDone, isExportable } = useOrderExportableCheck(order.data);
   if (isDone) return null;
-  if (!isExportable) return null;
-  if (order.isLoading) return null;
+  if (!isExportable) {
+    return (
+      <Alert status="warning">
+        <AlertIcon />
+        출고 가능한 상태가 아닙니다.
+      </Alert>
+    );
+  }
+  if (order.isLoading) {
+    return (
+      <Alert status="warning">
+        <AlertIcon />
+        데이터를 로딩중
+      </Alert>
+    );
+  }
   if (!order.data) {
     return (
       <Alert status="warning">
