@@ -87,6 +87,9 @@ export function ExportOrderOptionList({
     );
   }
 
+  console.log('====order.data====');
+  console.log(order.data);
+
   return (
     <Stack pt={2} spacing={4}>
       {order.data.shippings
