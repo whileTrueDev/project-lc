@@ -64,6 +64,11 @@ class MyDocument extends Document {
             name="naver-site-verification"
             content="1b71b20c016704c65fe9a4ffe6815f54103dc3dd"
           />
+          {/* 페이스북 메타태크 */}
+          <meta
+            name="facebook-domain-verification"
+            content="318la5nym43i696t6dm6w63sw0cgzb"
+          />
         </Head>
         <body>
           {/* Google Tag Manager (noscript) */}
