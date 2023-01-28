@@ -12,7 +12,7 @@ COPY ./dist/apps/batch-virtual-account .
 COPY ./libs/prisma-orm/prisma ./prisma
 
 RUN yarn install --prod
-RUN yarn global add prisma@3.11.0
+RUN yarn global add prisma@4.9.0
 RUN prisma generate
 
 CMD NODE_ENV=production node ./main.js

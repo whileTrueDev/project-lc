@@ -9,7 +9,7 @@ COPY ./dist/apps/api .
 COPY ./libs/prisma-orm/prisma ./prisma
 
 
-RUN yarn global add prisma@3.11.0
+RUN yarn global add prisma@4.9.0
 RUN yarn install --prod
 RUN prisma generate
 RUN yarn add argon2@0.28.2
