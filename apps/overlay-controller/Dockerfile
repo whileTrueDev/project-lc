@@ -11,6 +11,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY ./dist/apps/overlay-controller .
 COPY ./libs/prisma-orm/prisma ./prisma
 
+
 RUN yarn install --prod
 RUN yarn global add prisma@3.11.0
 RUN prisma generate
