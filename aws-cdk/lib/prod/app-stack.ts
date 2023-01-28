@@ -98,13 +98,13 @@ export class LCProdAppStack extends Stack {
       repositoryName: repoName,
       lifecycleRules: [
         {
-          maxImageAge: Duration.days(60),
-          description: 'only 60 days for prod images',
+          maxImageAge: Duration.days(365),
+          description: 'only 365 days for prod images',
           tagPrefixList: ['prod-'],
         },
         {
-          maxImageAge: Duration.days(365),
-          description: 'only 365 days for "latest" image',
+          maxImageAge: Duration.days(730),
+          description: 'only 730 days for "latest" image',
           tagPrefixList: ['latest'],
         },
         {
